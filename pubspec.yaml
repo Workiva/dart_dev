@@ -1,0 +1,10 @@
+name: dart_dev
+version: 0.0.0
+dependencies:
+  ansicolor: "^0.0.9"
+  args: "^0.13.0"
+  dart_style: "^0.2.0"
+  test: "^0.12.0"
+  yaml: "^2.1.0"
+executables:
+  dart_dev:
