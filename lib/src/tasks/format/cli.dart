@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/io.dart' show reporter;
+import 'package:dart_dev/util.dart' show hasImmediateDependency, reporter;
 
 import 'package:dart_dev/src/tasks/format/api.dart';
 import 'package:dart_dev/src/tasks/format/config.dart';
@@ -22,6 +22,17 @@ class FormatCli extends TaskCli {
   final String command = 'format';
 
   Future<CliResult> run(ArgResults parsedArgs) async {
+    try {
+      if (!hasImmediateDependency('dart_style')) return new CliResult.fail(
+          'Package "dart_style" must be an immediate dependency in order to run its executables.');
+    } catch (e) {
+      // It's possible that this check may throw if the pubspec.yaml
+      // could not be found or if the yaml could not be parsed.
+      // We silence this error and let the task continue in case it
+      // was a false negative. If it was accurate, then the task will
+      // fail anyway and the error will be available in the output.
+    }
+
     bool check = TaskCli.valueOf('check', parsedArgs, config.format.check);
     List<String> directories = config.format.directories;
 

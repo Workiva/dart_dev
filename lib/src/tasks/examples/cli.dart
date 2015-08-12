@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/io.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter;
 
 import 'package:dart_dev/src/tasks/examples/api.dart';
 import 'package:dart_dev/src/tasks/examples/config.dart';
@@ -28,6 +28,9 @@ class ExamplesCli extends TaskCli {
     if (port is String) {
       port = int.parse(port);
     }
+
+    if (!hasExamples()) return new CliResult.fail(
+        'This project does not have any examples.');
 
     ExamplesTask task = serveExamples(hostname: hostname, port: port);
     reporter.logGroup(task.pubServeCommand, outputStream: task.pubServeOutput);

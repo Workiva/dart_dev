@@ -1,4 +1,4 @@
-library dart_dev.src.io;
+library dart_dev.src.reporter;
 
 import 'dart:async';
 import 'dart:io';
@@ -11,16 +11,6 @@ final AnsiPen _blue = new AnsiPen()..cyan();
 final AnsiPen _green = new AnsiPen()..green();
 final AnsiPen _red = new AnsiPen()..red();
 final AnsiPen _yellow = new AnsiPen()..yellow();
-
-String parseExecutableFromCommand(String command) {
-  return command.split(' ').first;
-}
-
-List<String> parseArgsFromCommand(String command) {
-  var parts = command.split(' ');
-  if (parts.length <= 1) return [];
-  return parts.getRange(1, parts.length).toList();
-}
 
 class Reporter {
   bool color = true;

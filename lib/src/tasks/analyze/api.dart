@@ -3,7 +3,7 @@ library dart_dev.src.tasks.analyze.api;
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dart_dev/process.dart';
+import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/analyze/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';

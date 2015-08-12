@@ -5,9 +5,12 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/io.dart'
-    show parseArgsFromCommand, parseExecutableFromCommand, reporter;
-import 'package:dart_dev/process.dart';
+import 'package:dart_dev/util.dart'
+    show
+        TaskProcess,
+        parseArgsFromCommand,
+        parseExecutableFromCommand,
+        reporter;
 
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
@@ -75,7 +78,16 @@ Future _run(List<String> args) async {
     _parser.addCommand(command, cli.argParser);
   });
 
-  ArgResults env = _parser.parse(args);
+  ArgResults env;
+  try {
+    env = _parser.parse(args);
+  } on FormatException catch (e) {
+    reporter.error('${e.message}\n', shout: true);
+    reporter.log(_generateUsage(), shout: true);
+    exitCode = 1;
+    return;
+  }
+
   String task;
   if (env.command != null) {
     task = env.command.name;

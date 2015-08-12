@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/io.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter;
 
 import 'package:dart_dev/src/tasks/analyze/api.dart';
 import 'package:dart_dev/src/tasks/analyze/config.dart';
