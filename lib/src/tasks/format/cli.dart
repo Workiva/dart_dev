@@ -17,7 +17,9 @@ class FormatCli extends TaskCli {
         defaultsTo: defaultCheck,
         negatable: false,
         help:
-            'Dry-run; checks if formatter needs to be run and sets exit code accordingly.');
+            'Dry-run; checks if formatter needs to be run and sets exit code accordingly.')
+    ..addOption('line-length',
+        abbr: 'l', defaultsTo: '80', help: 'Wrap lines longer than this.');
 
   final String command = 'format';
 
@@ -35,8 +37,14 @@ class FormatCli extends TaskCli {
 
     bool check = TaskCli.valueOf('check', parsedArgs, config.format.check);
     List<String> directories = config.format.directories;
+    var lineLength =
+        TaskCli.valueOf('line-length', parsedArgs, config.format.lineLength);
+    if (lineLength is String) {
+      lineLength = int.parse(lineLength);
+    }
 
-    FormatTask task = format(check: check, directories: directories);
+    FormatTask task =
+        format(check: check, directories: directories, lineLength: lineLength);
     reporter.logGroup(task.formatterCommand,
         outputStream: task.formatterOutput);
     await task.done;
