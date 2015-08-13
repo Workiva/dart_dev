@@ -2,7 +2,7 @@ library dart_dev.src.tasks.test.api;
 
 import 'dart:async';
 
-import 'package:dart_dev/process.dart';
+import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
 

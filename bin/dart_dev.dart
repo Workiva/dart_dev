@@ -3,7 +3,7 @@ library dart_dev.bin.dart_dev;
 import 'dart:io';
 
 import 'package:dart_dev/dart_dev.dart' show dev;
-import 'package:dart_dev/process.dart' show TaskProcess;
+import 'package:dart_dev/util.dart' show TaskProcess;
 
 main(List<String> args) async {
   File devFile = new File('./tool/dev.dart');
