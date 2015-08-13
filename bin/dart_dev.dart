@@ -15,6 +15,7 @@ main(List<String> args) async {
     process.stdout.listen(stdout.writeln);
     process.stderr.listen(stderr.writeln);
     await process.done;
+    exitCode = await process.exitCode;
   } else {
     // Otherwise, run with defaults.
     await dev(args);
