@@ -8,9 +8,13 @@ import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
 FormatTask format(
-    {bool check: defaultCheck, List<String> directories: defaultDirectories}) {
+    {bool check: defaultCheck,
+    List<String> directories: defaultDirectories,
+    int lineLength: defaultLineLength}) {
   var executable = 'pub';
   var args = ['run', 'dart_style:format'];
+
+  args.addAll(['-l', '$lineLength']);
 
   if (check) {
     args.add('-n');
