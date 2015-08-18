@@ -85,7 +85,7 @@ class CoverageCli extends TaskCli {
     reporter.logGroup('Collecting coverage',
         outputStream: task.output, errorStream: task.errorOutput);
     CoverageResult result = await task.done;
-    if (result.successful && open) {
+    if (result.successful && html && open) {
       Process.run('open', [result.reportIndex.path]);
     }
     return result.successful

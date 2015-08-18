@@ -23,8 +23,10 @@ main(args) async {
   config.coverage.reportOn = ['bin/', 'lib/'];
   config.format.directories = directories;
   config.test
-    ..unitTests = []
-    ..integrationTests = ['test/integration/'];
+    ..concurrency = 1
+    ..platforms = ['vm']
+    ..integrationTests = ['test/integration/']
+    ..unitTests = [];
 
   await dev(args);
 }

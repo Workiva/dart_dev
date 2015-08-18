@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+@TestOn('vm')
 library dart_dev.test.integration.copy_license_test;
 
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dart_dev/util.dart' show TaskProcess;
+import 'package:dart_dev/util.dart' show TaskProcess, copyDirectory;
 import 'package:test/test.dart';
 
 const String projectWithLicenses = 'test/fixtures/copy_license/has_licenses';
@@ -28,8 +29,7 @@ const String projectWithoutLicenses = 'test/fixtures/copy_license/no_licenses';
 Future<String> createTemporaryProject(String source) async {
   String tempProject = '${source}_temp';
   Directory temp = new Directory(tempProject);
-  temp.createSync();
-  await Process.run('cp', ['-R', '$source/', tempProject]);
+  copyDirectory(new Directory(source), temp);
   return tempProject;
 }
 

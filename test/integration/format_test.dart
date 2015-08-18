@@ -18,7 +18,7 @@ library dart_dev.test.integration.format_test;
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dart_dev/util.dart' show TaskProcess;
+import 'package:dart_dev/util.dart' show TaskProcess, copyDirectory;
 import 'package:test/test.dart';
 
 const String projectWithChangesNeeded = 'test/fixtures/format/changes_needed';
@@ -71,9 +71,7 @@ void main() {
       // testing purposes (necessary since formatter will make changes).
       String testProject = '${projectWithChangesNeeded}_temp';
       Directory temp = new Directory(testProject);
-      temp.createSync();
-      await Process.run(
-          'cp', ['-R', '$projectWithChangesNeeded/', testProject]);
+      copyDirectory(new Directory(projectWithChangesNeeded), temp);
 
       File dirtyFile = new File('$testProject/lib/main.dart');
       File cleanFile = new File('$projectWithNoChangesNeeded/lib/main.dart');
