@@ -17,6 +17,13 @@ library dart_dev.src.tasks.task;
 import 'dart:async';
 
 abstract class Task {
-  Future get done;
   bool successful;
+  Future<TaskResult> get done;
+}
+
+abstract class TaskResult {
+  bool _successful;
+  TaskResult.fail() : _successful = false;
+  TaskResult.success() : _successful = true;
+  bool get successful => _successful;
 }

@@ -14,6 +14,7 @@
 All Dart (https://dartlang.org) projects eventually share a common set of development requirements:
 
 - Tests (unit, integration, and functional)
+- Code coverage
 - Consistent code formatting
 - Static analysis to detect issues
 - Examples for manual testing/exploration
@@ -57,6 +58,7 @@ static analysis - you just need to know how to use the `dart_dev` tool.
 ## Supported Tasks
 
 - **Tests:** runs test suites (unit, integration, and functional) via the [`test` package test runner](https://github.com/dart-lang/test).
+- **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
 - **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
 - **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
@@ -91,6 +93,9 @@ main(args) async {
   
   // Define the directories where the LICENSE should be applied.
   config.copyLicense.directories = ['example/', 'lib/'];
+
+  // Configure whether or not the HTML coverage report should be generated.
+  config.coverage.html = false;
   
   // Configure the port on which examples should be served.
   config.examples.port = 9000;
@@ -120,6 +125,7 @@ see the help usage. Try it out by running any of the following tasks:
 # with the alias
 ddev analyze
 ddev copy-license
+ddev coverage
 ddev examples
 ddev format
 ddev test
@@ -127,6 +133,7 @@ ddev test
 # without the alias
 pub run dart_dev analyze
 pub run dart_dev copy-license
+pub run dart_dev coverage
 pub run dart_dev examples
 pub run dart_dev format
 pub run dart_dev test
@@ -146,6 +153,7 @@ main(args) async {
   // Available config objects:
   //   config.analyze
   //   config.copyLicense
+  //   config.coverage
   //   config.examples
   //   config.format
   //   config.init
@@ -172,6 +180,15 @@ Name          | Type           | Default    | Description
 `directories` | `List<String>` | `['lib/']` | All source files in these directories will have the LICENSE header applied.
 `licensePath` | `String`       | `LICENSE`  | Path to the source LICENSE file that will be copied to all source files.
 
+### `coverage` config
+All configuration options for the `coverage` task are found on the `config.coverage` object.
+However, the `coverage` task also uses the test suite configuration from the `config.test` object.
+
+Name       | Type           | Default     | Description
+---------- | -------------- | ----------- | -----------
+`html`     | `bool`         | `true`      | Whether or not to generate the HTML report.
+`output`   | `String`       | `coverage/` | Output directory for coverage artifacts.
+`reportOn` | `List<String>` | `['lib/']`  | List of paths to include in the generated coverage report (LCOV and HTML).
 
 ### `examples` Config
 All configuration options for the `examples` task are found on the `config.examples` object.
@@ -220,6 +237,7 @@ Supported tasks:
 
     analyze
     copy-license
+    coverage
     examples
     format
     init
@@ -228,6 +246,7 @@ Supported tasks:
 
 - Static analysis: `ddev analyze`
 - Applying license to source files: `ddev copy-license`
+- Code coverage: `ddev coverage`
 - Serving examples: `ddev examples`
 - Dart formatter: `ddev format`
 - Initialization: `ddev init`
