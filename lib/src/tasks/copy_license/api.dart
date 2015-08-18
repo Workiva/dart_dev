@@ -95,7 +95,8 @@ String licenseForFileType(File file, String license) {
     throw new ArgumentError('Unsupported file type: ${file.path}');
   }
 
-  String l = license.split('\n').map((l) => '$linePrefix$l').join('\n');
+  String l =
+      license.split('\n').map((l) => '$linePrefix$l'.trimRight()).join('\n');
   return '$opening$l$closing\n';
 }
 
