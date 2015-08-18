@@ -17,6 +17,7 @@ All Dart (https://dartlang.org) projects eventually share a common set of develo
 - Consistent code formatting
 - Static analysis to detect issues
 - Examples for manual testing/exploration
+- Applying a LICENSE file to all source files
 
 Together, the Dart SDK and a couple of packages from the Dart team supply the necessary tooling to support the above
 requirements. But, the usage is inconsistent, configuration is limited to command-line arguments, and you inevitably end
@@ -59,6 +60,7 @@ static analysis - you just need to know how to use the `dart_dev` tool.
 - **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
 - **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
+- **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 
 
 ## Getting Started
@@ -87,6 +89,9 @@ main(args) async {
   // Define the entry points for static analysis.
   config.analyze.entryPoints = ['lib/', 'test/', 'tool/'];
   
+  // Define the directories where the LICENSE should be applied.
+  config.copyLicense.directories = ['example/', 'lib/'];
+  
   // Configure the port on which examples should be served.
   config.examples.port = 9000;
   
@@ -114,12 +119,14 @@ see the help usage. Try it out by running any of the following tasks:
 ```
 # with the alias
 ddev analyze
+ddev copy-license
 ddev examples
 ddev format
 ddev test
 
 # without the alias
 pub run dart_dev analyze
+pub run dart_dev copy-license
 pub run dart_dev examples
 pub run dart_dev format
 pub run dart_dev test
@@ -138,6 +145,7 @@ import 'package:dart_dev/dart_dev.dart';
 main(args) async {
   // Available config objects:
   //   config.analyze
+  //   config.copyLicense
   //   config.examples
   //   config.format
   //   config.init
@@ -155,6 +163,15 @@ Name            | Type           | Default    | Description
 `entryPoints`   | `List<String>` | `['lib/']` | Entry points to analyze. Items in this list can be directories and/or files. Directories will be expanded (depth=1) to find Dart files.
 `fatalWarnings` | `bool`         | `true`     | Treat non-type warnings as fatal.
 `hints`         | `bool`         | `true`     | Show hint results.
+
+### `copy-license` Config
+All configuration options for the `copy-license` task are found on the `config.copyLicense` object.
+
+Name          | Type           | Default    | Description
+------------- | -------------- | ---------- | -----------
+`directories` | `List<String>` | `['lib/']` | All source files in these directories will have the LICENSE header applied.
+`licensePath` | `String`       | `LICENSE`  | Path to the source LICENSE file that will be copied to all source files.
+
 
 ### `examples` Config
 All configuration options for the `examples` task are found on the `config.examples` object.
@@ -202,6 +219,7 @@ Usage: pub run dart_dev [task] [options]
 Supported tasks:
 
     analyze
+    copy-license
     examples
     format
     init
@@ -209,6 +227,7 @@ Supported tasks:
 ```
 
 - Static analysis: `ddev analyze`
+- Applying license to source files: `ddev copy-license`
 - Serving examples: `ddev examples`
 - Dart formatter: `ddev format`
 - Initialization: `ddev init`

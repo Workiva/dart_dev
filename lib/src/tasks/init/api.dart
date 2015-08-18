@@ -16,6 +16,7 @@ main(List<String> args) async {
 
   // Available task configurations:
   // config.analyze
+  // config.copyLicense
   // config.examples
   // config.format
   // config.test

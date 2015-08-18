@@ -1,0 +1,92 @@
+library dart_dev.src.tasks.copy_license.api;
+
+import 'dart:async';
+import 'dart:io';
+
+import 'package:dart_dev/src/tasks/copy_license/config.dart';
+import 'package:dart_dev/src/tasks/task.dart';
+
+CopyLicenseTask copyLicense(
+    {List<String> directories: defaultDirectories,
+    String licensePath: defaultLicensePath}) {
+  CopyLicenseTask task = new CopyLicenseTask();
+
+  File license = new File(licensePath);
+  if (!license.existsSync()) throw new Exception(
+      'License file "$licensePath" does not exist.');
+
+  String licenseContents = license.readAsStringSync();
+  directories.forEach((path) {
+    Directory dir = new Directory(path);
+    if (!dir.existsSync()) return;
+    Iterable<File> files =
+        dir.listSync(recursive: true).where((e) => e is File);
+    files.forEach((file) {
+      // Skip files in packages/ directory
+      if (file.path.contains('/packages/')) return;
+
+      if (applyLicense(file, licenseContents)) {
+        task.affectedFiles.add(file.path);
+      }
+    });
+  });
+
+  task.successful = true;
+  return task;
+}
+
+bool applyLicense(File file, String license) {
+  if (hasLicense(file, license)) return false;
+
+  String fileLicense;
+  try {
+    fileLicense = licenseForFileType(file, license);
+  } catch (e) {
+    return false;
+  }
+
+  String fileContents = file.readAsStringSync();
+  file.writeAsStringSync('$fileLicense\n$fileContents');
+  return true;
+}
+
+bool hasLicense(File file, String license) {
+  String licenseHeader = license.split('\n').first;
+  String fileContents = file.readAsStringSync();
+  Iterable<String> lines = fileContents.split('\n');
+  if (lines.isEmpty) return false;
+  if (lines.first.contains(licenseHeader)) return true;
+  if (lines.length <= 1) return false;
+  if (lines.elementAt(1).contains(licenseHeader)) return true;
+  return false;
+}
+
+String licenseForFileType(File file, String license) {
+  String opening = '';
+  String closing = '';
+  String linePrefix = '';
+
+  if (file.path.endsWith('.css')) {
+    opening = '/**\n';
+    linePrefix = ' * ';
+    closing = '\n */';
+  } else if (file.path.endsWith('.dart')) {
+    linePrefix = '// ';
+  } else if (file.path.endsWith('.html')) {
+    opening = '<!--\n';
+    closing = '\n-->';
+  } else if (file.path.endsWith('.js')) {
+    linePrefix = '// ';
+  } else {
+    throw new ArgumentError('Unsupported file type: ${file.path}');
+  }
+
+  String l = license.split('\n').map((l) => '$linePrefix$l').join('\n');
+  return '$opening$l$closing\n';
+}
+
+class CopyLicenseTask extends Task {
+  List<String> affectedFiles = [];
+  final Future done = new Future.value();
+  CopyLicenseTask();
+}
