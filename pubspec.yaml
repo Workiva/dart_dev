@@ -1,5 +1,14 @@
 name: dart_dev
 version: 0.0.0
+description: Centralized tooling for Dart projects. Consistent interface across projects. Easily configurable.
+authors:
+  - Workiva Client Platform Team <clientplatform@workiva.com>
+  - Dustin Lessard <dustin.lessard@workiva.com>
+  - Evan Weible <evan.weible@workiva.com>
+  - Jay Udey <jay.udey@workiva.com>
+  - Max Peterson <maxwell.peterson@workiva.com>
+  - Trent Grover <trent.grover@workiva.com>
+homepage: https://github.com/Workiva/dart_dev
 dependencies:
   ansicolor: "^0.0.9"
   args: "^0.13.0"
@@ -10,3 +19,5 @@ dependencies:
   yaml: "^2.1.0"
 executables:
   dart_dev:
+environment:
+  sdk: ">=1.9.0 <2.0.0"
