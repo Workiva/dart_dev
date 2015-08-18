@@ -20,6 +20,7 @@ main(args) async {
   var directories = ['bin/', 'lib/', 'test/integration/', 'tool/'];
   config.analyze.entryPoints = directories;
   config.copyLicense.directories = directories;
+  config.coverage.reportOn = ['bin/', 'lib/'];
   config.format.directories = directories;
   config.test
     ..unitTests = []

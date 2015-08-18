@@ -14,9 +14,30 @@
 
 library dart_dev.src.util;
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:yaml/yaml.dart';
+
+/// Returns an open port by creating a temporary Socket.
+/// Borrowed from coverage package https://github.com/dart-lang/coverage/blob/master/lib/src/util.dart#L49-L66
+Future<int> getOpenPort() async {
+  ServerSocket socket;
+
+  try {
+    socket = await ServerSocket.bind(InternetAddress.LOOPBACK_IP_V4, 0);
+  } catch (_) {
+    // try again v/ V6 only. Slight possibility that V4 is disabled
+    socket = await ServerSocket.bind(InternetAddress.LOOPBACK_IP_V6, 0,
+        v6Only: true);
+  }
+
+  try {
+    return socket.port;
+  } finally {
+    await socket.close();
+  }
+}
 
 bool hasImmediateDependency(String packageName) {
   File pubspec = new File('pubspec.yaml');
