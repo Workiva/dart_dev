@@ -127,6 +127,7 @@ Future _run(List<String> args) async {
     reporter.success(result.message, shout: true);
   } else {
     reporter.error(result.message, shout: true);
+    exitCode = 1;
   }
 }
 

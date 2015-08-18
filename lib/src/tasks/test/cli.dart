@@ -42,18 +42,20 @@ class TestCli extends TaskCli {
 
     List<String> tests = [];
     if (unit) {
-      if (config.test.unitTests.isEmpty) {
-        return new CliResult.fail(
-            'This project does not specify any unit tests.');
-      }
       tests.addAll(config.test.unitTests);
     }
     if (integration) {
-      if (config.test.integrationTests.isEmpty) {
+      tests.addAll(config.test.integrationTests);
+    }
+    if (tests.isEmpty) {
+      if (unit && config.test.unitTests.isEmpty) {
+        return new CliResult.fail(
+            'This project does not specify any unit tests.');
+      }
+      if (integration && config.test.integrationTests.isEmpty) {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
       }
-      tests.addAll(config.test.integrationTests);
     }
 
     TestTask task = test(platforms: platforms, tests: tests);

@@ -10,11 +10,17 @@ class TaskProcess {
   Completer _outc = new Completer();
   Completer<int> _procExitCode = new Completer();
 
+  Process _process;
+
   StreamController<String> _stdout = new StreamController();
   StreamController<String> _stderr = new StreamController();
 
-  TaskProcess(String executable, List<String> arguments) {
-    Process.start(executable, arguments).then((process) {
+  TaskProcess(String executable, List<String> arguments,
+      {String workingDirectory}) {
+    Process
+        .start(executable, arguments, workingDirectory: workingDirectory)
+        .then((process) {
+      _process = process;
       process.stdout
           .transform(UTF8.decoder)
           .transform(new LineSplitter())
@@ -37,4 +43,7 @@ class TaskProcess {
 
   Stream<String> get stderr => _stderr.stream;
   Stream<String> get stdout => _stdout.stream;
+
+  bool kill([ProcessSignal signal = ProcessSignal.SIGTERM]) =>
+      _process.kill(signal);
 }
