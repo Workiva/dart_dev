@@ -71,7 +71,10 @@ static analysis - you just need to know how to use the `dart_dev` tool.
 Add the following to your `pubspec.yaml`:
 ```yaml
 dev_dependencies:
-  dart_dev: any
+  coverage: "^0.7.2"
+  dart_dev: "^1.0.0"
+  dart_style: "^0.2.0"
+  test: "^0.12.0"
 ```
 
 ###### Create an Alias (optional)
