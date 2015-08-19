@@ -33,7 +33,7 @@ Future<bool> runCoverage(String projectPath) async {
     oldCoverage.deleteSync(recursive: true);
   }
 
-  List args = ['run', 'dart_dev', 'coverage', '--no-open'];
+  List args = ['run', 'dart_dev', 'coverage', '--no-html'];
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
 

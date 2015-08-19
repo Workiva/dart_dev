@@ -32,6 +32,10 @@ class TestCli extends TaskCli {
     ..addFlag('integration',
         defaultsTo: defaultIntegration,
         help: 'Includes the integration test suite.')
+    ..addOption('concurrency',
+        abbr: 'j',
+        defaultsTo: '$defaultConcurrency',
+        help: 'The number of concurrent test suites run.')
     ..addOption('platform',
         abbr: 'p',
         allowMultiple: true,
@@ -46,6 +50,11 @@ class TestCli extends TaskCli {
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
+    var concurrency =
+        TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
+    if (concurrency is String) {
+      concurrency = int.parse(concurrency);
+    }
     List<String> platforms =
         TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
 
@@ -72,7 +81,8 @@ class TestCli extends TaskCli {
       }
     }
 
-    TestTask task = test(platforms: platforms, tests: tests);
+    TestTask task =
+        test(tests: tests, concurrency: concurrency, platforms: platforms);
     reporter.logGroup(task.testCommand, outputStream: task.testOutput);
     await task.done;
     return task.successful

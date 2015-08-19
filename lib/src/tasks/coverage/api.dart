@@ -38,16 +38,18 @@ class CoverageResult extends TaskResult {
       {Directory report})
       : super.fail(),
         this.report = report,
-        reportIndex =
-            report != null ? new File('${report.path}/index.html') : null;
+        reportIndex = report != null
+            ? new File(path.join(report.path, 'index.html'))
+            : null;
 
   CoverageResult.success(
       Iterable<String> this.tests, File this.collection, File this.lcov,
       {Directory report})
       : super.success(),
         this.report = report,
-        reportIndex =
-            report != null ? new File('${report.path}/index.html') : null;
+        reportIndex = report != null
+            ? new File(path.join(report.path, 'index.html'))
+            : null;
 }
 
 class CoverageTask extends Task {
@@ -204,7 +206,7 @@ class CoverageTask extends Task {
     List<File> collections = [];
     for (int i = 0; i < _files.length; i++) {
       File collection = new File(path.join(
-          '${_outputDirectory.path}/collection', '${_files[i].path}.json'));
+          _outputDirectory.path, 'collection', '${_files[i].path}.json'));
       int observatoryPort;
 
       // Run the test and obtain the observatory port for coverage collection.
@@ -243,8 +245,7 @@ class CoverageTask extends Task {
   }
 
   Future _format(List<String> reportOn) async {
-    _lcov = new File('${_outputDirectory.path}/coverage.lcov');
-    _lcov.createSync();
+    _lcov = new File(path.join(_outputDirectory.path, 'coverage.lcov'));
 
     String executable = 'pub';
     List args = [
@@ -268,6 +269,16 @@ class CoverageTask extends Task {
     process.stdout.listen((l) => _coverageOutput.add('    $l'));
     process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
     await process.done;
+
+    if (lcov.existsSync()) {
+      _coverageOutput.add('');
+      _coverageOutput.add('Coverage formatted to LCOV: ${lcov.path}');
+    } else {
+      String error =
+          'Coverage formatting failed. Could not generate ${lcov.path}';
+      _coverageErrorOutput.add(error);
+      throw new Exception(error);
+    }
   }
 
   Future _generateReport() async {
@@ -303,7 +314,7 @@ class CoverageTask extends Task {
       collections[i].deleteSync();
     }
 
-    File coverage = new File('${_outputDirectory.path}/coverage.json');
+    File coverage = new File(path.join(_outputDirectory.path, 'coverage.json'));
     if (coverage.existsSync()) {
       coverage.deleteSync();
     }
@@ -392,10 +403,19 @@ class CoverageTask extends Task {
       _coverageOutput.add('$executable ${args.join(' ')}\n');
       TaskProcess process =
           _lastTestProcess = new TaskProcess('content_shell', args);
-      process.stdout.listen((l) => _coverageOutput.add('    $l'));
 
+      // Content-shell dumps render tree to stderr, which is where the test
+      // results will be. The observatory port should be output to stderr as
+      // well, but it is sometimes malformed. In those cases, the correct
+      // observatory port is output to stdout. So we listen to both.
       int observatoryPort;
-      // Note: content-shell dumps render tree to stderr.
+      process.stdout.listen((line) {
+        _coverageOutput.add('    $line');
+        if (line.contains(_observatoryPortPattern)) {
+          Match m = _observatoryPortPattern.firstMatch(line);
+          observatoryPort = int.parse(m.group(2));
+        }
+      });
       await for (String line in process.stderr) {
         _coverageOutput.add('    $line');
         if (line.contains(_observatoryFailPattern)) {

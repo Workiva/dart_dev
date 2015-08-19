@@ -1,4 +1,5 @@
 # Dart Dev Tools
+[![Build Status](https://travis-ci.org/Workiva/dart_dev.svg?branch=master)](https://travis-ci.org/Workiva/dart_dev)
 
 > Centralized tooling for Dart projects. Consistent interface across projects. Easily configurable.
 
@@ -214,6 +215,7 @@ All configuration options for the `test` task are found on the `config.test` obj
 
 Name               | Type           | Default     | Description
 ------------------ | -------------- | ----------- | -----------
+`concurrency`      | `int`          | `4`         | Number of concurrent test suites run.
 `integrationTests` | `List<String>` | `[]`        | Integration test locations. Items in this list can be directories and/or files.
 `platforms`        | `List<String>` | `[]`        | Platforms on which to run the tests (handled by the Dart test runner). See https://github.com/dart-lang/test#platform-selector-syntax for a full list of supported platforms.
 `unitTests`        | `List<String>` | `['test/']` | Unit test locations. Items in this list can be directories and/or files.

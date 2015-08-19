@@ -17,7 +17,33 @@ library dart_dev.src.util;
 import 'dart:async';
 import 'dart:io';
 
+import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
+
+void copyDirectory(Directory source, Directory dest) {
+  if (!dest.existsSync()) {
+    dest.createSync(recursive: true);
+  }
+
+  source.listSync(recursive: true).forEach((entity) {
+    if (FileSystemEntity.isDirectorySync(entity.path)) {
+      Directory orig = entity;
+      String p = path.relative(orig.path, from: source.path);
+      p = path.join(dest.path, p);
+      Directory copy = new Directory(p);
+      if (!copy.existsSync()) {
+        copy.createSync(recursive: true);
+      }
+    } else if (FileSystemEntity.isFileSync(entity.path)) {
+      File orig = entity;
+      String p = path.relative(orig.path, from: source.path);
+      p = path.join(dest.path, p);
+      File copy = new File(p);
+      copy.createSync(recursive: true);
+      copy.writeAsBytesSync(orig.readAsBytesSync());
+    }
+  });
+}
 
 /// Returns an open port by creating a temporary Socket.
 /// Borrowed from coverage package https://github.com/dart-lang/coverage/blob/master/lib/src/util.dart#L49-L66
