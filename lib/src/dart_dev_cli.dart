@@ -62,6 +62,7 @@ dev(List<String> args) async {
   registerTask(new TestCli(), config.test);
 
   await _run(args);
+  exit(exitCode);
 }
 
 void registerTask(TaskCli cli, TaskConfig config) {
