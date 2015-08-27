@@ -2,4 +2,6 @@
 packages
 pubspec.lock
 
-coverage/
+/coverage/
+/test/fixtures/coverage/browser/coverage/
+/test/fixtures/coverage/vm/coverage/

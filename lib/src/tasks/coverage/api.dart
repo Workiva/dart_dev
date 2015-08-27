@@ -21,7 +21,9 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show Reporter, TaskProcess, getOpenPort;
 import 'package:path/path.dart' as path;
 
+import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/coverage/config.dart';
+import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
 const String _testFilePattern = '_test.dart';
@@ -67,16 +69,9 @@ class CoverageTask extends Task {
       String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) async {
     CoverageTask coverage =
-        new CoverageTask._(tests, html: html, output: output);
-    await coverage._collect();
-    await coverage._format(reportOn);
-
-    if (html) {
-      await coverage._generateReport();
-    }
-    return new CoverageResult.success(
-        coverage.tests, coverage.collection, coverage.lcov,
-        report: coverage.report);
+        new CoverageTask._(tests, reportOn, html: html, output: output);
+    await coverage._run();
+    return coverage.done;
   }
 
   /// Collect and format coverage for the given suite of [tests]. The
@@ -96,22 +91,8 @@ class CoverageTask extends Task {
       String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) {
     CoverageTask coverage =
-        new CoverageTask._(tests, html: html, output: output);
-
-    // Execute the coverage collection and formatting, but don't wait on it.
-    () async {
-      await coverage._collect();
-      await coverage._format(reportOn);
-
-      if (html) {
-        await coverage._generateReport();
-      }
-      CoverageResult result = new CoverageResult.success(
-          coverage.tests, coverage.collection, coverage.lcov,
-          report: coverage.report);
-      coverage._done.complete(result);
-    }();
-
+        new CoverageTask._(tests, reportOn, html: html, output: output);
+    coverage._run();
     return coverage;
   }
 
@@ -135,6 +116,9 @@ class CoverageTask extends Task {
   /// searching all directories for valid test files.
   List<File> _files = [];
 
+  /// Whether or not to generate the HTML report.
+  bool _html = defaultHtml;
+
   /// File created to run the test in a browser. Need to store it so it can be
   /// cleaned up after the test finishes.
   File _lastHtmlFile;
@@ -146,9 +130,14 @@ class CoverageTask extends Task {
   /// Directory to output all coverage related artifacts.
   Directory _outputDirectory;
 
-  CoverageTask._(List<String> tests,
+  /// List of directories on which coverage should be reported.
+  List<String> _reportOn;
+
+  CoverageTask._(List<String> tests, List<String> reportOn,
       {bool html: defaultHtml, String output: defaultOutput})
-      : _outputDirectory = new Directory(output) {
+      : _html = html,
+        _outputDirectory = new Directory(output),
+        _reportOn = reportOn {
     // Build the list of test files.
     tests.forEach((path) {
       if (path.endsWith(_testFilePattern) &&
@@ -212,7 +201,7 @@ class CoverageTask extends Task {
       // Run the test and obtain the observatory port for coverage collection.
       try {
         observatoryPort = await _test(_files[i]);
-      } on TestException {
+      } on CoverageTestSuiteException {
         _coverageErrorOutput.add('Tests failed: ${_files[i].path}');
         continue;
       }
@@ -244,7 +233,7 @@ class CoverageTask extends Task {
     _collection = _merge(collections);
   }
 
-  Future _format(List<String> reportOn) async {
+  Future _format() async {
     _lcov = new File(path.join(_outputDirectory.path, 'coverage.lcov'));
 
     String executable = 'pub';
@@ -259,7 +248,7 @@ class CoverageTask extends Task {
       lcov.path,
       '--verbose'
     ];
-    args.addAll(reportOn.map((p) => '--report-on=$p'));
+    args.addAll(_reportOn.map((p) => '--report-on=$p'));
 
     _coverageOutput.add('');
     _coverageOutput.add('Formatting coverage');
@@ -321,6 +310,23 @@ class CoverageTask extends Task {
     coverage.createSync();
     coverage.writeAsStringSync(JSON.encode(mergedJson));
     return coverage;
+  }
+
+  Future _run() async {
+    if (_html && !(await platform_util.isExecutableInstalled('lcov'))) {
+      _done.completeError(new MissingLcovException());
+      return;
+    }
+
+    await _collect();
+    await _format();
+
+    if (_html) {
+      await _generateReport();
+    }
+
+    _done.complete(
+        new CoverageResult.success(tests, collection, lcov, report: report));
   }
 
   Future<int> _test(File file) async {
@@ -419,14 +425,14 @@ class CoverageTask extends Task {
       await for (String line in process.stderr) {
         _coverageOutput.add('    $line');
         if (line.contains(_observatoryFailPattern)) {
-          throw new TestException();
+          throw new CoverageTestSuiteException(file.path);
         }
         if (line.contains(_observatoryPortPattern)) {
           Match m = _observatoryPortPattern.firstMatch(line);
           observatoryPort = int.parse(m.group(2));
         }
         if (line.contains(_testsFailedPattern)) {
-          throw new TestException();
+          throw new CoverageTestSuiteException(file.path);
         }
         if (line.contains(_testsPassedPattern)) {
           break;
@@ -451,10 +457,10 @@ class CoverageTask extends Task {
       await for (String line in process.stdout) {
         _coverageOutput.add('    $line');
         if (line.contains(_observatoryFailPattern)) {
-          throw new TestException();
+          throw new CoverageTestSuiteException(file.path);
         }
         if (line.contains(_testsFailedPattern)) {
-          throw new TestException();
+          throw new CoverageTestSuiteException(file.path);
         }
         if (line.contains(_testsPassedPattern)) {
           break;
@@ -465,5 +471,3 @@ class CoverageTask extends Task {
     }
   }
 }
-
-class TestException implements Exception {}

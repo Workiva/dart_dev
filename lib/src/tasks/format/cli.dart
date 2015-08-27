@@ -18,8 +18,9 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show hasImmediateDependency, reporter;
+import 'package:dart_dev/util.dart' show reporter;
 
+import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/format/api.dart';
 import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -39,7 +40,8 @@ class FormatCli extends TaskCli {
 
   Future<CliResult> run(ArgResults parsedArgs) async {
     try {
-      if (!hasImmediateDependency('dart_style')) return new CliResult.fail(
+      if (!platform_util
+          .hasImmediateDependency('dart_style')) return new CliResult.fail(
           'Package "dart_style" must be an immediate dependency in order to run its executables.');
     } catch (e) {
       // It's possible that this check may throw if the pubspec.yaml

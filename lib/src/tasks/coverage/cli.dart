@@ -19,12 +19,14 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show hasImmediateDependency, reporter;
+import 'package:dart_dev/util.dart' show reporter;
 
+import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/coverage/api.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
+import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
 
 class CoverageCli extends TaskCli {
@@ -46,7 +48,8 @@ class CoverageCli extends TaskCli {
   final String command = 'coverage';
 
   Future<CliResult> run(ArgResults parsedArgs) async {
-    if (!hasImmediateDependency('coverage')) return new CliResult.fail(
+    if (!platform_util
+        .hasImmediateDependency('coverage')) return new CliResult.fail(
         'Package "coverage" must be an immediate dependency in order to run its executables.');
 
     bool unit = parsedArgs['unit'];
@@ -78,13 +81,19 @@ class CoverageCli extends TaskCli {
       }
     }
 
-    CoverageTask task = CoverageTask.start(tests,
-        html: html,
-        output: config.coverage.output,
-        reportOn: config.coverage.reportOn);
-    reporter.logGroup('Collecting coverage',
-        outputStream: task.output, errorStream: task.errorOutput);
-    CoverageResult result = await task.done;
+    CoverageResult result;
+    try {
+      CoverageTask task = CoverageTask.start(tests,
+          html: html,
+          output: config.coverage.output,
+          reportOn: config.coverage.reportOn);
+      reporter.logGroup('Collecting coverage',
+          outputStream: task.output, errorStream: task.errorOutput);
+      result = await task.done;
+    } on MissingLcovException catch (e) {
+      return new CliResult.fail(e.message);
+    }
+
     if (result.successful && html && open) {
       Process.run('open', [result.reportIndex.path]);
     }
