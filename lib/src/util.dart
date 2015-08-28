@@ -18,7 +18,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
-import 'package:yaml/yaml.dart';
 
 void copyDirectory(Directory source, Directory dest) {
   if (!dest.existsSync()) {
@@ -63,19 +62,6 @@ Future<int> getOpenPort() async {
   } finally {
     await socket.close();
   }
-}
-
-bool hasImmediateDependency(String packageName) {
-  File pubspec = new File('pubspec.yaml');
-  Map pubspecYaml = loadYaml(pubspec.readAsStringSync());
-  List deps = [];
-  if (pubspecYaml.containsKey('dependencies')) {
-    deps.addAll((pubspecYaml['dependencies'] as Map).keys);
-  }
-  if (pubspecYaml.containsKey('dev_dependencies')) {
-    deps.addAll((pubspecYaml['dev_dependencies'] as Map).keys);
-  }
-  return deps.contains(packageName);
 }
 
 String parseExecutableFromCommand(String command) {

@@ -18,8 +18,9 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show hasImmediateDependency, reporter;
+import 'package:dart_dev/util.dart' show reporter;
 
+import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/test/api.dart';
@@ -45,7 +46,8 @@ class TestCli extends TaskCli {
   final String command = 'test';
 
   Future<CliResult> run(ArgResults parsedArgs) async {
-    if (!hasImmediateDependency('test')) return new CliResult.fail(
+    if (!platform_util
+        .hasImmediateDependency('test')) return new CliResult.fail(
         'Package "test" must be an immediate dependency in order to run its executables.');
 
     bool unit = parsedArgs['unit'];

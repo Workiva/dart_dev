@@ -194,6 +194,13 @@ Name       | Type           | Default     | Description
 `output`   | `String`       | `coverage/` | Output directory for coverage artifacts.
 `reportOn` | `List<String>` | `['lib/']`  | List of paths to include in the generated coverage report (LCOV and HTML).
 
+> Note: "lcov" must be installed in order to generate the HTML report.
+>
+> If you're using brew, you can install it with:
+>    `brew update && brew install lcov`
+>
+> Otherwise, visit http://ltp.sourceforge.net/coverage/lcov.php
+
 ### `examples` Config
 All configuration options for the `examples` task are found on the `config.examples` object.
 
