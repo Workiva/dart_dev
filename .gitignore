@@ -2,6 +2,13 @@
 packages
 pubspec.lock
 
+# generated docs
+/doc/api/
+
+# generated coverage
 /coverage/
+
+# generated assets in test fixtures
 /test/fixtures/coverage/browser/coverage/
 /test/fixtures/coverage/vm/coverage/
+/test/fixtures/docs/docs/doc/api/
