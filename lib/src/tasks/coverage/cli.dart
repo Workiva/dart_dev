@@ -95,7 +95,7 @@ class CoverageCli extends TaskCli {
     }
 
     if (result.successful && html && open) {
-      Process.run('open', [result.reportIndex.path]);
+      await Process.run('open', [result.reportIndex.path]);
     }
     return result.successful
         ? new CliResult.success('Coverage collected.')
