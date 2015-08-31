@@ -18,6 +18,7 @@ All Dart (https://dartlang.org) projects eventually share a common set of develo
 - Code coverage
 - Consistent code formatting
 - Static analysis to detect issues
+- Documentation generation
 - Examples for manual testing/exploration
 - Applying a LICENSE file to all source files
 
@@ -62,6 +63,7 @@ static analysis - you just need to know how to use the `dart_dev` tool.
 - **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
 - **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
 - **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
+- **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs. 
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 
@@ -75,6 +77,7 @@ dev_dependencies:
   coverage: "^0.7.2"
   dart_dev: "^1.0.0"
   dart_style: "^0.2.0"
+  dartdoc: "^0.4.0"
   test: "^0.12.0"
 ```
 
@@ -130,6 +133,7 @@ see the help usage. Try it out by running any of the following tasks:
 ddev analyze
 ddev copy-license
 ddev coverage
+ddev docs
 ddev examples
 ddev format
 ddev test
@@ -138,6 +142,7 @@ ddev test
 pub run dart_dev analyze
 pub run dart_dev copy-license
 pub run dart_dev coverage
+pub run dart_dev docs
 pub run dart_dev examples
 pub run dart_dev format
 pub run dart_dev test
@@ -158,6 +163,7 @@ main(args) async {
   //   config.analyze
   //   config.copyLicense
   //   config.coverage
+  //   config.docs
   //   config.examples
   //   config.format
   //   config.init
@@ -200,6 +206,9 @@ Name       | Type           | Default     | Description
 >    `brew update && brew install lcov`
 >
 > Otherwise, visit http://ltp.sourceforge.net/coverage/lcov.php
+
+### `docs` config
+There are currently no project-configuration settings for the `docs` task.
 
 ### `examples` Config
 All configuration options for the `examples` task are found on the `config.examples` object.
@@ -250,6 +259,7 @@ Supported tasks:
     analyze
     copy-license
     coverage
+    docs
     examples
     format
     init
@@ -259,6 +269,7 @@ Supported tasks:
 - Static analysis: `ddev analyze`
 - Applying license to source files: `ddev copy-license`
 - Code coverage: `ddev coverage`
+- Documentation generation: `ddev docs`
 - Serving examples: `ddev examples`
 - Dart formatter: `ddev format`
 - Initialization: `ddev init`
