@@ -52,8 +52,8 @@ ExamplesTask serveExamples(
       '$pubServeExecutable ${pubServeArgs.join(' ')}',
       Future.wait([dartiumProcess.done, pubServeProcess.done]));
 
-  pubServeProcess.stdout.listen(task._pubServeOutput.add);
-  pubServeProcess.stderr.listen(task._pubServeOutput.addError);
+  pubServeProcess.stdout.listen(task._pubServeStdOut.add);
+  pubServeProcess.stderr.listen(task._pubServeStdErr.add);
   pubServeProcess.exitCode.then((code) {
     task.successful = code <= 0;
   });
@@ -70,16 +70,19 @@ class ExamplesTask extends Task {
   final String pubServeCommand;
 
   StreamController<String> _dartiumOutput = new StreamController();
-  StreamController<String> _pubServeOutput = new StreamController();
+  StreamController<String> _pubServeStdOut = new StreamController();
+  StreamController<String> _pubServeStdErr = new StreamController();
 
   ExamplesTask(String this.dartiumCommand, String this.pubServeCommand,
       Future this.done) {
     done.then((_) {
       _dartiumOutput.close();
-      _pubServeOutput.close();
+      _pubServeStdOut.close();
+      _pubServeStdErr.close();
     });
   }
 
   Stream<String> get dartiumOutput => _dartiumOutput.stream;
-  Stream<String> get pubServeOutput => _pubServeOutput.stream;
+  Stream<String> get pubServeStdOut => _pubServeStdOut.stream;
+  Stream<String> get pubServeStdErr => _pubServeStdErr.stream;
 }

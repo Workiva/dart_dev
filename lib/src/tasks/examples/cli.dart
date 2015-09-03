@@ -47,7 +47,8 @@ class ExamplesCli extends TaskCli {
         'This project does not have any examples.');
 
     ExamplesTask task = serveExamples(hostname: hostname, port: port);
-    reporter.logGroup(task.pubServeCommand, outputStream: task.pubServeOutput);
+    reporter.logGroup(task.pubServeCommand,
+        outputStream: task.pubServeStdOut, errorStream: task.pubServeStdErr);
     await task.done;
     reporter.logGroup(task.dartiumCommand, outputStream: task.dartiumOutput);
     return task.successful ? new CliResult.success() : new CliResult.fail();
