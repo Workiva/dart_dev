@@ -187,6 +187,10 @@ class CoverageTask extends Task {
   /// Directory containing the generated coverage report.
   Directory get report => _outputDirectory;
 
+  /// Path to the directory where collections will be temporarily stored.
+  Directory get _collections =>
+      new Directory(path.join(_outputDirectory.path, 'collection/'));
+
   /// All test files (expanded from the given list of test paths).
   /// This is the exact list of tests that were run for coverage collection.
   Iterable<String> get tests => _files.map((f) => f.path);
@@ -194,8 +198,8 @@ class CoverageTask extends Task {
   Future _collect() async {
     List<File> collections = [];
     for (int i = 0; i < _files.length; i++) {
-      File collection = new File(path.join(
-          _outputDirectory.path, 'collection', '${_files[i].path}.json'));
+      File collection =
+          new File(path.join(_collections.path, '${_files[i].path}.json'));
       int observatoryPort;
 
       // Run the test and obtain the observatory port for coverage collection.
@@ -300,8 +304,8 @@ class CoverageTask extends Task {
     for (int i = 1; i < collections.length; i++) {
       Map coverageJson = JSON.decode(collections[i].readAsStringSync());
       mergedJson['coverage'].addAll(coverageJson['coverage']);
-      collections[i].deleteSync();
     }
+    _collections.deleteSync(recursive: true);
 
     File coverage = new File(path.join(_outputDirectory.path, 'coverage.json'));
     if (coverage.existsSync()) {
