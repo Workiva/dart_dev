@@ -21,6 +21,7 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
+const String projectWithDartFile = 'test/fixtures/coverage/non_test_file';
 const String projectWithVmTests = 'test/fixtures/coverage/browser';
 const String projectWithBrowserTests = 'test/fixtures/coverage/vm';
 const String projectWithoutCoveragePackage =
@@ -59,6 +60,12 @@ void main() {
     test('should fail if "coverage" package is missing', () async {
       expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
     });
+
+    test('should create coverage with non_test file specified', () async {
+      expect(await runCoverage(projectWithDartFile), isTrue);
+      File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
+      expect(lcov.existsSync(), isTrue);
+    }, timeout: new Timeout(new Duration(seconds: 60)));
 
 //    TODO: Will need to mock out the `genhtml` command as well.
 //    test('should not fail if "lcov" is installed and --html is set', () async {
