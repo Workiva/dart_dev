@@ -26,6 +26,7 @@ import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
+const String _dartFilePattern = '.dart';
 const String _testFilePattern = '_test.dart';
 
 class CoverageResult extends TaskResult {
@@ -140,7 +141,7 @@ class CoverageTask extends Task {
         _reportOn = reportOn {
     // Build the list of test files.
     tests.forEach((path) {
-      if (path.endsWith(_testFilePattern) &&
+      if (path.endsWith(_dartFilePattern) &&
           FileSystemEntity.isFileSync(path)) {
         _files.add(new File(path));
       } else if (FileSystemEntity.isDirectorySync(path)) {
