@@ -53,33 +53,45 @@ class FormatCli extends TaskCli {
 
     bool check = TaskCli.valueOf('check', parsedArgs, config.format.check);
     List<String> directories = config.format.directories;
+    List<String> exclude = config.format.exclude;
     var lineLength =
         TaskCli.valueOf('line-length', parsedArgs, config.format.lineLength);
     if (lineLength is String) {
       lineLength = int.parse(lineLength);
     }
 
-    FormatTask task =
-        format(check: check, directories: directories, lineLength: lineLength);
+    FormatTask task = format(
+        check: check,
+        directories: directories,
+        exclude: exclude,
+        lineLength: lineLength);
     reporter.logGroup(task.formatterCommand,
         outputStream: task.formatterOutput);
     await task.done;
 
+    String excludedFilesWarning = '';
+    if (task.excludedFiles.isNotEmpty) {
+      excludedFilesWarning = 'WARNING - These files were excluded:\n    ';
+      excludedFilesWarning += task.excludedFiles.join('\n    ');
+      excludedFilesWarning += '\n\n';
+    }
+
     if (task.isDryRun) {
       if (task.successful) return new CliResult.success(
-          'You\'re Dart code is good to go!');
+          excludedFilesWarning + 'You\'re Dart code is good to go!');
       if (task.affectedFiles.isEmpty) return new CliResult.fail(
-          'The Dart formatter needs to be run.');
-      return new CliResult.fail(
+          excludedFilesWarning + 'The Dart formatter needs to be run.');
+      return new CliResult.fail(excludedFilesWarning +
           'The Dart formatter needs to be run. The following files require changes:\n    ' +
-              task.affectedFiles.join('\n    '));
+          task.affectedFiles.join('\n    '));
     } else {
       if (!task.successful) return new CliResult.fail('Dart formatter failed.');
       if (task.affectedFiles.isEmpty) return new CliResult.success(
-          'Success! All files are already formatted correctly.');
-      return new CliResult.success(
+          excludedFilesWarning +
+              'Success! All files are already formatted correctly.');
+      return new CliResult.success(excludedFilesWarning +
           'Success! The following files were formatted:\n    ' +
-              task.affectedFiles.join('\n    '));
+          task.affectedFiles.join('\n    '));
     }
   }
 }
