@@ -22,6 +22,7 @@ import 'package:dart_dev/util.dart' show TaskProcess, copyDirectory;
 import 'package:test/test.dart';
 
 const String projectWithChangesNeeded = 'test/fixtures/format/changes_needed';
+const String projectWithExclusions = 'test/fixtures/format/exclusions';
 const String projectWithNoChangesNeeded =
     'test/fixtures/format/no_changes_needed';
 const String projectWithoutDartStyle = 'test/fixtures/format/no_dart_style';
@@ -88,6 +89,14 @@ void main() {
     test('should warn if "dart_style" is not an immediate dependency',
         () async {
       expect(await formatProject(projectWithoutDartStyle), isFalse);
+    });
+
+    test('should allow files/directories to be excluded', () async {
+      File file = new File('$projectWithExclusions/lib/main.dart');
+      String contentsBefore = file.readAsStringSync();
+      expect(await formatProject(projectWithExclusions), isTrue);
+      String contentsAfter = file.readAsStringSync();
+      expect(contentsBefore, equals(contentsAfter));
     });
   });
 }
