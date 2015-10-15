@@ -2,7 +2,7 @@
 
 ## 1.0.2
 
-- **Improvement:** The copy-license task now trims empty leading and trailing lines when.
+- **Improvement:** The copy-license task now trims empty leading and trailing lines.
 - **Bug Fix:** Coverage task no longer incorrectly ignores test files that don't end in `_test.dart`.
 
 ## 1.0.1
