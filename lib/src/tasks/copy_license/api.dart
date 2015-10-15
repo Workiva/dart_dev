@@ -30,6 +30,8 @@ CopyLicenseTask copyLicense(
       'License file "$licensePath" does not exist.');
 
   String licenseContents = license.readAsStringSync();
+  licenseContents = trimLeadingAndTrailingEmptyLines(licenseContents);
+
   directories.forEach((path) {
     Directory dir = new Directory(path);
     if (!dir.existsSync()) return;
@@ -98,6 +100,17 @@ String licenseForFileType(File file, String license) {
   String l =
       license.split('\n').map((l) => '$linePrefix$l'.trimRight()).join('\n');
   return '$opening$l$closing\n';
+}
+
+String trimLeadingAndTrailingEmptyLines(String input) {
+  var lines = input.split('\n');
+  while (lines.first.trim().isEmpty) {
+    lines.removeAt(0);
+  }
+  while (lines.last.trim().isEmpty) {
+    lines.removeLast();
+  }
+  return lines.join('\n');
 }
 
 class CopyLicenseTask extends Task {

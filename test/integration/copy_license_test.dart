@@ -25,6 +25,8 @@ const String projectWithLicenses = 'test/fixtures/copy_license/has_licenses';
 const String projectWithoutLicenseFile =
     'test/fixtures/copy_license/no_license_file';
 const String projectWithoutLicenses = 'test/fixtures/copy_license/no_licenses';
+const String projectWithUntrimmedLicense =
+    'test/fixtures/copy_license/license_with_empty_lines';
 
 Future<String> createTemporaryProject(String source) async {
   String tempProject = '${source}_temp';
@@ -93,6 +95,18 @@ void main() {
         'lib/style.css'
       ];
       expect(await copyLicense(projectPath), unorderedEquals(expectedFiles));
+      deleteTemporaryProject(projectPath);
+    });
+
+    test('should trim leading and trailing empty lines from license', () async {
+      String projectPath =
+          await createTemporaryProject(projectWithUntrimmedLicense);
+      expect(await copyLicense(projectPath), isNotEmpty);
+      String contents =
+          new File('$projectPath/lib/main.dart').readAsStringSync();
+      var lines = contents.split('\n');
+      var licenseLines = lines.where((line) => line.startsWith('//'));
+      expect(licenseLines.length, equals(3));
       deleteTemporaryProject(projectPath);
     });
   });
