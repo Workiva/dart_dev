@@ -15,6 +15,7 @@
 library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/args.dart';
 
@@ -71,6 +72,18 @@ class TestCli extends TaskCli {
     }
     if (integration) {
       tests.addAll(config.test.integrationTests);
+    }
+
+    int restLength = parsedArgs.rest.length;
+    if (restLength > 0) {
+      //verify this is a test-file and it exists.
+      for (var i = 0; i < restLength; i++) {
+        String filePath = parsedArgs.rest[i];
+        await new File(filePath).exists().then((bool exists){
+              if (exists) tests.add(filePath);
+              else print("Ignoring unknown argument");});
+      }
+
     }
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
