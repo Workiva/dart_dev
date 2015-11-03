@@ -29,9 +29,7 @@ import 'package:dart_dev/src/tasks/test/config.dart';
 
 class TestCli extends TaskCli {
   final ArgParser argParser = new ArgParser()
-    ..addFlag('unit',
-        defaultsTo: null,
-        help: 'Includes the unit test suite.')
+    ..addFlag('unit', defaultsTo: null, help: 'Includes the unit test suite.')
     ..addFlag('integration',
         defaultsTo: defaultIntegration,
         help: 'Includes the integration test suite.')
@@ -51,23 +49,21 @@ class TestCli extends TaskCli {
     return parsedArgs.rest.length > 0;
   }
 
-  Future addToTestsFromRest(List<String> tests, List<String> rest) async{
+  Future addToTestsFromRest(List<String> tests, List<String> rest) async {
     int restLength = rest.length;
     int individualTests = 0;
     //verify this is a test-file and it exists.
-      for (var i = 0; i < restLength; i++) {
-        String filePath = rest[i];
-        print("filePath:" + filePath);
-        await new File(filePath).exists().then((bool exists) {
-          if (exists) {
-            individualTests++;
-            tests.add(filePath);
-          }
-          else {
-            print("Ignoring unknown argument");
-          }
-        });
-      }
+    for (var i = 0; i < restLength; i++) {
+      String filePath = rest[i];
+      await new File(filePath).exists().then((bool exists) {
+        if (exists) {
+          individualTests++;
+          tests.add(filePath);
+        } else {
+          print("Ignoring unknown argument");
+        }
+      });
+    }
     return individualTests;
   }
 
@@ -80,7 +76,7 @@ class TestCli extends TaskCli {
         .hasImmediateDependency('test')) return new CliResult.fail(
         'Package "test" must be an immediate dependency in order to run its executables.');
 
-    bool unit = parsedArgs['unit']; print("unit:"+unit.toString());
+    bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
     List<String> tests = [];
     int individualTests = 0;
@@ -93,19 +89,16 @@ class TestCli extends TaskCli {
     List<String> platforms =
         TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
 
-    if(hasRestParams(parsedArgs)) {
+    if (hasRestParams(parsedArgs)) {
       individualTests = await addToTestsFromRest(tests, parsedArgs.rest);
     }
 
-    if (isExplicitlyFalse(unit) && !integration && individualTests==0) {
+    if (isExplicitlyFalse(unit) && !integration && individualTests == 0) {
       return new CliResult.fail(
           'No tests were selected. Include at least one of --unit or --integration.');
+    } else {
+      if (individualTests == 0) unit = true;
     }
-    else
-    {
-      if(individualTests==0) unit=true;
-    }
-
 
     if (unit) {
       tests.addAll(config.test.unitTests);
@@ -113,7 +106,6 @@ class TestCli extends TaskCli {
     if (integration) {
       tests.addAll(config.test.integrationTests);
     }
-
 
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
