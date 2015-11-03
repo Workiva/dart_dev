@@ -395,6 +395,11 @@ object.
         </tr>
     </tbody>
 </table>
+* Individual test files can be executed by appending their path to the end of the command.
+
+```
+ddev test path/to/test_name path/to/another/test_name
+```
 
 
 ## CLI Usage
