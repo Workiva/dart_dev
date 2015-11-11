@@ -3,4 +3,4 @@ version: 0.0.0
 dev_dependencies:
   dart_dev:
     path: ../../../..
-  dartdoc: "^0.4.0"
+  dartdoc: ">=0.4.0 <0.9.0"
