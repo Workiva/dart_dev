@@ -18,14 +18,17 @@ import 'package:dart_dev/src/tasks/config.dart';
 
 const int defaultConcurrency = 4;
 const bool defaultIntegration = false;
+const bool defaultFunctional = false;
 const List<String> defaultIntegrationTests = const [];
 const bool defaultUnit = true;
 const List<String> defaultUnitTests = const ['test/'];
+const List<String> defaultFunctionalTests = const [];
 const List<String> defaultPlatforms = const [];
 
 class TestConfig extends TaskConfig {
   int concurrency = defaultConcurrency;
   List<String> integrationTests = defaultIntegrationTests;
+  List<String> functionalTests = defaultFunctionalTests;
   List<String> platforms = defaultPlatforms;
   List<String> unitTests = defaultUnitTests;
 }

@@ -36,6 +36,9 @@ class CoverageCli extends TaskCli {
     ..addFlag('integration',
         defaultsTo: defaultIntegration,
         help: 'Includes the integration test suite.')
+    ..addFlag('functional',
+        defaultsTo: defaultFunctional,
+        help: 'Includes the functional test suite')
     ..addFlag('html',
         negatable: true,
         defaultsTo: defaultHtml,
@@ -54,8 +57,9 @@ class CoverageCli extends TaskCli {
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
+    bool functional = parsedArgs['functional'];
 
-    if (!unit && !integration) {
+    if (!unit && !integration && !functional) {
       return new CliResult.fail(
           'No tests were selected. Include at least one of --unit or --integration.');
     }
@@ -70,6 +74,9 @@ class CoverageCli extends TaskCli {
     if (integration) {
       tests.addAll(config.test.integrationTests);
     }
+    if(functional && !integration && !unit){
+      tests.addAll(config.test.functionalTests);
+    }
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
         return new CliResult.fail(
@@ -79,18 +86,35 @@ class CoverageCli extends TaskCli {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
       }
+      if(functional && config.test.functionalTests.isEmpty){
+        return new CliResult.fail(
+            'This project does not specify any functional tests.');
+      }
     }
 
     CoverageResult result;
     try {
-      CoverageTask task = CoverageTask.start(tests,
+      CoverageTask task;
+      if(functional && !integration && !unit) {
+        task = CoverageTask.start_functional(tests,
           html: html,
           output: config.coverage.output,
           reportOn: config.coverage.reportOn);
-      reporter.logGroup('Collecting coverage',
+          reporter.logGroup('Collecting coverage',
           outputStream: task.output, errorStream: task.errorOutput);
+      }
+      else{
+        task = CoverageTask.start(tests,
+          html: html,
+          output: config.coverage.output,
+          reportOn: config.coverage.reportOn);
+          reporter.logGroup('Collecting coverage',
+          outputStream: task.output, errorStream: task.errorOutput);
+      }
       result = await task.done;
     } on MissingLcovException catch (e) {
+      return new CliResult.fail(e.message);
+    } on PortBoundException catch(e) {
       return new CliResult.fail(e.message);
     }
 

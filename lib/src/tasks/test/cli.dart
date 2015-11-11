@@ -33,6 +33,9 @@ class TestCli extends TaskCli {
     ..addFlag('integration',
         defaultsTo: defaultIntegration,
         help: 'Includes the integration test suite.')
+    ..addFlag('functional',
+        defaultsTo: defaultFunctional,
+        help: 'Includes the functional test suite')
     ..addOption('concurrency',
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
@@ -52,6 +55,7 @@ class TestCli extends TaskCli {
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
+    bool functional = parsedArgs['functional'];
     var concurrency =
         TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
     if (concurrency is String) {
@@ -60,7 +64,7 @@ class TestCli extends TaskCli {
     List<String> platforms =
         TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
 
-    if (!unit && !integration) {
+    if (!unit && !integration && !functional) {
       return new CliResult.fail(
           'No tests were selected. Include at least one of --unit or --integration.');
     }
@@ -72,6 +76,9 @@ class TestCli extends TaskCli {
     if (integration) {
       tests.addAll(config.test.integrationTests);
     }
+    if(functional){
+      tests.addAll(config.test.functionalTests);
+    }
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
         return new CliResult.fail(
@@ -80,6 +87,10 @@ class TestCli extends TaskCli {
       if (integration && config.test.integrationTests.isEmpty) {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
+      }
+      if(functional && config.test.functionalTests.isEmpty){
+        return new CliResult.fail(
+            'This project does not specify any functional tests.');
       }
     }
 

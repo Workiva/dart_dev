@@ -26,6 +26,9 @@ import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
+
+import 'package:dart_dev/src/tasks/config.dart';
+
 const String _dartFilePattern = '.dart';
 const String _testFilePattern = '_test.dart';
 
@@ -97,6 +100,16 @@ class CoverageTask extends Task {
     return coverage;
   }
 
+  static CoverageTask start_functional(List<String> tests,
+      {bool html: defaultHtml,
+      String output: defaultOutput,
+      List<String> reportOn: defaultReportOn}) {
+    CoverageTask coverage =
+    new CoverageTask._(tests, reportOn, html: html, output: output);
+    coverage._run_functional();
+    return coverage;
+  }
+
   /// JSON formatted coverage. Output from the coverage package.
   File _collection;
 
@@ -127,6 +140,8 @@ class CoverageTask extends Task {
   /// Process used to run the tests. Need to store it so it can be killed after
   /// the coverage collection has completed.
   TaskProcess _lastTestProcess;
+
+  TaskProcess _seleniumServerProcess;
 
   /// Directory to output all coverage related artifacts.
   Directory _outputDirectory;
@@ -238,6 +253,82 @@ class CoverageTask extends Task {
     _collection = _merge(collections);
   }
 
+  Future _collect_functional() async {
+    List<File> collections = [];
+    for(File f in _files){
+      print(f.path);
+    }
+    for (int i = 0; i < _files.length; i++) {
+      List<int> observatoryPorts;
+
+      // Run the test and obtain the observatory port for coverage collection.
+      try {
+        observatoryPorts = await _test_functional(_files[i]);
+      } on CoverageTestSuiteException {
+        _coverageErrorOutput.add('Tests failed: ${_files[i].path}');
+        continue;
+      }
+
+      List<int> validPorts = new List<int>();
+      List<Future> wsDone = new List<Future>();
+
+      //Check for observatories with actual data
+      for(int port in observatoryPorts) {
+        try {
+          var ws = await WebSocket.connect("ws://127.0.0.1:${port}/ws");
+          wsDone.add(ws.done);
+          ws.add("{\"id\":\"3\",\"method\":\"getVM\",\"params\":{}}");
+          ws.listen((l) {
+            var json = JSON.decode(l);
+            List isolates = (json["result"])["isolates"];
+            if (isolates != null && isolates.isNotEmpty) {
+              validPorts.add(port);
+            }
+            ws.close();
+          });
+        }
+        on Exception {
+          continue;
+        }
+      }
+      for(Future f in wsDone)
+        await f;
+
+      observatoryPorts = validPorts;
+
+      for(int j=0;j<observatoryPorts.length;j++) {
+        File collection =
+        new File(path.join(_collections.path, '${_files[i].path}${j}.json'));
+        int observatoryPort = observatoryPorts[j];
+        // Collect the coverage from observatory.
+        String executable = 'pub';
+        List args = [
+          'run',
+          'coverage:collect_coverage',
+          '--port=${observatoryPort}',
+          '-o',
+          collection.path
+        ];
+
+        _coverageOutput.add('');
+        _coverageOutput.add('Collecting coverage for ${_files[i].path}');
+        _coverageOutput.add('$executable ${args.join(' ')}\n');
+
+        _lastTestProcess = new TaskProcess(executable, args);
+        _lastTestProcess.stdout.listen((l) => _coverageOutput.add('    $l'));
+        _lastTestProcess.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
+        await _lastTestProcess.done;
+        _killTest();
+        collections.add(collection);
+//        if (await _lastTestProcess.exitCode > 0) continue;
+      }
+      await _seleniumServerProcess.killGroup();
+    }
+
+    // Merge all individual coverage collection files into one.
+    _collection = _merge(collections);
+  }
+
   Future _format() async {
     _lcov = new File(path.join(_outputDirectory.path, 'coverage.lcov'));
 
@@ -317,6 +408,8 @@ class CoverageTask extends Task {
     return coverage;
   }
 
+  List<int> observatoryPort;
+
   Future _run() async {
     if (_html && !(await platform_util.isExecutableInstalled('lcov'))) {
       _done.completeError(new MissingLcovException());
@@ -324,6 +417,77 @@ class CoverageTask extends Task {
     }
 
     await _collect();
+    await _format();
+
+    if (_html) {
+      await _generateReport();
+    }
+
+    _done.complete(
+        new CoverageResult.success(tests, collection, lcov, report: report));
+  }
+
+  Future _run_functional() async {
+    if (_html && !(await platform_util.isExecutableInstalled('lcov'))) {
+      _done.completeError(new MissingLcovException());
+      return;
+    }
+
+//    String executable = 'selenium-server';
+//    int port = await getOpenPort();
+    List args = ["-port"
+//    ,"${port}"
+    ];
+    args = [];
+    observatoryPort = new List<int>();
+    RegExp _serving = new RegExp("Serving .* on http:\/\/localhost:8080");
+    TaskProcess serve = new TaskProcess('pub', ['serve']);
+    Completer serverRunning = new Completer();
+    serve.stderr.listen((line) async {
+      print(line);
+      if(line.contains("Error: Address already in use")){
+        await serve.kill();
+        await _seleniumServerProcess.kill();
+        throw new PortBoundException("pub serve failed to start.  Check if port 8080 is already bound");
+      }
+    });
+    serve.stdout.listen((line){
+      print(line);
+      if(_serving.hasMatch(line)){
+        serverRunning.complete();
+      }
+    });
+
+    _seleniumServerProcess = new TaskProcess('selenium-server', args);
+
+    RegExp _observatoryPortPattern = new RegExp(
+        r'Observatory listening (at|on) http:\/\/127\.0\.0\.1:(\d+)');
+
+    int portPatternCount=0;
+    Completer seleniumRunning = new Completer();
+    _seleniumServerProcess.stderr.listen((line) async {
+      _coverageErrorOutput.add('    $line');
+      if (line.contains(_observatoryPortPattern)) {
+        Match m = _observatoryPortPattern.firstMatch(line);
+        observatoryPort.add(int.parse(m.group(2)));
+      }
+      else if(line.contains("Failed to start")){
+        await serve.kill();
+        await _seleniumServerProcess.kill();
+        throw new PortBoundException("selenium-server failed to start.  Check if this process is already running.");
+      }
+      else if(line.contains("Selenium Server is up and running")){
+        seleniumRunning.complete();
+      }
+    });
+
+    await seleniumRunning.future;
+    await serverRunning.future;
+
+    await _collect_functional();
+    await _seleniumServerProcess.kill();
+    await serve.kill();
+
     await _format();
 
     if (_html) {
@@ -404,6 +568,7 @@ class CoverageTask extends Task {
 
     String _testsFailedPattern = 'Some tests failed.';
     String _testsPassedPattern = 'All tests passed!';
+    RegExp _testsPassedPat = new RegExp(r'All\s[\d]*\s?tests passed.');
 
     if (isBrowserTest) {
       // Run the test in content-shell.
@@ -442,6 +607,9 @@ class CoverageTask extends Task {
         if (line.contains(_testsPassedPattern)) {
           break;
         }
+        if(_testsPassedPat.hasMatch(line)){
+          break;
+        }
       }
 
       return observatoryPort;
@@ -474,5 +642,38 @@ class CoverageTask extends Task {
 
       return port;
     }
+  }
+
+  Future<List<int>> _test_functional(File file) async {
+
+    int count = observatoryPort.length;
+
+    String executable = 'pub';
+    List args = ['run',
+//        int port = await getOpenPort();
+//        String executable = 'dart';
+//        List args = ["--observe=${port}"
+    file.path.split(config.test.functionalTests[0] + '/')[1]];
+    print(config.test.functionalTests[0]);
+    TaskProcess process = new TaskProcess(executable, args,workingDirectory:config.test.functionalTests[0]);
+    process.stdout.listen((d){print(d);});
+    process.stderr.listen((d){print(d);});
+
+
+    String _observatoryFailPattern = 'Could not start Observatory HTTP server';
+    RegExp _observatoryPortPattern = new RegExp(
+        r'Observatory listening (at|on) http:\/\/127\.0\.0\.1:(\d+)');
+
+    String _testsFailedPattern = 'Some tests failed.';
+    String _testsPassedPattern = 'All tests passed!';
+    RegExp _testsPassedPat = new RegExp(r'All\s[\d]*\s?tests passed.');
+
+    await process.done;
+    await process.exitCode;
+
+    if(observatoryPort.length>count) {
+      return observatoryPort.sublist(count);
+    }
+    return observatoryPort.sublist(observatoryPort.length-1);
   }
 }

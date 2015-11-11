@@ -23,7 +23,6 @@ class TaskProcess {
   Completer _errc = new Completer();
   Completer _outc = new Completer();
   Completer<int> _procExitCode = new Completer();
-
   Process _process;
 
   StreamController<String> _stdout = new StreamController();
@@ -58,6 +57,67 @@ class TaskProcess {
   Stream<String> get stderr => _stderr.stream;
   Stream<String> get stdout => _stdout.stream;
 
+  Future<List<int>> getChildPids(List<int> pids) async{
+    String executable = "pgrep";
+    var args = [];
+    for(int i in pids){
+      args.add("-P");
+      args.add("${i}");
+    }
+    TaskProcess pp = new TaskProcess(executable,args);
+    List<int> cpids = new List<int>();
+    pp.stdout.listen((l){
+      try{
+        int cpid = int.parse(l);
+        cpids.add(cpid);
+      }
+      on Exception{
+      }
+    });
+    await pp.done;
+    if(cpids.length > 0){
+      cpids = await getChildPids(cpids);
+      cpids.addAll(pids);
+      return cpids;
+    }
+    else return pids;
+  }
+
+  Future<bool> killAllChildren(int ppid) async{
+    List<int> cpids = await getChildPids([ppid]);
+    var args = ["-TERM"];
+    cpids.remove(ppid);
+    for(int i in cpids)
+      args.add(i.toString());
+    TaskProcess k = new TaskProcess("kill",args);
+    await k.done;
+    if(await k.exitCode ==0)
+      return true;
+    else
+      return false;
+
+  }
+
   bool kill([ProcessSignal signal = ProcessSignal.SIGTERM]) =>
       _process.kill(signal);
+  Future killGroup()async {
+    await killAllChildren(_process.pid);
+//    kill();
+//    TaskProcess l = new TaskProcess("pkill",["-P", "${_process.pid}"]);
+//    TaskProcess a = new TaskProcess("ps",["-o","pgid=", "-p" ,"${_process.pid}"]);
+//      a.stdout.listen((l) {
+//        print(l);
+//        int pgid = int.parse(l);
+//        TaskProcess p = new TaskProcess("kill",["-TERM","-${pgid}"]);
+//      });
+//      a.stderr.listen((l) {
+//        print(l);
+//      });
+//
+//    await a.done;
+//    try{_process.kill();}
+//          on Exception{
+//
+//          }
+  }
 }
