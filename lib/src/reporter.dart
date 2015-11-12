@@ -44,24 +44,31 @@ class Reporter {
     _log(stdout, message, shout: shout);
   }
 
+  static String _indent(String lines) {
+    return '    ' + lines.replaceAll('\n', '\n    ');
+  }
+
   void logGroup(String title,
       {String output,
+      String error,
       Stream<String> outputStream,
       Stream<String> errorStream}) {
-    log(colorBlue('\n::: $title'));
-    if (output != null) {
-      log('${output.split('\n').join('\n    ')}');
-      return;
-    }
+    var formattedTitle = colorBlue('\n::: $title');
 
-    if (outputStream != null) {
-      outputStream.listen((line) {
-        log('    $line');
+    if (output != null) {
+      log(formattedTitle);
+      log(_indent(output));
+    } else if (error != null) {
+      warning(formattedTitle);
+      warning(_indent(error));
+    } else {
+      log(formattedTitle);
+
+      outputStream?.listen((line) {
+        log(_indent(line));
       });
-    }
-    if (errorStream != null) {
-      errorStream.listen((line) {
-        warning('    $line');
+      errorStream?.listen((line) {
+        warning(_indent(line));
       });
     }
   }

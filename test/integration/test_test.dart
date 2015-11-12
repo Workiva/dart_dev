@@ -24,6 +24,7 @@ import 'package:test/test.dart';
 const String projectWithoutTestPackage = 'test/fixtures/test/no_test_package';
 const String projectWithFailingTests = 'test/fixtures/test/failing';
 const String projectWithPassingTests = 'test/fixtures/test/passing';
+const String projectThatNeedsPubServe = 'test/fixtures/test/needs_pub_serve';
 
 Future<bool> runTests(String projectPath,
     {bool unit: true, bool integration: false, List<String> files}) async {
@@ -113,6 +114,10 @@ void main() {
 
     test('should warn if "test" package is not immediate dependency', () async {
       expect(await runTests(projectWithoutTestPackage), isFalse);
+    });
+
+    test('should run tests that require a Pub server', () async {
+      expect(await runTests(projectThatNeedsPubServe), isTrue);
     });
   });
 }
