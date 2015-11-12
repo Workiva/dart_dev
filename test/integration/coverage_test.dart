@@ -24,10 +24,11 @@ import 'package:test/test.dart';
 const String projectWithDartFile = 'test/fixtures/coverage/non_test_file';
 const String projectWithVmTests = 'test/fixtures/coverage/browser';
 const String projectWithBrowserTests = 'test/fixtures/coverage/vm';
+const String projectWithFunctionalTests = 'test/fixtures/coverage/functional_test/';
 const String projectWithoutCoveragePackage =
     'test/fixtures/coverage/no_coverage_package';
 
-Future<bool> runCoverage(String projectPath, {bool html: false}) async {
+Future<bool> runCoverage(String projectPath, {bool html: false, bool functional:false}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
   Directory oldCoverage = new Directory('$projectPath/coverage');
   if (oldCoverage.existsSync()) {
@@ -35,6 +36,8 @@ Future<bool> runCoverage(String projectPath, {bool html: false}) async {
   }
 
   List args = ['run', 'dart_dev', 'coverage'];
+  if(functional)
+    args.add('--functional');
   args.add(html ? '--html' : '--no-html');
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
@@ -64,6 +67,12 @@ void main() {
     test('should create coverage with non_test file specified', () async {
       expect(await runCoverage(projectWithDartFile), isTrue);
       File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
+      expect(lcov.existsSync(), isTrue);
+    }, timeout: new Timeout(new Duration(seconds: 60)));
+
+    test('should generate coverage for Functional tests', () async{
+      expect(await runCoverage(projectWithFunctionalTests,functional: true), isTrue);
+      File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 60)));
 

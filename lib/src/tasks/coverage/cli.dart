@@ -68,14 +68,16 @@ class CoverageCli extends TaskCli {
     bool open = TaskCli.valueOf('open', parsedArgs, true);
 
     List<String> tests = [];
+    List<String> functional_tests = [];
+
     if (unit) {
       tests.addAll(config.test.unitTests);
     }
     if (integration) {
       tests.addAll(config.test.integrationTests);
     }
-    if(functional && !integration && !unit){
-      tests.addAll(config.test.functionalTests);
+    if(functional){
+      functional_tests.addAll(config.test.functionalTests);
     }
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
@@ -86,6 +88,8 @@ class CoverageCli extends TaskCli {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
       }
+    }
+    if(functional_tests.isEmpty){
       if(functional && config.test.functionalTests.isEmpty){
         return new CliResult.fail(
             'This project does not specify any functional tests.');
@@ -94,23 +98,13 @@ class CoverageCli extends TaskCli {
 
     CoverageResult result;
     try {
-      CoverageTask task;
-      if(functional && !integration && !unit) {
-        task = CoverageTask.start_functional(tests,
+      CoverageTask task = CoverageTask.start(tests,
+          functional_tests:functional_tests,
           html: html,
           output: config.coverage.output,
           reportOn: config.coverage.reportOn);
           reporter.logGroup('Collecting coverage',
           outputStream: task.output, errorStream: task.errorOutput);
-      }
-      else{
-        task = CoverageTask.start(tests,
-          html: html,
-          output: config.coverage.output,
-          reportOn: config.coverage.reportOn);
-          reporter.logGroup('Collecting coverage',
-          outputStream: task.output, errorStream: task.errorOutput);
-      }
       result = await task.done;
     } on MissingLcovException catch (e) {
       return new CliResult.fail(e.message);
