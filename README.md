@@ -74,6 +74,7 @@ need to know how to use the `dart_dev` tool.
 - **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs. 
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
+- **Linking a Dependency into a Project:** handles updating `dependency_overrides` in most cases.
 
 
 ## Getting Started
@@ -139,6 +140,9 @@ main(args) async {
   // Define the directories to include when running the
   // Dart formatter.
   config.format.directories = ['lib/', 'test/', 'tool/'];
+
+  // Specify a custom file to use for storing local dependency paths.
+  config.linkRegistryPath = '/home/myname/.ddev-links';
   
   // Define the location of your test suites.
   config.test
@@ -166,7 +170,9 @@ ddev coverage
 ddev docs
 ddev examples
 ddev format
+ddev link
 ddev test
+ddev unlink
 
 # without the alias
 pub run dart_dev analyze
@@ -175,7 +181,9 @@ pub run dart_dev coverage
 pub run dart_dev docs
 pub run dart_dev examples
 pub run dart_dev format
+pub run dart_dev link
 pub run dart_dev test
+pub run dart_dev unlink
 ```
 
 Add the `-h` flag to any of the above commands to receive additional help
@@ -199,7 +207,9 @@ main(args) async {
   config.examples
   config.format
   config.init
+  config.link
   config.test
+  config.unlink
   
   await dev(args);
 }
@@ -373,6 +383,29 @@ object.
     </tbody>
 </table>
 
+#### `link` config
+All configuration options for the `link` task are found on the
+`config.linkDependency` object.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>linkRegistryPath</code></td>
+            <td><code>String</code></td>
+            <td><code>'$HOME/.ddev-links'</code></td>
+            <td>The file to use for storing link targets.</td>
+        </tr>
+    </tbody>
+</table>
+
 #### `test` Config
 All configuration options for the `test` task are found on the `config.test`
 object.
@@ -421,6 +454,8 @@ object.
 ddev test path/to/test_name path/to/another/test_name
 ```
 
+#### `unlink` config
+There are currently no project-configuration settings for the `unlink` task.
 
 ## CLI Usage
 This package comes with a single executable: `dart_dev`. To run this executable:
@@ -449,7 +484,9 @@ Supported tasks:
     examples
     format
     init
+    link
     test
+    unlink
 ```
 
 - Static analysis: `ddev analyze`
@@ -459,7 +496,9 @@ Supported tasks:
 - Serving examples: `ddev examples`
 - Dart formatter: `ddev format`
 - Initialization: `ddev init`
+- Link dependency: `ddev link`
 - Tests: `ddev test`
+- Unlink dependency: `ddev unlink`
 
 Add the `-h` flag to any of the above commands to see task-specific flags and options.
 
@@ -467,6 +506,22 @@ Add the `-h` flag to any of the above commands to see task-specific flags and op
 > reflected in the execution of the above commands. CLI flags and options will
 > override said configuration.
 
+### Dependency Linking
+
+Dependency linking is a two-step process. First, a dependency must be
+registered before it can be linked into another project. To do this, navigate
+to the project you wish to include somewhere else and run `ddev link`. This
+will add it to a JSON file that is stored in your home directory by default and
+is used as a database of project locations.
+
+Now, to link the project above into another project, navigate to the second
+project and run `ddev link <project name>`, where `<project name>` is the name
+of the project you registered in the first step (the name you would use in
+a pubspec). Now, next time you run `pub get`, you will be using your local copy
+of that dependency.
+
+To reset linked dependencies for a project, use `ddev unlink`, this will remove
+the dependency overrides that were created with `ddev link`.
 
 ## Programmatic Usage
 The tooling facilitated by this package can also be executed via a programmatic
