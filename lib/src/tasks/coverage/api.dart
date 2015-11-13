@@ -134,6 +134,9 @@ class CoverageTask extends Task {
   /// List of directories on which coverage should be reported.
   List<String> _reportOn;
 
+  /// Process used to serve Test directory for browser based tests
+  TaskProcess _testServe;
+
   CoverageTask._(List<String> tests, List<String> reportOn,
       {bool html: defaultHtml, String output: defaultOutput})
       : _html = html,
@@ -292,6 +295,7 @@ class CoverageTask extends Task {
   void _killTest() {
     _lastTestProcess.kill();
     _lastTestProcess = null;
+    _testServe.kill();
     if (_lastHtmlFile != null) {
       _lastHtmlFile.deleteSync();
     }
@@ -340,6 +344,19 @@ class CoverageTask extends Task {
     htmlPath = htmlPath.substring(0, htmlPath.length - '.dart'.length);
     htmlPath = '$htmlPath.html';
     File customHtmlFile = new File(htmlPath);
+
+    String openPortForTest = await getOpenPort().then((value) {
+      return value.toString();
+    });
+
+    _testServe =
+        new TaskProcess('pub', ['serve', 'test', '--port', openPortForTest]);
+
+    await for (String line in _testServe.stdout) {
+      if (line.contains('Serving')) {
+        break;
+      }
+    }
 
     // Build or modify the HTML file to properly load the test.
     File htmlFile;
@@ -408,7 +425,18 @@ class CoverageTask extends Task {
     if (isBrowserTest) {
       // Run the test in content-shell.
       String executable = 'content_shell';
-      List args = [htmlFile.path];
+      List<String> args = [];
+      if (customHtmlFile.existsSync()) {
+        args = [
+          'http://localhost:$openPortForTest/' +
+              htmlFile.path.split('/test/').last
+        ];
+      } else {
+        args = [
+          'http://localhost:$openPortForTest/' +
+              htmlFile.path.replaceFirst('test/', '/')
+        ];
+      }
       _coverageOutput.add('');
       _coverageOutput.add('Running test suite ${file.path}');
       _coverageOutput.add('$executable ${args.join(' ')}\n');
