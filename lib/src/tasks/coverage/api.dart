@@ -295,7 +295,7 @@ class CoverageTask extends Task {
   void _killTest() {
     _lastTestProcess.kill();
     _lastTestProcess = null;
-    _testServe.kill();
+//    _testServe.kill();
     if (_lastHtmlFile != null) {
       _lastHtmlFile.deleteSync();
     }
@@ -434,7 +434,7 @@ class CoverageTask extends Task {
       } else {
         args = [
           'http://localhost:$openPortForTest/' +
-              htmlFile.path.replaceFirst('test/', '/')
+              htmlFile.path.replaceFirst('test/', '')
         ];
       }
       _coverageOutput.add('');
