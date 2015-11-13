@@ -471,12 +471,14 @@ class CoverageTask extends Task {
     }
 
     List<File> functional_collections = await _collect_functional();
-    await _collect(functional_collections: functional_collections);
 
+    //Moved so that if merge fails, selenium and pub serve are still killed
     if(functional_tests.isNotEmpty){
       await _seleniumServerProcess.kill();
       await serve.kill();
     }
+
+    await _collect(functional_collections: functional_collections);
 
     await _format();
 
@@ -558,7 +560,6 @@ class CoverageTask extends Task {
 
     String _testsFailedPattern = 'Some tests failed.';
     String _testsPassedPattern = 'All tests passed!';
-    RegExp _testsPassedPat = new RegExp(r'All\s[\d]*\s?tests passed.');
 
     if (isBrowserTest) {
       // Run the test in content-shell.
@@ -595,9 +596,6 @@ class CoverageTask extends Task {
           throw new CoverageTestSuiteException(file.path);
         }
         if (line.contains(_testsPassedPattern)) {
-          break;
-        }
-        if(_testsPassedPat.hasMatch(line)){
           break;
         }
       }
@@ -646,24 +644,32 @@ class CoverageTask extends Task {
     file.path.split(config.test.functionalTests[0] + '/')[1]];
     print(config.test.functionalTests[0]);
     TaskProcess process = new TaskProcess(executable, args,workingDirectory:config.test.functionalTests[0]);
-    process.stdout.listen((d){print(d);});
-    process.stderr.listen((d){print(d);});
-
 
     String _observatoryFailPattern = 'Could not start Observatory HTTP server';
     RegExp _observatoryPortPattern = new RegExp(
         r'Observatory listening (at|on) http:\/\/127\.0\.0\.1:(\d+)');
 
     String _testsFailedPattern = 'Some tests failed.';
-    String _testsPassedPattern = 'All tests passed!';
     RegExp _testsPassedPat = new RegExp(r'All\s[\d]*\s?tests passed.');
 
-    await process.done;
-    await process.exitCode;
+    process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
+
+    await for (String line in process.stdout) {
+      _coverageOutput.add('    $line');
+      if (line.contains(_observatoryFailPattern)) {
+        throw new CoverageTestSuiteException(file.path);
+      }
+      if (line.contains(_testsFailedPattern)) {
+        throw new CoverageTestSuiteException(file.path);
+      }
+      if(_testsPassedPat.hasMatch(line)){
+        break;
+      }
+    }
 
     if(observatoryPort.length>count) {
       return observatoryPort.sublist(count);
     }
-    return observatoryPort.sublist(observatoryPort.length-1);
+    return [];
   }
 }

@@ -15,6 +15,7 @@
 library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/args.dart';
 
@@ -28,8 +29,7 @@ import 'package:dart_dev/src/tasks/test/config.dart';
 
 class TestCli extends TaskCli {
   final ArgParser argParser = new ArgParser()
-    ..addFlag('unit',
-        defaultsTo: defaultUnit, help: 'Includes the unit test suite.')
+    ..addFlag('unit', defaultsTo: null, help: 'Includes the unit test suite.')
     ..addFlag('integration',
         defaultsTo: defaultIntegration,
         help: 'Includes the integration test suite.')
@@ -48,6 +48,32 @@ class TestCli extends TaskCli {
 
   final String command = 'test';
 
+  bool hasRestParams(ArgResults parsedArgs) {
+    return parsedArgs.rest.length > 0;
+  }
+
+  Future addToTestsFromRest(List<String> tests, List<String> rest) async {
+    int restLength = rest.length;
+    int individualTests = 0;
+    //verify this is a test-file and it exists.
+    for (var i = 0; i < restLength; i++) {
+      String filePath = rest[i];
+      await new File(filePath).exists().then((bool exists) {
+        if (exists) {
+          individualTests++;
+          tests.add(filePath);
+        } else {
+          print("Ignoring unknown argument");
+        }
+      });
+    }
+    return individualTests;
+  }
+
+  bool isExplicitlyFalse(bool value) {
+    return value != null && value == false;
+  }
+
   Future<CliResult> run(ArgResults parsedArgs) async {
     if (!platform_util
         .hasImmediateDependency('test')) return new CliResult.fail(
@@ -56,6 +82,9 @@ class TestCli extends TaskCli {
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
     bool functional = parsedArgs['functional'];
+    List<String> tests = [];
+    int individualTests = 0;
+
     var concurrency =
         TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
     if (concurrency is String) {
@@ -64,12 +93,16 @@ class TestCli extends TaskCli {
     List<String> platforms =
         TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
 
-    if (!unit && !integration && !functional) {
+    if (hasRestParams(parsedArgs)) {
+      individualTests = await addToTestsFromRest(tests, parsedArgs.rest);
+    }
+    if (isExplicitlyFalse(unit) && !integration && !functional && individualTests == 0) {
       return new CliResult.fail(
           'No tests were selected. Include at least one of --unit or --integration.');
+    } else {
+      if (individualTests == 0) unit = true;
     }
 
-    List<String> tests = [];
     if (unit) {
       tests.addAll(config.test.unitTests);
     }
@@ -79,6 +112,7 @@ class TestCli extends TaskCli {
     if(functional){
       tests.addAll(config.test.functionalTests);
     }
+
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
         return new CliResult.fail(

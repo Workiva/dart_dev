@@ -383,7 +383,9 @@ object.
             <td><code>platforms</code></td>
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
-            <td>Platforms on which to run the tests (handled by the Dart test runner). See https://github.com/dart-lang/test#platform-selector-syntax for a full list of supported platforms.</td>
+            <td>Platforms on which to run the tests (handled by the Dart test runner). See https://github.com/dart-lang/test#platform-selector-syntax for a full list of supported platforms.
+            <strong>* Not all platforms are supported by all continuous integration servers.  Please consult your CI server's documentation for more details.</strong> 
+            </td>
         </tr>
         <tr>
             <td><code>unitTests</code></td>
@@ -393,6 +395,11 @@ object.
         </tr>
     </tbody>
 </table>
+* Individual test files can be executed by appending their path to the end of the command.
+
+```
+ddev test path/to/test_name path/to/another/test_name
+```
 
 
 ## CLI Usage

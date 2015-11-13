@@ -1,5 +1,5 @@
 name: dart_dev
-version: 1.0.2
+version: 1.0.3
 description: Centralized tooling for Dart projects. Consistent interface across projects. Easily configurable.
 authors:
   - Workiva Client Platform Team <clientplatform@workiva.com>
@@ -14,7 +14,7 @@ dependencies:
   args: "^0.13.0"
   coverage: "^0.7.2"
   dart_style: ">=0.1.8 <0.3.0"
-  dartdoc: "^0.4.0"
+  dartdoc: ">=0.4.0 <0.9.0"
   path: "^1.3.6"
   test: "^0.12.0"
   yaml: "^2.1.0"

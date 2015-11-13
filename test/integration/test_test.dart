@@ -26,12 +26,24 @@ const String projectWithFailingTests = 'test/fixtures/test/failing';
 const String projectWithPassingTests = 'test/fixtures/test/passing';
 
 Future<bool> runTests(String projectPath,
-    {bool unit: true, bool integration: false}) async {
+    {bool unit: true, bool integration: false, List<String> files}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
   List args = ['run', 'dart_dev', 'test'];
-  args.add(unit ? '--unit' : '--no-unit');
-  args.add(integration ? '--integration' : '--no-integration');
+  if (unit != null) args.add(unit ? '--unit' : '--no-unit');
+  if (integration != null) args
+      .add(integration ? '--integration' : '--no-integration');
+  int i;
+
+  if (files != null) {
+    int filesLength = files.length;
+    if (filesLength > 0) {
+      for (i = 0; i < filesLength; i++) {
+        args.add(files[i]);
+      }
+    }
+  }
+
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
 
@@ -55,10 +67,33 @@ void main() {
           isFalse);
     });
 
+    test('should run individual unit test', () async {
+      expect(
+          await runTests(projectWithPassingTests, files:
+              ['test/fixtures/test/passing/test/passing_unit_test.dart']),
+          isTrue);
+    });
+
+    test('should run individual unit tests', () async {
+      expect(
+          await runTests(projectWithPassingTests, files: [
+            'test/fixtures/test/passing/test/passing_unit_test.dart',
+            'test/fixtures/test/passing/test/passing_unit_integration.dart'
+          ]),
+          isTrue);
+    });
+
     test('should run unit tests', () async {
       expect(
           await runTests(projectWithPassingTests,
               unit: true, integration: false),
+          isTrue);
+    });
+
+    test('should run unit tests by default', () async {
+      expect(
+          await runTests(projectWithPassingTests,
+              unit: null, integration: null),
           isTrue);
     });
 
