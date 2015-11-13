@@ -53,13 +53,13 @@ void main() {
       expect(await runCoverage(projectWithBrowserTests), isTrue);
       File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 120)));
 
     test('should generate coverage for VM tests', () async {
       expect(await runCoverage(projectWithVmTests), isTrue);
       File lcov = new File('$projectWithVmTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 120)));
 
     test('should fail if "coverage" package is missing', () async {
       expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
@@ -69,7 +69,7 @@ void main() {
       expect(await runCoverage(projectWithDartFile), isTrue);
       File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 120)));
 
 //    TODO: Will need to mock out the `genhtml` command as well.
 //    test('should not fail if "lcov" is installed and --html is set', () async {
