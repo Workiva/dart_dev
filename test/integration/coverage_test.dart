@@ -24,11 +24,13 @@ import 'package:test/test.dart';
 const String projectWithDartFile = 'test/fixtures/coverage/non_test_file';
 const String projectWithVmTests = 'test/fixtures/coverage/browser';
 const String projectWithBrowserTests = 'test/fixtures/coverage/vm';
-const String projectWithFunctionalTests = 'test/fixtures/coverage/functional_test/';
+const String projectWithFunctionalTests =
+    'test/fixtures/coverage/functional_test/';
 const String projectWithoutCoveragePackage =
     'test/fixtures/coverage/no_coverage_package';
 
-Future<bool> runCoverage(String projectPath, {bool html: false, bool functional:false}) async {
+Future<bool> runCoverage(String projectPath,
+    {bool html: false, bool functional: false}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
   Directory oldCoverage = new Directory('$projectPath/coverage');
   if (oldCoverage.existsSync()) {
@@ -36,15 +38,18 @@ Future<bool> runCoverage(String projectPath, {bool html: false, bool functional:
   }
 
   List args = ['run', 'dart_dev', 'coverage'];
-  if(functional)
+  if (functional) {
     args.add('--functional');
-  args.add(html ? '--html' : '--no-html');
-  TaskProcess process =
-      new TaskProcess('pub', args, workingDirectory: projectPath);
+    args.add('--no-unit');
+  }
+    args.add(html ? '--html' : '--no-html');
+    TaskProcess process =
+    new TaskProcess('pub', args, workingDirectory: projectPath);
 
-  await process.done;
-  return (await process.exitCode) == 0;
-}
+    await process.done;
+    return (await process.exitCode) == 0;
+  }
+
 
 void main() {
   group('Coverage Task', () {
@@ -70,9 +75,10 @@ void main() {
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 60)));
 
-    test('should generate coverage for Functional tests', () async{
-      expect(await runCoverage(projectWithFunctionalTests,functional: true), isTrue);
-      File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
+    test('should generate coverage for Functional tests', () async {
+      expect(await runCoverage(projectWithFunctionalTests, functional: true),
+          isTrue);
+      File lcov = new File('$projectWithFunctionalTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 60)));
 

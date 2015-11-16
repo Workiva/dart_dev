@@ -22,12 +22,11 @@ import 'package:dart_dev/util.dart' show Reporter, TaskProcess, getOpenPort;
 import 'package:path/path.dart' as path;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
+import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
-
-import 'package:dart_dev/src/tasks/config.dart';
 
 const String _dartFilePattern = '.dart';
 const String _testFilePattern = '_test.dart';
@@ -41,7 +40,10 @@ class CoverageResult extends TaskResult {
   final Iterable<String> functionalTests;
 
   CoverageResult.fail(
-      Iterable<String> this.tests, Iterable<String> this.functionalTests, File this.collection, File this.lcov,
+      Iterable<String> this.tests,
+      Iterable<String> this.functionalTests,
+      File this.collection,
+      File this.lcov,
       {Directory report})
       : super.fail(),
         this.report = report,
@@ -50,7 +52,10 @@ class CoverageResult extends TaskResult {
             : null;
 
   CoverageResult.success(
-      Iterable<String> this.tests, Iterable<String> this.functionalTests, File this.collection, File this.lcov,
+      Iterable<String> this.tests,
+      Iterable<String> this.functionalTests,
+      File this.collection,
+      File this.lcov,
       {Directory report})
       : super.success(),
         this.report = report,
@@ -70,12 +75,12 @@ class CoverageTask extends Task {
   /// If [html] is true, `genhtml` will be used to generate an HTML report of
   /// the collected coverage and the report will be opened.
   static Future<CoverageResult> run(List<String> tests,
-      {List<String> functional_tests:defaultFunctionalTests,
+      {List<String> functionalTests: defaultFunctionalTests,
       bool html: defaultHtml,
       String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) async {
-    CoverageTask coverage =
-        new CoverageTask._(tests, reportOn, html: html, output: output, functional_tests:functional_tests);
+    CoverageTask coverage = new CoverageTask._(tests, reportOn,
+        html: html, output: output, functionalTests: functionalTests);
     await coverage._run();
     return coverage.done;
   }
@@ -93,12 +98,12 @@ class CoverageTask extends Task {
   /// If [html] is true, `genhtml` will be used to generate an HTML report of
   /// the collected coverage and the report will be opened.
   static CoverageTask start(List<String> tests,
-      {List<String> functional_tests:defaultFunctionalTests,
+      {List<String> functionalTests: defaultFunctionalTests,
       bool html: defaultHtml,
       String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) {
-    CoverageTask coverage =
-        new CoverageTask._(tests, reportOn,functional_tests:functional_tests, html: html, output: output);
+    CoverageTask coverage = new CoverageTask._(tests, reportOn,
+        functionalTests: functionalTests, html: html, output: output);
     coverage._run();
     return coverage;
   }
@@ -122,7 +127,7 @@ class CoverageTask extends Task {
   /// generated from the given list of test paths by adding all files and
   /// searching all directories for valid test files.
   List<File> _files = [];
-  List<File> _functional_files = [];
+  List<File> _functionalFiles = [];
 
   /// Whether or not to generate the HTML report.
   bool _html = defaultHtml;
@@ -143,36 +148,20 @@ class CoverageTask extends Task {
   /// List of directories on which coverage should be reported.
   List<String> _reportOn;
 
-  void _testFileValidation(path,fileCollection) {
-    if (path.endsWith(_dartFilePattern) &&
-        FileSystemEntity.isFileSync(path)) {
-      fileCollection.add(new File(path));
-    } else if (FileSystemEntity.isDirectorySync(path)) {
-      Directory dir = new Directory(path);
-      List<FileSystemEntity> children = dir.listSync(recursive: true);
-      Iterable<FileSystemEntity> validTests =
-      children.where((FileSystemEntity e) {
-        Uri uri = Uri.parse(e.absolute.path);
-        return (
-            // Is a file, not a directory.
-            e is File &&
-                // Is not a package dependency file.
-                !(Uri.parse(e.path).pathSegments.contains('packages')) &&
-                // Is a valid test file.
-                e.path.endsWith(_testFilePattern));
-      });
-      fileCollection.addAll(validTests);
-    }
-  }
-
   CoverageTask._(List<String> tests, List<String> reportOn,
-      {List<String> functional_tests:defaultFunctionalTests,bool html: defaultHtml, String output: defaultOutput})
+      {List<String> functionalTests: defaultFunctionalTests,
+      bool html: defaultHtml,
+      String output: defaultOutput})
       : _html = html,
         _outputDirectory = new Directory(output),
         _reportOn = reportOn {
     // Build the list of test files.
-    tests.forEach((path){_testFileValidation(path,_files);});
-    functional_tests.forEach((path){_testFileValidation(path, _functional_files);});
+    tests.forEach((path) {
+      _testFileValidation(path, _files);
+    });
+    functionalTests.forEach((path) {
+      _testFileValidation(path, _functionalFiles);
+    });
   }
 
   /// Generated file with the coverage collection information in JSON format.
@@ -207,9 +196,9 @@ class CoverageTask extends Task {
   /// All test files (expanded from the given list of test paths).
   /// This is the exact list of tests that were run for coverage collection.
   Iterable<String> get tests => _files.map((f) => f.path);
-  Iterable<String> get functional_tests => _functional_files.map((f) => f.path);
+  Iterable<String> get functionalTests => _functionalFiles.map((f) => f.path);
 
-  Future _collect({List<File> functional_collections:const []}) async {
+  Future _collect({List<File> functionalCollections: const []}) async {
     List<File> collections = [];
     for (int i = 0; i < _files.length; i++) {
       File collection =
@@ -246,24 +235,24 @@ class CoverageTask extends Task {
       if (await process.exitCode > 0) continue;
       collections.add(collection);
     }
-    collections.addAll(functional_collections);
+    collections.addAll(functionalCollections);
     // Merge all individual coverage collection files into one.
     _collection = _merge(collections);
   }
 
   Future<List<File>> _collect_functional() async {
     List<File> collections = [];
-    for(File f in _functional_files){
+    for (File f in _functionalFiles) {
       print(f.path);
     }
-    for (int i = 0; i < _functional_files.length; i++) {
+    for (int i = 0; i < _functionalFiles.length; i++) {
       List<int> observatoryPorts;
 
       // Run the test and obtain the observatory port for coverage collection.
       try {
-        observatoryPorts = await _test_functional(_functional_files[i]);
+        observatoryPorts = await _test_functional(_functionalFiles[i]);
       } on CoverageTestSuiteException {
-        _coverageErrorOutput.add('Tests failed: ${_functional_files[i].path}');
+        _coverageErrorOutput.add('Tests failed: ${_functionalFiles[i].path}');
         continue;
       }
 
@@ -271,9 +260,9 @@ class CoverageTask extends Task {
       List<Future> wsDone = new List<Future>();
 
       //Check for observatories with actual data
-      for(int port in observatoryPorts) {
+      for (int port in observatoryPorts) {
         try {
-          var ws = await WebSocket.connect("ws://127.0.0.1:${port}/ws");
+          WebSocket ws = await WebSocket.connect("ws://127.0.0.1:${port}/ws");
           wsDone.add(ws.done);
           ws.add("{\"id\":\"3\",\"method\":\"getVM\",\"params\":{}}");
           ws.listen((l) {
@@ -284,19 +273,17 @@ class CoverageTask extends Task {
             }
             ws.close();
           });
-        }
-        on Exception {
+        } on Exception {
           continue;
         }
       }
-      for(Future f in wsDone)
-        await f;
+      for (Future f in wsDone) await f;
 
       observatoryPorts = validPorts;
 
-      for(int j=0;j<observatoryPorts.length;j++) {
-        File collection =
-        new File(path.join(_collections.path, '${_functional_files[i].path}${j}.json'));
+      for (int j = 0; j < observatoryPorts.length; j++) {
+        File collection = new File(path.join(
+            _collections.path, '${_functionalFiles[i].path}${j}.json'));
         int observatoryPort = observatoryPorts[j];
         // Collect the coverage from observatory.
         String executable = 'pub';
@@ -309,12 +296,14 @@ class CoverageTask extends Task {
         ];
 
         _coverageOutput.add('');
-        _coverageOutput.add('Collecting coverage for ${_functional_files[i].path}');
+        _coverageOutput
+            .add('Collecting coverage for ${_functionalFiles[i].path}');
         _coverageOutput.add('$executable ${args.join(' ')}\n');
 
         _lastTestProcess = new TaskProcess(executable, args);
         _lastTestProcess.stdout.listen((l) => _coverageOutput.add('    $l'));
-        _lastTestProcess.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
+        _lastTestProcess.stderr
+            .listen((l) => _coverageErrorOutput.add('    $l'));
         await _lastTestProcess.done;
         _killTest();
         collections.add(collection);
@@ -417,68 +406,62 @@ class CoverageTask extends Task {
 
     TaskProcess serve;
 
-    if(functional_tests.isNotEmpty){
-      //    String executable = 'selenium-server';
-//    int port = await getOpenPort();
-      List args = ["-port"
-//    ,"${port}"
-      ];
-      args = [];
+    if (functionalTests.isNotEmpty) {
       observatoryPort = new List<int>();
       RegExp _serving = new RegExp("Serving .* on http:\/\/localhost:8080");
       serve = new TaskProcess('pub', ['serve']);
       Completer serverRunning = new Completer();
       serve.stderr.listen((line) async {
         print(line);
-        if(line.contains("Error: Address already in use")){
+        if (line.contains("Error: Address already in use")) {
           await serve.kill();
           await _seleniumServerProcess.kill();
-          throw new PortBoundException("pub serve failed to start.  Check if port 8080 is already bound");
+          throw new PortBoundException(
+              "pub serve failed to start.  Check if port 8080 is already bound");
         }
       });
-      serve.stdout.listen((line){
+      serve.stdout.listen((line) {
         print(line);
-        if(_serving.hasMatch(line)){
+        if (_serving.hasMatch(line)) {
           serverRunning.complete();
         }
       });
 
-      _seleniumServerProcess = new TaskProcess('selenium-server', args);
+      _seleniumServerProcess = new TaskProcess('selenium-server', []);
 
       RegExp _observatoryPortPattern = new RegExp(
           r'Observatory listening (at|on) http:\/\/127\.0\.0\.1:(\d+)');
 
-      int portPatternCount=0;
       Completer seleniumRunning = new Completer();
       _seleniumServerProcess.stderr.listen((line) async {
         _coverageErrorOutput.add('    $line');
         if (line.contains(_observatoryPortPattern)) {
           Match m = _observatoryPortPattern.firstMatch(line);
           observatoryPort.add(int.parse(m.group(2)));
-        }
-        else if(line.contains("Failed to start")){
+        } else if (line.contains("Failed to start")) {
           await serve.kill();
           await _seleniumServerProcess.kill();
-          throw new PortBoundException("selenium-server failed to start.  Check if this process is already running.");
-        }
-        else if(line.contains("Selenium Server is up and running")){
+          throw new PortBoundException(
+              "selenium-server failed to start.  Check if this process is already running.");
+        } else if (line.contains("Selenium Server is up and running")) {
           seleniumRunning.complete();
         }
       });
 
       await seleniumRunning.future;
       await serverRunning.future;
+      print(serve);
     }
 
-    List<File> functional_collections = await _collect_functional();
+    List<File> functionalCollections = await _collect_functional();
 
     //Moved so that if merge fails, selenium and pub serve are still killed
-    if(functional_tests.isNotEmpty){
-      await _seleniumServerProcess.kill();
+    if (functionalTests.isNotEmpty) {
       await serve.kill();
+      await _seleniumServerProcess.kill();
     }
 
-    await _collect(functional_collections: functional_collections);
+    await _collect(functionalCollections: functionalCollections);
 
     await _format();
 
@@ -486,8 +469,9 @@ class CoverageTask extends Task {
       await _generateReport();
     }
 
-    _done.complete(
-        new CoverageResult.success(tests, functional_tests, collection, lcov, report: report));
+    _done.complete(new CoverageResult.success(
+        tests, functionalTests, collection, lcov,
+        report: report));
   }
 
   Future<int> _test(File file) async {
@@ -632,18 +616,38 @@ class CoverageTask extends Task {
     }
   }
 
-  Future<List<int>> _test_functional(File file) async {
+  void _testFileValidation(path, fileCollection) {
+    if (path.endsWith(_dartFilePattern) && FileSystemEntity.isFileSync(path)) {
+      fileCollection.add(new File(path));
+    } else if (FileSystemEntity.isDirectorySync(path)) {
+      Directory dir = new Directory(path);
+      List<FileSystemEntity> children = dir.listSync(recursive: true);
+      Iterable<FileSystemEntity> validTests =
+      children.where((FileSystemEntity e) {
+        Uri uri = Uri.parse(e.absolute.path);
+        return (
+            // Is a file, not a directory.
+            e is File &&
+                // Is not a package dependency file.
+                !(Uri.parse(e.path).pathSegments.contains('packages')) &&
+                // Is a valid test file.
+                e.path.endsWith(_testFilePattern));
+      });
+      fileCollection.addAll(validTests);
+    }
+  }
 
+  Future<List<int>> _test_functional(File file) async {
     int count = observatoryPort.length;
 
     String executable = 'pub';
-    List args = ['run',
-//        int port = await getOpenPort();
-//        String executable = 'dart';
-//        List args = ["--observe=${port}"
-    file.path.split(config.test.functionalTests[0] + '/')[1]];
+    List args = [
+      'run',
+      file.path.split(config.test.functionalTests[0] + '/')[1]
+    ];
     print(config.test.functionalTests[0]);
-    TaskProcess process = new TaskProcess(executable, args,workingDirectory:config.test.functionalTests[0]);
+    TaskProcess process = new TaskProcess(executable, args,
+        workingDirectory: config.test.functionalTests[0]);
 
     String _observatoryFailPattern = 'Could not start Observatory HTTP server';
     RegExp _observatoryPortPattern = new RegExp(
@@ -662,12 +666,12 @@ class CoverageTask extends Task {
       if (line.contains(_testsFailedPattern)) {
         throw new CoverageTestSuiteException(file.path);
       }
-      if(_testsPassedPat.hasMatch(line)){
+      if (_testsPassedPat.hasMatch(line)) {
         break;
       }
     }
 
-    if(observatoryPort.length>count) {
+    if (observatoryPort.length > count) {
       return observatoryPort.sublist(count);
     }
     return [];

@@ -39,9 +39,9 @@ class MissingLcovException implements Exception {
   String toString() => 'MissingLcovException: $message';
 }
 
-
 class PortBoundException implements Exception {
   final String message;
-  PortBoundException(String message): this.message = 'Port could not be bound: $message';
+  PortBoundException(String message)
+      : this.message = 'Port could not be bound: $message';
   String toString() => 'PortBoundException: $message';
 }

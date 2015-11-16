@@ -9,6 +9,7 @@ void main() {
         desiredCapabilities: {'browserName': 'chrome','chromeOptions':{'binary': '/usr/local/bin/dartium'}});
   });
 
+  //The webdriver is not quit because the functional coverage tool will forcibly close the browser after coverage collection
 //  tearDown(() => driver.quit());
 
   test('Test1', () async {

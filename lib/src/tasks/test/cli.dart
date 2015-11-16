@@ -96,9 +96,12 @@ class TestCli extends TaskCli {
     if (hasRestParams(parsedArgs)) {
       individualTests = await addToTestsFromRest(tests, parsedArgs.rest);
     }
-    if (isExplicitlyFalse(unit) && !integration && !functional && individualTests == 0) {
+    if (isExplicitlyFalse(unit) &&
+        !integration &&
+        !functional &&
+        individualTests == 0) {
       return new CliResult.fail(
-          'No tests were selected. Include at least one of --unit or --integration.');
+          'No tests were selected. Include at least one of --unit, --integration or --functional.');
     } else {
       if (individualTests == 0) unit = true;
     }
@@ -109,7 +112,7 @@ class TestCli extends TaskCli {
     if (integration) {
       tests.addAll(config.test.integrationTests);
     }
-    if(functional){
+    if (functional) {
       tests.addAll(config.test.functionalTests);
     }
 
@@ -122,7 +125,7 @@ class TestCli extends TaskCli {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
       }
-      if(functional && config.test.functionalTests.isEmpty){
+      if (functional && config.test.functionalTests.isEmpty) {
         return new CliResult.fail(
             'This project does not specify any functional tests.');
       }

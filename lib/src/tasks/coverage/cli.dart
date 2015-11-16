@@ -61,14 +61,14 @@ class CoverageCli extends TaskCli {
 
     if (!unit && !integration && !functional) {
       return new CliResult.fail(
-          'No tests were selected. Include at least one of --unit or --integration.');
+          'No tests were selected. Include at least one of --unit, --integration or --functional.');
     }
 
     bool html = TaskCli.valueOf('html', parsedArgs, config.coverage.html);
     bool open = TaskCli.valueOf('open', parsedArgs, true);
 
     List<String> tests = [];
-    List<String> functional_tests = [];
+    List<String> functionalTests = [];
 
     if (unit) {
       tests.addAll(config.test.unitTests);
@@ -76,8 +76,8 @@ class CoverageCli extends TaskCli {
     if (integration) {
       tests.addAll(config.test.integrationTests);
     }
-    if(functional){
-      functional_tests.addAll(config.test.functionalTests);
+    if (functional) {
+      functionalTests.addAll(config.test.functionalTests);
     }
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
@@ -89,8 +89,8 @@ class CoverageCli extends TaskCli {
             'This project does not specify any integration tests.');
       }
     }
-    if(functional_tests.isEmpty){
-      if(functional && config.test.functionalTests.isEmpty){
+    if (functionalTests.isEmpty) {
+      if (functional && config.test.functionalTests.isEmpty) {
         return new CliResult.fail(
             'This project does not specify any functional tests.');
       }
@@ -99,16 +99,16 @@ class CoverageCli extends TaskCli {
     CoverageResult result;
     try {
       CoverageTask task = CoverageTask.start(tests,
-          functional_tests:functional_tests,
+          functionalTests: functionalTests,
           html: html,
           output: config.coverage.output,
           reportOn: config.coverage.reportOn);
-          reporter.logGroup('Collecting coverage',
+      reporter.logGroup('Collecting coverage',
           outputStream: task.output, errorStream: task.errorOutput);
       result = await task.done;
     } on MissingLcovException catch (e) {
       return new CliResult.fail(e.message);
-    } on PortBoundException catch(e) {
+    } on PortBoundException catch (e) {
       return new CliResult.fail(e.message);
     }
 
