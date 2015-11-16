@@ -329,7 +329,11 @@ class CoverageTask extends Task {
       return;
     }
 
-    await _collect();
+    try {
+      await _collect();
+    } catch (e) {
+      print(e);
+    }
     await _format();
     print('completed _format() task');
 
