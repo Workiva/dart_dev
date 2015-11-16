@@ -303,23 +303,31 @@ class CoverageTask extends Task {
   }
 
   File _merge(List<File> collections) {
-    if (collections.isEmpty) throw new ArgumentError(
-        'Cannot merge an empty list of coverages.');
+    Map mergedJson = {};
+    try {
+      if (collections.isEmpty) throw new ArgumentError(
+          'Cannot merge an empty list of coverages.');
 
-    Map mergedJson = JSON.decode(collections.first.readAsStringSync());
-    for (int i = 1; i < collections.length; i++) {
-      Map coverageJson = JSON.decode(collections[i].readAsStringSync());
-      mergedJson['coverage'].addAll(coverageJson['coverage']);
-    }
-    _collections.deleteSync(recursive: true);
+      mergedJson = JSON.decode(collections.first.readAsStringSync());
+      for (int i = 1; i < collections.length; i++) {
+        Map coverageJson = JSON.decode(collections[i].readAsStringSync());
+        mergedJson['coverage'].addAll(coverageJson['coverage']);
+      }
+      _collections.deleteSync(recursive: true);
 
-    File coverage = new File(path.join(_outputDirectory.path, 'coverage.json'));
-    if (coverage.existsSync()) {
-      coverage.deleteSync();
+      File coverage =
+          new File(path.join(_outputDirectory.path, 'coverage.json'));
+      if (coverage.existsSync()) {
+        coverage.deleteSync();
+      }
+      coverage.createSync();
+      coverage.writeAsStringSync(JSON.encode(mergedJson));
+      return coverage;
+    } catch (e) {
+      var description = e.toString();
+      description = description + mergedJson.toString();
+      throw new Exception(description);
     }
-    coverage.createSync();
-    coverage.writeAsStringSync(JSON.encode(mergedJson));
-    return coverage;
   }
 
   Future _run() async {
