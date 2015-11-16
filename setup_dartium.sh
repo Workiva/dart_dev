@@ -18,4 +18,4 @@ rm $DARTIUM_DIST
 
 mv dartium-* dartium
 
-ln -s "$PWD/dartium/chrome" /usr/local/bin/dartium
+sudo ln -s "$PWD/dartium/chrome" /usr/local/bin/dartium
