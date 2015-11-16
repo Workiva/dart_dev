@@ -307,13 +307,12 @@ class CoverageTask extends Task {
     if (collections.isEmpty) throw new ArgumentError(
         'Cannot merge an empty list of coverages.');
 
-    print(collections.first.readAsStringSync());
-    Map mergedJson = JSON.decode(collections.first.readAsStringSync());
+    String firstMessage = await collections.first.readAsString();
+    Map mergedJson = JSON.decode(firstMessage);
 
-    print('\n\n\n\n\n\n\n\nnew line\n\n\n\n');
     for (int i = 1; i < collections.length; i++) {
-      print(collections[i].readAsStringSync());
-      Map coverageJson = JSON.decode(collections[i].readAsStringSync());
+      String message = await collections[i].readAsString();
+      Map coverageJson = JSON.decode(message);
       mergedJson['coverage'].addAll(coverageJson['coverage']);
     }
     _collections.deleteSync(recursive: true);

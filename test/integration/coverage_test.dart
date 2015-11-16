@@ -39,10 +39,6 @@ Future<bool> runCoverage(String projectPath, {bool html: false}) async {
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
 
-  process.stdout.forEach((line) {
-    print(line);
-  });
-
   await process.done;
   return (await process.exitCode) == 0;
 }
@@ -53,7 +49,7 @@ void main() {
       expect(await runCoverage(projectWithBrowserTests), isTrue);
       File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 125)));
+    }, timeout: new Timeout(new Duration(seconds: 300)));
 
 //    test('should generate coverage for VM tests', () async {
 //      expect(await runCoverage(projectWithVmTests), isTrue);
