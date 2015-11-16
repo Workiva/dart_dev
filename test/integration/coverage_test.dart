@@ -53,7 +53,7 @@ void main() {
       expect(await runCoverage(projectWithBrowserTests), isTrue);
       File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 120)));
+    }, timeout: new Timeout(new Duration(seconds: 125)));
 
     test('should generate coverage for VM tests', () async {
       expect(await runCoverage(projectWithVmTests), isTrue);
