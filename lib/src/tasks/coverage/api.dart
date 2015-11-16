@@ -238,13 +238,11 @@ class CoverageTask extends Task {
     }
 
     // Merge all individual coverage collection files into one.
-    _collection = await _merge(collections);
+    _collection = _merge(collections);
   }
 
   Future _format() async {
     _lcov = new File(path.join(_outputDirectory.path, 'coverage.lcov'));
-
-    print('in the _format() task');
 
     String executable = 'pub';
     List args = [
@@ -298,21 +296,19 @@ class CoverageTask extends Task {
     _lastTestProcess.kill();
     _lastTestProcess = null;
     _testServe.kill();
+    _testServe = null;
     if (_lastHtmlFile != null) {
       _lastHtmlFile.deleteSync();
     }
   }
 
-  Future<File> _merge(List<File> collections) async {
+  File _merge(List<File> collections) {
     if (collections.isEmpty) throw new ArgumentError(
         'Cannot merge an empty list of coverages.');
 
-    String firstMessage = await collections.first.readAsString();
-    Map mergedJson = JSON.decode(firstMessage);
-
+    Map mergedJson = JSON.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
-      String message = await collections[i].readAsString();
-      Map coverageJson = JSON.decode(message);
+      Map coverageJson = JSON.decode(collections[i].readAsStringSync());
       mergedJson['coverage'].addAll(coverageJson['coverage']);
     }
     _collections.deleteSync(recursive: true);
@@ -332,13 +328,8 @@ class CoverageTask extends Task {
       return;
     }
 
-    try {
-      await _collect();
-    } catch (e) {
-      print(e);
-    }
+    await _collect();
     await _format();
-    print('completed _format() task');
 
     if (_html) {
       await _generateReport();
