@@ -306,13 +306,13 @@ class CoverageTask extends Task {
   Future<File> _merge(List<File> collections) async {
     if (collections.isEmpty) throw new ArgumentError(
         'Cannot merge an empty list of coverages.');
-    for (int i = 1; i < collections.length; i++) {
-      List<String> lines = await collections[i].readAsLines();
-//      lines.forEach((String line) => print(line));
-    }
 
+    print(collections.first.readAsStringSync());
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());
+
+    print('\n\n\n\n\n\n\n\nnew line\n\n\n\n');
     for (int i = 1; i < collections.length; i++) {
+      print(collections[i].readAsStringSync());
       Map coverageJson = JSON.decode(collections[i].readAsStringSync());
       mergedJson['coverage'].addAll(coverageJson['coverage']);
     }
