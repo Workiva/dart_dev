@@ -233,7 +233,7 @@ class CoverageTask extends Task {
       process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
       await process.done;
       _killTest();
-      if (await process.exitCode > 0) continue;
+//      if (await process.exitCode > 0) continue;
       collections.add(collection);
     }
 
@@ -243,6 +243,8 @@ class CoverageTask extends Task {
 
   Future _format() async {
     _lcov = new File(path.join(_outputDirectory.path, 'coverage.lcov'));
+
+    print('in the _format() task');
 
     String executable = 'pub';
     List args = [
@@ -329,6 +331,7 @@ class CoverageTask extends Task {
 
     await _collect();
     await _format();
+    print('completed _format() task');
 
     if (_html) {
       await _generateReport();
