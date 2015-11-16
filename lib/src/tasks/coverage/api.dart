@@ -233,12 +233,12 @@ class CoverageTask extends Task {
       process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
       await process.done;
       _killTest();
-//      if (await process.exitCode > 0) continue;
+      if (await process.exitCode > 0) continue;
       collections.add(collection);
     }
 
     // Merge all individual coverage collection files into one.
-    _collection = _merge(collections);
+    _collection = await _merge(collections);
   }
 
   Future _format() async {
@@ -303,9 +303,13 @@ class CoverageTask extends Task {
     }
   }
 
-  File _merge(List<File> collections) {
+  Future<File> _merge(List<File> collections) async {
     if (collections.isEmpty) throw new ArgumentError(
         'Cannot merge an empty list of coverages.');
+    for (int i = 1; i < collections.length; i++) {
+      List<String> lines = await collections[i].readAsLines();
+      lines.forEach((String line) => print(line));
+    }
 
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
