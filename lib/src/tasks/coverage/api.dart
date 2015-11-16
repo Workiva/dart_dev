@@ -297,7 +297,7 @@ class CoverageTask extends Task {
   void _killTest() {
     _lastTestProcess.kill();
     _lastTestProcess = null;
-//    _testServe.kill();
+    _testServe.kill();
     if (_lastHtmlFile != null) {
       _lastHtmlFile.deleteSync();
     }
@@ -306,10 +306,9 @@ class CoverageTask extends Task {
   Future<File> _merge(List<File> collections) async {
     if (collections.isEmpty) throw new ArgumentError(
         'Cannot merge an empty list of coverages.');
-    await new Future.delayed(new Duration(seconds: 60));
     for (int i = 1; i < collections.length; i++) {
       List<String> lines = await collections[i].readAsLines();
-      lines.forEach((String line) => print(line));
+//      lines.forEach((String line) => print(line));
     }
 
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());

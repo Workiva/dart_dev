@@ -49,7 +49,7 @@ TestTask test(
     if (line.contains('All tests passed!') ||
         line.contains('Some tests failed.')) {
       task.testSummary = line;
-//      outputProcessed.complete();
+      outputProcessed.complete();
     }
   });
 
