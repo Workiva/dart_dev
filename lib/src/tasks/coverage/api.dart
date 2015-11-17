@@ -235,11 +235,7 @@ class CoverageTask extends Task {
       process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
       await process.done;
 
-      var string = await collection.readAsString();
-
-      while (string == ''){
-        string = await collection.readAsString();
-      }
+      await new Future.delayed(new Duraction(seconds:60));
 
       _killTest();
       if (await process.exitCode > 0) continue;
