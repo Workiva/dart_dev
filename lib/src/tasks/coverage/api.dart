@@ -128,6 +128,8 @@ class CoverageTask extends Task {
   /// the coverage collection has completed.
   TaskProcess _lastTestProcess;
 
+  String _openPortForTest;
+
   /// Directory to output all coverage related artifacts.
   Directory _outputDirectory;
 
@@ -295,10 +297,8 @@ class CoverageTask extends Task {
   void _killTest() {
     _lastTestProcess.kill();
     _lastTestProcess = null;
-    _testServe.kill();
-    _testServe = null;
     if (_lastHtmlFile != null) {
-//      _lastHtmlFile.deleteSync();
+      _lastHtmlFile.deleteSync();
     }
   }
 
@@ -340,8 +340,22 @@ class CoverageTask extends Task {
       return;
     }
 
+    _openPortForTest = await getOpenPort().then((value) {
+      return value.toString();
+    });
+
+    _testServe =
+        new TaskProcess('pub', ['serve', 'test', '--port', _openPortForTest]);
+
+    await for (String line in _testServe.stdout) {
+      if (line.contains('Serving')) {
+        break;
+      }
+    }
+
     await _collect();
     await _format();
+    _testServe.kill();
 
     if (_html) {
       await _generateReport();
@@ -357,19 +371,6 @@ class CoverageTask extends Task {
     htmlPath = htmlPath.substring(0, htmlPath.length - '.dart'.length);
     htmlPath = '$htmlPath.html';
     File customHtmlFile = new File(htmlPath);
-
-    String openPortForTest = await getOpenPort().then((value) {
-      return value.toString();
-    });
-
-    _testServe =
-        new TaskProcess('pub', ['serve', 'test', '--port', openPortForTest]);
-
-    await for (String line in _testServe.stdout) {
-      if (line.contains('Serving')) {
-        break;
-      }
-    }
 
     // Build or modify the HTML file to properly load the test.
     File htmlFile;
@@ -441,12 +442,12 @@ class CoverageTask extends Task {
       List<String> args = [];
       if (customHtmlFile.existsSync()) {
         args = [
-          'http://localhost:$openPortForTest/' +
+          'http://localhost:$_openPortForTest/' +
               htmlFile.path.split('/test/').last
         ];
       } else {
         args = [
-          'http://localhost:$openPortForTest/' +
+          'http://localhost:$_openPortForTest/' +
               htmlFile.path.replaceFirst('test/', '')
         ];
       }
