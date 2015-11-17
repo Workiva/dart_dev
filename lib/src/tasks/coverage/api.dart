@@ -222,6 +222,7 @@ class CoverageTask extends Task {
         'run',
         'coverage:collect_coverage',
         '--port=${observatoryPort}',
+        '--host=localhost',
         '-o',
         collection.path
       ];
@@ -234,8 +235,6 @@ class CoverageTask extends Task {
       process.stdout.listen((l) => _coverageOutput.add('    $l'));
       process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
       await process.done;
-
-      await new Future.delayed(new Duration(seconds: 60));
 
       _killTest();
       if (await process.exitCode > 0) continue;
