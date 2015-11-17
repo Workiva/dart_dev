@@ -234,6 +234,13 @@ class CoverageTask extends Task {
       process.stdout.listen((l) => _coverageOutput.add('    $l'));
       process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
       await process.done;
+
+      var string = await collection.readAsString();
+
+      while (string == ''){
+        string = await collection.readAsString();
+      }
+
       _killTest();
       if (await process.exitCode > 0) continue;
       collections.add(collection);
@@ -306,7 +313,6 @@ class CoverageTask extends Task {
     Map mergedJson = {};
     try {
       bool existsFirst = collections.first.existsSync();
-      while (await collections.first.length() <= 0) {}
       _coverageOutput.add('first file ' + existsFirst.toString());
       bool existsSecond = collections[1].existsSync();
       _coverageOutput.add('second file ' + existsSecond.toString());
@@ -315,7 +321,6 @@ class CoverageTask extends Task {
 
       mergedJson = JSON.decode(collections.first.readAsStringSync());
       for (int i = 1; i < collections.length; i++) {
-        while (await collections[i].length() <= 0) {}
         Map coverageJson = JSON.decode(collections[i].readAsStringSync());
         mergedJson['coverage'].addAll(coverageJson['coverage']);
       }
