@@ -240,7 +240,7 @@ class CoverageTask extends Task {
     }
 
     // Merge all individual coverage collection files into one.
-    _collection = _merge(collections);
+    _collection = await _merge(collections);
   }
 
   Future _format() async {
@@ -302,10 +302,11 @@ class CoverageTask extends Task {
     }
   }
 
-  File _merge(List<File> collections) {
+  Future<File> _merge(List<File> collections) async {
     Map mergedJson = {};
     try {
       bool existsFirst = collections.first.existsSync();
+      while (await collections.first.length() <= 0) {}
       _coverageOutput.add('first file ' + existsFirst.toString());
       bool existsSecond = collections[1].existsSync();
       _coverageOutput.add('second file ' + existsSecond.toString());
@@ -314,6 +315,7 @@ class CoverageTask extends Task {
 
       mergedJson = JSON.decode(collections.first.readAsStringSync());
       for (int i = 1; i < collections.length; i++) {
+        while (await collections[i].length() <= 0) {}
         Map coverageJson = JSON.decode(collections[i].readAsStringSync());
         mergedJson['coverage'].addAll(coverageJson['coverage']);
       }
