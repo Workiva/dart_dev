@@ -298,13 +298,17 @@ class CoverageTask extends Task {
     _testServe.kill();
     _testServe = null;
     if (_lastHtmlFile != null) {
-      _lastHtmlFile.deleteSync();
+//      _lastHtmlFile.deleteSync();
     }
   }
 
   File _merge(List<File> collections) {
     Map mergedJson = {};
     try {
+      bool existsFirst = collections.first.existsSync();
+      _coverageOutput.add('first file ' + existsFirst.toString());
+      bool existsSecond = collections[1].existsSync();
+      _coverageOutput.add('second file ' + existsSecond.toString());
       if (collections.isEmpty) throw new ArgumentError(
           'Cannot merge an empty list of coverages.');
 

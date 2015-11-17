@@ -39,6 +39,13 @@ Future<bool> runCoverage(String projectPath, {bool html: false}) async {
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
 
+  process.stdout.forEach((line) {
+    if (line.contains('pass') || line.contains('fail')){
+      line = '';
+    }
+    print(line);
+  });
+
   process.stderr.forEach((line) {
     print(line);
   });
