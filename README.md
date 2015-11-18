@@ -97,9 +97,9 @@ alias ddev='pub run dart_dev'
 
 #### Bash Completion
 
-Symlink the file `tool/ddev-completion.sh` into `/etc/bash_completion.d/` (or
-wherever your completion scripts live, if you have installed Bash through
-Homebrew on a Mac, for instance, this will be
+Symlink or copy the file `tool/ddev-completion.sh` into
+`/etc/bash_completion.d/` (or wherever your completion scripts live, if you
+have installed Bash through Homebrew on a Mac, for instance, this will be
 `/usr/local/etc/bash_completion.d/`). Next time you load a Bash session you'll
 have basic completions for the `ddev` alias described above.
 
