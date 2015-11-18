@@ -88,11 +88,11 @@ class CoverageCli extends TaskCli {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
       }
-    }
-    if (functionalTests.isEmpty) {
-      if (functional && config.test.functionalTests.isEmpty) {
-        return new CliResult.fail(
-            'This project does not specify any functional tests.');
+      if (functionalTests.isEmpty) {
+        if (functional && config.test.functionalTests.isEmpty) {
+          return new CliResult.fail(
+              'This project does not specify any functional tests.');
+        }
       }
     }
 

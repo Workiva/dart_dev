@@ -62,7 +62,7 @@ class TaskProcess {
     var args = [];
     for (int i in pids) {
       args.add("-P");
-      args.add("${i}");
+      args.add("$i");
     }
     TaskProcess pgrep = new TaskProcess(executable, args);
     List<int> cpids = new List<int>();

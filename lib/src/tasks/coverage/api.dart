@@ -307,14 +307,11 @@ class CoverageTask extends Task {
         await _lastTestProcess.done;
         _killTest();
         collections.add(collection);
-//        if (await _lastTestProcess.exitCode > 0) continue;
       }
       await _seleniumServerProcess.killGroup();
     }
 
     return collections;
-    // Merge all individual coverage collection files into one.
-//    _collection = _merge(collections);
   }
 
   Future _format() async {
@@ -616,7 +613,7 @@ class CoverageTask extends Task {
     }
   }
 
-  void _testFileValidation(path, fileCollection) {
+  void _testFileValidation(String path,List<File> fileCollection) {
     if (path.endsWith(_dartFilePattern) && FileSystemEntity.isFileSync(path)) {
       fileCollection.add(new File(path));
     } else if (FileSystemEntity.isDirectorySync(path)) {
