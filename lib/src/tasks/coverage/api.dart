@@ -305,34 +305,58 @@ class CoverageTask extends Task {
   }
 
   Future<File> _merge(List<File> collections) async {
-    Map mergedJson = {};
-    try {
-      bool existsFirst = collections.first.existsSync();
-      _coverageOutput.add('first file ' + existsFirst.toString());
-      bool existsSecond = collections[1].existsSync();
-      _coverageOutput.add('second file ' + existsSecond.toString());
-      if (collections.isEmpty) throw new ArgumentError(
-          'Cannot merge an empty list of coverages.');
-
-      mergedJson = JSON.decode(collections.first.readAsStringSync());
-      for (int i = 1; i < collections.length; i++) {
-        Map coverageJson = JSON.decode(collections[i].readAsStringSync());
-        mergedJson['coverage'].addAll(coverageJson['coverage']);
+    Map mergedJson = {'coverage': []};
+    for (var collection in collections) {
+      String contents = collection.readAsStringSync();
+      if (contents.isEmpty) {
+        _coverageErrorOutput.add('Failed to collect coverage (${collection.path})');
+      } else {
+        Map coverageJson;
+        try {
+          coverageJson = JSON.decode(contents);
+          mergedJson['coverage'].addAll(coverageJson['coverage']);
+        } on FormatException {
+          _coverageErrorOutput.add('Failed to parse coverage (${collection.path})');
+        }
       }
-      _collections.deleteSync(recursive: true);
-
-      File coverage =
-          new File(path.join(_outputDirectory.path, 'coverage.json'));
-      if (coverage.existsSync()) {
-        coverage.deleteSync();
-      }
-      coverage.createSync();
-      coverage.writeAsStringSync(JSON.encode(mergedJson));
-      return coverage;
-    } catch (e, stackTrace) {
-      print('COVERAGE MERGE FAILED: $e\n$stackTrace');
-      print('MERGED JSON: $mergedJson');
     }
+    _collections.deleteSync(recursive: true);
+    File coverage = new File(path.join(_outputDirectory.path, 'coverage.json'));
+    if (coverage.existsSync()) {
+      coverage.deleteSync();
+    }
+    coverage.createSync();
+    coverage.writeAsStringSync(JSON.encode(mergedJson));
+    return coverage;
+
+//    Map mergedJson = {};
+//    try {
+//      bool existsFirst = collections.first.existsSync();
+//      _coverageOutput.add('first file ' + existsFirst.toString());
+//      bool existsSecond = collections[1].existsSync();
+//      _coverageOutput.add('second file ' + existsSecond.toString());
+//      if (collections.isEmpty) throw new ArgumentError(
+//          'Cannot merge an empty list of coverages.');
+//
+//      mergedJson = JSON.decode(collections.first.readAsStringSync());
+//      for (int i = 1; i < collections.length; i++) {
+//        Map coverageJson = JSON.decode(collections[i].readAsStringSync());
+//        mergedJson['coverage'].addAll(coverageJson['coverage']);
+//      }
+//      _collections.deleteSync(recursive: true);
+//
+//      File coverage =
+//          new File(path.join(_outputDirectory.path, 'coverage.json'));
+//      if (coverage.existsSync()) {
+//        coverage.deleteSync();
+//      }
+//      coverage.createSync();
+//      coverage.writeAsStringSync(JSON.encode(mergedJson));
+//      return coverage;
+//    } catch (e, stackTrace) {
+//      print('COVERAGE MERGE FAILED: $e\n$stackTrace');
+//      print('MERGED JSON: $mergedJson');
+//    }
   }
 
   Future _run() async {
