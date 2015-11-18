@@ -222,7 +222,7 @@ class CoverageTask extends Task {
         'run',
         'coverage:collect_coverage',
         '--port=${observatoryPort}',
-        '--host=localhost',
+        '--host=127.0.0.1',
         '-o',
         collection.path
       ];
