@@ -241,6 +241,9 @@ class CoverageTask extends Task {
       collections.add(collection);
     }
 
+    print('PUB SERVE KILLED');
+    _testServe.kill();
+
     // Merge all individual coverage collection files into one.
     _collection = await _merge(collections);
   }
@@ -372,16 +375,17 @@ class CoverageTask extends Task {
     _testServe =
         new TaskProcess('pub', ['serve', 'test', '--port', _openPortForTest]);
 
-    await for (String line in _testServe.stdout) {
+    Completer pubServeReady = new Completer();
+    _testServe.stdout.listen((line) {
       _coverageOutput.add('PUB SERVE: $line');
       if (line.contains('Serving')) {
-        break;
+        pubServeReady.complete();
       }
-    }
+    });
 
+    await pubServeReady.future;
     await _collect();
     await _format();
-    _testServe.kill();
 
     if (_html) {
       await _generateReport();
