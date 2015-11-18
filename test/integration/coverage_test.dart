@@ -46,6 +46,9 @@ Future<bool> runCoverage(String projectPath,
     TaskProcess process =
     new TaskProcess('pub', args, workingDirectory: projectPath);
 
+  process.stdout.listen((l){print(l);});
+  process.stderr.listen((l){print(l);});
+
     await process.done;
     return (await process.exitCode) == 0;
   }
