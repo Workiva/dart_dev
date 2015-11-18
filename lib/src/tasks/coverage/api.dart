@@ -350,6 +350,7 @@ class CoverageTask extends Task {
         new TaskProcess('pub', ['serve', 'test', '--port', _openPortForTest]);
 
     await for (String line in _testServe.stdout) {
+      _coverageOutput.add('PUB SERVE: $line');
       if (line.contains('Serving')) {
         break;
       }
