@@ -329,10 +329,9 @@ class CoverageTask extends Task {
       coverage.createSync();
       coverage.writeAsStringSync(JSON.encode(mergedJson));
       return coverage;
-    } catch (e) {
-      var description = e.toString();
-      description = description + mergedJson.toString();
-      throw new Exception(description);
+    } catch (e, stackTrace) {
+      print('COVERAGE MERGE FAILED: $e\n$stackTrace');
+      print('MERGED JSON: $mergedJson');
     }
   }
 
@@ -445,12 +444,12 @@ class CoverageTask extends Task {
       List<String> args = [];
       if (customHtmlFile.existsSync()) {
         args = [
-          'http://localhost:$_openPortForTest/' +
+          'http://127.0.0.1:$_openPortForTest/' +
               htmlFile.path.split('/test/').last
         ];
       } else {
         args = [
-          'http://localhost:$_openPortForTest/' +
+          'http://127.0.0.1:$_openPortForTest/' +
               htmlFile.path.replaceFirst('test/', '')
         ];
       }
