@@ -128,11 +128,16 @@ class CoverageTask extends Task {
   /// the coverage collection has completed.
   TaskProcess _lastTestProcess;
 
+  String _openPortForTest;
+
   /// Directory to output all coverage related artifacts.
   Directory _outputDirectory;
 
   /// List of directories on which coverage should be reported.
   List<String> _reportOn;
+
+  /// Process used to serve Test directory for browser based tests
+  TaskProcess _testServe;
 
   CoverageTask._(List<String> tests, List<String> reportOn,
       {bool html: defaultHtml, String output: defaultOutput})
@@ -217,6 +222,7 @@ class CoverageTask extends Task {
         'run',
         'coverage:collect_coverage',
         '--port=${observatoryPort}',
+        '--host=127.0.0.1',
         '-o',
         collection.path
       ];
@@ -229,13 +235,17 @@ class CoverageTask extends Task {
       process.stdout.listen((l) => _coverageOutput.add('    $l'));
       process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
       await process.done;
+
       _killTest();
       if (await process.exitCode > 0) continue;
       collections.add(collection);
     }
 
+    print('PUB SERVE KILLED');
+    _testServe.kill();
+
     // Merge all individual coverage collection files into one.
-    _collection = _merge(collections);
+    _collection = await _merge(collections);
   }
 
   Future _format() async {
@@ -297,17 +307,23 @@ class CoverageTask extends Task {
     }
   }
 
-  File _merge(List<File> collections) {
-    if (collections.isEmpty) throw new ArgumentError(
-        'Cannot merge an empty list of coverages.');
-
-    Map mergedJson = JSON.decode(collections.first.readAsStringSync());
-    for (int i = 1; i < collections.length; i++) {
-      Map coverageJson = JSON.decode(collections[i].readAsStringSync());
-      mergedJson['coverage'].addAll(coverageJson['coverage']);
+  Future<File> _merge(List<File> collections) async {
+    Map mergedJson = {'coverage': []};
+    for (var collection in collections) {
+      String contents = collection.readAsStringSync();
+      if (contents.isEmpty) {
+        _coverageErrorOutput.add('Failed to collect coverage (${collection.path})');
+      } else {
+        Map coverageJson;
+        try {
+          coverageJson = JSON.decode(contents);
+          mergedJson['coverage'].addAll(coverageJson['coverage']);
+        } on FormatException {
+          _coverageErrorOutput.add('Failed to parse coverage (${collection.path})');
+        }
+      }
     }
     _collections.deleteSync(recursive: true);
-
     File coverage = new File(path.join(_outputDirectory.path, 'coverage.json'));
     if (coverage.existsSync()) {
       coverage.deleteSync();
@@ -315,6 +331,35 @@ class CoverageTask extends Task {
     coverage.createSync();
     coverage.writeAsStringSync(JSON.encode(mergedJson));
     return coverage;
+
+//    Map mergedJson = {};
+//    try {
+//      bool existsFirst = collections.first.existsSync();
+//      _coverageOutput.add('first file ' + existsFirst.toString());
+//      bool existsSecond = collections[1].existsSync();
+//      _coverageOutput.add('second file ' + existsSecond.toString());
+//      if (collections.isEmpty) throw new ArgumentError(
+//          'Cannot merge an empty list of coverages.');
+//
+//      mergedJson = JSON.decode(collections.first.readAsStringSync());
+//      for (int i = 1; i < collections.length; i++) {
+//        Map coverageJson = JSON.decode(collections[i].readAsStringSync());
+//        mergedJson['coverage'].addAll(coverageJson['coverage']);
+//      }
+//      _collections.deleteSync(recursive: true);
+//
+//      File coverage =
+//          new File(path.join(_outputDirectory.path, 'coverage.json'));
+//      if (coverage.existsSync()) {
+//        coverage.deleteSync();
+//      }
+//      coverage.createSync();
+//      coverage.writeAsStringSync(JSON.encode(mergedJson));
+//      return coverage;
+//    } catch (e, stackTrace) {
+//      print('COVERAGE MERGE FAILED: $e\n$stackTrace');
+//      print('MERGED JSON: $mergedJson');
+//    }
   }
 
   Future _run() async {
@@ -323,6 +368,22 @@ class CoverageTask extends Task {
       return;
     }
 
+    _openPortForTest = await getOpenPort().then((value) {
+      return value.toString();
+    });
+
+    _testServe =
+        new TaskProcess('pub', ['serve', 'test', '--port', _openPortForTest]);
+
+    Completer pubServeReady = new Completer();
+    _testServe.stdout.listen((line) {
+      _coverageOutput.add('PUB SERVE: $line');
+      if (line.contains('Serving')) {
+        pubServeReady.complete();
+      }
+    });
+
+    await pubServeReady.future;
     await _collect();
     await _format();
 
@@ -408,7 +469,18 @@ class CoverageTask extends Task {
     if (isBrowserTest) {
       // Run the test in content-shell.
       String executable = 'content_shell';
-      List args = [htmlFile.path];
+      List<String> args = [];
+      if (customHtmlFile.existsSync()) {
+        args = [
+          'http://127.0.0.1:$_openPortForTest/' +
+              htmlFile.path.split('/test/').last
+        ];
+      } else {
+        args = [
+          'http://127.0.0.1:$_openPortForTest/' +
+              htmlFile.path.replaceFirst('test/', '')
+        ];
+      }
       _coverageOutput.add('');
       _coverageOutput.add('Running test suite ${file.path}');
       _coverageOutput.add('$executable ${args.join(' ')}\n');
