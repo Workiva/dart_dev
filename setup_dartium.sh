@@ -27,8 +27,8 @@ export DARTIUM_BIN="$PWD/dartium/chrome"
 echo Pub install
 pub install
 
-sudo echo "#!/usr/bin/env bash" >> /usr/local/bin/selenium-server
-sudo echo "exec java  -jar $PWD/$SELENIUM_JAR \"$@\"" >> /usr/local/bin/selenium-server
+sudo echo "#!/usr/bin/env bash" | sudo tee -a /usr/local/bin/selenium-server
+sudo echo "exec java  -jar $PWD/$SELENIUM_JAR \"$@\"" | sudo tee -a /usr/local/bin/selenium-server
 sudo chmod +x /usr/local/bin/selenium-server
 
 sudo ln -s "$PWD/dartium/chrome" /usr/local/bin/dartium
