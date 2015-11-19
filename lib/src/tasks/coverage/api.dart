@@ -246,6 +246,8 @@ class CoverageTask extends Task {
       print(f.path);
     }
     TaskProcess pubGet = new TaskProcess('pub',['get'],workingDirectory:config.test.functionalTests[0]);
+    pubGet.stdout.listen((l){print(l);});
+    pubGet.stderr.listen((l){print(l);});
     await pubGet.done;
     for (int i = 0; i < _functionalFiles.length; i++) {
       List<int> observatoryPorts;
