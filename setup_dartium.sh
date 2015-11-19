@@ -32,6 +32,7 @@ sudo echo "exec java  -jar $PWD/$SELENIUM_JAR \"$@\"" | sudo tee -a /usr/local/b
 sudo chmod +x /usr/local/bin/selenium-server
 
 echo "Check port check 8080"
-lsof -i tcp:8080
+nc 127.0.0.1 8080&> /dev/null
+echo $?
 
 sudo ln -s "$PWD/dartium/chrome" /usr/local/bin/dartium
