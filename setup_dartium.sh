@@ -18,4 +18,11 @@ rm $DARTIUM_DIST
 
 mv dartium-* dartium
 
+export DART_SDK="$PWD/dart-sdk"
+export PATH="$DART_SDK/bin:$PATH"
+export DARTIUM_BIN="$PWD/dartium/chrome"
+
+echo Pub install
+pub install
+
 sudo ln -s "$PWD/dartium/chrome" /usr/local/bin/dartium
