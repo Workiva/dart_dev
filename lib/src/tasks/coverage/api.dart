@@ -245,6 +245,8 @@ class CoverageTask extends Task {
     for (File f in _functionalFiles) {
       print(f.path);
     }
+    TaskProcess pubGet = new TaskProcess('pub',['get'],workingDirectory:config.test.functionalTests[0]);
+    await pubGet.done;
     for (int i = 0; i < _functionalFiles.length; i++) {
       List<int> observatoryPorts;
 
@@ -636,7 +638,6 @@ class CoverageTask extends Task {
 
   Future<List<int>> _test_functional(File file) async {
     int count = observatoryPort.length;
-
     String executable = 'pub';
     List args = [
       'run',
