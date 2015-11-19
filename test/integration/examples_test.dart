@@ -33,9 +33,10 @@ Future<bool> serveExamplesFor(String projectPath) async {
   bool served = false;
 
   Pattern pubServePattern = new RegExp(r'pub serve .* example');
-  process.stdout.listen((line) {
+  process.stdout.listen((line) async {
     if (line.contains(pubServePattern)) {
       served = true;
+      await process.killGroup();
       process.kill();
     }
   });
