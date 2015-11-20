@@ -395,7 +395,8 @@ class CoverageTask extends Task {
       // TODO: When dart2js has fixed the issue with their exitcode we should
       //       rely on the exitcode instead of the stdout.
       isBrowserTest = pr.stdout != null &&
-          (pr.stdout as String).contains('Error: Library not found');
+          (pr.stdout as String)
+              .contains(new RegExp(r'Error: Library not (found|supported)'));
     }
 
     String _observatoryFailPattern = 'Could not start Observatory HTTP server';
