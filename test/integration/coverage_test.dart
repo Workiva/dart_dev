@@ -22,8 +22,8 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
 const String projectWithDartFile = 'test/fixtures/coverage/non_test_file';
-const String projectWithVmTests = 'test/fixtures/coverage/browser';
-const String projectWithBrowserTests = 'test/fixtures/coverage/vm';
+const String projectWithBrowserTests = 'test/fixtures/coverage/browser';
+const String projectWithVmTests = 'test/fixtures/coverage/vm';
 const String projectWithoutCoveragePackage =
     'test/fixtures/coverage/no_coverage_package';
 

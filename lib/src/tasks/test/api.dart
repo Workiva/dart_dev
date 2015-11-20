@@ -46,8 +46,9 @@ TestTask test(
   StreamController stdoutc = new StreamController();
   process.stdout.listen((line) {
     stdoutc.add(line);
-    if (line.contains('All tests passed!') ||
-        line.contains('Some tests failed.')) {
+    if ((line.contains('All tests passed!') ||
+            line.contains('Some tests failed.')) &&
+        !outputProcessed.isCompleted) {
       task.testSummary = line;
       outputProcessed.complete();
     }
