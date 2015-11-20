@@ -33,7 +33,7 @@ sudo chmod +x /usr/local/bin/selenium-server
 
 CHROMEDRIVER="chromedriver.zip";
 
-curl "http://chromedriver.storage.googleapis.com/2.20/chromedriver_linux64.zip" > $CHROMEDRIVER
+curl "http://chromedriver.storage.googleapis.com/2.14/chromedriver_linux64.zip" > $CHROMEDRIVER
 unzip $CHROMEDRIVER
 sudo cp chromedriver /usr/bin/chromedriver
 sudo chown root /usr/bin/chromedriver
