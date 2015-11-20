@@ -95,6 +95,26 @@ Add the following to your bash or zsh profile for convenience:
 alias ddev='pub run dart_dev'
 ```
 
+#### Bash Completion
+
+Symlink or copy the file `tool/ddev-completion.sh` into
+`/etc/bash_completion.d/` (or wherever your completion scripts live, if you
+have installed Bash through Homebrew on a Mac, for instance, this will be
+`/usr/local/etc/bash_completion.d/`).
+
+If you are using Bash installed through Homebrew, you'll also need to install
+the completion machinery with `brew install bash-completion`. Then make sure
+something like the following is in your `.bashrc` file:
+
+```
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+  . $(brew --prefix)/etc/bash_completion
+fi
+```
+
+Next time you load a Bash session you'll have basic completions for the `ddev`
+alias described above.
+
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
 `pub run dart_dev init` to generate the configuration file. This should create a
