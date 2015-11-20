@@ -3,7 +3,3 @@ version: 0.0.0
 dev_dependencies:
   unittest: '>=0.11.5+4 < 1.0.0'
   webdriver: '0.9.1'
-  w_webdriver_utils:
-    git:
-      url: git@github.com:Workiva/w_webdriver_utils.git
-      ref: v1.0.3
