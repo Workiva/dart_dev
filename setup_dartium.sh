@@ -31,4 +31,13 @@ sudo echo "#!/usr/bin/env bash" | sudo tee -a /usr/local/bin/selenium-server
 sudo echo "exec java  -jar $PWD/$SELENIUM_JAR \"$@\"" | sudo tee -a /usr/local/bin/selenium-server
 sudo chmod +x /usr/local/bin/selenium-server
 
+CHROMEDRIVER = "chromedriver.zip";
+
+curl "http://chromedriver.storage.googleapis.com/2.20/chromedriver_linux64.zip" > $CHROMEDRIVER
+unzip $CHROMEDRIVER
+sudo cp chromedriver /usr/bin/chromedriver
+sudo chown root /usr/bin/chromedriver
+sudo chmod +x /usr/bin/chromedriver
+sudo chmod 755 /usr/bin/chromedriver
+
 sudo ln -s "$PWD/dartium/chrome" /usr/local/bin/dartium
