@@ -311,6 +311,8 @@ class CoverageTask extends Task {
         await _lastTestProcess.done;
         _killTest();
         collections.add(collection);
+        collection.readAsString().then((l){print("COVERAGE FILE:");
+        print(l);});
       }
       await _seleniumServerProcess.killGroup();
     }
