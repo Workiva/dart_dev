@@ -380,7 +380,8 @@ class CoverageTask extends Task {
   File _merge(List<File> collections) {
     if (collections.isEmpty) throw new ArgumentError(
         'Cannot merge an empty list of coverages.');
-
+    print("Coverage Log");
+    print(collections.first.readAsStringSync());
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
       Map coverageJson = JSON.decode(collections[i].readAsStringSync());
