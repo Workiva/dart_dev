@@ -237,6 +237,12 @@ All configuration options for the `analyze` task are found on the
             <td><code>true</code></td>
             <td>Show hint results.</td>
         </tr>
+        <tr>
+        	<td><code>fatalHints</code></td>
+        	<td><code>bool</code></td>
+        	<td><code>false</code></td>
+        	<td>Fail on hints (requests hints to be true).</td>
+        </tr>
     </tbody>
 </table>
 
