@@ -316,8 +316,7 @@ class CoverageTask extends Task {
     for (File f in _functionalFiles) {
       print(f.path);
     }
-    if(_functionalFiles.isEmpty)
-      return [];
+    if (_functionalFiles.isEmpty) return [];
     TaskProcess pubGet = new TaskProcess('pub', ['get'],
         workingDirectory: config.test.functionalTests[0]);
     pubGet.stdout.listen((l) {
@@ -367,25 +366,21 @@ class CoverageTask extends Task {
       for (Future f in wsDone) await f;
 
       for (int k = 0; k < isolate.length; k++) {
-        _Connection ws;
+        _Connection ws = await _Connection.connect("127.0.0.1", validPorts[k]);
         while (true) {
           try {
             print(k);
-            ws = await _Connection.connect("127.0.0.1", validPorts[k]);
             print(await ws
                 .request("getIsolate", {'isolateId': "${isolate[k]}"})
                 .timeout(new Duration(seconds: 15)));
             print((await ws
                 .request("_getCoverage", {'isolateId': "${isolate[k]}"})
                 .timeout(new Duration(seconds: 30))).toString().length);
-//            print((await ws.request(
-//                "_getCallSiteData", {'isolateId': "${isolate[k]}"}).timeout(
-//                new Duration(seconds: 15)))
-//                .toString()
-//                .length);
             break;
           } catch (TimeoutException) {
+            print(ws._socket.readyState);
             await ws.close();
+            ws = await _Connection.connect("127.0.0.1", validPorts[k]);
             continue;
           }
         }
