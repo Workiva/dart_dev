@@ -288,9 +288,18 @@ class CoverageTask extends Task {
 
       for (Future f in wsDone) await f;
 
-      for( int k =0;k<1;k++){
+      for( int k =0;k<isolate.length;k++){
         WebSocket ws = await WebSocket.connect("ws://127.0.0.1:${validPorts[k]}/ws");
         ws.add("{\"id\":\"4\",\"method\":\"getIsolate\",\"params\":{\"isolateId\":\"${isolate[k]}\"}}");
+        ws.listen((l){
+          print(l);
+          ws.close();
+        });
+      }
+
+      for( int k =0;k<isolate.length;k++){
+        WebSocket ws = await WebSocket.connect("ws://127.0.0.1:${validPorts[k]}/ws");
+        ws.add("{\"id\":\"5\",\"method\":\"_getCallSiteData\",\"params\":{\"isolateId\":\"${isolate[k]}\"}}");
         ws.listen((l){
           print(l);
           ws.close();
