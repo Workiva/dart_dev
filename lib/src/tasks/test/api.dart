@@ -20,8 +20,8 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
 
-TestTask test({int concurrency, List<String> platforms: const [],
-    List<String> tests: const []}) {
+TestTask test({int concurrency, List<String> additionalArgs: const [],
+    List<String> platforms: const [], List<String> tests: const []}) {
   var executable = 'pub';
   var args = ['run', 'test'];
   if (concurrency != null) {
@@ -31,6 +31,7 @@ TestTask test({int concurrency, List<String> platforms: const [],
     args.addAll(['-p', p]);
   });
   args.addAll(['--reporter=expanded']);
+  args.addAll(additionalArgs);
   args.addAll(tests);
 
   TaskProcess process = new TaskProcess(executable, args);
@@ -44,8 +45,9 @@ TestTask test({int concurrency, List<String> platforms: const [],
   StreamController stdoutc = new StreamController();
   process.stdout.listen((line) {
     stdoutc.add(line);
-    if (line.contains('All tests passed!') ||
-        line.contains('Some tests failed.')) {
+    if ((line.contains('All tests passed!') ||
+            line.contains('Some tests failed.')) &&
+        !outputProcessed.isCompleted) {
       task.testSummary = line;
       outputProcessed.complete();
     }

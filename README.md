@@ -95,6 +95,26 @@ Add the following to your bash or zsh profile for convenience:
 alias ddev='pub run dart_dev'
 ```
 
+#### Bash Completion
+
+Symlink or copy the file `tool/ddev-completion.sh` into
+`/etc/bash_completion.d/` (or wherever your completion scripts live, if you
+have installed Bash through Homebrew on a Mac, for instance, this will be
+`/usr/local/etc/bash_completion.d/`).
+
+If you are using Bash installed through Homebrew, you'll also need to install
+the completion machinery with `brew install bash-completion`. Then make sure
+something like the following is in your `.bashrc` file:
+
+```
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+  . $(brew --prefix)/etc/bash_completion
+fi
+```
+
+Next time you load a Bash session you'll have basic completions for the `ddev`
+alias described above.
+
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
 `pub run dart_dev init` to generate the configuration file. This should create a
@@ -282,6 +302,12 @@ configuration from the `config.test` object.
             <td><code>['lib/']</code></td>
             <td>List of paths to include in the generated coverage report (LCOV and HTML).</td>
         </tr>
+        <tr>
+            <td><code>pubServe</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
+        </tr>
     </tbody>
 </table>
 
@@ -392,6 +418,12 @@ object.
             <td><code>List&lt;String&gt;</code></td>
             <td><code>['test/']</code></td>
             <td>Unit test locations. Items in this list can be directories and/or files.</td>
+        </tr>
+        <tr>
+            <td><code>pubServe</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
         </tr>
     </tbody>
 </table>

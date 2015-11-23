@@ -15,14 +15,15 @@
 library dart_dev.src.tasks.coverage.config;
 
 import 'package:dart_dev/src/tasks/config.dart';
+import 'package:dart_dev/src/tasks/test/config.dart';
 
 const bool defaultHtml = true;
-const List<String> defaultFunctionalTests = const [];
 const String defaultOutput = 'coverage/';
 const List<String> defaultReportOn = const ['lib/'];
 
 class CoverageConfig extends TaskConfig {
   bool html = defaultHtml;
+  bool pubServe = defaultPubServe;
   String output = defaultOutput;
   List<String> reportOn = defaultReportOn;
 }

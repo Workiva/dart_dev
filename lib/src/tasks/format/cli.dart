@@ -77,7 +77,7 @@ class FormatCli extends TaskCli {
 
     if (task.isDryRun) {
       if (task.successful) return new CliResult.success(
-          excludedFilesWarning + 'You\'re Dart code is good to go!');
+          excludedFilesWarning + 'Your Dart code is good to go!');
       if (task.affectedFiles.isEmpty) return new CliResult.fail(
           excludedFilesWarning + 'The Dart formatter needs to be run.');
       return new CliResult.fail(excludedFilesWarning +
