@@ -366,12 +366,24 @@ class CoverageTask extends Task {
 
       for (int k = 0; k < isolate.length; k++) {
         var ws = await _Connection.connect("127.0.0.1", validPorts[k]);
-        print(await ws.request("getIsolate", {'isolateId': "${isolate[k]}"}));
-        print((await ws.request("_getCoverage", {'isolateId': "${isolate[k]}"}))
-            .toString().length);
-        print((await ws.request(
-                "_getCallSiteData", {'isolateId': "${isolate[k]}"}))
-            .toString().length);
+        while (true) {
+          try {
+            print(await ws
+                .request("getIsolate", {'isolateId': "${isolate[k]}"})
+                .timeout(new Duration(seconds: 15)));
+            print((await ws
+                .request("_getCoverage", {'isolateId': "${isolate[k]}"})
+                .timeout(new Duration(seconds: 15))).toString().length);
+//            print((await ws.request(
+//                "_getCallSiteData", {'isolateId': "${isolate[k]}"}).timeout(
+//                new Duration(seconds: 15)))
+//                .toString()
+//                .length);
+            break;
+          } catch (TimeoutException) {
+            continue;
+          }
+        }
       }
 
 //      for( int k =0;k<1;k++){
