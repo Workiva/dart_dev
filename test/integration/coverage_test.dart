@@ -24,6 +24,8 @@ import 'package:test/test.dart';
 const String projectWithDartFile = 'test/fixtures/coverage/non_test_file';
 const String projectWithBrowserTests = 'test/fixtures/coverage/browser';
 const String projectWithVmTests = 'test/fixtures/coverage/vm';
+const String projectWithBrowserTestsThatNeedsPubServe =
+    'test/fixtures/coverage/browser_needs_pub_serve';
 const String projectWithoutCoveragePackage =
     'test/fixtures/coverage/no_coverage_package';
 
@@ -48,6 +50,15 @@ void main() {
     test('should generate coverage for Browser tests', () async {
       expect(await runCoverage(projectWithBrowserTests), isTrue);
       File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
+      expect(lcov.existsSync(), isTrue);
+    }, timeout: new Timeout(new Duration(seconds: 60)));
+
+    test('should generate coverage for Browser tests that require a Pub server',
+        () async {
+      expect(
+          await runCoverage(projectWithBrowserTestsThatNeedsPubServe), isTrue);
+      File lcov = new File(
+          '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 60)));
 

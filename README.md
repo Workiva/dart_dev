@@ -302,6 +302,12 @@ configuration from the `config.test` object.
             <td><code>['lib/']</code></td>
             <td>List of paths to include in the generated coverage report (LCOV and HTML).</td>
         </tr>
+        <tr>
+            <td><code>pubServe</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
+        </tr>
     </tbody>
 </table>
 
@@ -412,6 +418,12 @@ object.
             <td><code>List&lt;String&gt;</code></td>
             <td><code>['test/']</code></td>
             <td>Unit test locations. Items in this list can be directories and/or files.</td>
+        </tr>
+        <tr>
+            <td><code>pubServe</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
         </tr>
     </tbody>
 </table>

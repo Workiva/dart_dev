@@ -24,6 +24,7 @@ import 'package:dart_dev/util.dart' show reporter;
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
+import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/src/tasks/test/api.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
 
@@ -37,6 +38,10 @@ class TestCli extends TaskCli {
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
         help: 'The number of concurrent test suites run.')
+    ..addFlag('pub-serve',
+        negatable: true,
+        defaultsTo: defaultPubServe,
+        help: 'Serves browser tests using a Pub server.')
     ..addOption('platform',
         abbr: 'p',
         allowMultiple: true,
@@ -76,10 +81,15 @@ class TestCli extends TaskCli {
         .hasImmediateDependency('test')) return new CliResult.fail(
         'Package "test" must be an immediate dependency in order to run its executables.');
 
+    List<String> additionalArgs = [];
+
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
     List<String> tests = [];
     int individualTests = 0;
+
+    bool pubServe =
+        TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
 
     var concurrency =
         TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
@@ -118,10 +128,51 @@ class TestCli extends TaskCli {
       }
     }
 
-    TestTask task =
-        test(tests: tests, concurrency: concurrency, platforms: platforms);
+    PubServeTask pubServeTask;
+    if (pubServe) {
+      // Start `pub serve` on the `test` directory
+      pubServeTask = startPubServe(additionalArgs: ['test']);
+
+      var startupLogFinished = new Completer();
+      reporter.logGroup(pubServeTask.command,
+          outputStream:
+              pubServeTask.stdOut.transform(until(startupLogFinished.future)),
+          errorStream:
+              pubServeTask.stdErr.transform(until(startupLogFinished.future)));
+
+      var serveInfo = await pubServeTask.serveInfos.first;
+      additionalArgs.add('--pub-serve=${serveInfo.port}');
+
+      startupLogFinished.complete();
+      pubServeTask.stdOut.join('\n').then((stdOut) {
+        if (stdOut.isNotEmpty) {
+          reporter.logGroup('`${pubServeTask.command}` (buffered stdout)',
+              output: stdOut);
+        }
+      });
+      pubServeTask.stdErr.join('\n').then((stdErr) {
+        if (stdErr.isNotEmpty) {
+          reporter.logGroup('`${pubServeTask.command}` (buffered stderr)',
+              error: stdErr);
+        }
+      });
+    }
+
+    TestTask task = test(
+        tests: tests,
+        concurrency: concurrency,
+        platforms: platforms,
+        additionalArgs: additionalArgs);
     reporter.logGroup(task.testCommand, outputStream: task.testOutput);
+
     await task.done;
+
+    if (pubServeTask != null) {
+      pubServeTask.stop();
+      // Wait for the task to finish to flush its output.
+      await pubServeTask.done;
+    }
+
     return task.successful
         ? new CliResult.success(task.testSummary)
         : new CliResult.fail(task.testSummary);
