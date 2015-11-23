@@ -83,7 +83,7 @@ void main() {
           isTrue);
       File lcov = new File('$projectWithFunctionalTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 300)));
 
 //    TODO: Will need to mock out the `genhtml` command as well.
 //    test('should not fail if "lcov" is installed and --html is set', () async {
