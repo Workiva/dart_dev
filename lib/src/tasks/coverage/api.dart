@@ -264,6 +264,7 @@ class CoverageTask extends Task {
       List<Future> wsDone = new List<Future>();
 
       //Check for observatories with actual data
+      List<String> isolate = new List<String>();
       for (int port in observatoryPorts) {
         try {
           WebSocket ws = await WebSocket.connect("ws://127.0.0.1:${port}/ws");
@@ -274,6 +275,8 @@ class CoverageTask extends Task {
             List isolates = (json["result"])["isolates"];
             if (isolates != null && isolates.isNotEmpty) {
               validPorts.add(port);
+              isolate.add((isolates[0])['id']);
+              print(json);
             }
             ws.close();
           });
@@ -281,7 +284,18 @@ class CoverageTask extends Task {
           continue;
         }
       }
+      print(validPorts);
+
       for (Future f in wsDone) await f;
+
+      for( int k =0;k<1;k++){
+        WebSocket ws = await WebSocket.connect("ws://127.0.0.1:${validPorts[k]}/ws");
+        ws.add("{\"id\":\"4\",\"method\":\"getIsolate\",\"params\":{\"isolateId\":\"${isolate[k]}\"}}");
+        ws.listen((l){
+          print(l);
+          ws.close();
+        });
+      }
 
       observatoryPorts = validPorts;
 
