@@ -75,8 +75,8 @@ class _Connection {
     // Behavior >= Dart 1.11-dev.3
     var error = json['error'];
     if (error != null) {
-      var errorObj = new JsonRpcError.fromJson(error);
-      completer.completeError(errorObj);
+//      var errorObj = new JsonRpcError.fromJson(error);
+//      completer.completeError(errorObj);
       return;
     }
 
@@ -364,15 +364,15 @@ class CoverageTask extends Task {
 
       for (Future f in wsDone) await f;
 
-//      for (int k = 0; k < isolate.length; k++) {
-//        var ws = await _Connection.connect("127.0.0.1", validPorts[k]);
-//        print(await ws.request("getIsolate", {'isolateId': "${isolate[k]}"}));
-//        print((await ws.request("_getCoverage", {'isolateId': "${isolate[k]}"}))
-//            .toString().length);
-//        print((await ws.request(
-//                "_getCallSiteData", {'isolateId': "${isolate[k]}"}))
-//            .toString().length);
-//      }
+      for (int k = 0; k < isolate.length; k++) {
+        var ws = await _Connection.connect("127.0.0.1", validPorts[k]);
+        print(await ws.request("getIsolate", {'isolateId': "${isolate[k]}"}));
+        print((await ws.request("_getCoverage", {'isolateId': "${isolate[k]}"}))
+            .toString().length);
+        print((await ws.request(
+                "_getCallSiteData", {'isolateId': "${isolate[k]}"}))
+            .toString().length);
+      }
 
 //      for( int k =0;k<1;k++){
 //        WebSocket ws = await WebSocket.connect("ws://127.0.0.1:${validPorts[k]}/ws");
