@@ -43,8 +43,7 @@ class TestCli extends TaskCli {
     ..addOption('platform',
         abbr: 'p',
         allowMultiple: true,
-        help:
-            'The platform(s) on which to run the tests.\n[vm (default), dartium, content-shell, chrome, phantomjs, firefox, safari]');
+        help: 'The platform(s) on which to run the tests.\n[vm (default), dartium, content-shell, chrome, phantomjs, firefox, safari]');
 
   final String command = 'test';
 
@@ -75,8 +74,8 @@ class TestCli extends TaskCli {
   }
 
   Future<CliResult> run(ArgResults parsedArgs) async {
-    if (!platform_util
-        .hasImmediateDependency('test')) return new CliResult.fail(
+    if (!platform_util.hasImmediateDependency(
+        'test')) return new CliResult.fail(
         'Package "test" must be an immediate dependency in order to run its executables.');
 
     bool unit = parsedArgs['unit'];

@@ -27,7 +27,6 @@ import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
-
 const String _dartFilePattern = '.dart';
 const String _testFilePattern = '_test.dart';
 
@@ -49,7 +48,7 @@ class _Connection {
   Future<Map> request(String method, [Map params = const {}]) {
     _pendingRequests[_requestId] = new Completer();
     var message =
-    JSON.encode({'id': _requestId, 'method': method, 'params': params,});
+        JSON.encode({'id': _requestId, 'method': method, 'params': params,});
     _socket.add(message);
     return _pendingRequests[_requestId++].future;
   }
@@ -120,24 +119,18 @@ class CoverageResult extends TaskResult {
   final Iterable<String> tests;
   final Iterable<String> functionalTests;
 
-  CoverageResult.fail(
-      Iterable<String> this.tests,
-      Iterable<String> this.functionalTests,
-      File this.collection,
-      File this.lcov,
-      {Directory report})
+  CoverageResult.fail(Iterable<String> this.tests,
+      Iterable<String> this.functionalTests, File this.collection,
+      File this.lcov, {Directory report})
       : super.fail(),
         this.report = report,
         reportIndex = report != null
             ? new File(path.join(report.path, 'index.html'))
             : null;
 
-  CoverageResult.success(
-      Iterable<String> this.tests,
-      Iterable<String> this.functionalTests,
-      File this.collection,
-      File this.lcov,
-      {Directory report})
+  CoverageResult.success(Iterable<String> this.tests,
+      Iterable<String> this.functionalTests, File this.collection,
+      File this.lcov, {Directory report})
       : super.success(),
         this.report = report,
         reportIndex = report != null
@@ -157,8 +150,7 @@ class CoverageTask extends Task {
   /// the collected coverage and the report will be opened.
   static Future<CoverageResult> run(List<String> tests,
       {List<String> functionalTests: defaultFunctionalTests,
-      bool html: defaultHtml,
-      String output: defaultOutput,
+      bool html: defaultHtml, String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) async {
     CoverageTask coverage = new CoverageTask._(tests, reportOn,
         html: html, output: output, functionalTests: functionalTests);
@@ -180,8 +172,7 @@ class CoverageTask extends Task {
   /// the collected coverage and the report will be opened.
   static CoverageTask start(List<String> tests,
       {List<String> functionalTests: defaultFunctionalTests,
-      bool html: defaultHtml,
-      String output: defaultOutput,
+      bool html: defaultHtml, String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) {
     CoverageTask coverage = new CoverageTask._(tests, reportOn,
         functionalTests: functionalTests, html: html, output: output);
@@ -231,8 +222,7 @@ class CoverageTask extends Task {
 
   CoverageTask._(List<String> tests, List<String> reportOn,
       {List<String> functionalTests: defaultFunctionalTests,
-      bool html: defaultHtml,
-      String output: defaultOutput})
+      bool html: defaultHtml, String output: defaultOutput})
       : _html = html,
         _outputDirectory = new Directory(output),
         _reportOn = reportOn {
@@ -326,9 +316,14 @@ class CoverageTask extends Task {
     for (File f in _functionalFiles) {
       print(f.path);
     }
-    TaskProcess pubGet = new TaskProcess('pub',['get'],workingDirectory:config.test.functionalTests[0]);
-    pubGet.stdout.listen((l){print(l);});
-    pubGet.stderr.listen((l){print(l);});
+    TaskProcess pubGet = new TaskProcess('pub', ['get'],
+        workingDirectory: config.test.functionalTests[0]);
+    pubGet.stdout.listen((l) {
+      print(l);
+    });
+    pubGet.stderr.listen((l) {
+      print(l);
+    });
     await pubGet.done;
     for (int i = 0; i < _functionalFiles.length; i++) {
       List<int> observatoryPorts;
@@ -369,14 +364,15 @@ class CoverageTask extends Task {
 
       for (Future f in wsDone) await f;
 
-      for( int k =0;k<isolate.length;k++){
-        var ws = await _Connection.connect("127.0.0.1",validPorts[k]);
-        print(await ws.request("getIsolate",{'isolateId':"${isolate[k]}"}));
-        print((await ws.request("_getCoverage",{'isolateId':"${isolate[k]}"})).toString().length);
-        print((await ws.request("_getCallSiteData",{'isolateId':"${isolate[k]}"})).toString().length);
-      }
-
-
+//      for (int k = 0; k < isolate.length; k++) {
+//        var ws = await _Connection.connect("127.0.0.1", validPorts[k]);
+//        print(await ws.request("getIsolate", {'isolateId': "${isolate[k]}"}));
+//        print((await ws.request("_getCoverage", {'isolateId': "${isolate[k]}"}))
+//            .toString().length);
+//        print((await ws.request(
+//                "_getCallSiteData", {'isolateId': "${isolate[k]}"}))
+//            .toString().length);
+//      }
 
 //      for( int k =0;k<1;k++){
 //        WebSocket ws = await WebSocket.connect("ws://127.0.0.1:${validPorts[k]}/ws");
@@ -579,8 +575,7 @@ class CoverageTask extends Task {
     }
 
     _done.complete(new CoverageResult.success(
-        tests, functionalTests, collection, lcov,
-        report: report));
+        tests, functionalTests, collection, lcov, report: report));
   }
 
   Future<int> _test(File file) async {
@@ -632,15 +627,12 @@ class CoverageTask extends Task {
     } else {
       // Run analysis on file in "Server" category and look for "Library not
       // found" errors, which indicates a `dart:html` import.
-      ProcessResult pr = await Process.run(
-          'dart2js',
-          [
-            '--analyze-only',
-            '--categories=Server',
-            '--package-root=packages',
-            file.path
-          ],
-          runInShell: true);
+      ProcessResult pr = await Process.run('dart2js', [
+        '--analyze-only',
+        '--categories=Server',
+        '--package-root=packages',
+        file.path
+      ], runInShell: true);
       // TODO: When dart2js has fixed the issue with their exitcode we should
       //       rely on the exitcode instead of the stdout.
       isBrowserTest = pr.stdout != null &&
@@ -725,14 +717,14 @@ class CoverageTask extends Task {
     }
   }
 
-  void _testFileValidation(String path,List<File> fileCollection) {
+  void _testFileValidation(String path, List<File> fileCollection) {
     if (path.endsWith(_dartFilePattern) && FileSystemEntity.isFileSync(path)) {
       fileCollection.add(new File(path));
     } else if (FileSystemEntity.isDirectorySync(path)) {
       Directory dir = new Directory(path);
       List<FileSystemEntity> children = dir.listSync(recursive: true);
-      Iterable<FileSystemEntity> validTests =
-      children.where((FileSystemEntity e) {
+      Iterable<FileSystemEntity> validTests = children
+          .where((FileSystemEntity e) {
         Uri uri = Uri.parse(e.absolute.path);
         return (
             // Is a file, not a directory.

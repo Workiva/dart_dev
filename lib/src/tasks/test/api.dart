@@ -20,9 +20,7 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
 
-TestTask test(
-    {int concurrency,
-    List<String> platforms: const [],
+TestTask test({int concurrency, List<String> platforms: const [],
     List<String> tests: const []}) {
   var executable = 'pub';
   var args = ['run', 'test'];

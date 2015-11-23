@@ -31,8 +31,7 @@ class FormatCli extends TaskCli {
     ..addFlag('check',
         defaultsTo: defaultCheck,
         negatable: false,
-        help:
-            'Dry-run; checks if formatter needs to be run and sets exit code accordingly.')
+        help: 'Dry-run; checks if formatter needs to be run and sets exit code accordingly.')
     ..addOption('line-length',
         abbr: 'l', defaultsTo: '80', help: 'Wrap lines longer than this.');
 
@@ -40,8 +39,8 @@ class FormatCli extends TaskCli {
 
   Future<CliResult> run(ArgResults parsedArgs) async {
     try {
-      if (!platform_util
-          .hasImmediateDependency('dart_style')) return new CliResult.fail(
+      if (!platform_util.hasImmediateDependency(
+          'dart_style')) return new CliResult.fail(
           'Package "dart_style" must be an immediate dependency in order to run its executables.');
     } catch (e) {
       // It's possible that this check may throw if the pubspec.yaml

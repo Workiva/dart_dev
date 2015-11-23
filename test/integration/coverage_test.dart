@@ -42,17 +42,23 @@ Future<bool> runCoverage(String projectPath,
     args.add('--functional');
     args.add('--no-unit');
   }
-    args.add(html ? '--html' : '--no-html');
-    TaskProcess process =
-    new TaskProcess('pub', args, workingDirectory: projectPath);
+  args.add(html ? '--html' : '--no-html');
+  TaskProcess process =
+      new TaskProcess('pub', args, workingDirectory: projectPath);
 
-  process.stdout.listen((l){if(!l.contains('passed') && !l.contains('failed')){print(l);};});
-  process.stderr.listen((l){print(l);});
+  process.stdout.listen((l) {
+    if (!l.contains('passed') && !l.contains('failed')) {
+      print(l);
+    }
+    ;
+  });
+  process.stderr.listen((l) {
+    print(l);
+  });
 
-    await process.done;
-    return (await process.exitCode) == 0;
-  }
-
+  await process.done;
+  return (await process.exitCode) == 0;
+}
 
 void main() {
   group('Coverage Task', () {
@@ -81,7 +87,8 @@ void main() {
     test('should generate coverage for Functional tests', () async {
       expect(await runCoverage(projectWithFunctionalTests, functional: true),
           isTrue);
-      File lcov = new File('$projectWithFunctionalTests/coverage/coverage.lcov');
+      File lcov =
+          new File('$projectWithFunctionalTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 300)));
 

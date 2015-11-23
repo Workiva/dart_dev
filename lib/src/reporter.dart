@@ -44,9 +44,7 @@ class Reporter {
     _log(stdout, message, shout: shout);
   }
 
-  void logGroup(String title,
-      {String output,
-      Stream<String> outputStream,
+  void logGroup(String title, {String output, Stream<String> outputStream,
       Stream<String> errorStream}) {
     log(colorBlue('\n::: $title'));
     if (output != null) {

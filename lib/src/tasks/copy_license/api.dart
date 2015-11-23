@@ -20,8 +20,7 @@ import 'dart:io';
 import 'package:dart_dev/src/tasks/copy_license/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
-CopyLicenseTask copyLicense(
-    {List<String> directories: defaultDirectories,
+CopyLicenseTask copyLicense({List<String> directories: defaultDirectories,
     String licensePath: defaultLicensePath}) {
   CopyLicenseTask task = new CopyLicenseTask();
 

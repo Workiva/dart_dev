@@ -40,8 +40,7 @@ void main() {
   group('Docs task', () {
     test('should generate docs for a valid project', () async {
       expect(await generateDocsFor(projectWithDocs), isTrue);
-      expect(
-          FileSystemEntity
+      expect(FileSystemEntity
               .isFileSync(path.join(projectWithDocs, 'doc/api/index.html')),
           isTrue);
     });
