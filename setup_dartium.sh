@@ -41,7 +41,12 @@ CHROMEDRIVER="chromedriver.zip";
 curl "http://chromedriver.storage.googleapis.com/2.14/chromedriver_linux64.zip" > $CHROMEDRIVER
 unzip $CHROMEDRIVER
 
-export PATH=$PATH+":$PWD"
+export PATH=$PATH":$PWD"
+
+echo "export PATH=\$PATH\":$PWD\"" | tee -a ~/.profile
+echo "export PATH=\$PATH\":$PWD\"" | tee -a ~/.bash_profile
+echo "export PATH=\$PATH\":$PWD\"" | tee -a ~/.xprofile
+
 chmod +x chromedriver
 
 ln -s "$PWD/dartiumdir/chrome" "$PWD/dartium"
