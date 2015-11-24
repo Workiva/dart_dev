@@ -565,7 +565,7 @@ class CoverageTask extends Task {
           serverRunning.complete();
         }
       });
-
+      
       _seleniumServerProcess = new TaskProcess('selenium-server', []);
 
       RegExp _observatoryPortPattern = new RegExp(
