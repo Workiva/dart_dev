@@ -55,48 +55,61 @@ Future<bool> runTests(String projectPath,
 void main() {
   group('Test Task', () {
     test('should fail if some unit tests fail', () async {
-      expect(await runTests(projectWithFailingTests,
-          unit: true, integration: false), isFalse);
+      expect(
+          await runTests(projectWithFailingTests,
+              unit: true, integration: false),
+          isFalse);
     });
 
     test('should fail if some integration tests fail', () async {
-      expect(await runTests(projectWithFailingTests,
-          unit: false, integration: true), isFalse);
+      expect(
+          await runTests(projectWithFailingTests,
+              unit: false, integration: true),
+          isFalse);
     });
 
     test('should run individual unit test', () async {
-      expect(await runTests(projectWithPassingTests,
-          files: [
-        'test/fixtures/test/passing/test/passing_unit_test.dart'
-      ]), isTrue);
+      expect(
+          await runTests(projectWithPassingTests, files:
+              ['test/fixtures/test/passing/test/passing_unit_test.dart']),
+          isTrue);
     });
 
     test('should run individual unit tests', () async {
-      expect(await runTests(projectWithPassingTests,
-          files: [
-        'test/fixtures/test/passing/test/passing_unit_test.dart',
-        'test/fixtures/test/passing/test/passing_unit_integration.dart'
-      ]), isTrue);
+      expect(
+          await runTests(projectWithPassingTests, files: [
+            'test/fixtures/test/passing/test/passing_unit_test.dart',
+            'test/fixtures/test/passing/test/passing_unit_integration.dart'
+          ]),
+          isTrue);
     });
 
     test('should run unit tests', () async {
-      expect(await runTests(projectWithPassingTests,
-          unit: true, integration: false), isTrue);
+      expect(
+          await runTests(projectWithPassingTests,
+              unit: true, integration: false),
+          isTrue);
     });
 
     test('should run unit tests by default', () async {
-      expect(await runTests(projectWithPassingTests,
-          unit: null, integration: null), isTrue);
+      expect(
+          await runTests(projectWithPassingTests,
+              unit: null, integration: null),
+          isTrue);
     });
 
     test('should run integration tests', () async {
-      expect(await runTests(projectWithPassingTests,
-          unit: false, integration: true), isTrue);
+      expect(
+          await runTests(projectWithPassingTests,
+              unit: false, integration: true),
+          isTrue);
     });
 
     test('should run unit and integration tests', () async {
-      expect(await runTests(projectWithPassingTests,
-          unit: true, integration: true), isTrue);
+      expect(
+          await runTests(projectWithPassingTests,
+              unit: true, integration: true),
+          isTrue);
     });
 
     test('should warn if "test" package is not immediate dependency', () async {

@@ -48,8 +48,11 @@ class Reporter {
     return '    ' + lines.replaceAll('\n', '\n    ');
   }
 
-  void logGroup(String title, {String output, String error,
-      Stream<String> outputStream, Stream<String> errorStream}) {
+  void logGroup(String title,
+      {String output,
+      String error,
+      Stream<String> outputStream,
+      Stream<String> errorStream}) {
     var formattedTitle = colorBlue('\n::: $title');
 
     if (output != null) {

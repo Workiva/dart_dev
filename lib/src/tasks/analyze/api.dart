@@ -22,8 +22,10 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:dart_dev/src/tasks/analyze/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
-AnalyzeTask analyze({List<String> entryPoints: defaultEntryPoints,
-    bool fatalWarnings: defaultFatalWarnings, bool hints: defaultHints}) {
+AnalyzeTask analyze(
+    {List<String> entryPoints: defaultEntryPoints,
+    bool fatalWarnings: defaultFatalWarnings,
+    bool hints: defaultHints}) {
   var executable = 'dartanalyzer';
   var args = [];
   if (fatalWarnings) {

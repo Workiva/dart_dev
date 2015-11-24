@@ -121,18 +121,24 @@ class CoverageResult extends TaskResult {
   final Iterable<String> tests;
   final Iterable<String> functionalTests;
 
-  CoverageResult.fail(Iterable<String> this.tests,
-      Iterable<String> this.functionalTests, File this.collection,
-      File this.lcov, {Directory report})
+  CoverageResult.fail(
+      Iterable<String> this.tests,
+      Iterable<String> this.functionalTests,
+      File this.collection,
+      File this.lcov,
+      {Directory report})
       : super.fail(),
         this.report = report,
         reportIndex = report != null
             ? new File(path.join(report.path, 'index.html'))
             : null;
 
-  CoverageResult.success(Iterable<String> this.tests,
-      Iterable<String> this.functionalTests, File this.collection,
-      File this.lcov, {Directory report})
+  CoverageResult.success(
+      Iterable<String> this.tests,
+      Iterable<String> this.functionalTests,
+      File this.collection,
+      File this.lcov,
+      {Directory report})
       : super.success(),
         this.report = report,
         reportIndex = report != null
@@ -152,7 +158,8 @@ class CoverageTask extends Task {
   /// the collected coverage and the report will be opened.
   static Future<CoverageResult> run(List<String> tests,
       {List<String> functionalTests: defaultFunctionalTests,
-      bool html: defaultHtml, String output: defaultOutput,
+      bool html: defaultHtml,
+      String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) async {
     CoverageTask coverage = new CoverageTask._(tests, reportOn,
         html: html, output: output, functionalTests: functionalTests);
@@ -177,8 +184,10 @@ class CoverageTask extends Task {
   /// the collected coverage and the report will be opened.
   static CoverageTask start(List<String> tests,
       {List<String> functionalTests: defaultFunctionalTests,
-      bool html: defaultHtml, bool pubServe: defaultPubServe,
-      String output: defaultOutput, List<String> reportOn: defaultReportOn}) {
+      bool html: defaultHtml,
+      bool pubServe: defaultPubServe,
+      String output: defaultOutput,
+      List<String> reportOn: defaultReportOn}) {
     CoverageTask coverage = new CoverageTask._(tests, reportOn,
         functionalTests: functionalTests,
         html: html,
@@ -234,7 +243,8 @@ class CoverageTask extends Task {
 
   CoverageTask._(List<String> tests, List<String> reportOn,
       {List<String> functionalTests: defaultFunctionalTests,
-      bool this.pubServe: defaultPubServe, bool html: defaultHtml,
+      bool this.pubServe: defaultPubServe,
+      bool html: defaultHtml,
       String output: defaultOutput})
       : _html = html,
         _outputDirectory = new Directory(output),
@@ -383,8 +393,7 @@ class CoverageTask extends Task {
         while (true) {
           try {
             print(k);
-            print(await ws
-                .request("getIsolate", {'isolateId': "${isolate[k]}"})
+            print(await ws.request("getIsolate", {'isolateId': "${isolate[k]}"})
                 .timeout(new Duration(seconds: 15)));
             print((await ws
                 .request("_getCoverage", {'isolateId': "${isolate[k]}"})
@@ -557,12 +566,6 @@ class CoverageTask extends Task {
         }
       });
 
-      TaskProcess path = new TaskProcess("echo", ["$PATH"]);
-      path.stdout.listen((l) {
-        print(l);
-      });
-      await path.done;
-
       _seleniumServerProcess = new TaskProcess('selenium-server', []);
 
       RegExp _observatoryPortPattern = new RegExp(
@@ -606,7 +609,8 @@ class CoverageTask extends Task {
     }
 
     _done.complete(new CoverageResult.success(
-        tests, functionalTests, collection, lcov, report: report));
+        tests, functionalTests, collection, lcov,
+        report: report));
   }
 
   Future<int> _test(File file) async {
@@ -658,12 +662,15 @@ class CoverageTask extends Task {
     } else {
       // Run analysis on file in "Server" category and look for "Library not
       // found" errors, which indicates a `dart:html` import.
-      ProcessResult pr = await Process.run('dart2js', [
-        '--analyze-only',
-        '--categories=Server',
-        '--package-root=packages',
-        file.path
-      ], runInShell: true);
+      ProcessResult pr = await Process.run(
+          'dart2js',
+          [
+            '--analyze-only',
+            '--categories=Server',
+            '--package-root=packages',
+            file.path
+          ],
+          runInShell: true);
       // TODO: When dart2js has fixed the issue with their exitcode we should
       //       rely on the exitcode instead of the stdout.
       isBrowserTest = pr.stdout != null &&
@@ -808,8 +815,8 @@ class CoverageTask extends Task {
     } else if (FileSystemEntity.isDirectorySync(path)) {
       Directory dir = new Directory(path);
       List<FileSystemEntity> children = dir.listSync(recursive: true);
-      Iterable<FileSystemEntity> validTests = children
-          .where((FileSystemEntity e) {
+      Iterable<FileSystemEntity> validTests =
+          children.where((FileSystemEntity e) {
         Uri uri = Uri.parse(e.absolute.path);
         return (
             // Is a file, not a directory.
