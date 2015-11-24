@@ -5,7 +5,7 @@ dart:
 with_content_shell: true
 before_install:
   - export DISPLAY=:99.0
-#  - ./setup_dartium.sh
+  - ./setup_dartium.sh
   - sh -e /etc/init.d/xvfb start
 script:
   - pub run dart_dev format --check

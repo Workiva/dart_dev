@@ -95,13 +95,13 @@ void main() {
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 60)));
 
-//    test('should generate coverage for Functional tests', () async {
-//      expect(await runCoverage(projectWithFunctionalTests, functional: true),
-//          isTrue);
-//      File lcov =
-//          new File('$projectWithFunctionalTests/coverage/coverage.lcov');
-//      expect(lcov.existsSync(), isTrue);
-//    }, timeout: new Timeout(new Duration(seconds: 300)));
+    test('should generate coverage for Functional tests', () async {
+      expect(await runCoverage(projectWithFunctionalTests, functional: true),
+          isTrue);
+      File lcov =
+          new File('$projectWithFunctionalTests/coverage/coverage.lcov');
+      expect(lcov.existsSync(), isTrue);
+    }, timeout: new Timeout(new Duration(seconds: 300)));
 
 //    TODO: Will need to mock out the `genhtml` command as well.
 //    test('should not fail if "lcov" is installed and --html is set', () async {

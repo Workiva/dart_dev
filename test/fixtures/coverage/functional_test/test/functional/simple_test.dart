@@ -1,12 +1,18 @@
-import 'package:unittest/unittest.dart';
-import 'package:webdriver/webdriver.dart' show WebDriver;
+import 'package:test/test.dart';
+import 'package:webdriver/io.dart';
+import 'package:dart_dev/src/task_process.dart';
 
 void main() {
   WebDriver driver;
 
   setUp(() async{
-    driver = await WebDriver.createDriver(
-        desiredCapabilities: {'browserName': 'chrome','chromeOptions':{'binary': '/usr/local/bin/dartium'}});
+    TaskProcess dartium = new TaskProcess("which",["dartium"]);
+    String dartpath;
+    dartium.stdout.listen((l){dartpath = l;});
+    await dartium.done;
+    print(dartpath);
+    driver = await createDriver(
+        desired: {'browserName': 'chrome','chromeOptions':{'binary': dartpath}});
   });
 
   //The webdriver is not quit because the functional coverage tool will forcibly close the browser after coverage collection
