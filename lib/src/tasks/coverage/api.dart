@@ -557,8 +557,10 @@ class CoverageTask extends Task {
         }
       });
 
-      TaskProcess path = new TaskProcess("echo",["$PATH"]);
-      path.stdout.listen((l){print(l);});
+      TaskProcess path = new TaskProcess("echo", ["$PATH"]);
+      path.stdout.listen((l) {
+        print(l);
+      });
       await path.done;
 
       _seleniumServerProcess = new TaskProcess('selenium-server', []);
