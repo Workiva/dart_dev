@@ -32,87 +32,6 @@ import 'package:dart_dev/src/tasks/test/config.dart';
 const String _dartFilePattern = '.dart';
 const String _testFilePattern = '_test.dart';
 
-class _Connection {
-  final WebSocket _socket;
-  final Map<int, Completer> _pendingRequests = {};
-  int _requestId = 1;
-
-  _Connection(this._socket) {
-    _socket.listen(_handleResponse);
-  }
-
-  static Future<_Connection> connect(String host, int port) async {
-    var uri = 'ws://$host:$port/ws';
-    var socket = await WebSocket.connect(uri);
-    return new _Connection(socket);
-  }
-
-  Future<Map> request(String method, [Map params = const {}]) {
-    _pendingRequests[_requestId] = new Completer();
-    var message =
-        JSON.encode({'id': _requestId, 'method': method, 'params': params,});
-    _socket.add(message);
-    return _pendingRequests[_requestId++].future;
-  }
-
-  Future close() => _socket.close();
-
-  void _handleResponse(String response) {
-    var json = JSON.decode(response);
-    var id = json['id'];
-    if (id is String) {
-      // Support for vm version >= 1.11.0
-      id = int.parse(id);
-    }
-    if (id == null || !_pendingRequests.keys.contains(id)) {
-      // Suppress unloved messages.
-      return;
-    }
-
-    var completer = _pendingRequests.remove(id);
-    if (completer == null) {
-      print('Failed to pair response with request');
-    }
-
-    // Behavior >= Dart 1.11-dev.3
-    var error = json['error'];
-    if (error != null) {
-//      var errorObj = new JsonRpcError.fromJson(error);
-//      completer.completeError(errorObj);
-      return;
-    }
-
-    var innerResponse = json['result'];
-    if (innerResponse == null) {
-      // Support for 1.9.0 <= vm version < 1.10.0.
-      innerResponse = json['response'];
-    }
-    if (innerResponse == null) {
-      completer.completeError('Failed to get JSON response for message $id');
-      return;
-    }
-    var message;
-    if (innerResponse != null) {
-      if (innerResponse is Map) {
-        // Support for vm version >= 1.11.0
-        message = innerResponse;
-      } else {
-        message = JSON.decode(innerResponse);
-      }
-    }
-
-    // need to check this for errors in the Dart 1.10 version
-    var type = message['type'];
-    if (type == 'Error') {
-      //var errorObj = new Dart_1_10_RpcError.fromJson(message);
-      //completer.completeError(errorObj);
-      return;
-    }
-
-    completer.complete(message);
-  }
-}
-
 class CoverageResult extends TaskResult {
   final File collection;
   final Directory report;
@@ -336,18 +255,12 @@ class CoverageTask extends Task {
 
   Future<List<File>> _collect_functional() async {
     List<File> collections = [];
-    for (File f in _functionalFiles) {
-      print(f.path);
-    }
+//    for (File f in _functionalFiles) {
+//      print(f.path);
+//    }
     if (_functionalFiles.isEmpty) return [];
     TaskProcess pubGet = new TaskProcess('pub', ['get'],
         workingDirectory: config.test.functionalTests[0]);
-    pubGet.stdout.listen((l) {
-      print(l);
-    });
-    pubGet.stderr.listen((l) {
-      print(l);
-    });
     await pubGet.done;
     for (int i = 0; i < _functionalFiles.length; i++) {
       List<int> observatoryPorts;
@@ -376,7 +289,6 @@ class CoverageTask extends Task {
             if (isolates != null && isolates.isNotEmpty) {
               validPorts.add(port);
               isolate.add((isolates[0])['id']);
-              print(json);
             }
             ws.close();
           });
@@ -384,39 +296,8 @@ class CoverageTask extends Task {
           continue;
         }
       }
-      print(validPorts);
 
       for (Future f in wsDone) await f;
-
-      for (int k = 0; k < isolate.length; k++) {
-        _Connection ws = await _Connection.connect("127.0.0.1", validPorts[k]);
-        while (true) {
-          try {
-            print(k);
-            print(await ws.request("getIsolate", {'isolateId': "${isolate[k]}"})
-                .timeout(new Duration(seconds: 15)));
-            print((await ws
-                .request("_getCoverage", {'isolateId': "${isolate[k]}"})
-                .timeout(new Duration(seconds: 30))).toString().length);
-            break;
-          } catch (TimeoutException) {
-            print(ws._socket.readyState);
-            await ws.close();
-            ws = await _Connection.connect("127.0.0.1", validPorts[k]);
-            continue;
-          }
-        }
-      }
-
-//      for( int k =0;k<1;k++){
-//        WebSocket ws = await WebSocket.connect("ws://127.0.0.1:${validPorts[k]}/ws");
-//        ws.add("{\"id\":\"5\",\"method\":\"_getCoverage\",\"params\":{\"isolateId\":\"${isolate[k]}\"}}");
-//        ws.add("{\"id\":\"5\",\"method\":\"_getCallSiteData\",\"params\":{\"isolateId\":\"${isolate[k]}\"}}");
-//        ws.listen((l){
-//          print("--------------------------LINE BREAK---------------------------");
-//          print(l);
-//        });
-//      }
 
       observatoryPorts = validPorts;
 
@@ -446,8 +327,6 @@ class CoverageTask extends Task {
         await _lastTestProcess.done;
         _killTest();
         collections.add(collection);
-        //collection.readAsString().then((l){print("COVERAGE FILE:");
-        //print(l);});
       }
       await _seleniumServerProcess.killGroup();
     }
@@ -517,8 +396,6 @@ class CoverageTask extends Task {
   File _merge(List<File> collections) {
     if (collections.isEmpty) throw new ArgumentError(
         'Cannot merge an empty list of coverages.');
-    //print("Coverage Log");
-    //print(collections.first.readAsStringSync());
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
       Map coverageJson = JSON.decode(collections[i].readAsStringSync());
@@ -551,7 +428,6 @@ class CoverageTask extends Task {
       serve = new TaskProcess('pub', ['serve']);
       Completer serverRunning = new Completer();
       serve.stderr.listen((line) async {
-        print(line);
         if (line.contains("Error: Address already in use")) {
           await serve.kill();
           await _seleniumServerProcess.kill();
@@ -560,12 +436,11 @@ class CoverageTask extends Task {
         }
       });
       serve.stdout.listen((line) {
-        print(line);
         if (_serving.hasMatch(line)) {
           serverRunning.complete();
         }
       });
-      
+
       _seleniumServerProcess = new TaskProcess('selenium-server', []);
 
       RegExp _observatoryPortPattern = new RegExp(
@@ -589,7 +464,6 @@ class CoverageTask extends Task {
 
       await seleniumRunning.future;
       await serverRunning.future;
-      print(serve);
     }
 
     List<File> functionalCollections = await _collect_functional();
@@ -837,7 +711,7 @@ class CoverageTask extends Task {
       'run',
       file.path.split(config.test.functionalTests[0] + '/')[1]
     ];
-    print(config.test.functionalTests[0]);
+//    print(config.test.functionalTests[0]);
     TaskProcess process = new TaskProcess(executable, args,
         workingDirectory: config.test.functionalTests[0]);
 

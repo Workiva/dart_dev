@@ -43,10 +43,6 @@ unzip $CHROMEDRIVER
 
 export PATH=$PATH":$PWD"
 
-echo "export PATH=\$PATH\":$PWD\"" | tee -a ~/.profile
-echo "export PATH=\$PATH\":$PWD\"" | tee -a ~/.bash_profile
-echo "export PATH=\$PATH\":$PWD\"" | tee -a ~/.xprofile
-
 chmod +x chromedriver
 
 ln -s "$PWD/dartiumdir/chrome" "$PWD/dartium"
