@@ -32,7 +32,11 @@ class AnalyzeCli extends TaskCli {
         negatable: true,
         help: 'Treat non-type warnings as fatal.')
     ..addFlag('hints',
-        defaultsTo: defaultHints, negatable: true, help: 'Show hint results.');
+        defaultsTo: defaultHints, negatable: true, help: 'Show hint results.')
+    ..addFlag('fatal-hints',
+        defaultsTo: defaultFatalHints,
+        negatable: true,
+        help: 'Treat hints as fatal.');
 
   final String command = 'analyze';
 
@@ -41,10 +45,22 @@ class AnalyzeCli extends TaskCli {
     bool fatalWarnings = TaskCli.valueOf(
         'fatal-warnings', parsedArgs, config.analyze.fatalWarnings);
     bool hints = TaskCli.valueOf('hints', parsedArgs, config.analyze.hints);
+    bool fatalHints =
+        TaskCli.valueOf('fatal-hints', parsedArgs, config.analyze.fatalHints);
+
+    if (!hints && fatalHints) {
+      return new CliResult.fail('You must enable hints to fail on hints.');
+    }
 
     AnalyzeTask task = analyze(
-        entryPoints: entryPoints, fatalWarnings: fatalWarnings, hints: hints);
-    reporter.logGroup(task.analyzerCommand, outputStream: task.analyzerOutput);
+        entryPoints: entryPoints,
+        fatalWarnings: fatalWarnings,
+        hints: hints,
+        fatalHints: fatalHints);
+    var title = task.analyzerCommand;
+    if (fatalHints) title += ' (treating hints as fatal)';
+
+    reporter.logGroup(title, outputStream: task.analyzerOutput);
     await task.done;
     return task.successful
         ? new CliResult.success('Analysis completed.')
