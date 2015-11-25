@@ -27,10 +27,6 @@ export DARTIUM_BIN="$PWD/dartiumdir/chrome"
 echo Pub install
 pub install
 
-#sudo echo "#!/usr/bin/env bash" | sudo tee -a /usr/local/bin/selenium-server
-#sudo echo "exec java  -jar $PWD/$SELENIUM_JAR \"$@\"" | sudo tee -a /usr/local/bin/selenium-server
-#sudo chmod +x /usr/local/bin/selenium-server
-
 echo "#!/usr/bin/env bash" | tee -a selenium-server
 echo "exec java  -jar $PWD/$SELENIUM_JAR \"$@\"" | tee -a selenium-server
 chmod +x selenium-server
@@ -46,10 +42,3 @@ export PATH=$PATH":$PWD"
 chmod +x chromedriver
 
 ln -s "$PWD/dartiumdir/chrome" "$PWD/dartium"
-
-#sudo cp chromedriver /usr/bin/chromedriver
-#sudo chown root /usr/bin/chromedriver
-#sudo chmod +x /usr/bin/chromedriver
-#sudo chmod 755 /usr/bin/chromedriver
-
-#sudo ln -s "$PWD/dartium/chrome" /usr/local/bin/dartium

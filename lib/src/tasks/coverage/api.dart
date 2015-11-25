@@ -716,8 +716,6 @@ class CoverageTask extends Task {
         workingDirectory: config.test.functionalTests[0]);
 
     String _observatoryFailPattern = 'Could not start Observatory HTTP server';
-    RegExp _observatoryPortPattern = new RegExp(
-        r'Observatory listening (at|on) http:\/\/127\.0\.0\.1:(\d+)');
 
     String _testsFailedPattern = 'Some tests failed.';
     RegExp _testsPassedPat = new RegExp(r'All\s[\d]*\s?tests passed.');
