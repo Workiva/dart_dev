@@ -114,7 +114,8 @@ void main() {
     test('should report hints as fatal if configured to do so', () async {
       Analysis analysis =
           await analyzeProject(projectWithHints, fatalHints: true);
-      expect(analysis.numHints, equals(2));
+      expect(analysis.numErrors, equals(2));
+      expect(analysis.numHints, equals(0));
       expect(analysis.exitCode, greaterThan(0));
     });
 

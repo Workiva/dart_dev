@@ -34,33 +34,20 @@ AnalyzeTask analyze(
   }
   if (!hints) {
     args.add('--no-hints');
+  } else if (fatalHints) {
+    args.add('--fatal-hints');
   }
+
   args.addAll(_findFilesFromEntryPoints(entryPoints));
 
-  var postProcessCompleter = new Completer();
   TaskProcess process = new TaskProcess(executable, args);
-  AnalyzeTask task = new AnalyzeTask(
-      '$executable ${args.join(' ')}', postProcessCompleter.future);
+  AnalyzeTask task =
+      new AnalyzeTask('$executable ${args.join(' ')}', process.done);
 
-  var matchingLineFuture = task.analyzerOutput
-      .firstWhere((line) => line.contains('[hint] '), defaultValue: () => null);
-
-  var stdoutDone = process.stdout.listen(task._analyzerOutput.add).asFuture();
-  var stderrDone = process.stderr.listen(task._analyzerOutput.add).asFuture();
-  Future.wait([stdoutDone, stderrDone])
-      .then((_) => task._analyzerOutput.close());
-
-  matchingLineFuture.then((matchingLine) {
-    process.exitCode.then((exitCode) async {
-      if (exitCode > 0) {
-        task.successful = false;
-      } else if (fatalHints) {
-        task.successful = matchingLine == null;
-      } else {
-        task.successful = true;
-      }
-      postProcessCompleter.complete();
-    });
+  process.stdout.listen(task._analyzerOutput.add);
+  process.stderr.listen(task._analyzerOutput.addError);
+  process.exitCode.then((code) {
+    task.successful = code <= 0;
   });
 
   return task;
@@ -89,7 +76,7 @@ class AnalyzeTask extends Task {
   final String analyzerCommand;
   final Future done;
 
-  StreamController<String> _analyzerOutput = new StreamController.broadcast();
+  StreamController<String> _analyzerOutput = new StreamController();
   Stream<String> get analyzerOutput => _analyzerOutput.stream;
   AnalyzeTask(String this.analyzerCommand, Future this.done);
 }
