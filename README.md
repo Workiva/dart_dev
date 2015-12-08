@@ -115,6 +115,21 @@ fi
 Next time you load a Bash session you'll have basic completions for the `ddev`
 alias described above.
 
+#### Zsh Completion
+
+The Bash completion script will work for Zsh as well, but requires a little
+configuration. The following lines must all be found somewhere (and in this
+order, though they needn't be adjacent to one another) in your `.zshrc` file,
+or a file sourced from it:
+
+```
+autoload -U compinit
+compinit
+autoload -U bashcompinit
+bashcompinit
+source <path/to/ddev-completion.sh>
+```
+
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
 `pub run dart_dev init` to generate the configuration file. This should create a
