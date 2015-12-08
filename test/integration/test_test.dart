@@ -32,8 +32,8 @@ Future<bool> runTests(String projectPath,
 
   List args = ['run', 'dart_dev', 'test'];
   if (unit != null) args.add(unit ? '--unit' : '--no-unit');
-  if (integration != null) args
-      .add(integration ? '--integration' : '--no-integration');
+  if (integration != null)
+    args.add(integration ? '--integration' : '--no-integration');
   int i;
 
   if (files != null) {
@@ -70,8 +70,9 @@ void main() {
 
     test('should run individual unit test', () async {
       expect(
-          await runTests(projectWithPassingTests, files:
-              ['test/fixtures/test/passing/test/passing_unit_test.dart']),
+          await runTests(projectWithPassingTests, files: [
+            'test/fixtures/test/passing/test/passing_unit_test.dart'
+          ]),
           isTrue);
     });
 
