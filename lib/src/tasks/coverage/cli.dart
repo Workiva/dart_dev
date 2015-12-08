@@ -52,9 +52,9 @@ class CoverageCli extends TaskCli {
   final String command = 'coverage';
 
   Future<CliResult> run(ArgResults parsedArgs) async {
-    if (!platform_util
-        .hasImmediateDependency('coverage')) return new CliResult.fail(
-        'Package "coverage" must be an immediate dependency in order to run its executables.');
+    if (!platform_util.hasImmediateDependency('coverage'))
+      return new CliResult.fail(
+          'Package "coverage" must be an immediate dependency in order to run its executables.');
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];

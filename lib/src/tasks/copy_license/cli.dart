@@ -32,8 +32,8 @@ class CopyLicenseCli extends TaskCli {
     List<String> directories = config.copyLicense.directories;
     String licensePath = config.copyLicense.licensePath;
 
-    if (!(new File(licensePath)).existsSync()) return new CliResult.fail(
-        'License file "$licensePath" does not exist.');
+    if (!(new File(licensePath)).existsSync())
+      return new CliResult.fail('License file "$licensePath" does not exist.');
 
     CopyLicenseTask task =
         copyLicense(directories: directories, licensePath: licensePath);

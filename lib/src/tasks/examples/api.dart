@@ -29,8 +29,8 @@ bool hasExamples() {
 
 ExamplesTask serveExamples(
     {String hostname: defaultHostname, int port: defaultPort}) {
-  if (!hasExamples()) throw new Exception(
-      'This project does not have any examples.');
+  if (!hasExamples())
+    throw new Exception('This project does not have any examples.');
 
   var dartiumExecutable = 'dartium';
   var dartiumArgs = ['http://$hostname:$port'];

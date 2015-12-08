@@ -77,9 +77,9 @@ class TestCli extends TaskCli {
   }
 
   Future<CliResult> run(ArgResults parsedArgs) async {
-    if (!platform_util
-        .hasImmediateDependency('test')) return new CliResult.fail(
-        'Package "test" must be an immediate dependency in order to run its executables.');
+    if (!platform_util.hasImmediateDependency('test'))
+      return new CliResult.fail(
+          'Package "test" must be an immediate dependency in order to run its executables.');
 
     List<String> additionalArgs = [];
 
