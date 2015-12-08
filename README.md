@@ -71,7 +71,7 @@ need to know how to use the `dart_dev` tool.
 - **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
 - **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
 - **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
-- **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs. 
+- **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 
@@ -253,10 +253,16 @@ All configuration options for the `analyze` task are found on the
             <td>Show hint results.</td>
         </tr>
         <tr>
-        	<td><code>fatalHints</code></td>
-        	<td><code>bool</code></td>
-        	<td><code>false</code></td>
-        	<td>Fail on hints (requests hints to be true).</td>
+          	<td><code>fatalHints</code></td>
+          	<td><code>bool</code></td>
+          	<td><code>false</code></td>
+          	<td>Fail on hints (requests hints to be true).</td>
+        </tr>
+        <tr>
+            <td><code>strong</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Enable strong static checks ([https://goo.gl/DqcBsw](Enable strong static checks (https://goo.gl/DqcBsw))</td>
         </tr>
     </tbody>
 </table>
@@ -431,7 +437,7 @@ object.
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
             <td>Platforms on which to run the tests (handled by the Dart test runner). See https://github.com/dart-lang/test#platform-selector-syntax for a full list of supported platforms.
-            <strong>* Not all platforms are supported by all continuous integration servers.  Please consult your CI server's documentation for more details.</strong> 
+            <strong>* Not all platforms are supported by all continuous integration servers.  Please consult your CI server's documentation for more details.</strong>
             </td>
         </tr>
         <tr>

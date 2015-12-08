@@ -36,7 +36,11 @@ class AnalyzeCli extends TaskCli {
     ..addFlag('fatal-hints',
         defaultsTo: defaultFatalHints,
         negatable: true,
-        help: 'Treat hints as fatal.');
+        help: 'Treat hints as fatal.')
+    ..addFlag('strong',
+        defaultsTo: defaultStrong,
+        negatable: true,
+        help: 'Enable strong static checks (https://goo.gl/DqcBsw)');
 
   final String command = 'analyze';
 
@@ -47,6 +51,7 @@ class AnalyzeCli extends TaskCli {
     bool hints = TaskCli.valueOf('hints', parsedArgs, config.analyze.hints);
     bool fatalHints =
         TaskCli.valueOf('fatal-hints', parsedArgs, config.analyze.fatalHints);
+    bool strong = TaskCli.valueOf('strong', parsedArgs, config.analyze.strong);
 
     if (!hints && fatalHints) {
       return new CliResult.fail('You must enable hints to fail on hints.');
@@ -56,7 +61,8 @@ class AnalyzeCli extends TaskCli {
         entryPoints: entryPoints,
         fatalWarnings: fatalWarnings,
         hints: hints,
-        fatalHints: fatalHints);
+        fatalHints: fatalHints,
+        strong: strong);
     var title = task.analyzerCommand;
     if (fatalHints) title += ' (treating hints as fatal)';
 
