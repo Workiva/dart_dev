@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.0.6
+
+- **Improvement:** `--strong` flag added to the Analyze task.
+- **Improvement:** The Analyze task's `--fatal-hints` flag is now implemented
+   by utilizing the `--fatal-hints` flag on `dartanalyzer` instead of parsing
+   the output.
+- **Documentation:** Add zsh completion instructions to the README.
+
+## 1.0.5
+
+### New Feature: pub server support for tests and coverage
+
+- The Test and Coverage tasks now take a `--pub-serve` flag that will
+  automatically spin up a pub server that is used to run the tests.
+- Tests that require a pub transformer can now be run by passing in this flag!
+
+### Changes
+
+- **Improvement:** `--fatal-hints` flag added to the Analyze task.
+
 ## 1.0.4
 
 - **Tooling:** Bash completions are available in the `tool/` directory! See the
