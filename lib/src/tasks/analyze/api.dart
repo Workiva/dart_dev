@@ -26,7 +26,8 @@ AnalyzeTask analyze(
     {List<String> entryPoints: defaultEntryPoints,
     bool fatalWarnings: defaultFatalWarnings,
     bool hints: defaultHints,
-    bool fatalHints: defaultFatalHints}) {
+    bool fatalHints: defaultFatalHints,
+    bool strong: defaultStrong}) {
   var executable = 'dartanalyzer';
   var args = [];
   if (fatalWarnings) {
@@ -36,6 +37,9 @@ AnalyzeTask analyze(
     args.add('--no-hints');
   } else if (fatalHints) {
     args.add('--fatal-hints');
+  }
+  if (strong) {
+    args.add('--strong');
   }
 
   args.addAll(_findFilesFromEntryPoints(entryPoints));

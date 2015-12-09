@@ -24,16 +24,19 @@ import 'package:test/test.dart';
 const String projectWithErrors = 'test/fixtures/analyze/errors';
 const String projectWithHints = 'test/fixtures/analyze/hints';
 const String projectWithNoIssues = 'test/fixtures/analyze/no_issues';
+const String projectWithStaticTypingIssues = 'test/fixtures/analyze/strong';
 
 Future<Analysis> analyzeProject(String projectPath,
     {bool fatalWarnings: true,
     bool hints: true,
-    bool fatalHints: false}) async {
+    bool fatalHints: false,
+    bool strong: false}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
   var args = ['run', 'dart_dev', 'analyze'];
   args.add(fatalWarnings ? '--fatal-warnings' : '--no-fatal-warnings');
   args.add(hints ? '--hints' : '--no-hints');
+  args.add(strong ? '--strong' : '--no-strong');
   args.add(fatalHints ? '--fatal-hints' : ' --no-fatal-hints');
 
   TaskProcess process =
@@ -138,6 +141,22 @@ void main() {
           await analyzeProject(projectWithErrors, fatalWarnings: false);
       expect(analysis.numErrors, equals(1));
       expect(analysis.numWarnings, equals(1));
+    });
+
+    test(
+        'should not report any issues on project with static typing issues if strong mode is off',
+        () async {
+      Analysis analysis =
+          await analyzeProject(projectWithStaticTypingIssues, strong: false);
+      expect(analysis.exitCode, equals(0));
+    });
+
+    test(
+        'should report issues on project with static typing issues if strong mode is on',
+        () async {
+      Analysis analysis =
+          await analyzeProject(projectWithStaticTypingIssues, strong: true);
+      expect(analysis.numErrors, greaterThan(0));
     });
   });
 }
