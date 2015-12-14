@@ -255,9 +255,7 @@ class CoverageTask extends Task {
 
   Future<List<File>> _collect_functional() async {
     List<File> collections = [];
-//    for (File f in _functionalFiles) {
-//      print(f.path);
-//    }
+
     if (_functionalFiles.isEmpty) return [];
     TaskProcess pubGet = new TaskProcess('pub', ['get'],
         workingDirectory: config.test.functionalTests[0]);
@@ -424,20 +422,21 @@ class CoverageTask extends Task {
 
     if (functionalTests.isNotEmpty) {
       observatoryPort = new List<int>();
-      RegExp _serving = new RegExp("Serving .* on http:\/\/localhost:8080");
-      serve = new TaskProcess('pub', ['serve']);
+      RegExp _serving = new RegExp("Serving .* on http:\/\/localhost:[^d]{1,}");
+      serve = new TaskProcess('pub', ['serve','--port=${config.test.pubServePort}']);
       Completer serverRunning = new Completer();
       serve.stderr.listen((line) async {
         if (line.contains("Error: Address already in use")) {
           await serve.kill();
           await _seleniumServerProcess.kill();
           throw new PortBoundException(
-              "pub serve failed to start.  Check if port 8080 is already bound");
+              "pub serve failed to start.  Check if port ${config.test.pubServePort} is already bound");
         }
       });
       serve.stdout.listen((line) {
         if (_serving.hasMatch(line)) {
-          serverRunning.complete();
+          if(!serverRunning.isCompleted)
+            serverRunning.complete();
         }
       });
 
@@ -568,7 +567,7 @@ class CoverageTask extends Task {
           _coverageOutput.add('Starting Pub server...');
 
           // Start `pub serve` on the `test` directory.
-          pubServeTask = startPubServe(additionalArgs: ['test']);
+          pubServeTask = startPubServe(port:config.test.pubServePort,additionalArgs: ['test']);
 
           _coverageOutput.add('::: ${pubServeTask.command}');
           String indentLine(String line) => '    $line';
@@ -709,11 +708,9 @@ class CoverageTask extends Task {
     String executable = 'pub';
     List args = [
       'run',
-      file.path.split(config.test.functionalTests[0] + '/')[1]
+      file.path
     ];
-//    print(config.test.functionalTests[0]);
-    TaskProcess process = new TaskProcess(executable, args,
-        workingDirectory: config.test.functionalTests[0]);
+    TaskProcess process = new TaskProcess(executable, args);
 
     String _observatoryFailPattern = 'Could not start Observatory HTTP server';
 

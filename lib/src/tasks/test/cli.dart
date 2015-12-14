@@ -144,7 +144,7 @@ class TestCli extends TaskCli {
     PubServeTask pubServeTask;
     if (pubServe) {
       // Start `pub serve` on the `test` directory
-      pubServeTask = startPubServe(additionalArgs: ['test']);
+      pubServeTask = startPubServe(port:config.test.pubServePort,additionalArgs: ['test']);
 
       var startupLogFinished = new Completer();
       reporter.logGroup(pubServeTask.command,
