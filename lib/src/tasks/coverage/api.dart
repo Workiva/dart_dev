@@ -537,6 +537,9 @@ class CoverageTask extends Task {
       process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
 
       await for (String line in process.stdout) {
+        if(!line.contains("Pass") && !line.contains("Fail")) {
+          print(line);
+        }
         _coverageOutput.add('    $line');
         if (line.contains(_observatoryFailPattern)) {
           throw new CoverageTestSuiteException(file.path);
