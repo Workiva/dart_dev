@@ -234,8 +234,7 @@ class CoverageTask extends Task {
 
         process = new TaskProcess(executable, args);
         process.stdout.listen((l) => _coverageOutput.add('    $l'));
-        process.stderr
-            .listen((l) => _coverageErrorOutput.add('    $l'));
+        process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
         await process.done;
         _killTest();
         collections.add(collection);
@@ -300,13 +299,13 @@ class CoverageTask extends Task {
   }
 
   void _killTest() {
-    if(_lastTestProcess!=null) {
+    if (_lastTestProcess != null) {
       _lastTestProcess.kill();
     }
-      _lastTestProcess = null;
-      if (_lastHtmlFile != null && _lastHtmlFile.existsSync()) {
-        _lastHtmlFile.deleteSync();
-      }
+    _lastTestProcess = null;
+    if (_lastHtmlFile != null && _lastHtmlFile.existsSync()) {
+      _lastHtmlFile.deleteSync();
+    }
   }
 
   File _merge(List<File> collections) {
