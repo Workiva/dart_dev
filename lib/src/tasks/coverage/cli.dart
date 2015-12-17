@@ -55,9 +55,9 @@ class CoverageCli extends TaskCli {
   final String command = 'coverage';
 
   Future<CliResult> run(ArgResults parsedArgs) async {
-    if (!platform_util
-        .hasImmediateDependency('coverage')) return new CliResult.fail(
-        'Package "coverage" must be an immediate dependency in order to run its executables.');
+    if (!platform_util.hasImmediateDependency('coverage'))
+      return new CliResult.fail(
+          'Package "coverage" must be an immediate dependency in order to run its executables.');
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
@@ -74,7 +74,6 @@ class CoverageCli extends TaskCli {
     bool open = TaskCli.valueOf('open', parsedArgs, true);
 
     List<String> tests = [];
-    List<String> functionalTests = [];
 
     if (unit) {
       tests.addAll(config.test.unitTests);
@@ -83,7 +82,7 @@ class CoverageCli extends TaskCli {
       tests.addAll(config.test.integrationTests);
     }
     if (functional) {
-      functionalTests.addAll(config.test.functionalTests);
+      tests.addAll(config.test.functionalTests);
     }
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
@@ -94,18 +93,16 @@ class CoverageCli extends TaskCli {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
       }
-      if (functionalTests.isEmpty) {
-        if (functional && config.test.functionalTests.isEmpty) {
-          return new CliResult.fail(
-              'This project does not specify any functional tests.');
-        }
+      if (functional && config.test.functionalTests.isEmpty) {
+        return new CliResult.fail(
+            'This project does not specify any functional tests.');
       }
     }
 
     CoverageResult result;
     try {
       CoverageTask task = CoverageTask.start(tests,
-          functionalTests: functionalTests,
+          functional: functional,
           html: html,
           pubServe: pubServe,
           output: config.coverage.output,

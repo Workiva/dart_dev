@@ -26,8 +26,8 @@ CopyLicenseTask copyLicense(
   CopyLicenseTask task = new CopyLicenseTask();
 
   File license = new File(licensePath);
-  if (!license.existsSync()) throw new Exception(
-      'License file "$licensePath" does not exist.');
+  if (!license.existsSync())
+    throw new Exception('License file "$licensePath" does not exist.');
 
   String licenseContents = license.readAsStringSync();
   licenseContents = trimLeadingAndTrailingEmptyLines(licenseContents);

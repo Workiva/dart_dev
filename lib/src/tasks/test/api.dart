@@ -19,14 +19,18 @@ import 'dart:async';
 import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
+import 'package:dart_dev/src/tasks/test/config.dart';
+import 'package:dart_dev/src/util.dart' show SeleniumServer;
 
-TestTask test(
-    {int concurrency,
+Future<TestTask> test(
+    {bool functional: defaultFunctional,
+    int concurrency,
     List<String> additionalArgs: const [],
     List<String> platforms: const [],
-    List<String> tests: const []}) {
+    List<String> tests: const []}) async {
   var executable = 'pub';
   var args = ['run', 'test'];
+  SeleniumServer server;
   if (concurrency != null) {
     args.add('--concurrency=$concurrency');
   }
@@ -37,6 +41,11 @@ TestTask test(
   args.addAll(additionalArgs);
   args.addAll(tests);
 
+  if (functional) {
+    server = new SeleniumServer(coverage: false);
+    await server.isDone;
+  }
+
   TaskProcess process = new TaskProcess(executable, args);
   Completer outputProcessed = new Completer();
   TestTask task = new TestTask('$executable ${args.join(' ')}',
@@ -46,11 +55,15 @@ TestTask test(
   // RegExp resultPattern = new RegExp(r'(\d+:\d+) \+(\d+) ?~?(\d+)? ?-?(\d+)?: (All|Some) tests (failed|passed)');
 
   StreamController stdoutc = new StreamController();
-  process.stdout.listen((line) {
+  process.stdout.listen((line) async {
     stdoutc.add(line);
     if ((line.contains('All tests passed!') ||
             line.contains('Some tests failed.')) &&
         !outputProcessed.isCompleted) {
+      if (server != null) {
+        await server.closeTests();
+        await server.kill();
+      }
       task.testSummary = line;
       outputProcessed.complete();
     }

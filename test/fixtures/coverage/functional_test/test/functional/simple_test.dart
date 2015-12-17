@@ -10,7 +10,6 @@ void main() {
     String dartpath;
     dartium.stdout.listen((l){dartpath = l;});
     await dartium.done;
-    print(dartpath);
     driver = await createDriver(
         desired: {'browserName': 'chrome','chromeOptions':{'binary': dartpath}});
   });

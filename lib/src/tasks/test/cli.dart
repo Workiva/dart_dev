@@ -80,9 +80,9 @@ class TestCli extends TaskCli {
   }
 
   Future<CliResult> run(ArgResults parsedArgs) async {
-    if (!platform_util
-        .hasImmediateDependency('test')) return new CliResult.fail(
-        'Package "test" must be an immediate dependency in order to run its executables.');
+    if (!platform_util.hasImmediateDependency('test'))
+      return new CliResult.fail(
+          'Package "test" must be an immediate dependency in order to run its executables.');
 
     List<String> additionalArgs = [];
 
@@ -112,10 +112,7 @@ class TestCli extends TaskCli {
         individualTests == 0) {
       return new CliResult.fail(
           'No tests were selected. Include at least one of --unit, --integration or --functional.');
-    } else {
-      if (individualTests == 0) unit = true;
     }
-
     if (unit) {
       tests.addAll(config.test.unitTests);
     }
@@ -144,7 +141,8 @@ class TestCli extends TaskCli {
     PubServeTask pubServeTask;
     if (pubServe) {
       // Start `pub serve` on the `test` directory
-      pubServeTask = startPubServe(port:config.test.pubServePort,additionalArgs: ['test']);
+      pubServeTask = startPubServe(
+          port: config.test.pubServePort, additionalArgs: ['test']);
 
       var startupLogFinished = new Completer();
       reporter.logGroup(pubServeTask.command,
@@ -171,7 +169,8 @@ class TestCli extends TaskCli {
       });
     }
 
-    TestTask task = test(
+    TestTask task = await test(
+        functional: functional,
         tests: tests,
         concurrency: concurrency,
         platforms: platforms,

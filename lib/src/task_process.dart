@@ -45,8 +45,8 @@ class TaskProcess {
       _outc.future.then((_) => _stdout.close());
       _errc.future.then((_) => _stderr.close());
       process.exitCode.then(_procExitCode.complete);
-      Future.wait([_outc.future, _errc.future, process.exitCode])
-          .then((_) => _donec.complete());
+      Future.wait([_outc.future, _errc.future, process.exitCode]).then(
+          (_) => _donec.complete());
     });
   }
 
@@ -74,7 +74,8 @@ class TaskProcess {
       cpids = await getChildPids(cpids);
       cpids.addAll(pids);
       return cpids;
-    } else return pids;
+    } else
+      return pids;
   }
 
   Future<bool> killAllChildren(int ppid) async {
@@ -84,8 +85,10 @@ class TaskProcess {
     for (int i in cpids) args.add(i.toString());
     TaskProcess k = new TaskProcess("kill", args);
     await k.done;
-    if (await k.exitCode == 0) return true;
-    else return false;
+    if (await k.exitCode == 0)
+      return true;
+    else
+      return false;
   }
 
   bool kill([ProcessSignal signal = ProcessSignal.SIGTERM]) =>

@@ -40,9 +40,9 @@ class FormatCli extends TaskCli {
 
   Future<CliResult> run(ArgResults parsedArgs) async {
     try {
-      if (!platform_util
-          .hasImmediateDependency('dart_style')) return new CliResult.fail(
-          'Package "dart_style" must be an immediate dependency in order to run its executables.');
+      if (!platform_util.hasImmediateDependency('dart_style'))
+        return new CliResult.fail(
+            'Package "dart_style" must be an immediate dependency in order to run its executables.');
     } catch (e) {
       // It's possible that this check may throw if the pubspec.yaml
       // could not be found or if the yaml could not be parsed.
@@ -77,18 +77,20 @@ class FormatCli extends TaskCli {
     }
 
     if (task.isDryRun) {
-      if (task.successful) return new CliResult.success(
-          excludedFilesWarning + 'Your Dart code is good to go!');
-      if (task.affectedFiles.isEmpty) return new CliResult.fail(
-          excludedFilesWarning + 'The Dart formatter needs to be run.');
+      if (task.successful)
+        return new CliResult.success(
+            excludedFilesWarning + 'Your Dart code is good to go!');
+      if (task.affectedFiles.isEmpty)
+        return new CliResult.fail(
+            excludedFilesWarning + 'The Dart formatter needs to be run.');
       return new CliResult.fail(excludedFilesWarning +
           'The Dart formatter needs to be run. The following files require changes:\n    ' +
           task.affectedFiles.join('\n    '));
     } else {
       if (!task.successful) return new CliResult.fail('Dart formatter failed.');
-      if (task.affectedFiles.isEmpty) return new CliResult.success(
-          excludedFilesWarning +
-              'Success! All files are already formatted correctly.');
+      if (task.affectedFiles.isEmpty)
+        return new CliResult.success(excludedFilesWarning +
+            'Success! All files are already formatted correctly.');
       return new CliResult.success(excludedFilesWarning +
           'Success! The following files were formatted:\n    ' +
           task.affectedFiles.join('\n    '));
