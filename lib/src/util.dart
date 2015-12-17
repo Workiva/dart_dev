@@ -20,7 +20,9 @@ import 'dart:convert';
 
 import 'package:path/path.dart' as path;
 import 'package:dart_dev/util.dart' show TaskProcess;
+import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
+import 'package:dart_dev/src/tasks/coverage/config.dart';
 
 void copyDirectory(Directory source, Directory dest) {
   if (!dest.existsSync()) {
@@ -83,7 +85,7 @@ class SeleniumServer {
   List<int> observatoryPort;
   List<Future> checkPortDone;
   SeleniumServer(
-      {String executable: "selenium-server",
+      {String executable: defaultSeleniumCommand,
       List args: const [],
       bool coverage: false}) {
     observatoryPort = new List<int>();
@@ -100,8 +102,8 @@ class SeleniumServer {
       } else if (line.contains("Failed to start")) {
         await _server.kill();
         throw new PortBoundException(
-            "selenium-server failed to start.  Check if this process is already running.");
-      } else if (line.contains("Selenium Server is up and running")) {
+            "${config.coverage.seleniumCommand} failed to start.  Check if this process is already running.");
+      } else if (line.contains(config.coverage.seleniumSuccess)) {
         isDone.complete();
       }
     });

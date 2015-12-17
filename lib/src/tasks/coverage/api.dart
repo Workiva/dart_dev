@@ -214,8 +214,8 @@ class CoverageTask extends Task {
       }
 
       for (int j = 0; j < observatoryPorts.length; j++) {
-        File collection = new File(
-            path.join(_collections.path, '${_files[i].path}${j}.json'));
+        File collection = new File(path.join(_collections.path,
+            '${_files[i].path}${observatoryPorts.length > 1 ? j : ""}.json'));
         int observatoryPort = observatoryPorts[j];
         // Collect the coverage from observatory.
         String executable = 'pub';
@@ -334,7 +334,8 @@ class CoverageTask extends Task {
     }
 
     if (functional) {
-      server = new SeleniumServer(coverage: true);
+      server = new SeleniumServer(
+          coverage: true, executable: config.coverage.seleniumCommand);
       await server.isDone;
     }
 
@@ -547,7 +548,7 @@ class CoverageTask extends Task {
           break;
         }
       }
-      if (server.observatoryPort.length > 0) {
+      if (server != null && server.observatoryPort.length > 0) {
         List<int> result = await server.checkPorts();
         return result;
       }
