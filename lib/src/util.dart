@@ -96,9 +96,6 @@ class SeleniumServer {
     isDone = new Completer();
     _server.stderr.listen((line) async {
 //      _coverageErrorOutput.add('    $line');
-      if(!line.contains("Pass") && !line.contains("Fail")) {
-        print(line);
-      }
       if (coverage && line.contains(_observatoryPortPattern)) {
         Match m = _observatoryPortPattern.firstMatch(line);
         observatoryPort.add(int.parse(m.group(2)));
