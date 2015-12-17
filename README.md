@@ -262,7 +262,7 @@ All configuration options for the `analyze` task are found on the
             <td><code>strong</code></td>
             <td><code>bool</code></td>
             <td><code>false</code></td>
-            <td>Enable strong static checks ([https://goo.gl/DqcBsw](Enable strong static checks (https://goo.gl/DqcBsw))</td>
+            <td><a href="https://goo.gl/DqcBsw">Enable strong static checks</a></td>
         </tr>
     </tbody>
 </table>
