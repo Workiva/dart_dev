@@ -300,11 +300,13 @@ class CoverageTask extends Task {
   }
 
   void _killTest() {
-    _lastTestProcess.kill();
-    _lastTestProcess = null;
-    if (_lastHtmlFile != null && _lastHtmlFile.existsSync()) {
-      _lastHtmlFile.deleteSync();
+    if(_lastTestProcess!=null) {
+      _lastTestProcess.kill();
     }
+      _lastTestProcess = null;
+      if (_lastHtmlFile != null && _lastHtmlFile.existsSync()) {
+        _lastHtmlFile.deleteSync();
+      }
   }
 
   File _merge(List<File> collections) {
