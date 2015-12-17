@@ -204,6 +204,7 @@ class CoverageTask extends Task {
     List<File> collections = [];
     for (int i = 0; i < _files.length; i++) {
       List<int> observatoryPorts;
+      TaskProcess process;
 
       // Run the test and obtain the observatory port for coverage collection.
       try {
@@ -231,11 +232,11 @@ class CoverageTask extends Task {
         _coverageOutput.add('Collecting coverage for ${_files[i].path}');
         _coverageOutput.add('$executable ${args.join(' ')}\n');
 
-        _lastTestProcess = new TaskProcess(executable, args);
-        _lastTestProcess.stdout.listen((l) => _coverageOutput.add('    $l'));
-        _lastTestProcess.stderr
+        process = new TaskProcess(executable, args);
+        process.stdout.listen((l) => _coverageOutput.add('    $l'));
+        process.stderr
             .listen((l) => _coverageErrorOutput.add('    $l'));
-        await _lastTestProcess.done;
+        await process.done;
         _killTest();
         collections.add(collection);
       }
@@ -537,9 +538,6 @@ class CoverageTask extends Task {
       process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
 
       await for (String line in process.stdout) {
-        if(!line.contains("Pass") && !line.contains("Fail")) {
-          print(line);
-        }
         _coverageOutput.add('    $line');
         if (line.contains(_observatoryFailPattern)) {
           throw new CoverageTestSuiteException(file.path);
