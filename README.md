@@ -132,20 +132,36 @@ source <path/to/ddev-completion.sh>
 
 #### Functional Test Code Coverage
 
->The following dependencies are needed to run functional code coverage:
->
->Chromedriver v2.14
->https://chromedriver.storage.googleapis.com/index.html?path=2.14/
->
->Selenium Server
->http://www.seleniumhq.org/download/
+The following dependencies are needed to run functional code coverage:
 
-In order for coverage to be collected against functional tests, Dartium must be run against native dart code.  To launch an instance of Dartium with chromedriver you will need to configure the chromedriver instance to include the path to your dartium binary.
+Chromedriver 2.14:
+```
+https://chromedriver.storage.googleapis.com/index.html?path=2.14/
+```
+
+Selenium Server:
+```
+http://www.seleniumhq.org/download/
+or
+brew install selenium-server-standalone
+```
+
+In order for coverage to be collected against functional tests, the application under test must be utilizing native dart code.  To launch an instance of Dartium with chromedriver you will need to configure the chromedriver instance to include the path to your dartium binary.
+
+Using [webdriver.dart](https://github.com/google/webdriver.dart):
 ```
 WebDriver driver = await createDriver(
-	desired: {'browserName': 'chrome','chromeOptions':{'binary': dartpath}});
+	desired: {'browserName': 'chrome','chromeOptions':{'binary': 'dartiumpath'}});
 ```
-The `coverage` and `test` tasks will both handle closing your browser instances after functional test completion.  In fact, this is necessary for collection of coverage data.  Because of this, you will need to omit the standard `tearDown(() => driver.quit());` from your test instances.
+Using [w_webdriver_utils](https://github.com/Workiva/w_webdriver_utils):
+```
+config.yaml
+
+chrome:
+  chromeOptions:
+    'binary': 'dartiumpath'
+```
+The `coverage` and `test` tasks will both handle closing your browser instances after functional test completion.  You will need to omit the standard `tearDown(() => driver.quit());` from your test instances and your tests **must not close themselves** after completion or `coverage` cannot be collected.
 
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
