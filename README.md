@@ -130,6 +130,23 @@ bashcompinit
 source <path/to/ddev-completion.sh>
 ```
 
+#### Functional Test Code Coverage
+
+>The following dependencies are needed to run functional code coverage:
+>
+>Chromedriver v2.14
+>https://chromedriver.storage.googleapis.com/index.html?path=2.14/
+>
+>Selenium Server
+>http://www.seleniumhq.org/download/
+
+In order for coverage to be collected against functional tests, Dartium must be run against native dart code.  To launch an instance of Dartium with chromedriver you will need to configure the chromedriver instance to include the path to your dartium binary.
+```
+WebDriver driver = await createDriver(
+	desired: {'browserName': 'chrome','chromeOptions':{'binary': dartpath}});
+```
+The `coverage` and `test` tasks will both handle closing your browser instances after functional test completion.  In fact, this is necessary for collection of coverage data.  Because of this, you will need to omit the standard `tearDown(() => driver.quit());` from your test instances.
+
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
 `pub run dart_dev init` to generate the configuration file. This should create a
@@ -141,24 +158,25 @@ import 'package:dart_dev/dart_dev.dart';
 main(args) async {
   // Define the entry points for static analysis.
   config.analyze.entryPoints = ['lib/', 'test/', 'tool/'];
-  
+
   // Define the directories where the LICENSE should be applied.
   config.copyLicense.directories = ['example/', 'lib/'];
 
   // Configure whether or not the HTML coverage report should be generated.
   config.coverage.html = false;
-  
+
   // Configure the port on which examples should be served.
   config.examples.port = 9000;
-  
+
   // Define the directories to include when running the
   // Dart formatter.
   config.format.directories = ['lib/', 'test/', 'tool/'];
-  
+
   // Define the location of your test suites.
   config.test
     ..unitTests = ['test/unit/']
-    ..integrationTests = ['test/integration/'];
+    ..integrationTests = ['test/integration/']
+    ..functionalTests = ['test/functional'];
 
   // Execute the dart_dev tooling.
   await dev(args);
@@ -215,7 +233,7 @@ main(args) async {
   config.format
   config.init
   config.test
-  
+
   await dev(args);
 }
 ```
@@ -335,6 +353,18 @@ configuration from the `config.test` object.
             <td><code>false</code></td>
             <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
         </tr>
+        <tr>
+            <td><code>seleniumCommand</code></td>
+            <td><code>String</code></td>
+            <td><code>"selenium-server"</code></td>
+            <td>Command used to execute Selenium for functional testing.</td>
+        </tr>
+        <tr>
+            <td><code>seleniumSuccess</code></td>
+            <td><code>String</code></td>
+            <td><code>"Selenium Server is up and running"</code></td>
+            <td>Value used to verify that Selenium has been started successfully.  This value is accurate for v2.48.0 of Selenium Server.</td>
+        </tr>
     </tbody>
 </table>
 
@@ -427,6 +457,12 @@ object.
             <td>Number of concurrent test suites run.</td>
         </tr>
         <tr>
+            <td><code>functionalTests</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>[]</code></td>
+            <td>Functional test locations. Items in this list can be directories and/or files.</td>
+        </tr>
+        <tr>
             <td><code>integrationTests</code></td>
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
@@ -451,6 +487,12 @@ object.
             <td><code>bool</code></td>
             <td><code>false</code></td>
             <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
+        </tr>
+        <tr>
+            <td><code>pubServePort</code></td>
+            <td><code>int</code></td>
+            <td><code>0</code></td>
+            <td>Port used by the Pub server for browser tests.  The default value will randomly select an open port to use.</td>
         </tr>
     </tbody>
 </table>
