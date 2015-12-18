@@ -311,6 +311,7 @@ class CoverageTask extends Task {
   File _merge(List<File> collections) {
     if (collections.isEmpty)
       throw new ArgumentError('Cannot merge an empty list of coverages.');
+
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
       Map coverageJson = JSON.decode(collections[i].readAsStringSync());
@@ -428,7 +429,6 @@ class CoverageTask extends Task {
 
     String _testsFailedPattern = 'Some tests failed.';
     String _testsPassedPattern = 'All tests passed!';
-    RegExp _testsPassedPat = new RegExp(r'All\s[\d]*\s?tests passed.');
 
     if (isBrowserTest) {
       PubServeTask pubServeTask;
