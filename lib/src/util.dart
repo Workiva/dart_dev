@@ -92,6 +92,7 @@ class SeleniumServer {
     checkPortDone = new List<Future>();
     RegExp _observatoryPortPattern = new RegExp(
         r'Observatory listening (at|on) http:\/\/127\.0\.0\.1:(\d+)');
+    RegExp _seleniumPortBound = new RegExp(r'Failed to start.*\:([\d]{1,})');
     _server = new TaskProcess(executable, args);
     isDone = new Completer();
     _server.stderr.listen((line) async {
@@ -99,10 +100,11 @@ class SeleniumServer {
       if (coverage && line.contains(_observatoryPortPattern)) {
         Match m = _observatoryPortPattern.firstMatch(line);
         observatoryPort.add(int.parse(m.group(2)));
-      } else if (line.contains("Failed to start")) {
+      } else if (_seleniumPortBound.hasMatch(line)) {
         await _server.kill();
         throw new PortBoundException(
-            "${config.coverage.seleniumCommand} failed to start.  Check if this process is already running.");
+            "${config.coverage.seleniumCommand} failed to start.  Check if this process is already running.",
+            _seleniumPortBound.firstMatch(line).group(1));
       } else if (line.contains(config.coverage.seleniumSuccess)) {
         isDone.complete();
       }
