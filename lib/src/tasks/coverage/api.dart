@@ -163,8 +163,24 @@ class CoverageTask extends Task {
         _reportOn = reportOn {
     // Build the list of test files.
     tests.forEach((path) {
-      _testFileValidation(path, _files);
-    });
+      if (path.endsWith(_dartFilePattern) && FileSystemEntity.isFileSync(path)) {
+        _files.add(new File(path));
+      } else if (FileSystemEntity.isDirectorySync(path)) {
+        Directory dir = new Directory(path);
+        List<FileSystemEntity> children = dir.listSync(recursive: true);
+        Iterable<FileSystemEntity> validTests =
+        children.where((FileSystemEntity e) {
+          Uri uri = Uri.parse(e.absolute.path);
+          return (
+              // Is a file, not a directory.
+              e is File &&
+                  // Is not a package dependency file.
+                  !(Uri.parse(e.path).pathSegments.contains('packages')) &&
+                  // Is a valid test file.
+                  e.path.endsWith(_testFilePattern));
+        });
+        _files.addAll(validTests);
+    }});
   }
 
   /// Generated file with the coverage collection information in JSON format.
@@ -555,27 +571,6 @@ class CoverageTask extends Task {
         return result;
       }
       return [port];
-    }
-  }
-
-  void _testFileValidation(String path, List<File> fileCollection) {
-    if (path.endsWith(_dartFilePattern) && FileSystemEntity.isFileSync(path)) {
-      fileCollection.add(new File(path));
-    } else if (FileSystemEntity.isDirectorySync(path)) {
-      Directory dir = new Directory(path);
-      List<FileSystemEntity> children = dir.listSync(recursive: true);
-      Iterable<FileSystemEntity> validTests =
-          children.where((FileSystemEntity e) {
-        Uri uri = Uri.parse(e.absolute.path);
-        return (
-            // Is a file, not a directory.
-            e is File &&
-                // Is not a package dependency file.
-                !(Uri.parse(e.path).pathSegments.contains('packages')) &&
-                // Is a valid test file.
-                e.path.endsWith(_testFilePattern));
-      });
-      fileCollection.addAll(validTests);
     }
   }
 }

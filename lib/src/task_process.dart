@@ -58,7 +58,7 @@ class TaskProcess {
   Stream<String> get stdout => _stdout.stream;
 
   Future<List<int>> getChildPids(List<int> pids) async {
-    String executable = "pgrep";
+    String executable = 'pgrep';
     var args = [];
     for (int i in pids) {
       args.add("-P");
