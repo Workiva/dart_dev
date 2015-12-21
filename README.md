@@ -146,7 +146,9 @@ or
 brew install selenium-server-standalone
 ```
 
-In order for coverage to be collected against functional tests, the application under test must be utilizing native dart code.  To launch an instance of Dartium with chromedriver you will need to configure the chromedriver instance to include the path to your dartium binary.
+**It is the consumer's responsibility to serve the application under test as expected.**  An example of this can be seen within the functional coverage integration test dev.dart file.
+
+In order for coverage to be collected against functional tests, the application under test must be utilizing native dart code.  To utilize the Dartium browser for test you will need to launch an instance of the Chrome browser and configure chromeOptions to include a path to your dartium binary.
 
 Using [webdriver.dart](https://github.com/google/webdriver.dart):
 ```
