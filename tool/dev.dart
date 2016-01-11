@@ -22,10 +22,14 @@ main(args) async {
   config.copyLicense.directories = directories;
   config.coverage.reportOn = ['bin/', 'lib/'];
   config.format.directories = directories;
+  config.genTestRunner.configs = [
+    new SingleRunnerConfig(
+        directory: 'test/integration', env: Environment.vm, react: false)
+  ];
   config.test
     ..concurrency = 1
     ..platforms = ['vm']
-    ..integrationTests = ['test/integration/']
+    ..integrationTests = ['test/integration/generated_runner.dart']
     ..unitTests = [];
 
   await dev(args);

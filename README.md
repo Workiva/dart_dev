@@ -77,6 +77,7 @@ need to know how to use the `dart_dev` tool.
 - **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
+- **Generate a test runner file:** that allows for faster test execution.
 
 
 ## Getting Started
@@ -184,6 +185,7 @@ ddev coverage
 ddev docs
 ddev examples
 ddev format
+ddev gen-test-runner
 ddev test
 
 # without the alias
@@ -193,6 +195,7 @@ pub run dart_dev coverage
 pub run dart_dev docs
 pub run dart_dev examples
 pub run dart_dev format
+pub run dart_dev gen-test-runner
 pub run dart_dev test
 ```
 
@@ -216,6 +219,7 @@ main(args) async {
   config.docs
   config.examples
   config.format
+  config.genTestRunner
   config.init
   config.test
   
@@ -409,6 +413,82 @@ object.
     </tbody>
 </table>
 
+#### `gen-test-runner` Config
+All configuration options for the `gen-test-runner` task are found on the `config.genTestRunner`
+object.
+
+##### `GenTestRunner`
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>configs</code></td>
+            <td><code>List&lt;SingleRunnerConfig&gt;</code></td>
+            <td><code>[SingleRunnerConfig()]</code></td>
+            <td>The list of runner configurations used to create individual test runners</td>
+        </tr>
+    </tbody>
+</table>
+
+##### `SingleRunnerConfig`
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>directory</code></td>
+            <td><code>String</code></td>
+            <td><code>'test'</code></td>
+            <td>The directory to search for test files in</td>
+        </tr>
+        <tr>
+            <td><code>env</code></td>
+            <td><code>Environment</code></td>
+            <td><code>Environment.browser</code></td>
+            <td>The environment to run tests in ('vm' or 'browser')</td>
+        </tr>
+        <tr>
+            <td><code>filename</code></td>
+            <td><code>String</code></td>
+            <td><code>'generated_runner'</code></td>
+            <td>The name of the generated test runner file</td>
+        </tr>
+        <tr>
+            <td><code>genHtml</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Whether or not a companion html file should be generated</td>
+        </tr>
+        <tr>
+            <td><code>react</code></td>
+            <td><code>bool</code></td>
+            <td><code>true</code></td>
+            <td>Whether or not the runner will need to run tests using the react test utilities</td>
+        </tr>
+        <tr>
+            <td><code>scriptTags</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>['packages/react/react_with_addons.js']</code></td>
+            <td>The list of custom script tags to include in the companion html file</td>
+        </tr>
+    </tbody>
+</table>
+
 #### `test` Config
 All configuration options for the `test` task are found on the `config.test`
 object.
@@ -490,6 +570,7 @@ Supported tasks:
     docs
     examples
     format
+    gen-test-runner
     init
     test
 ```
@@ -500,6 +581,7 @@ Supported tasks:
 - Documentation generation: `ddev docs`
 - Serving examples: `ddev examples`
 - Dart formatter: `ddev format`
+- Generate test runner: `ddev gen-test-runner`
 - Initialization: `ddev init`
 - Tests: `ddev test`
 
