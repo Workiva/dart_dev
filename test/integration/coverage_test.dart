@@ -21,15 +21,15 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
-const String projectWithDartFile = 'test/fixtures/coverage/non_test_file';
-const String projectWithVmTests = 'test/fixtures/coverage/browser';
-const String projectWithBrowserTests = 'test/fixtures/coverage/vm';
+const String projectWithDartFile = 'test_fixtures/coverage/non_test_file';
+const String projectWithVmTests = 'test_fixtures/coverage/browser';
+const String projectWithBrowserTests = 'test_fixtures/coverage/vm';
 const String projectWithFunctionalTests =
-    'test/fixtures/coverage/functional_test/';
+    'test_fixtures/coverage/functional_test/';
 const String projectWithBrowserTestsThatNeedsPubServe =
-    'test/fixtures/coverage/browser_needs_pub_serve';
+    'test_fixtures/coverage/browser_needs_pub_serve';
 const String projectWithoutCoveragePackage =
-    'test/fixtures/coverage/no_coverage_package';
+    'test_fixtures/coverage/no_coverage_package';
 
 Future<bool> runCoverage(String projectPath,
     {bool html: false, bool functional: false}) async {

@@ -38,7 +38,7 @@ class CoverageCli extends TaskCli {
         help: 'Includes the integration test suite.')
     ..addFlag('functional',
         defaultsTo: defaultFunctional,
-        help: 'Includes the functional test suite')
+        help: 'Includes the functional test suite.')
     ..addFlag('html',
         negatable: true,
         defaultsTo: defaultHtml,
@@ -102,7 +102,6 @@ class CoverageCli extends TaskCli {
     CoverageResult result;
     try {
       CoverageTask task = CoverageTask.start(tests,
-          functional: functional,
           html: html,
           pubServe: pubServe,
           output: config.coverage.output,
@@ -112,8 +111,8 @@ class CoverageCli extends TaskCli {
       result = await task.done;
     } on MissingLcovException catch (e) {
       return new CliResult.fail(e.message);
-    } on PortBoundException catch (e) {
-      return new CliResult.fail(e.message);
+    } catch (e) {
+      return new CliResult.fail(e.toString());
     }
 
     if (result.successful && html && open) {

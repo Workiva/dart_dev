@@ -20,14 +20,10 @@ import 'package:dart_dev/src/tasks/test/config.dart';
 const bool defaultHtml = true;
 const String defaultOutput = 'coverage/';
 const List<String> defaultReportOn = const ['lib/'];
-const String defaultSeleniumCommand = "selenium-server";
-const String defaultSeleniumSuccess = "Selenium Server is up and running";
 
 class CoverageConfig extends TaskConfig {
   bool html = defaultHtml;
-  bool pubServe = defaultPubServe;
-  String seleniumCommand = defaultSeleniumCommand;
-  String seleniumSuccess = defaultSeleniumSuccess;
   String output = defaultOutput;
+  bool pubServe = defaultPubServe;
   List<String> reportOn = defaultReportOn;
 }

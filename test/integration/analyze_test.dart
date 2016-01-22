@@ -21,10 +21,10 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
-const String projectWithErrors = 'test/fixtures/analyze/errors';
-const String projectWithHints = 'test/fixtures/analyze/hints';
-const String projectWithNoIssues = 'test/fixtures/analyze/no_issues';
-const String projectWithStaticTypingIssues = 'test/fixtures/analyze/strong';
+const String projectWithErrors = 'test_fixtures/analyze/errors';
+const String projectWithHints = 'test_fixtures/analyze/hints';
+const String projectWithNoIssues = 'test_fixtures/analyze/no_issues';
+const String projectWithStaticTypingIssues = 'test_fixtures/analyze/strong';
 
 Future<Analysis> analyzeProject(String projectPath,
     {bool fatalWarnings: true,

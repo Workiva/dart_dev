@@ -94,12 +94,13 @@ StreamTransformer<String, String> until(Future cancelled) {
   return new StreamTransformer((Stream<String> input, bool cancelOnError) {
     StreamController<String> controller;
     StreamSubscription<String> subscription;
-    controller = new StreamController<String>(onListen: () {
-      subscription = input.listen(controller.add,
-          onError: controller.addError,
-          onDone: controller.close,
-          cancelOnError: cancelOnError);
-    },
+    controller = new StreamController<String>(
+        onListen: () {
+          subscription = input.listen(controller.add,
+              onError: controller.addError,
+              onDone: controller.close,
+              cancelOnError: cancelOnError);
+        },
         onPause: () => subscription.pause(),
         onResume: () => subscription.resume(),
         onCancel: () => subscription.cancel(),

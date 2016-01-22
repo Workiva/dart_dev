@@ -21,8 +21,8 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
-const String projectWithExamples = 'test/fixtures/examples/examples_dir';
-const String projectWithoutExamples = 'test/fixtures/examples/no_examples_dir';
+const String projectWithExamples = 'test_fixtures/examples/examples_dir';
+const String projectWithoutExamples = 'test_fixtures/examples/no_examples_dir';
 
 Future<bool> serveExamplesFor(String projectPath) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
@@ -36,7 +36,7 @@ Future<bool> serveExamplesFor(String projectPath) async {
   process.stdout.listen((line) async {
     if (line.contains(pubServePattern)) {
       served = true;
-      await process.killGroup();
+      await process.killAllChildren();
       process.kill();
     }
   });

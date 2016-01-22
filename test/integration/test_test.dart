@@ -21,10 +21,10 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
-const String projectWithoutTestPackage = 'test/fixtures/test/no_test_package';
-const String projectWithFailingTests = 'test/fixtures/test/failing';
-const String projectWithPassingTests = 'test/fixtures/test/passing';
-const String projectThatNeedsPubServe = 'test/fixtures/test/needs_pub_serve';
+const String projectWithoutTestPackage = 'test_fixtures/test/no_test_package';
+const String projectWithFailingTests = 'test_fixtures/test/failing';
+const String projectWithPassingTests = 'test_fixtures/test/passing';
+const String projectThatNeedsPubServe = 'test_fixtures/test/needs_pub_serve';
 
 Future<bool> runTests(String projectPath,
     {bool unit: true, bool integration: false, List<String> files}) async {
@@ -71,7 +71,7 @@ void main() {
     test('should run individual unit test', () async {
       expect(
           await runTests(projectWithPassingTests, files: [
-            'test/fixtures/test/passing/test/passing_unit_test.dart'
+            'test_fixtures/test/passing/test/passing_unit_test.dart'
           ]),
           isTrue);
     });
@@ -79,8 +79,8 @@ void main() {
     test('should run individual unit tests', () async {
       expect(
           await runTests(projectWithPassingTests, files: [
-            'test/fixtures/test/passing/test/passing_unit_test.dart',
-            'test/fixtures/test/passing/test/passing_unit_integration.dart'
+            'test_fixtures/test/passing/test/passing_unit_test.dart',
+            'test_fixtures/test/passing/test/passing_unit_integration.dart'
           ]),
           isTrue);
     });
