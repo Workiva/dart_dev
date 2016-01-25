@@ -28,11 +28,11 @@ const List<String> defaultFunctionalTests = const [];
 const List<String> defaultPlatforms = const [];
 
 class TestConfig extends TaskConfig {
-  bool pubServe = defaultPubServe;
   int concurrency = defaultConcurrency;
-  int pubServePort = defaultPubServePort;
-  List<String> integrationTests = defaultIntegrationTests;
   List<String> functionalTests = defaultFunctionalTests;
+  List<String> integrationTests = defaultIntegrationTests;
   List<String> platforms = defaultPlatforms;
+  bool pubServe = defaultPubServe;
+  int pubServePort = defaultPubServePort;
   List<String> unitTests = defaultUnitTests;
 }

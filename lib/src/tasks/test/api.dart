@@ -19,18 +19,15 @@ import 'dart:async';
 import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
-import 'package:dart_dev/src/tasks/test/config.dart';
-import 'package:dart_dev/src/util.dart' show SeleniumServer;
+import 'package:dart_dev/src/tools/selenium.dart' show SeleniumHelper;
 
-Future<TestTask> test(
-    {bool functional: defaultFunctional,
-    int concurrency,
+TestTask test(
+    {int concurrency,
     List<String> additionalArgs: const [],
     List<String> platforms: const [],
-    List<String> tests: const []}) async {
+    List<String> tests: const []}) {
   var executable = 'pub';
   var args = ['run', 'test'];
-  SeleniumServer server;
   if (concurrency != null) {
     args.add('--concurrency=$concurrency');
   }
@@ -40,11 +37,6 @@ Future<TestTask> test(
   args.addAll(['--reporter=expanded']);
   args.addAll(additionalArgs);
   args.addAll(tests);
-
-  if (functional) {
-    server = new SeleniumServer(coverage: false);
-    await server.isDone;
-  }
 
   TaskProcess process = new TaskProcess(executable, args);
   Completer outputProcessed = new Completer();
@@ -60,11 +52,8 @@ Future<TestTask> test(
     if ((line.contains('All tests passed!') ||
             line.contains('Some tests failed.')) &&
         !outputProcessed.isCompleted) {
-      if (server != null) {
-        await server.closeTests();
-        await server.kill();
-      }
       task.testSummary = line;
+      await SeleniumHelper.killChildrenProcesses();
       outputProcessed.complete();
     }
   });

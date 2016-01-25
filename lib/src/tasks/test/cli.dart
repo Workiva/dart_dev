@@ -36,7 +36,7 @@ class TestCli extends TaskCli {
         help: 'Includes the integration test suite.')
     ..addFlag('functional',
         defaultsTo: defaultFunctional,
-        help: 'Includes the functional test suite')
+        help: 'Includes the functional test suite.')
     ..addOption('concurrency',
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
@@ -169,8 +169,7 @@ class TestCli extends TaskCli {
       });
     }
 
-    TestTask task = await test(
-        functional: functional,
+    TestTask task = test(
         tests: tests,
         concurrency: concurrency,
         platforms: platforms,

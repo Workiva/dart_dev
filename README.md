@@ -10,6 +10,7 @@
 - [**Project Configuration**](#project-configuration)
 - [**CLI Usage**](#cli-usage)
 - [**Programmatic Usage**](#programmatic-usage)
+- [**BONUS: Functional Test Code Coverage**](#functional-test-code-coverage)
 
 ## Motivation
 
@@ -129,41 +130,6 @@ autoload -U bashcompinit
 bashcompinit
 source <path/to/ddev-completion.sh>
 ```
-
-#### Functional Test Code Coverage
-
-The following dependencies are needed to run functional code coverage:
-
-Chromedriver 2.14:
-```
-https://chromedriver.storage.googleapis.com/index.html?path=2.14/
-```
-
-Selenium Server:
-```
-http://www.seleniumhq.org/download/
-or
-brew install selenium-server-standalone
-```
-
-**It is the consumer's responsibility to serve the application under test as expected.**  An example of this can be seen within the functional coverage integration test dev.dart file.
-
-In order for coverage to be collected against functional tests, the application under test must be utilizing native dart code.  To utilize the Dartium browser for test you will need to launch an instance of the Chrome browser and configure chromeOptions to include a path to your dartium binary.
-
-Using [webdriver.dart](https://github.com/google/webdriver.dart):
-```
-WebDriver driver = await createDriver(
-	desired: {'browserName': 'chrome','chromeOptions':{'binary': 'dartiumpath'}});
-```
-Using [w_webdriver_utils](https://github.com/Workiva/w_webdriver_utils):
-```
-config.yaml
-
-chrome:
-  chromeOptions:
-    'binary': 'dartiumpath'
-```
-The `coverage` and `test` tasks will both handle closing your browser instances after functional test completion.  You will need to omit the standard `tearDown(() => driver.quit());` from your test instances and your tests **must not close themselves** after completion or `coverage` cannot be collected.
 
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
@@ -589,3 +555,105 @@ Check out the source of these API methods for additional documentation.
 > configuration instances that the command-line interfaces do. Because of this,
 > the default usage may be different. You can access said configurations from
 > the main `package:dart_dev/dart_dev.dart` import.
+
+## Functional Test Code Coverage
+
+If you're running functional tests with [Selenium](http://www.seleniumhq.org/)
+and [webdriver.dart](https://github.com/google/webdriver.dart), dart_dev can
+help you run the Selenium standalone server and collect coverage from those
+functional tests.
+
+As the webdriver.dart project documents, `selenium-server-standalone` and
+`chromedriver` are required dependencies.
+
+### `selenium-server-standalone`
+
+```
+brew install selenium-server-standalone
+```
+
+> If you need to use multiple versions of Selenium, you can create a local
+> executable and store it in your project's `tool/` directory (and check it in
+> to version control). You can then pass the path to this local executable to
+> the Selenium helper (see [configuring dart_dev to run Selenium](#configuring-dart_dev-to-run-selenium)).
+>
+> ```
+> cd tool/
+> curl -o selenium-server-standalone.jar http://selenium-release.storage.googleapis.com/2.48/selenium-server-standalone-2.48.2.jar
+> echo '#!/usr/bin/env bash' | tee -a selenium-server
+> echo 'DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"' | tee -a selenium-server
+> echo 'exec java -jar $DIR/selenium-server-standalone.jar "$@"' | tee -a selenium-server
+> chmod +x selenium-server
+> ```
+
+### `chromedriver`
+
+Normally, `chromedriver` could be installed with brew, but to collect coverage,
+the functional tests need to be run in Dartium, which requires an older version
+of `chromedriver` (currently 2.14).
+
+Download `chromedriver` 2.14 here:
+```
+https://chromedriver.storage.googleapis.com/index.html?path=2.14/
+```
+
+Unzip and run the executable once to place it in `/usr/local/bin/`.
+
+### Configuring dart_dev to run Selenium
+
+**tool/dev.dart**
+```dart
+import 'package:dart_dev/dart_dev.dart';
+import 'package:dart_dev/util.dart' show SeleniumHelper;
+
+main() async {
+  // By default, this helper assumes the `selenium-server` executable is in the path
+  var selenium = new SeleniumHelper();
+
+  // If you have a local executable, point to it like so:
+  var selenium = new SeleniumHelper(executablePath: 'tool/selenium-server');
+
+  config.test
+    ..before = [selenium.start]
+    ..after = [selenium.stop];
+}
+```
+
+> **Note:** you may also want to spin up a pub instance here to serve the
+> application that will be exercised in your functional tests.
+
+### Example functional test
+
+```dart
+import 'package:test/test.dart';
+import 'package:webdriver/io.dart';
+
+WebDriver driver;
+
+void main() {
+  setUp(() async {
+    var options = {
+      'browserName': 'chrome',
+      'chromeOptions': {
+        'binary': 'path/to/dartium'
+      }
+    };
+    driver = await createDriver(desired: options);
+  });
+
+  // Do not quit the webdriver because the test and coverage tasks will handle
+  // closing the browser when complete.
+  //tearDown(() => driver.quit());
+
+  test('test', () async {
+    // This requires that your application is being served at localhost:8080
+    await driver.get('http://localhost:8080');
+    // interact with application
+  });
+}
+```
+
+> The `coverage` and `test` tasks will both handle closing any Dartium instances
+> that were opened via the `WebDriver` once the tests are complete. You will
+> need to omit the standard `tearDown(() => driver.quit());` from your test
+> setups or code coverage cannot be collected.

@@ -28,7 +28,7 @@ import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
-import 'package:dart_dev/src/util.dart' show SeleniumServer;
+import 'package:dart_dev/src/tools/selenium.dart';
 
 const String _dartFilePattern = '.dart';
 const String _testFilePattern = '_test.dart';
@@ -70,12 +70,11 @@ class CoverageTask extends Task {
   /// If [html] is true, `genhtml` will be used to generate an HTML report of
   /// the collected coverage and the report will be opened.
   static Future<CoverageResult> run(List<String> tests,
-      {bool functional: defaultFunctional,
-      bool html: defaultHtml,
+      {bool html: defaultHtml,
       String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) async {
-    CoverageTask coverage = new CoverageTask._(tests, reportOn,
-        html: html, output: output, functional: functional);
+    CoverageTask coverage =
+        new CoverageTask._(tests, reportOn, html: html, output: output);
     await coverage._run();
     return coverage.done;
   }
@@ -96,13 +95,12 @@ class CoverageTask extends Task {
   /// If [html] is true, `genhtml` will be used to generate an HTML report of
   /// the collected coverage and the report will be opened.
   static CoverageTask start(List<String> tests,
-      {bool functional: defaultFunctional,
-      bool html: defaultHtml,
+      {bool html: defaultHtml,
       bool pubServe: defaultPubServe,
       String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) {
     CoverageTask coverage = new CoverageTask._(tests, reportOn,
-        functional: functional, html: html, output: output, pubServe: pubServe);
+        html: html, output: output, pubServe: pubServe);
     coverage._run();
     return coverage;
   }
@@ -134,9 +132,6 @@ class CoverageTask extends Task {
   /// browser tests.
   final bool pubServe;
 
-  ///Whether or not functional tests are being run.  Kicks off SeleniumServer before test execution
-  final bool functional;
-
   /// File created to run the test in a browser. Need to store it so it can be
   /// cleaned up after the test finishes.
   File _lastHtmlFile;
@@ -145,8 +140,6 @@ class CoverageTask extends Task {
   /// the coverage collection has completed.
   TaskProcess _lastTestProcess;
 
-  SeleniumServer server;
-
   /// Directory to output all coverage related artifacts.
   Directory _outputDirectory;
 
@@ -154,10 +147,9 @@ class CoverageTask extends Task {
   List<String> _reportOn;
 
   CoverageTask._(List<String> tests, List<String> reportOn,
-      {bool this.functional: defaultFunctional,
-      bool this.pubServe: defaultPubServe,
-      bool html: defaultHtml,
-      String output: defaultOutput})
+      {bool html: defaultHtml,
+      String output: defaultOutput,
+      bool this.pubServe: defaultPubServe})
       : _html = html,
         _outputDirectory = new Directory(output),
         _reportOn = reportOn {
@@ -233,15 +225,14 @@ class CoverageTask extends Task {
       }
 
       for (int j = 0; j < observatoryPorts.length; j++) {
-        File collection = new File(path.join(_collections.path,
-            '${_files[i].path}${observatoryPorts.length > 1 ? j : ""}.json'));
-        int observatoryPort = observatoryPorts[j];
-        // Collect the coverage from observatory.
+        // Collect the coverage from observatory located at this port.
+        File collection =
+            new File(path.join(_collections.path, '${_files[i].path}$j.json'));
         String executable = 'pub';
         List args = [
           'run',
           'coverage:collect_coverage',
-          '--port=${observatoryPort}',
+          '--port=${observatoryPorts[j]}',
           '-o',
           collection.path
         ];
@@ -254,12 +245,14 @@ class CoverageTask extends Task {
         process.stdout.listen((l) => _coverageOutput.add('    $l'));
         process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
         await process.done;
-        _killTest();
         collections.add(collection);
       }
-      if (server != null) {
-        await server.closeTests();
-      }
+
+      _killTest();
+
+      // Kill off any child selenium processes that may have been spawned for
+      // functional tests.
+      await SeleniumHelper.killChildrenProcesses();
     }
     // Merge all individual coverage collection files into one.
     _collection = _merge(collections);
@@ -354,18 +347,7 @@ class CoverageTask extends Task {
       return;
     }
 
-    if (functional) {
-      server = new SeleniumServer(
-          coverage: true, executable: config.coverage.seleniumCommand);
-      await server.isDone;
-    }
-
     await _collect();
-
-    if (server != null) {
-      await server.kill();
-    }
-
     await _format();
 
     if (_html) {
@@ -568,11 +550,9 @@ class CoverageTask extends Task {
           break;
         }
       }
-      if (server != null && server.observatoryPort.length > 0) {
-        List<int> result = await server.checkPorts();
-        return result;
-      }
-      return [port];
+      var observatoryPorts = await SeleniumHelper.getActiveObservatoryPorts();
+      SeleniumHelper.clearObservatoryPorts();
+      return [port]..addAll(observatoryPorts);
     }
   }
 }

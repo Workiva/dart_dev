@@ -57,43 +57,37 @@ class TaskProcess {
   Stream<String> get stderr => _stderr.stream;
   Stream<String> get stdout => _stdout.stream;
 
-  Future<List<int>> getChildPids(List<int> pids) async {
+  bool kill([ProcessSignal signal = ProcessSignal.SIGTERM]) =>
+      _process.kill(signal);
+
+  Future<bool> killAllChildren(
+      [ProcessSignal signal = ProcessSignal.SIGTERM]) async {
+    List<int> cpids = await _getChildPids();
+    cpids.remove(_process.pid);
+    List<String> args = ['-${signal.toString()}'];
+    args.addAll(cpids.map((pid) => pid.toString()));
+    TaskProcess killTask = new TaskProcess('kill', args);
+    return (await killTask.exitCode) == 0;
+  }
+
+  Future<List<int>> _getChildPids({List<int> pids}) async {
+    pids = pids ?? [_process.pid];
     String executable = 'pgrep';
     var args = [];
-    for (int i in pids) {
-      args.add("-P");
-      args.add("$i");
+    for (int pid in pids) {
+      args.add('-P');
+      args.add(pid.toString());
     }
-    TaskProcess pgrep = new TaskProcess(executable, args);
-    List<int> cpids = new List<int>();
+    var pgrep = new TaskProcess(executable, args);
+    List<int> cpids = [];
     pgrep.stdout.listen((l) {
       cpids.add(int.parse(l));
     });
+    pgrep.stderr.listen(print);
     await pgrep.done;
-    if (cpids.length > 0) {
-      cpids = await getChildPids(cpids);
-      cpids.addAll(pids);
-      return cpids;
-    } else
-      return pids;
-  }
-
-  Future<bool> killAllChildren(int ppid) async {
-    List<int> cpids = await getChildPids([ppid]);
-    List<String> args = ["-TERM"];
-    cpids.remove(ppid);
-    for (int i in cpids) args.add(i.toString());
-    TaskProcess k = new TaskProcess("kill", args);
-    await k.done;
-    if (await k.exitCode == 0)
-      return true;
-    else
-      return false;
-  }
-
-  bool kill([ProcessSignal signal = ProcessSignal.SIGTERM]) =>
-      _process.kill(signal);
-  Future killGroup() async {
-    await killAllChildren(_process.pid);
+    if (cpids.isNotEmpty) {
+      cpids.addAll(await _getChildPids(pids: cpids));
+    }
+    return cpids;
   }
 }
