@@ -16,34 +16,36 @@ library dart_dev.src.tasks.gen_test_runner.config;
 
 import 'package:dart_dev/src/tasks/config.dart';
 
+const List<String> defaultAdditionalImports = const [];
+const List<String> defaultCommandsPriorToTesting = const [];
 const String defaultDirectory = 'test';
 const Environment defaultEnv = Environment.browser;
 const String defaultFilename = 'generated_runner';
 const bool defaultGenHtml = false;
 const bool defaultReact = true;
-const List<String> defaultScriptTags = const [
-  'packages/react/react_with_addons.js'
-];
+const List<String> defaultScriptPaths = const [];
 
 enum Environment { vm, browser }
 
-class SingleRunnerConfig {
+class TestRunnerConfig {
+  List<String> additionalImports = defaultAdditionalImports;
+  List<String> commandsPriorToTesting = defaultCommandsPriorToTesting;
   String directory = defaultDirectory;
   Environment env = defaultEnv;
   String filename = defaultFilename;
   bool genHtml = defaultGenHtml;
-  bool react = defaultReact;
-  List<String> scriptTags = defaultScriptTags;
+  List<String> scriptPaths = defaultScriptPaths;
 
-  SingleRunnerConfig(
-      {String this.directory: defaultDirectory,
+  TestRunnerConfig(
+      {List<String> this.additionalImports: defaultAdditionalImports,
+      List<String> this.commandsPriorToTesting: defaultCommandsPriorToTesting,
+      String this.directory: defaultDirectory,
       Environment this.env: defaultEnv,
       String this.filename: defaultFilename,
       bool this.genHtml: defaultGenHtml,
-      bool this.react: defaultReact,
-      List<String> this.scriptTags: defaultScriptTags});
+      List<String> this.scriptPaths: defaultScriptPaths});
 }
 
 class GenTestRunnerConfig extends TaskConfig {
-  List<SingleRunnerConfig> configs = [new SingleRunnerConfig()];
+  List<TestRunnerConfig> configs = [new TestRunnerConfig()];
 }

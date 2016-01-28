@@ -22,7 +22,6 @@ import 'package:args/args.dart';
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/gen_test_runner/api.dart';
-import 'package:dart_dev/src/tasks/gen_test_runner/config.dart';
 
 class GenResultGroup {
   List<bool> passing = [];
@@ -40,32 +39,27 @@ class GenTestRunnerCli extends TaskCli {
   Future<CliResult> run(ArgResults parsedArgs) async {
     GenResultGroup results = new GenResultGroup();
 
-    for (var i = 0; i < config.genTestRunner.configs.length; i++) {
-      SingleRunnerConfig currentConfig = config.genTestRunner.configs[i];
-
+    for (var currentConfig in config.genTestRunner.configs) {
       if (!new Directory(currentConfig.directory).existsSync()) {
         return new CliResult.fail(
             'Must return a valid directory path, ${currentConfig.directory} is not a valid path');
       }
 
-      if (currentConfig.react && currentConfig.env == Environment.vm) {
-        return new CliResult.fail('React tests can not be run on the vm');
-      }
-
-      GenTestRunnerTask task = await genTestRunner(
-          filename: currentConfig.filename,
-          directory: currentConfig.directory,
-          environment: currentConfig.env,
-          genHtml: currentConfig.genHtml,
-          react: currentConfig.react,
-          scriptTags: currentConfig.scriptTags);
+      GenTestRunnerTask task = await genTestRunner(currentConfig);
       await task.done;
       results.tasks.add(task);
       results.passing.add(task.successful);
     }
 
     if (results.passing.contains(false)) {
-      return new CliResult.fail('Failed to generate test runner');
+      var failedFiles = '';
+      for (var task in results.tasks) {
+        if (!task.successful) {
+          failedFiles += ' ${task.runnerFile}';
+        }
+      }
+      return new CliResult.fail('Failed to generate test runner.'
+          '\nThe following file(s) failed to generate:$failedFiles');
     } else {
       String resultMessage = '';
       for (var i = 0; i < results.tasks.length; i++) {
@@ -79,7 +73,7 @@ class GenTestRunnerCli extends TaskCli {
           resultMessage += 'Found test dart file: $filename\n';
         });
         resultMessage +=
-            '\nCreated runner file; ${results.tasks[i].runnerFile}\n';
+            '\nCreated runner file: ${results.tasks[i].runnerFile}\n';
       }
       return new CliResult.success('$resultMessage\nTest runner generated');
     }

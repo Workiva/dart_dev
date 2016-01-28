@@ -23,8 +23,7 @@ main(args) async {
   config.coverage.reportOn = ['bin/', 'lib/'];
   config.format.directories = directories;
   config.genTestRunner.configs = [
-    new SingleRunnerConfig(
-        directory: 'test/integration', env: Environment.vm, react: false)
+    new TestRunnerConfig(directory: 'test/integration', env: Environment.vm)
   ];
   config.test
     ..concurrency = 1

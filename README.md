@@ -431,14 +431,14 @@ object.
     <tbody>
         <tr>
             <td><code>configs</code></td>
-            <td><code>List&lt;SingleRunnerConfig&gt;</code></td>
-            <td><code>[SingleRunnerConfig()]</code></td>
+            <td><code>List&lt;TestRunnerConfig&gt;</code></td>
+            <td><code>[TestRunnerConfig()]</code></td>
             <td>The list of runner configurations used to create individual test runners</td>
         </tr>
     </tbody>
 </table>
 
-##### `SingleRunnerConfig`
+##### `TestRunnerConfig`
 
 <table>
     <thead>
@@ -450,6 +450,18 @@ object.
         </tr>
     </thead>
     <tbody>
+        <tr>
+            <td><code>additionalImports</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>[]</code></td>
+            <td>Any other imports necessary to have in the generated runner file</td>
+        </tr>      
+        <tr>
+            <td><code>commandsPriorToTesting</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>[]</code></td>
+            <td>Commands to be executed in the generated file's main method before test execution</td>
+        </tr>        
         <tr>
             <td><code>directory</code></td>
             <td><code>String</code></td>
@@ -475,15 +487,9 @@ object.
             <td>Whether or not a companion html file should be generated</td>
         </tr>
         <tr>
-            <td><code>react</code></td>
-            <td><code>bool</code></td>
-            <td><code>true</code></td>
-            <td>Whether or not the runner will need to run tests using the react test utilities</td>
-        </tr>
-        <tr>
-            <td><code>scriptTags</code></td>
+            <td><code>scriptPaths</code></td>
             <td><code>List&lt;String&gt;</code></td>
-            <td><code>['packages/react/react_with_addons.js']</code></td>
+            <td><code>[]</code></td>
             <td>The list of custom script tags to include in the companion html file</td>
         </tr>
     </tbody>

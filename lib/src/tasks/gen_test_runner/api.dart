@@ -20,78 +20,69 @@ import 'dart:io';
 import 'package:dart_dev/src/tasks/gen_test_runner/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
-Future<GenTestRunnerTask> genTestRunner(
-    {String directory,
-    Environment environment,
-    String filename,
-    bool genHtml,
-    bool react,
-    List<String> scriptTags}) async {
-  var executable = 'gen-test-runner';
-  var args = ['-d $directory', '-e $environment'];
-  react ? args.add('--react') : args.add('--no-react');
-  genHtml ? args.add('--genHtml') : args.add('--no-genHtml');
+Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
+  var taskTitle = 'gen-test-runner';
+  var args = ['-d ${currentConfig.directory}', '-e ${currentConfig.env}'];
+  currentConfig.genHtml ? args.add('--genHtml') : args.add('--no-genHtml');
 
   GenTestRunnerTask task =
-      new GenTestRunnerTask('$executable ${args.join(' ')}');
+      new GenTestRunnerTask('$taskTitle ${args.join(' ')}');
 
-  File generatedRunner = new File('$directory/$filename.dart');
+  File generatedRunner =
+      new File('${currentConfig.directory}/${currentConfig.filename}.dart');
   IOSink writer = generatedRunner.openWrite(mode: FileMode.WRITE);
 
-  Directory testDirectory = new Directory(directory);
+  Directory testDirectory = new Directory(currentConfig.directory);
   List<File> testFiles = [];
   List<FileSystemEntity> allFiles =
       testDirectory.listSync(recursive: true, followLinks: false);
   allFiles.forEach((FileSystemEntity entity) {
     if (entity is File) {
-      if (entity.path.contains(new RegExp(r'_test\.dart$'))) {
+      if (entity.path.endsWith('_test.dart')) {
         testFiles.add(entity);
         task.testFiles.add(entity.path);
-      } else if (!entity.path.endsWith('$filename.dart') &&
-          entity.path.contains(new RegExp(r'\.dart$'))) {
+      } else if (!entity.path.endsWith('${currentConfig.filename}.dart') &&
+          entity.path.endsWith('.dart')) {
         task.excludedFiles.add(entity.path);
       }
     }
   });
 
-  if (environment == Environment.browser) {
-    if (genHtml) {
-      await testHtmlFileGenerator(directory, filename, scriptTags);
+  if (currentConfig.env == Environment.browser) {
+    if (currentConfig.genHtml) {
+      await testHtmlFileGenerator(currentConfig.directory,
+          currentConfig.filename, currentConfig.scriptPaths);
     }
     writer.writeln('@TestOn(\'browser\')');
   } else {
     writer.writeln('@TestOn(\'vm\')');
   }
-  writer.writeln();
-  writer.writeln('/************ GENERATED FILE ************');
-  writer.writeln();
-  writer.writeln('This file was generated with the command:');
-  String generationCommand = '$executable ';
-  args.forEach((String element) {
-    generationCommand += '$element ';
-  });
-
-  writer.writeln(generationCommand);
-  writer.writeln();
-  writer.writeln('************* GENERATED FILE ************/');
+  writer.writeln(
+      'library ${currentConfig.directory.replaceAll('/','.')}.${currentConfig.filename};');
   writer.writeln();
 
   testFiles.forEach((File file) {
     Match filenameMatch = new RegExp(r'([^/]+).dart$').firstMatch(file.path);
     String filename = filenameMatch.group(1);
     writer.writeln(
-        'import \'${file.path.replaceFirst(directory, '.')}\' as $filename;');
+        'import \'${file.path.replaceFirst(currentConfig.directory, '.')}\' as ${filename};');
   });
 
   writer.writeln('import \'package:test/test.dart\';');
-  if (react) {
-    writer
-        .writeln('import \'package:react/react_client.dart\' as reactClient;');
+
+  if (currentConfig.additionalImports.isNotEmpty) {
+    currentConfig.additionalImports.forEach((String import) {
+      writer.writeln(import);
+    });
   }
+
   writer.writeln('');
   writer.writeln('void main() {');
-  if (react) {
-    writer.writeln('  reactClient.setClientConfiguration();');
+
+  if (currentConfig.commandsPriorToTesting.isNotEmpty) {
+    currentConfig.commandsPriorToTesting.forEach((String command) {
+      writer.writeln('  $command');
+    });
   }
 
   testFiles.forEach((File file) {
@@ -102,7 +93,7 @@ Future<GenTestRunnerTask> genTestRunner(
   writer.writeln('}');
   await writer.close();
 
-  task.runnerFile = '$directory/$filename.dart';
+  task.runnerFile = '${currentConfig.directory}/${currentConfig.filename}.dart';
 
   task.successful = true;
 
@@ -110,15 +101,15 @@ Future<GenTestRunnerTask> genTestRunner(
 }
 
 Future testHtmlFileGenerator(
-    String directory, String filename, List<String> scriptTags) async {
+    String directory, String filename, List<String> scriptPaths) async {
   File generatedRunner = new File('$directory/$filename.html');
   IOSink writer = generatedRunner.openWrite(mode: FileMode.WRITE);
   writer.writeln('<!DOCTYPE html>');
   writer.writeln('<html>');
   writer.writeln('  <head>');
   writer.writeln('    <title>$filename</title>');
-  scriptTags.forEach((tag) {
-    writer.writeln('    <script src="$tag"></script>');
+  scriptPaths.forEach((path) {
+    writer.writeln('    <script src="$path"></script>');
   });
   writer.writeln('    <link rel="x-dart-test"  href="$filename.dart">');
   writer.writeln('    <script src="packages/test/dart.js"></script>');

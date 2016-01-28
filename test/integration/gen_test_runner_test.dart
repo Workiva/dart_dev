@@ -22,7 +22,6 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-const String reactAndVm = 'test/fixtures/gen_test_runner/react_and_vm';
 const String defaultConfig = 'test/fixtures/gen_test_runner/default_config';
 const String browserAndVm = 'test/fixtures/gen_test_runner/browser_and_vm';
 
@@ -46,45 +45,42 @@ Future<Runner> generateTestRunnerDocsFor(String projectPath,
   return new Runner(await process.exitCode, errors, files);
 }
 
-verifyExistence(String file, bool shouldExist, {bool delete: false}) {
-  expect(FileSystemEntity.isFileSync(file), equals(shouldExist));
-  if (shouldExist) {
+verifyExistenceAndCleanup(String file,
+    {bool delete: false, bool shouldFileExist}) {
+  expect(FileSystemEntity.isFileSync(file), equals(shouldFileExist));
+  if (shouldFileExist) {
     new File(file).deleteSync();
   }
 }
 
 void main() {
   group('gen-test-runner task', () {
-    test('should not generate if react flag and vm flag are passed in',
-        () async {
-      Runner runner = await generateTestRunnerDocsFor(reactAndVm);
-      expect(runner.exitCode, isNonZero);
-      verifyExistence(
-          path.join(reactAndVm, 'test/generated_runner.dart'), false);
-      verifyExistence(
-          path.join(reactAndVm, 'test/generated_runner.html'), false);
-    });
-
     test('should work with default config', () async {
       Runner runner = await generateTestRunnerDocsFor(defaultConfig);
       expect(runner.exitCode, isZero);
-      verifyExistence(
-          path.join(defaultConfig, 'test/generated_runner.dart'), true);
-      verifyExistence(
-          path.join(defaultConfig, 'test/generated_runner.html'), false);
+      verifyExistenceAndCleanup(
+          path.join(defaultConfig, 'test/generated_runner.dart'),
+          shouldFileExist: true);
+      verifyExistenceAndCleanup(
+          path.join(defaultConfig, 'test/generated_runner.html'),
+          shouldFileExist: false);
     });
 
     test('should work with multiple configs', () async {
       Runner runner = await generateTestRunnerDocsFor(browserAndVm);
       expect(runner.exitCode, isZero);
-      verifyExistence(
-          path.join(browserAndVm, 'test/browser/generated_runner.dart'), true);
-      verifyExistence(
-          path.join(browserAndVm, 'test/browser/generated_runner.html'), true);
-      verifyExistence(
-          path.join(browserAndVm, 'test/vm/generated_runner.dart'), true);
-      verifyExistence(
-          path.join(browserAndVm, 'test/vm/generated_runner.html'), false);
+      verifyExistenceAndCleanup(
+          path.join(browserAndVm, 'test/browser/generated_runner.dart'),
+          shouldFileExist: true);
+      verifyExistenceAndCleanup(
+          path.join(browserAndVm, 'test/browser/generated_runner.html'),
+          shouldFileExist: true);
+      verifyExistenceAndCleanup(
+          path.join(browserAndVm, 'test/vm/generated_runner.dart'),
+          shouldFileExist: true);
+      verifyExistenceAndCleanup(
+          path.join(browserAndVm, 'test/vm/generated_runner.html'),
+          shouldFileExist: false);
     });
   });
 }

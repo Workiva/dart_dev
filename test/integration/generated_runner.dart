@@ -1,11 +1,5 @@
 @TestOn('vm')
-
-/************ GENERATED FILE ************
-
-This file was generated with the command:
-gen-test-runner -d test/integration -e Environment.vm --no-react --no-genHtml 
-
-************* GENERATED FILE ************/
+library test.integration.generated_runner;
 
 import './analyze_test.dart' as analyze_test;
 import './copy_license_test.dart' as copy_license_test;
