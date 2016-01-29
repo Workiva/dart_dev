@@ -21,8 +21,8 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
-const String initializedProject = 'test_fixtures/init/initialized';
-const String uninitializedProject = 'test_fixtures/init/uninitialized';
+const String initializedProject = 'test/fixtures/init/initialized';
+const String uninitializedProject = 'test/fixtures/init/uninitialized';
 
 Future init(String projectPath) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);

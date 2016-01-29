@@ -1,5 +1,8 @@
 # Dart Dev Tools
-[![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dartlang.org/packages/dart_dev) [![Build Status](https://travis-ci.org/Workiva/dart_dev.svg?branch=master)](https://travis-ci.org/Workiva/dart_dev) [![codecov.io](http://codecov.io/github/Workiva/dart_dev/coverage.svg?branch=master)](http://codecov.io/github/Workiva/dart_dev?branch=master)
+[![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dartlang.org/packages/dart_dev)
+[![Build Status](https://travis-ci.org/Workiva/dart_dev.svg?branch=master)](https://travis-ci.org/Workiva/dart_dev)
+[![codecov.io](http://codecov.io/github/Workiva/dart_dev/coverage.svg?branch=master)](http://codecov.io/github/Workiva/dart_dev?branch=master)
+[![documentation](https://img.shields.io/badge/Documentation-dart_dev-blue.svg)](https://www.dartdocs.org/documentation/dart_dev/latest/)
 
 > Centralized tooling for Dart projects. Consistent interface across projects.
 > Easily configurable.
@@ -336,18 +339,6 @@ configuration from the `config.test` object.
             <td><code>bool</code></td>
             <td><code>false</code></td>
             <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
-        </tr>
-        <tr>
-            <td><code>seleniumCommand</code></td>
-            <td><code>String</code></td>
-            <td><code>"selenium-server"</code></td>
-            <td>Command used to execute Selenium for functional testing.</td>
-        </tr>
-        <tr>
-            <td><code>seleniumSuccess</code></td>
-            <td><code>String</code></td>
-            <td><code>"Selenium Server is up and running"</code></td>
-            <td>Value used to verify that Selenium has been started successfully.  This value is accurate for v2.48.0 of Selenium Server.</td>
         </tr>
     </tbody>
 </table>

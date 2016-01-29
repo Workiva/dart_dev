@@ -22,8 +22,8 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-const String projectWithDocs = 'test_fixtures/docs/docs';
-const String projectWithoutDartdoc = 'test_fixtures/docs/no_dartdoc_package';
+const String projectWithDocs = 'test/fixtures/docs/docs';
+const String projectWithoutDartdoc = 'test/fixtures/docs/no_dartdoc_package';
 
 Future<bool> generateDocsFor(String projectPath) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);

@@ -1,5 +1,4 @@
 language: dart
-#sudo: required
 dart:
   - stable
 with_content_shell: true
