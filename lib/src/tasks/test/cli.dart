@@ -89,8 +89,7 @@ class TestCli extends TaskCli {
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
-    bool testNamed;
-    parsedArgs['name'] != null ? testNamed = true : '';
+    bool testNamed = parsedArgs['name'] != null;
     List<String> tests = [];
     int individualTests = 0;
 
