@@ -406,6 +406,15 @@ object.
             <td><code>['lib/']</code></td>
             <td>Directories to run the formatter on. All files (any depth) in the given directories will be formatted.</td>
         </tr>
+        <tr>
+            <td><code>exclude</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>[]</code></td>
+            <td>
+              Directories or files to exclude running the formatter on. None of the files (any depth) in the given
+              directories will be formatted.
+            </td>
+        </tr>
     </tbody>
 </table>
 
