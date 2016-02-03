@@ -27,7 +27,10 @@ const String projectWithPassingTests = 'test/fixtures/test/passing';
 const String projectThatNeedsPubServe = 'test/fixtures/test/needs_pub_serve';
 
 Future<bool> runTests(String projectPath,
-    {bool unit: true, bool integration: false, List<String> files}) async {
+    {bool unit: true,
+    bool integration: false,
+    List<String> files,
+    String testName: ''}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
   List args = ['run', 'dart_dev', 'test'];
@@ -43,6 +46,10 @@ Future<bool> runTests(String projectPath,
         args.add(files[i]);
       }
     }
+  }
+
+  if (testName.isNotEmpty) {
+    args.addAll(['-n', testName]);
   }
 
   TaskProcess process =
@@ -119,6 +126,18 @@ void main() {
 
     test('should run tests that require a Pub server', () async {
       expect(await runTests(projectThatNeedsPubServe), isTrue);
+    });
+
+    test('should run tests with test name specified', () async {
+      expect(
+          await runTests(projectWithPassingTests, testName: 'passes'), isTrue);
+    });
+
+    test('should fail if named test does not exist', () async {
+      expect(
+          await runTests(projectWithPassingTests,
+              testName: 'non-existent test'),
+          isFalse);
     });
   });
 }
