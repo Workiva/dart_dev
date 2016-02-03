@@ -451,13 +451,13 @@ object.
     </thead>
     <tbody>
         <tr>
-            <td><code>additionalImports</code></td>
+            <td><code>dartHeaders</code></td>
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
-            <td>Any other imports necessary to have in the generated runner file</td>
+            <td>Any lines of dart code that should exist between test file imports and the main method</td>
         </tr>      
         <tr>
-            <td><code>commandsPriorToTesting</code></td>
+            <td><code>preTestCommands</code></td>
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
             <td>Commands to be executed in the generated file's main method before test execution</td>
@@ -487,10 +487,10 @@ object.
             <td>Whether or not a companion html file should be generated</td>
         </tr>
         <tr>
-            <td><code>scriptPaths</code></td>
+            <td><code>htmlHeaders</code></td>
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
-            <td>The list of custom script tags to include in the companion html file</td>
+            <td>The list of custom html elements to include in the companion html file</td>
         </tr>
     </tbody>
 </table>

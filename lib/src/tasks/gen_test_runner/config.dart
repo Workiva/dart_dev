@@ -16,34 +16,34 @@ library dart_dev.src.tasks.gen_test_runner.config;
 
 import 'package:dart_dev/src/tasks/config.dart';
 
-const List<String> defaultAdditionalImports = const [];
-const List<String> defaultCommandsPriorToTesting = const [];
+const List<String> defaultDartHeaders = const [];
+const List<String> defaultPreTestCommands = const [];
 const String defaultDirectory = 'test';
 const Environment defaultEnv = Environment.browser;
 const String defaultFilename = 'generated_runner';
 const bool defaultGenHtml = false;
 const bool defaultReact = true;
-const List<String> defaultScriptPaths = const [];
+const List<String> defaultHtmlHeaders = const [];
 
 enum Environment { vm, browser }
 
 class TestRunnerConfig {
-  List<String> additionalImports = defaultAdditionalImports;
-  List<String> commandsPriorToTesting = defaultCommandsPriorToTesting;
+  List<String> dartHeaders = defaultDartHeaders;
+  List<String> preTestCommands = defaultPreTestCommands;
   String directory = defaultDirectory;
   Environment env = defaultEnv;
   String filename = defaultFilename;
   bool genHtml = defaultGenHtml;
-  List<String> scriptPaths = defaultScriptPaths;
+  List<String> htmlHeaders = defaultHtmlHeaders;
 
   TestRunnerConfig(
-      {List<String> this.additionalImports: defaultAdditionalImports,
-      List<String> this.commandsPriorToTesting: defaultCommandsPriorToTesting,
+      {List<String> this.dartHeaders: defaultDartHeaders,
+      List<String> this.preTestCommands: defaultPreTestCommands,
       String this.directory: defaultDirectory,
       Environment this.env: defaultEnv,
       String this.filename: defaultFilename,
       bool this.genHtml: defaultGenHtml,
-      List<String> this.scriptPaths: defaultScriptPaths});
+      List<String> this.htmlHeaders: defaultHtmlHeaders});
 }
 
 class GenTestRunnerConfig extends TaskConfig {

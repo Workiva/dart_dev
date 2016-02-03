@@ -51,7 +51,7 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   if (currentConfig.env == Environment.browser) {
     if (currentConfig.genHtml) {
       await testHtmlFileGenerator(currentConfig.directory,
-          currentConfig.filename, currentConfig.scriptPaths);
+          currentConfig.filename, currentConfig.htmlHeaders);
     }
     writer.writeln('@TestOn(\'browser\')');
   } else {
@@ -70,17 +70,17 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   writer.writeln('import \'package:test/test.dart\';');
 
-  if (currentConfig.additionalImports.isNotEmpty) {
-    currentConfig.additionalImports.forEach((String import) {
-      writer.writeln(import);
+  if (currentConfig.dartHeaders.isNotEmpty) {
+    currentConfig.dartHeaders.forEach((String header) {
+      writer.writeln(header);
     });
   }
 
   writer.writeln('');
   writer.writeln('void main() {');
 
-  if (currentConfig.commandsPriorToTesting.isNotEmpty) {
-    currentConfig.commandsPriorToTesting.forEach((String command) {
+  if (currentConfig.preTestCommands.isNotEmpty) {
+    currentConfig.preTestCommands.forEach((String command) {
       writer.writeln('  $command');
     });
   }
@@ -101,15 +101,15 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 }
 
 Future testHtmlFileGenerator(
-    String directory, String filename, List<String> scriptPaths) async {
+    String directory, String filename, List<String> htmlHeaders) async {
   File generatedRunner = new File('$directory/$filename.html');
   IOSink writer = generatedRunner.openWrite(mode: FileMode.WRITE);
   writer.writeln('<!DOCTYPE html>');
   writer.writeln('<html>');
   writer.writeln('  <head>');
   writer.writeln('    <title>$filename</title>');
-  scriptPaths.forEach((path) {
-    writer.writeln('    <script src="$path"></script>');
+  htmlHeaders.forEach((header) {
+    writer.writeln('    $header');
   });
   writer.writeln('    <link rel="x-dart-test"  href="$filename.dart">');
   writer.writeln('    <script src="packages/test/dart.js"></script>');
