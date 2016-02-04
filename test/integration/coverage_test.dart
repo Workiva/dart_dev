@@ -28,6 +28,7 @@ const String projectWithBrowserTestsThatNeedsPubServe =
     'test/fixtures/coverage/browser_needs_pub_serve';
 const String projectWithoutCoveragePackage =
     'test/fixtures/coverage/no_coverage_package';
+const String projectWithFailingTests = 'test/fixtures/coverage/failing_test';
 
 Future<bool> runCoverage(String projectPath, {bool html: false}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
@@ -71,6 +72,10 @@ void main() {
     test('should fail if "coverage" package is missing', () async {
       expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
     });
+
+    test('should fail if there is a test that fails', () async {
+      expect(await runCoverage(projectWithFailingTests), isFalse);
+    }, timeout: new Timeout(new Duration(seconds: 60)));
 
     test('should create coverage with non_test file specified', () async {
       expect(await runCoverage(projectWithDartFile), isTrue);

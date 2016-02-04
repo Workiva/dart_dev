@@ -549,6 +549,11 @@ object.
 ddev test path/to/test_name path/to/another/test_name
 ```
 
+* Individual tests can be executed by passing in a test name or regex pattern of a test that would be loaded by the test runner
+```
+ddev test -n 'run only this test'
+```
+
 
 ## CLI Usage
 This package comes with a single executable: `dart_dev`. To run this executable:
