@@ -25,6 +25,7 @@ const String projectWithErrors = 'test/fixtures/analyze/errors';
 const String projectWithHints = 'test/fixtures/analyze/hints';
 const String projectWithNoIssues = 'test/fixtures/analyze/no_issues';
 const String projectWithStaticTypingIssues = 'test/fixtures/analyze/strong';
+const String projectWithWarnings = 'test/fixtures/analyze/warnings';
 
 Future<Analysis> analyzeProject(String projectPath,
     {bool fatalWarnings: true,
@@ -130,9 +131,10 @@ void main() {
     });
 
     test('should report warnings as fatal if configured to do so', () async {
-      Analysis analysis = await analyzeProject(projectWithErrors);
-      expect(analysis.numErrors, equals(2));
-      expect(analysis.numWarnings, equals(0));
+      Analysis analysis = await analyzeProject(projectWithWarnings);
+      expect(analysis.numErrors, equals(0));
+      expect(analysis.numWarnings, equals(1));
+      expect(analysis.exitCode, equals(1));
     });
 
     test('should not report warnings as fatal if not configured to do so',
