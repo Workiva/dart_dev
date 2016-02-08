@@ -19,8 +19,9 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter, TaskProcess;
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
@@ -34,79 +35,77 @@ class TestCli extends TaskCli {
     ..addFlag('integration',
         defaultsTo: defaultIntegration,
         help: 'Includes the integration test suite.')
-    ..addOption('concurrency',
-        abbr: 'j',
-        defaultsTo: '$defaultConcurrency',
-        help: 'The number of concurrent test suites run.')
     ..addFlag('pub-serve',
-        negatable: true,
+        negatable: false,
         defaultsTo: defaultPubServe,
-        help: 'Serves browser tests using a Pub server.')
-    ..addOption('platform',
-        abbr: 'p',
-        allowMultiple: true,
-        help:
-            'The platform(s) on which to run the tests.\n[vm (default), dartium, content-shell, chrome, phantomjs, firefox, safari]')
-    ..addOption('name',
-        abbr: 'n',
-        help:
-            'A substring of the name of the test to run.\nRegular expression syntax is supported.');
+        help: 'Spins up a Pub server and uses it to serve browser tests.');
 
   final String command = 'test';
 
-  bool hasRestParams(ArgResults parsedArgs) {
+  Future<String> getUsage() async {
+    var usage = [
+      'dart_dev test options',
+      '=====================',
+      '${argParser.usage}',
+      '',
+      'test package options',
+      '====================',
+    ].join('\n');
+    var process = new TaskProcess('pub', ['run', 'test', '-h']);
+    usage += await process.stdout.join('\n');
+    return usage;
+  }
+
+  bool hasRestParams(LenientArgResults parsedArgs) {
     return parsedArgs.rest.length > 0;
   }
 
-  Future addToTestsFromRest(List<String> tests, List<String> rest) async {
-    int restLength = rest.length;
-    int individualTests = 0;
-    //verify this is a test-file and it exists.
-    for (var i = 0; i < restLength; i++) {
-      String filePath = rest[i];
-      await new File(filePath).exists().then((bool exists) {
-        if (exists) {
-          individualTests++;
-          tests.add(filePath);
-        } else {
-          print("Ignoring unknown argument");
-        }
-      });
-    }
-    return individualTests;
-  }
+//  Future addToTestsFromRest(List<String> tests, List<String> rest) async {
+//    int restLength = rest.length;
+//    int individualTests = 0;
+//    // Verify this is a test-file and it exists.
+//    for (var i = 0; i < restLength; i++) {
+//      String filePath = rest[i];
+//      await new File(filePath).exists().then((bool exists) {
+//        if (exists) {
+//          individualTests++;
+//          tests.add(filePath);
+//        } else {
+//          print("Ignoring unknown argument");
+//        }
+//      });
+//    }
+//    return individualTests;
+//  }
 
   bool isExplicitlyFalse(bool value) {
     return value != null && value == false;
   }
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(LenientArgResults parsedArgs) async {
     if (!platform_util.hasImmediateDependency('test'))
       return new CliResult.fail(
           'Package "test" must be an immediate dependency in order to run its executables.');
 
-    List<String> additionalArgs = [];
+    List<String> cliArgs = [];
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
-    bool testNamed = parsedArgs['name'] != null;
     List<String> tests = [];
     int individualTests = 0;
 
     bool pubServe =
         TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
 
-    var concurrency =
-        TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
-    if (concurrency is String) {
-      concurrency = int.parse(concurrency);
+    List<String> platforms = [];
+    if (!parsedArgs.unknownOptions.any(
+        (option) => option.contains('-p') || option.contains('--platform'))) {
+      platforms = config.test.platforms;
     }
-    List<String> platforms =
-        TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
 
-    if (hasRestParams(parsedArgs)) {
-      individualTests = await addToTestsFromRest(tests, parsedArgs.rest);
-    }
+//    if (hasRestParams(parsedArgs)) {
+//      individualTests = await addToTestsFromRest(tests, parsedArgs.rest);
+//    }
 
     if (isExplicitlyFalse(unit) && !integration && individualTests == 0) {
       return new CliResult.fail(
@@ -122,7 +121,7 @@ class TestCli extends TaskCli {
       tests.addAll(config.test.integrationTests);
     }
 
-    if (tests.isEmpty) {
+    if (tests.isEmpty && parsedArgs.rest.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
         return new CliResult.fail(
             'This project does not specify any unit tests.');
@@ -146,7 +145,7 @@ class TestCli extends TaskCli {
               pubServeTask.stdErr.transform(until(startupLogFinished.future)));
 
       var serveInfo = await pubServeTask.serveInfos.first;
-      additionalArgs.add('--pub-serve=${serveInfo.port}');
+      cliArgs.add('--pub-serve=${serveInfo.port}');
 
       startupLogFinished.complete();
       pubServeTask.stdOut.join('\n').then((stdOut) {
@@ -163,15 +162,14 @@ class TestCli extends TaskCli {
       });
     }
 
-    if (testNamed) {
-      additionalArgs.addAll(['-n', '${parsedArgs['name']}']);
-    }
+    var forwardedArgs = parsedArgs.unknownOptions.toList()
+      ..addAll(parsedArgs.rest);
+    print('\nForwarding the following options and args to `pub run test`:');
+    print(forwardedArgs);
 
-    TestTask task = test(
-        tests: tests,
-        concurrency: concurrency,
-        platforms: platforms,
-        additionalArgs: additionalArgs);
+    cliArgs.addAll(forwardedArgs);
+
+    TestTask task = test(tests: tests, platforms: platforms, cliArgs: cliArgs);
     reporter.logGroup(task.testCommand, outputStream: task.testOutput);
 
     await task.done;

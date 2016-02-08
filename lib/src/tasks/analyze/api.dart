@@ -27,7 +27,8 @@ AnalyzeTask analyze(
     bool fatalWarnings: defaultFatalWarnings,
     bool hints: defaultHints,
     bool fatalHints: defaultFatalHints,
-    bool strong: defaultStrong}) {
+    bool strong: defaultStrong,
+    List<String> cliArgs}) {
   var executable = 'dartanalyzer';
   var args = [];
   if (fatalWarnings) {
@@ -41,15 +42,15 @@ AnalyzeTask analyze(
   if (strong) {
     args.add('--strong');
   }
-
+  args.addAll(cliArgs);
   args.addAll(_findFilesFromEntryPoints(entryPoints));
 
   TaskProcess process = new TaskProcess(executable, args);
   AnalyzeTask task =
       new AnalyzeTask('$executable ${args.join(' ')}', process.done);
 
-  process.stdout.listen(task._analyzerOutput.add);
-  process.stderr.listen(task._analyzerOutput.addError);
+  process.stdout.listen((l) {print(l); task._analyzerOutput.add(l);});
+  process.stderr.listen((l) {print(l); task._analyzerOutput.addError(l);});
   process.exitCode.then((code) {
     task.successful = code <= 0;
   });

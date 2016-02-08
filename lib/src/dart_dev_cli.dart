@@ -26,6 +26,9 @@ import 'package:dart_dev/util.dart'
         parseExecutableFromCommand,
         reporter;
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
+import 'package:dart_dev/src/lenient_args/lenient_parser.dart';
+
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
@@ -72,7 +75,7 @@ void registerTask(TaskCli cli, TaskConfig config) {
   _cliConfigs[cli.command] = config;
 }
 
-String _generateUsage([String task]) {
+Future<String> _generateUsage([String task]) async {
   StringBuffer u = new StringBuffer();
   u.writeln('Standardized tooling for Dart projects.');
   u.writeln();
@@ -80,7 +83,7 @@ String _generateUsage([String task]) {
   if (task != null && _cliTasks.containsKey(task)) {
     u.writeln('Usage: pub run dart_dev $task [options]');
     u.writeln();
-    u.writeln(_cliTasks[task].argParser.usage);
+    u.writeln(await _cliTasks[task].getUsage());
   } else {
     u.writeln('Usage: pub run dart_dev [task] [options]');
     u.writeln();
@@ -99,12 +102,12 @@ Future _run(List<String> args) async {
     _parser.addCommand(command, cli.argParser);
   });
 
-  ArgResults env;
+  LenientArgResults env;
   try {
-    env = _parser.parse(args);
+    env = LenientParser.parseArgs(_parser, args);
   } on FormatException catch (e) {
     reporter.error('${e.message}\n', shout: true);
-    reporter.log(_generateUsage(), shout: true);
+    reporter.log(await _generateUsage(), shout: true);
     exitCode = 1;
     return;
   }
@@ -128,13 +131,13 @@ Future _run(List<String> args) async {
 
   if (task != null && !_cliTasks.containsKey(task)) {
     reporter.error('Invalid task: $task', shout: true);
-    reporter.log(_generateUsage(), shout: true);
+    reporter.log(await _generateUsage(), shout: true);
     exitCode = 1;
     return;
   }
 
   if (env['help'] || task == null) {
-    reporter.log(_generateUsage(task), shout: true);
+    reporter.log(await _generateUsage(task), shout: true);
     return;
   }
 

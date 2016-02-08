@@ -21,6 +21,7 @@ import 'package:args/args.dart';
 import 'package:dart_dev/util.dart' show hasImmediateDependency, reporter;
 import 'package:path/path.dart' as path;
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/docs/api.dart';
 
@@ -31,7 +32,15 @@ class DocsCli extends TaskCli {
 
   final String command = 'docs';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<String> getUsage() async {
+    return [
+      'dart_dev docs options',
+      '=====================',
+      '${argParser.usage}',
+    ].join('\n');
+  }
+
+  Future<CliResult> run(LenientArgResults parsedArgs) async {
     if (!hasImmediateDependency('dartdoc'))
       return new CliResult.fail(
           'Package "dartdoc" must be an immediate dependency in order to run its executables.');

@@ -25,6 +25,7 @@ const List<String> defaultUnitTests = const ['test/'];
 const List<String> defaultPlatforms = const [];
 
 class TestConfig extends TaskConfig {
+  @deprecated
   int concurrency = defaultConcurrency;
   bool pubServe = defaultPubServe;
   List<String> integrationTests = defaultIntegrationTests;

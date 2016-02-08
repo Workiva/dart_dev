@@ -19,8 +19,9 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter, TaskProcess;
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
@@ -40,18 +41,23 @@ class CoverageCli extends TaskCli {
         negatable: true,
         defaultsTo: defaultHtml,
         help: 'Generate and open an HTML report.')
-    ..addFlag('pub-serve',
-        negatable: true,
-        defaultsTo: defaultPubServe,
-        help: 'Serves browser tests using a Pub server.')
     ..addFlag('open',
         negatable: true,
         defaultsTo: true,
-        help: 'Open the HTML report automatically.');
+        help: 'Open the HTML report automatically.')
+    ..addFlag('pub-serve',
+        negatable: false,
+        defaultsTo: defaultPubServe,
+        help: 'Spins up a Pub server and uses it to serve browser tests.');
 
   final String command = 'coverage';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<String> getUsage() async {
+    return ['dart_dev options', '================', '${argParser.usage}']
+        .join('\n');
+  }
+
+  Future<CliResult> run(LenientArgResults parsedArgs) async {
     if (!platform_util.hasImmediateDependency('coverage'))
       return new CliResult.fail(
           'Package "coverage" must be an immediate dependency in order to run its executables.');
@@ -66,7 +72,7 @@ class CoverageCli extends TaskCli {
 
     bool html = TaskCli.valueOf('html', parsedArgs, config.coverage.html);
     bool pubServe =
-        TaskCli.valueOf('pub-serve', parsedArgs, config.coverage.pubServe);
+        TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
     bool open = TaskCli.valueOf('open', parsedArgs, true);
 
     List<String> tests = [];
