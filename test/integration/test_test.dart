@@ -77,9 +77,8 @@ void main() {
 
     test('should run individual unit test', () async {
       expect(
-          await runTests(projectWithPassingTests, files: [
-            'test/passing_unit_test.dart'
-          ]),
+          await runTests(projectWithPassingTests,
+              files: ['test/passing_unit_test.dart']),
           isTrue);
     });
 

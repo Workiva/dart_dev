@@ -36,8 +36,7 @@ class AnalyzeCli extends TaskCli {
   final String command = 'analyze';
 
   Future<String> getUsage() async {
-    var usage =
-        ['dartanalyzer options', '====================', ''].join('\n');
+    var usage = ['dartanalyzer options', '====================', ''].join('\n');
     var process = new TaskProcess('dartanalyzer', ['--help']);
     usage += await process.stderr.join('\n');
     return usage;
