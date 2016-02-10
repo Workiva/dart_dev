@@ -60,24 +60,6 @@ class TestCli extends TaskCli {
     return parsedArgs.rest.length > 0;
   }
 
-//  Future addToTestsFromRest(List<String> tests, List<String> rest) async {
-//    int restLength = rest.length;
-//    int individualTests = 0;
-//    // Verify this is a test-file and it exists.
-//    for (var i = 0; i < restLength; i++) {
-//      String filePath = rest[i];
-//      await new File(filePath).exists().then((bool exists) {
-//        if (exists) {
-//          individualTests++;
-//          tests.add(filePath);
-//        } else {
-//          print("Ignoring unknown argument");
-//        }
-//      });
-//    }
-//    return individualTests;
-//  }
-
   bool isExplicitlyFalse(bool value) {
     return value != null && value == false;
   }
@@ -102,10 +84,6 @@ class TestCli extends TaskCli {
         (option) => option.contains('-p') || option.contains('--platform'))) {
       platforms = config.test.platforms;
     }
-
-//    if (hasRestParams(parsedArgs)) {
-//      individualTests = await addToTestsFromRest(tests, parsedArgs.rest);
-//    }
 
     if (isExplicitlyFalse(unit) && !integration && individualTests == 0) {
       return new CliResult.fail(

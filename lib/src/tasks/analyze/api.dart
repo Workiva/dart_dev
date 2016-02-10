@@ -50,11 +50,9 @@ AnalyzeTask analyze(
       new AnalyzeTask('$executable ${args.join(' ')}', process.done);
 
   process.stdout.listen((l) {
-    print(l);
     task._analyzerOutput.add(l);
   });
   process.stderr.listen((l) {
-    print(l);
     task._analyzerOutput.addError(l);
   });
   process.exitCode.then((code) {
