@@ -15,7 +15,6 @@
 library dart_dev.src.tasks.unlink_dependency.cli;
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:dart_dev/util.dart' show hasImmediateDependency, reporter;
