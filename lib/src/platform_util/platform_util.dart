@@ -22,8 +22,9 @@ PlatformUtil platformUtil = new StandardPlatformUtil();
 
 abstract class PlatformUtil {
   static PlatformUtil retrieve() {
-    if (platformUtil == null) throw new StateError(
-        'dart_dev\'s PlatformUtil instance must not be null.');
+    if (platformUtil == null)
+      throw new StateError(
+          'dart_dev\'s PlatformUtil instance must not be null.');
     return platformUtil;
   }
 

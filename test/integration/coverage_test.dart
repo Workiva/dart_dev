@@ -24,8 +24,11 @@ import 'package:test/test.dart';
 const String projectWithDartFile = 'test/fixtures/coverage/non_test_file';
 const String projectWithBrowserTests = 'test/fixtures/coverage/browser';
 const String projectWithVmTests = 'test/fixtures/coverage/vm';
+const String projectWithBrowserTestsThatNeedsPubServe =
+    'test/fixtures/coverage/browser_needs_pub_serve';
 const String projectWithoutCoveragePackage =
     'test/fixtures/coverage/no_coverage_package';
+const String projectWithFailingTests = 'test/fixtures/coverage/failing_test';
 
 Future<bool> runCoverage(String projectPath, {bool html: false}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
@@ -51,6 +54,15 @@ void main() {
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 60)));
 
+    test('should generate coverage for Browser tests that require a Pub server',
+        () async {
+      expect(
+          await runCoverage(projectWithBrowserTestsThatNeedsPubServe), isTrue);
+      File lcov = new File(
+          '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
+      expect(lcov.existsSync(), isTrue);
+    }, timeout: new Timeout(new Duration(seconds: 60)));
+
     test('should generate coverage for VM tests', () async {
       expect(await runCoverage(projectWithVmTests), isTrue);
       File lcov = new File('$projectWithVmTests/coverage/coverage.lcov');
@@ -60,6 +72,10 @@ void main() {
     test('should fail if "coverage" package is missing', () async {
       expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
     });
+
+    test('should fail if there is a test that fails', () async {
+      expect(await runCoverage(projectWithFailingTests), isFalse);
+    }, timeout: new Timeout(new Duration(seconds: 60)));
 
     test('should create coverage with non_test file specified', () async {
       expect(await runCoverage(projectWithDartFile), isTrue);

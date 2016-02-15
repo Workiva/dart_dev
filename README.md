@@ -1,5 +1,8 @@
 # Dart Dev Tools
-[![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dartlang.org/packages/dart_dev) [![Build Status](https://travis-ci.org/Workiva/dart_dev.svg?branch=master)](https://travis-ci.org/Workiva/dart_dev) [![codecov.io](http://codecov.io/github/Workiva/dart_dev/coverage.svg?branch=master)](http://codecov.io/github/Workiva/dart_dev?branch=master)
+[![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dartlang.org/packages/dart_dev)
+[![Build Status](https://travis-ci.org/Workiva/dart_dev.svg?branch=master)](https://travis-ci.org/Workiva/dart_dev)
+[![codecov.io](http://codecov.io/github/Workiva/dart_dev/coverage.svg?branch=master)](http://codecov.io/github/Workiva/dart_dev?branch=master)
+[![documentation](https://img.shields.io/badge/Documentation-dart_dev-blue.svg)](https://www.dartdocs.org/documentation/dart_dev/latest/)
 
 > Centralized tooling for Dart projects. Consistent interface across projects.
 > Easily configurable.
@@ -71,7 +74,7 @@ need to know how to use the `dart_dev` tool.
 - **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
 - **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
 - **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
-- **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs. 
+- **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Linking a Dependency into a Project:** handles updating `dependency_overrides` in most cases.
@@ -115,6 +118,21 @@ fi
 
 Next time you load a Bash session you'll have basic completions for the `ddev`
 alias described above.
+
+#### Zsh Completion
+
+The Bash completion script will work for Zsh as well, but requires a little
+configuration. The following lines must all be found somewhere (and in this
+order, though they needn't be adjacent to one another) in your `.zshrc` file,
+or a file sourced from it:
+
+```
+autoload -U compinit
+compinit
+autoload -U bashcompinit
+bashcompinit
+source <path/to/ddev-completion.sh>
+```
 
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
@@ -247,6 +265,18 @@ All configuration options for the `analyze` task are found on the
             <td><code>true</code></td>
             <td>Show hint results.</td>
         </tr>
+        <tr>
+          	<td><code>fatalHints</code></td>
+          	<td><code>bool</code></td>
+          	<td><code>false</code></td>
+          	<td>Fail on hints (requests hints to be true).</td>
+        </tr>
+        <tr>
+            <td><code>strong</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td><a href="https://goo.gl/DqcBsw">Enable strong static checks</a></td>
+        </tr>
     </tbody>
 </table>
 
@@ -311,6 +341,12 @@ configuration from the `config.test` object.
             <td><code>List&lt;String&gt;</code></td>
             <td><code>['lib/']</code></td>
             <td>List of paths to include in the generated coverage report (LCOV and HTML).</td>
+        </tr>
+        <tr>
+            <td><code>pubServe</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
         </tr>
     </tbody>
 </table>
@@ -437,7 +473,7 @@ object.
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
             <td>Platforms on which to run the tests (handled by the Dart test runner). See https://github.com/dart-lang/test#platform-selector-syntax for a full list of supported platforms.
-            <strong>* Not all platforms are supported by all continuous integration servers.  Please consult your CI server's documentation for more details.</strong> 
+            <strong>* Not all platforms are supported by all continuous integration servers.  Please consult your CI server's documentation for more details.</strong>
             </td>
         </tr>
         <tr>
@@ -446,12 +482,24 @@ object.
             <td><code>['test/']</code></td>
             <td>Unit test locations. Items in this list can be directories and/or files.</td>
         </tr>
+        <tr>
+            <td><code>pubServe</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
+        </tr>
     </tbody>
 </table>
 * Individual test files can be executed by appending their path to the end of the command.
 
 ```
 ddev test path/to/test_name path/to/another/test_name
+```
+
+* Individual tests can be executed by passing in a test name or regex pattern of a test that would be loaded by the test runner
+
+```
+ddev test -n 'run only this test'
 ```
 
 #### `unlink` config

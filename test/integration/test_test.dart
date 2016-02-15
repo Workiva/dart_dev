@@ -24,15 +24,19 @@ import 'package:test/test.dart';
 const String projectWithoutTestPackage = 'test/fixtures/test/no_test_package';
 const String projectWithFailingTests = 'test/fixtures/test/failing';
 const String projectWithPassingTests = 'test/fixtures/test/passing';
+const String projectThatNeedsPubServe = 'test/fixtures/test/needs_pub_serve';
 
 Future<bool> runTests(String projectPath,
-    {bool unit: true, bool integration: false, List<String> files}) async {
+    {bool unit: true,
+    bool integration: false,
+    List<String> files,
+    String testName: ''}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
   List args = ['run', 'dart_dev', 'test'];
   if (unit != null) args.add(unit ? '--unit' : '--no-unit');
-  if (integration != null) args
-      .add(integration ? '--integration' : '--no-integration');
+  if (integration != null)
+    args.add(integration ? '--integration' : '--no-integration');
   int i;
 
   if (files != null) {
@@ -42,6 +46,10 @@ Future<bool> runTests(String projectPath,
         args.add(files[i]);
       }
     }
+  }
+
+  if (testName.isNotEmpty) {
+    args.addAll(['-n', testName]);
   }
 
   TaskProcess process =
@@ -69,8 +77,9 @@ void main() {
 
     test('should run individual unit test', () async {
       expect(
-          await runTests(projectWithPassingTests, files:
-              ['test/fixtures/test/passing/test/passing_unit_test.dart']),
+          await runTests(projectWithPassingTests, files: [
+            'test/fixtures/test/passing/test/passing_unit_test.dart'
+          ]),
           isTrue);
     });
 
@@ -113,6 +122,22 @@ void main() {
 
     test('should warn if "test" package is not immediate dependency', () async {
       expect(await runTests(projectWithoutTestPackage), isFalse);
+    });
+
+    test('should run tests that require a Pub server', () async {
+      expect(await runTests(projectThatNeedsPubServe), isTrue);
+    });
+
+    test('should run tests with test name specified', () async {
+      expect(
+          await runTests(projectWithPassingTests, testName: 'passes'), isTrue);
+    });
+
+    test('should fail if named test does not exist', () async {
+      expect(
+          await runTests(projectWithPassingTests,
+              testName: 'non-existent test'),
+          isFalse);
     });
   });
 }

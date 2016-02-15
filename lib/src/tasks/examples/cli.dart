@@ -43,8 +43,8 @@ class ExamplesCli extends TaskCli {
       port = int.parse(port);
     }
 
-    if (!hasExamples()) return new CliResult.fail(
-        'This project does not have any examples.');
+    if (!hasExamples())
+      return new CliResult.fail('This project does not have any examples.');
 
     ExamplesTask task = serveExamples(hostname: hostname, port: port);
     reporter.logGroup(task.pubServeCommand,

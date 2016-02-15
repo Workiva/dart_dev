@@ -40,6 +40,10 @@ class CoverageCli extends TaskCli {
         negatable: true,
         defaultsTo: defaultHtml,
         help: 'Generate and open an HTML report.')
+    ..addFlag('pub-serve',
+        negatable: true,
+        defaultsTo: defaultPubServe,
+        help: 'Serves browser tests using a Pub server.')
     ..addFlag('open',
         negatable: true,
         defaultsTo: true,
@@ -48,9 +52,9 @@ class CoverageCli extends TaskCli {
   final String command = 'coverage';
 
   Future<CliResult> run(ArgResults parsedArgs) async {
-    if (!platform_util
-        .hasImmediateDependency('coverage')) return new CliResult.fail(
-        'Package "coverage" must be an immediate dependency in order to run its executables.');
+    if (!platform_util.hasImmediateDependency('coverage'))
+      return new CliResult.fail(
+          'Package "coverage" must be an immediate dependency in order to run its executables.');
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
@@ -61,6 +65,8 @@ class CoverageCli extends TaskCli {
     }
 
     bool html = TaskCli.valueOf('html', parsedArgs, config.coverage.html);
+    bool pubServe =
+        TaskCli.valueOf('pub-serve', parsedArgs, config.coverage.pubServe);
     bool open = TaskCli.valueOf('open', parsedArgs, true);
 
     List<String> tests = [];
@@ -85,6 +91,7 @@ class CoverageCli extends TaskCli {
     try {
       CoverageTask task = CoverageTask.start(tests,
           html: html,
+          pubServe: pubServe,
           output: config.coverage.output,
           reportOn: config.coverage.reportOn);
       reporter.logGroup('Collecting coverage',

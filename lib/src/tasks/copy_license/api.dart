@@ -26,8 +26,8 @@ CopyLicenseTask copyLicense(
   CopyLicenseTask task = new CopyLicenseTask();
 
   File license = new File(licensePath);
-  if (!license.existsSync()) throw new Exception(
-      'License file "$licensePath" does not exist.');
+  if (!license.existsSync())
+    throw new Exception('License file "$licensePath" does not exist.');
 
   String licenseContents = license.readAsStringSync();
   licenseContents = trimLeadingAndTrailingEmptyLines(licenseContents);
@@ -41,8 +41,12 @@ CopyLicenseTask copyLicense(
       // Skip files in packages/ directory
       if (file.path.contains('/packages/')) return;
 
-      if (applyLicense(file, licenseContents)) {
-        task.affectedFiles.add(file.path);
+      try {
+        if (applyLicense(file, licenseContents)) {
+          task.affectedFiles.add(file.path);
+        }
+      } on NonUtf8EncodedFileException {
+        // Ignore files that could not be read.
       }
     });
   });
@@ -67,8 +71,15 @@ bool applyLicense(File file, String license) {
 }
 
 bool hasLicense(File file, String license) {
+  String fileContents;
+  try {
+    fileContents = file.readAsStringSync();
+  } catch (e) {
+    // File could not be read (probably not UTF8-encoded). Ignore this file.
+    throw new NonUtf8EncodedFileException(file.path);
+  }
+
   String licenseHeader = license.split('\n').first;
-  String fileContents = file.readAsStringSync();
   Iterable<String> lines = fileContents.split('\n');
   if (lines.isEmpty) return false;
   if (lines.first.contains(licenseHeader)) return true;
@@ -117,4 +128,11 @@ class CopyLicenseTask extends Task {
   List<String> affectedFiles = [];
   final Future done = new Future.value();
   CopyLicenseTask();
+}
+
+class NonUtf8EncodedFileException implements Exception {
+  final String filename;
+  NonUtf8EncodedFileException(this.filename);
+  @override
+  String toString() => 'File is not UTF8-encoded: $filename';
 }
