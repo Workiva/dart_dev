@@ -38,10 +38,11 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
       testDirectory.listSync(recursive: true, followLinks: false);
   allFiles.forEach((FileSystemEntity entity) {
     if (entity is File) {
-      if (entity.path.endsWith('_test.dart')) {
+      if (entity.path.endsWith('_test.dart') &&
+          !entity.path.endsWith('${currentConfig.filename}.dart')) {
         testFiles.add(entity);
         task.testFiles.add(entity.path);
-      } else if (!entity.path.endsWith('${currentConfig.filename}.dart') &&
+      } else if (entity.path.endsWith('${currentConfig.filename}.dart') ||
           entity.path.endsWith('.dart')) {
         task.excludedFiles.add(entity.path);
       }
