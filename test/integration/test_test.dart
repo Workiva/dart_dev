@@ -24,6 +24,8 @@ import 'package:test/test.dart';
 const String projectWithoutTestPackage = 'test/fixtures/test/no_test_package';
 const String projectWithFailingTests = 'test/fixtures/test/failing';
 const String projectWithPassingTests = 'test/fixtures/test/passing';
+const String projectWithPassingIntegrationTests =
+    'test/fixtures/test/passingIntegration';
 const String projectThatNeedsPubServe = 'test/fixtures/test/needs_pub_serve';
 
 Future<bool> runTests(String projectPath,
@@ -106,9 +108,9 @@ void main() {
           isTrue);
     });
 
-    test('should run integration tests', () async {
+    test('should run integration tests and not unit tests', () async {
       expect(
-          await runTests(projectWithPassingTests,
+          await runTests(projectWithPassingIntegrationTests,
               unit: false, integration: true),
           isTrue);
     });
