@@ -111,8 +111,6 @@ class TestCli extends TaskCli {
     if (isExplicitlyFalse(unit) && !integration && individualTests == 0) {
       return new CliResult.fail(
           'No tests were selected. Include at least one of --unit or --integration.');
-    } else {
-      if (individualTests == 0) unit = true;
     }
 
     if (unit) {
