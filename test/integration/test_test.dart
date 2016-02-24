@@ -21,6 +21,8 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
+const String projectToVerifyUnitTestsRunByDefault =
+    'test/fixtures/test/default_unit';
 const String projectWithoutTestPackage = 'test/fixtures/test/no_test_package';
 const String projectWithFailingTests = 'test/fixtures/test/failing';
 const String projectWithPassingTests = 'test/fixtures/test/passing';
@@ -103,7 +105,7 @@ void main() {
 
     test('should run unit tests by default', () async {
       expect(
-          await runTests(projectWithPassingTests,
+          await runTests(projectToVerifyUnitTestsRunByDefault,
               unit: null, integration: null),
           isTrue);
     });
