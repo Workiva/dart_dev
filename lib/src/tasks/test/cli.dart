@@ -90,7 +90,7 @@ class TestCli extends TaskCli {
 
     List<String> additionalArgs = [];
 
-    bool unit = parsedArgs['unit'];
+    bool unit = !isExplicitlyFalse(parsedArgs['unit']);
     bool integration = parsedArgs['integration'];
     bool functional = parsedArgs['functional'];
     bool testNamed = parsedArgs['name'] != null;
