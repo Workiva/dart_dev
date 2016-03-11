@@ -85,7 +85,7 @@ need to know how to use the `dart_dev` tool.
 Add the following to your `pubspec.yaml`:
 ```yaml
 dev_dependencies:
-  coverage: "^0.7.2"
+  coverage: "^0.7.3"
   dart_dev: "^1.0.0"
   dart_style: ">=0.1.8 <0.3.0"
   dartdoc: "^0.4.0"
