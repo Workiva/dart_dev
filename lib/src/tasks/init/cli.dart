@@ -18,6 +18,7 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
 import 'package:dart_dev/src/tasks/init/api.dart';
 import 'package:dart_dev/src/tasks/cli.dart';
 
@@ -26,7 +27,9 @@ class InitCli extends TaskCli {
 
   final String command = 'init';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<String> getUsage() async => argParser.usage;
+
+  Future<CliResult> run(LenientArgResults parsedArgs) async {
     InitTask task = init();
     await task.done;
     return task.successful

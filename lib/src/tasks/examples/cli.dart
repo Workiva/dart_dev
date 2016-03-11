@@ -20,11 +20,13 @@ import 'package:args/args.dart';
 
 import 'package:dart_dev/util.dart' show reporter;
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
 import 'package:dart_dev/src/tasks/examples/api.dart';
 import 'package:dart_dev/src/tasks/examples/config.dart';
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
+// TODO: Make a more generic serve task that forwards args to `pub serve`
 class ExamplesCli extends TaskCli {
   final ArgParser argParser = new ArgParser()
     ..addOption('hostname',
@@ -35,7 +37,15 @@ class ExamplesCli extends TaskCli {
 
   final String command = 'examples';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<String> getUsage() async {
+    return [
+      'dart_dev examples options',
+      '=========================',
+      '${argParser.usage}'
+    ].join('\n');
+  }
+
+  Future<CliResult> run(LenientArgResults parsedArgs) async {
     String hostname =
         TaskCli.valueOf('hostname', parsedArgs, config.examples.hostname);
     var port = TaskCli.valueOf('port', parsedArgs, config.examples.port);

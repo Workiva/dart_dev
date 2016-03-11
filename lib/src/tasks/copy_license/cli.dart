@@ -28,7 +28,9 @@ class CopyLicenseCli extends TaskCli {
 
   final String command = 'copy-license';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<String> getUsage() async => 'The copy-license task has no options.';
+
+  Future<CliResult> run(_) async {
     List<String> directories = config.copyLicense.directories;
     String licensePath = config.copyLicense.licensePath;
 

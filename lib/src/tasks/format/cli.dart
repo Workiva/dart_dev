@@ -18,8 +18,9 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter, TaskProcess;
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/format/api.dart';
 import 'package:dart_dev/src/tasks/format/config.dart';
@@ -32,13 +33,26 @@ class FormatCli extends TaskCli {
         defaultsTo: defaultCheck,
         negatable: false,
         help:
-            'Dry-run; checks if formatter needs to be run and sets exit code accordingly.')
-    ..addOption('line-length',
-        abbr: 'l', defaultsTo: '80', help: 'Wrap lines longer than this.');
+            'Dry-run; checks if formatter needs to be run and sets exit code accordingly.');
 
   final String command = 'format';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<String> getUsage() async {
+    var usage = [
+      'dart_dev format options',
+      '=======================',
+      '${argParser.usage}',
+      '',
+      'dart_style:format options',
+      '=========================',
+      '',
+    ].join('\n');
+    var process = new TaskProcess('pub', ['run', 'dart_style:format', '-h']);
+    usage += await process.stdout.join('\n');
+    return usage;
+  }
+
+  Future<CliResult> run(LenientArgResults parsedArgs) async {
     try {
       if (!platform_util.hasImmediateDependency('dart_style'))
         return new CliResult.fail(
@@ -54,17 +68,19 @@ class FormatCli extends TaskCli {
     bool check = TaskCli.valueOf('check', parsedArgs, config.format.check);
     List<String> directories = config.format.directories;
     List<String> exclude = config.format.exclude;
-    var lineLength =
-        TaskCli.valueOf('line-length', parsedArgs, config.format.lineLength);
-    if (lineLength is String) {
-      lineLength = int.parse(lineLength);
-    }
+
+    var cliArgs = parsedArgs.unknownOptions.toList()..addAll(parsedArgs.rest);
+
+    print(
+        '\nForwarding the following options and args to `pub run dart_style:format`:');
+    print(cliArgs);
 
     FormatTask task = format(
         check: check,
         directories: directories,
         exclude: exclude,
-        lineLength: lineLength);
+        lineLength: config.format.lineLength,
+        cliArgs: cliArgs);
     reporter.logGroup(task.formatterCommand,
         outputStream: task.formatterOutput);
     await task.done;

@@ -25,6 +25,7 @@ import 'package:dart_dev/src/tasks/task.dart';
 
 FormatTask format(
     {bool check: defaultCheck,
+    List<String> cliArgs: const [],
     List<String> directories: defaultDirectories,
     List<String> exclude: defaultExclude,
     int lineLength: defaultLineLength}) {
@@ -83,6 +84,8 @@ FormatTask format(
 
     args.addAll(filesToFormat);
   }
+
+  args.addAll(cliArgs);
 
   TaskProcess process = new TaskProcess(executable, args);
   FormatTask task = new FormatTask(

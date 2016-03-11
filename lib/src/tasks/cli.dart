@@ -18,6 +18,8 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
+
 class CliResult {
   final String message;
   final bool successful;
@@ -26,11 +28,12 @@ class CliResult {
 }
 
 abstract class TaskCli {
-  static valueOf(String arg, ArgResults parsedArgs, dynamic fallback) =>
+  static valueOf(String arg, LenientArgResults parsedArgs, dynamic fallback) =>
       parsedArgs.wasParsed(arg) ? parsedArgs[arg] : fallback;
 
   ArgParser get argParser;
   String get command;
 
-  Future<CliResult> run(ArgResults parsedArgs);
+  Future<String> getUsage();
+  Future<CliResult> run(LenientArgResults parsedArgs);
 }

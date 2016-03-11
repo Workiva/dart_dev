@@ -18,53 +18,45 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter, TaskProcess;
 
+import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
 import 'package:dart_dev/src/tasks/analyze/api.dart';
-import 'package:dart_dev/src/tasks/analyze/config.dart';
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
 class AnalyzeCli extends TaskCli {
-  final ArgParser argParser = new ArgParser()
-    ..addFlag('fatal-warnings',
-        defaultsTo: defaultFatalWarnings,
-        negatable: true,
-        help: 'Treat non-type warnings as fatal.')
-    ..addFlag('hints',
-        defaultsTo: defaultHints, negatable: true, help: 'Show hint results.')
-    ..addFlag('fatal-hints',
-        defaultsTo: defaultFatalHints,
-        negatable: true,
-        help: 'Treat hints as fatal.')
-    ..addFlag('strong',
-        defaultsTo: defaultStrong,
-        negatable: true,
-        help: 'Enable strong static checks (https://goo.gl/DqcBsw)');
+  static Future<String> getAnalyzerUsage() {
+    var process = new TaskProcess('dartanalyzer', ['--help']);
+    return process.stdout.join();
+  }
+
+  final ArgParser argParser = new ArgParser();
 
   final String command = 'analyze';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
-    List<String> entryPoints = config.analyze.entryPoints;
-    bool fatalWarnings = TaskCli.valueOf(
-        'fatal-warnings', parsedArgs, config.analyze.fatalWarnings);
-    bool hints = TaskCli.valueOf('hints', parsedArgs, config.analyze.hints);
-    bool fatalHints =
-        TaskCli.valueOf('fatal-hints', parsedArgs, config.analyze.fatalHints);
-    bool strong = TaskCli.valueOf('strong', parsedArgs, config.analyze.strong);
+  Future<String> getUsage() async {
+    var usage = ['dartanalyzer options', '====================', ''].join('\n');
+    var process = new TaskProcess('dartanalyzer', ['--help']);
+    usage += await process.stderr.join('\n');
+    return usage;
+  }
 
-    if (!hints && fatalHints) {
-      return new CliResult.fail('You must enable hints to fail on hints.');
-    }
+  Future<CliResult> run(LenientArgResults parsedArgs) async {
+    List<String> entryPoints = config.analyze.entryPoints;
+    var cliArgs = parsedArgs.unknownOptions.toList()..addAll(parsedArgs.rest);
+
+    print('\nForwarding the following options and args to dartanalyzer:');
+    print(cliArgs);
 
     AnalyzeTask task = analyze(
         entryPoints: entryPoints,
-        fatalWarnings: fatalWarnings,
-        hints: hints,
-        fatalHints: fatalHints,
-        strong: strong);
+        fatalWarnings: config.analyze.fatalWarnings,
+        hints: config.analyze.hints,
+        fatalHints: config.analyze.fatalHints,
+        strong: config.analyze.strong,
+        cliArgs: cliArgs);
     var title = task.analyzerCommand;
-    if (fatalHints) title += ' (treating hints as fatal)';
 
     reporter.logGroup(title, outputStream: task.analyzerOutput);
     await task.done;

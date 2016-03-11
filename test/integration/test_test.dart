@@ -81,17 +81,16 @@ void main() {
 
     test('should run individual unit test', () async {
       expect(
-          await runTests(projectWithPassingTests, files: [
-            'test/fixtures/test/passing/test/passing_unit_test.dart'
-          ]),
+          await runTests(projectWithPassingTests,
+              files: ['test/passing_unit_test.dart']),
           isTrue);
     });
 
     test('should run individual unit tests', () async {
       expect(
           await runTests(projectWithPassingTests, files: [
-            'test/fixtures/test/passing/test/passing_unit_test.dart',
-            'test/fixtures/test/passing/test/passing_unit_integration.dart'
+            'test/passing_unit_test.dart',
+            'test/passing_integration_test.dart'
           ]),
           isTrue);
     });
