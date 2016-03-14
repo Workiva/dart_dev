@@ -568,8 +568,11 @@ class CoverageTask extends Task {
           break;
         }
       }
+      await new Future.delayed(new Duration(seconds: 1));
       var observatoryPorts = await SeleniumHelper.getActiveObservatoryPorts();
-      SeleniumHelper.clearObservatoryPorts();
+      await new Future.delayed(new Duration(seconds: 1));
+
+//      SeleniumHelper.clearObservatoryPorts();
       return [port]..addAll(observatoryPorts);
     }
   }
