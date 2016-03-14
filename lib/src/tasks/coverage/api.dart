@@ -327,8 +327,13 @@ class CoverageTask extends Task {
 
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
-      Map coverageJson = JSON.decode(collections[i].readAsStringSync());
-      mergedJson['coverage'].addAll(coverageJson['coverage']);
+      String coverage = collections[i].readAsStringSync();
+      if (coverage.isEmpty) {
+        mergedJson['coverage'].addAll({});
+      } else {
+        Map coverageJson = JSON.decode(collections[i].readAsStringSync());
+        mergedJson['coverage'].addAll(coverageJson['coverage']);
+      }
     }
     _collections.deleteSync(recursive: true);
 
