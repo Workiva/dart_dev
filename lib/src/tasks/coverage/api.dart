@@ -247,6 +247,10 @@ class CoverageTask extends Task {
         process.stdout.listen((l) => _coverageOutput.add('    $l'));
         process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
         await process.done;
+        print(collection.path +
+            " " +
+            collection.readAsStringSync().isEmpty.toString());
+        print('\n');
         collections.add(collection);
       }
 
