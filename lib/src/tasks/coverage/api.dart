@@ -125,6 +125,8 @@ class CoverageTask extends Task {
   /// searching all directories for valid test files.
   List<File> _files = [];
 
+  bool _failingTest = false;
+
   /// Whether or not to generate the HTML report.
   bool _html = defaultHtml;
 
@@ -354,8 +356,13 @@ class CoverageTask extends Task {
       await _generateReport();
     }
 
-    _done.complete(
-        new CoverageResult.success(tests, collection, lcov, report: report));
+    if (_failingTest) {
+      _done.complete(
+          new CoverageResult.fail(tests, collection, lcov, report: report));
+    } else {
+      _done.complete(
+          new CoverageResult.success(tests, collection, lcov, report: report));
+    }
   }
 
   Future<List<int>> _test(File file) async {
@@ -514,6 +521,7 @@ class CoverageTask extends Task {
             observatoryPort = int.parse(m.group(2));
           }
           if (line.contains(_testsFailedPattern)) {
+            _failingTest = true;
             throw new CoverageTestSuiteException(file.path);
           }
           if (line.contains(_testsPassedPattern)) {
@@ -544,6 +552,7 @@ class CoverageTask extends Task {
           throw new CoverageTestSuiteException(file.path);
         }
         if (line.contains(_testsFailedPattern)) {
+          _failingTest = true;
           throw new CoverageTestSuiteException(file.path);
         }
         if (line.contains(_testsPassedPattern)) {

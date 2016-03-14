@@ -49,7 +49,11 @@ class TestCli extends TaskCli {
         abbr: 'p',
         allowMultiple: true,
         help:
-            'The platform(s) on which to run the tests.\n[vm (default), dartium, content-shell, chrome, phantomjs, firefox, safari]');
+            'The platform(s) on which to run the tests.\n[vm (default), dartium, content-shell, chrome, phantomjs, firefox, safari]')
+    ..addOption('name',
+        abbr: 'n',
+        help:
+            'A substring of the name of the test to run.\nRegular expression syntax is supported.');
 
   final String command = 'test';
 
@@ -86,9 +90,10 @@ class TestCli extends TaskCli {
 
     List<String> additionalArgs = [];
 
-    bool unit = parsedArgs['unit'];
+    bool unit = !isExplicitlyFalse(parsedArgs['unit']);
     bool integration = parsedArgs['integration'];
     bool functional = parsedArgs['functional'];
+    bool testNamed = parsedArgs['name'] != null;
     List<String> tests = [];
     int individualTests = 0;
 
@@ -167,6 +172,10 @@ class TestCli extends TaskCli {
               error: stdErr);
         }
       });
+    }
+
+    if (testNamed) {
+      additionalArgs.addAll(['-n', '${parsedArgs['name']}']);
     }
 
     TestTask task = test(

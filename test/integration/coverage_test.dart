@@ -30,6 +30,7 @@ const String projectWithBrowserTestsThatNeedsPubServe =
     'test_fixtures/coverage/browser_needs_pub_serve';
 const String projectWithoutCoveragePackage =
     'test_fixtures/coverage/no_coverage_package';
+const String projectWithFailingTests = 'test_fixtures/coverage/failing_test';
 
 Future<bool> runCoverage(String projectPath,
     {bool html: false, bool functional: false}) async {
@@ -47,42 +48,58 @@ Future<bool> runCoverage(String projectPath,
   args.add(html ? '--html' : '--no-html');
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
+  process.stdout.listen((l) {
+    if (!l.contains('passed') && !l.contains('failed')) {
+      print(l);
+    }
+    ;
+  });
+  process.stderr.listen((l) {
+    if (!l.contains('passed') && !l.contains('failed')) {
+      print(l);
+    }
+    ;
+  });
   await process.done;
   return (await process.exitCode) == 0;
 }
 
 void main() {
   group('Coverage Task', () {
-    test('should generate coverage for Browser tests', () async {
-      expect(await runCoverage(projectWithBrowserTests), isTrue);
-      File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
-      expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+//    test('should generate coverage for Browser tests', () async {
+//      expect(await runCoverage(projectWithBrowserTests), isTrue);
+//      File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
+//      expect(lcov.existsSync(), isTrue);
+//    }, timeout: new Timeout(new Duration(seconds: 60)));
+//
+//    test('should generate coverage for Browser tests that require a Pub server',
+//        () async {
+//      expect(
+//          await runCoverage(projectWithBrowserTestsThatNeedsPubServe), isTrue);
+//      File lcov = new File(
+//          '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
+//      expect(lcov.existsSync(), isTrue);
+//    }, timeout: new Timeout(new Duration(seconds: 60)));
+//
+//    test('should generate coverage for VM tests', () async {
+//      expect(await runCoverage(projectWithVmTests), isTrue);
+//      File lcov = new File('$projectWithVmTests/coverage/coverage.lcov');
+//      expect(lcov.existsSync(), isTrue);
+//    }, timeout: new Timeout(new Duration(seconds: 60)));
 
-    test('should generate coverage for Browser tests that require a Pub server',
-        () async {
-      expect(
-          await runCoverage(projectWithBrowserTestsThatNeedsPubServe), isTrue);
-      File lcov = new File(
-          '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
-      expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
-
-    test('should generate coverage for VM tests', () async {
-      expect(await runCoverage(projectWithVmTests), isTrue);
-      File lcov = new File('$projectWithVmTests/coverage/coverage.lcov');
-      expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
-
-    test('should fail if "coverage" package is missing', () async {
-      expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
-    });
-
-    test('should create coverage with non_test file specified', () async {
-      expect(await runCoverage(projectWithDartFile), isTrue);
-      File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
-      expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+//    test('should fail if "coverage" package is missing', () async {
+//      expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
+//    });
+//
+//    test('should fail if there is a test that fails', () async {
+//      expect(await runCoverage(projectWithFailingTests), isFalse);
+//    }, timeout: new Timeout(new Duration(seconds: 60)));
+//
+//    test('should create coverage with non_test file specified', () async {
+//      expect(await runCoverage(projectWithDartFile), isTrue);
+//      File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
+//      expect(lcov.existsSync(), isTrue);
+//    }, timeout: new Timeout(new Duration(seconds: 60)));
 
     test('should generate coverage for Functional tests', () async {
       expect(await runCoverage(projectWithFunctionalTests, functional: true),
