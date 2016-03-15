@@ -227,7 +227,7 @@ class CoverageTask extends Task {
       }
 
 //      for (int j = 0; j < observatoryPorts.length; j++) {
-      for(int j = observatoryPorts.length - 1; j>0;j--){
+      for(int j = observatoryPorts.length - 1; j>=0;j--){
         // Collect the coverage from observatory located at this port.
         File collection =
             new File(path.join(_collections.path, '${_files[i].path}$j.json'));
@@ -239,6 +239,9 @@ class CoverageTask extends Task {
           '-o',
           collection.path
         ];
+
+        print(SeleniumHelper.getActiveObservatoryPorts());
+        print(observatoryPorts);
 
         print(collection.existsSync());
 
