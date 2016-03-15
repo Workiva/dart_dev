@@ -258,7 +258,8 @@ class CoverageTask extends Task {
 
       // Kill off any child selenium processes that may have been spawned for
       // functional tests.
-      await SeleniumHelper.killChildrenProcesses();
+      await new Future.delayed(new Duration(seconds: 3));
+//      await SeleniumHelper.killChildrenProcesses();
     }
     // Merge all individual coverage collection files into one.
     _collection = _merge(collections);
@@ -568,9 +569,9 @@ class CoverageTask extends Task {
           break;
         }
       }
-      await new Future.delayed(new Duration(seconds: 1));
+      await new Future.delayed(new Duration(seconds: 3));
       var observatoryPorts = await SeleniumHelper.getActiveObservatoryPorts();
-      await new Future.delayed(new Duration(seconds: 1));
+      await new Future.delayed(new Duration(seconds: 3));
 
 //      SeleniumHelper.clearObservatoryPorts();
       return [port]..addAll(observatoryPorts);
