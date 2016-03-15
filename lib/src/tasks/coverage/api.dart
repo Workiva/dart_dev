@@ -239,6 +239,8 @@ class CoverageTask extends Task {
           collection.path
         ];
 
+        print(collection.existsSync());
+
         _coverageOutput.add('');
         _coverageOutput.add('Collecting coverage for ${_files[i].path}');
         _coverageOutput.add('$executable ${args.join(' ')}\n');
@@ -249,10 +251,11 @@ class CoverageTask extends Task {
 
         await process.done;
 
-        print(process.exitCode);
+        print(await process.exitCode);
 
-        while(collection.lengthSync() == 0){
-          await new Future.delayed(new Duration(milliseconds: 1));
+        while(await collection.length() == 0){
+          await new Future.delayed(new Duration(milliseconds: 1000));
+          print('waiting');
         }
 
         print(collection.path +
