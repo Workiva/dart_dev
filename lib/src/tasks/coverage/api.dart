@@ -240,10 +240,8 @@ class CoverageTask extends Task {
           collection.path
         ];
 
-        print(SeleniumHelper.getActiveObservatoryPorts());
+        print(await SeleniumHelper.getActiveObservatoryPorts());
         print(observatoryPorts);
-
-        print(collection.existsSync());
 
         _coverageOutput.add('');
         _coverageOutput.add('Collecting coverage for ${_files[i].path}');
@@ -251,11 +249,17 @@ class CoverageTask extends Task {
 
         process = new TaskProcess(executable, args);
         process.stdout.listen((l) => _coverageOutput.add('    $l'));
-        process.stderr.listen((l) => _coverageOutput.add('err $l'));
+        process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
 
         await process.done;
 
-        print(await process.exitCode);
+//        await new Future.delayed(new Duration(seconds: 30));
+
+        if(collection.lengthSync() == 0){
+          await new Future.delayed(new Duration(seconds: 5));
+          print("waited");
+          print(collection.lengthSync());
+        }
 
         print(collection.path +
             " " +
