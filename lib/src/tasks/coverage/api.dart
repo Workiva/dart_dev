@@ -246,15 +246,22 @@ class CoverageTask extends Task {
         process = new TaskProcess(executable, args);
         process.stdout.listen((l) => _coverageOutput.add('    $l'));
         process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
+
         await process.done;
+
+        while(collection.lengthSync() == 0){
+          await new Future.delayed(new Duration(milliseconds: 1));
+        }
+
         print(collection.path +
             " " +
             collection.readAsStringSync().isEmpty.toString());
         print('\n');
+        print(collection.existsSync());
         collections.add(collection);
       }
 
-      await new Future.delayed(new Duration(seconds: 3));
+//      await new Future.delayed(new Duration(seconds: 3));
       _killTest();
 
       // Kill off any child selenium processes that may have been spawned for
