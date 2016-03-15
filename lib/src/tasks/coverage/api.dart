@@ -254,7 +254,7 @@ class CoverageTask extends Task {
         collections.add(collection);
       }
 
-      _killTest();
+//      _killTest();
 
       // Kill off any child selenium processes that may have been spawned for
       // functional tests.
