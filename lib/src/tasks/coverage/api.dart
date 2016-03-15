@@ -226,7 +226,8 @@ class CoverageTask extends Task {
         continue;
       }
 
-      for (int j = 0; j < observatoryPorts.length; j++) {
+//      for (int j = 0; j < observatoryPorts.length; j++) {
+      for(int j = observatoryPorts.length - 1; j>0;j--){
         // Collect the coverage from observatory located at this port.
         File collection =
             new File(path.join(_collections.path, '${_files[i].path}$j.json'));
@@ -252,11 +253,6 @@ class CoverageTask extends Task {
         await process.done;
 
         print(await process.exitCode);
-
-        while(await collection.length() == 0){
-          await new Future.delayed(new Duration(milliseconds: 1000));
-          print('waiting');
-        }
 
         print(collection.path +
             " " +
