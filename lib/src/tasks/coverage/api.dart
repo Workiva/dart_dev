@@ -245,9 +245,11 @@ class CoverageTask extends Task {
 
         process = new TaskProcess(executable, args);
         process.stdout.listen((l) => _coverageOutput.add('    $l'));
-        process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
+        process.stderr.listen((l) => _coverageOutput.add('err $l'));
 
         await process.done;
+
+        print(process.exitCode);
 
         while(collection.lengthSync() == 0){
           await new Future.delayed(new Duration(milliseconds: 1));
@@ -257,7 +259,6 @@ class CoverageTask extends Task {
             " " +
             collection.readAsStringSync().isEmpty.toString());
         print('\n');
-        print(collection.existsSync());
         collections.add(collection);
       }
 
