@@ -275,6 +275,8 @@ class CoverageTask extends Task {
       // Kill off any child selenium processes that may have been spawned for
       // functional tests.
       await SeleniumHelper.killChildrenProcesses();
+      await new Future.delayed(new Duration(seconds: 3));
+
       print(
           'selenium ports after tests are done ${await SeleniumHelper.getActiveObservatoryPorts()}');
     }
