@@ -62,6 +62,7 @@ class TaskProcess {
 
   Future<bool> killAllChildren(
       [ProcessSignal signal = ProcessSignal.SIGTERM]) async {
+    print('killing selenium');
     List<int> cpids = await _getChildPids();
     cpids.remove(_process.pid);
     List<String> args = ['-${signal.toString()}'];
