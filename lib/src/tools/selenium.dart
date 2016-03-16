@@ -121,6 +121,8 @@ class SeleniumHelper {
           {'jsonrpc': '2.0', 'method': 'getVM', 'params': {}, 'id': uuid,}));
       return c.future;
     } catch (e) {
+      print(e);
+      print(e.description);
       return false;
     }
   }
