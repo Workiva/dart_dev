@@ -106,6 +106,7 @@ class SeleniumHelper {
       var uuid = _uuidGenerator.v1();
       ws.listen((message) {
         var response = JSON.decode(message);
+        print('reponse id ${response['id']} equals uuid $uuid, ${response['id'] != uuid}');
         if (response['id'] != uuid) return;
         print('result ${response['result']}');
         print('isList ${response['result']['isolates'] is List}');
