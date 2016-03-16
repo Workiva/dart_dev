@@ -227,7 +227,7 @@ class CoverageTask extends Task {
       }
 
 //      for (int j = 0; j < observatoryPorts.length; j++) {
-      for(int j = observatoryPorts.length - 1; j>=0;j--){
+      for (int j = observatoryPorts.length - 1; j >= 0; j--) {
         // Collect the coverage from observatory located at this port.
         File collection =
             new File(path.join(_collections.path, '${_files[i].path}$j.json'));
@@ -240,8 +240,9 @@ class CoverageTask extends Task {
           collection.path
         ];
 
-        print(await SeleniumHelper.getActiveObservatoryPorts());
-        print(observatoryPorts);
+        print(
+            'selenium ports ${await SeleniumHelper.getActiveObservatoryPorts()}');
+        print('observatory ports $observatoryPorts');
 
         _coverageOutput.add('');
         _coverageOutput.add('Collecting coverage for ${_files[i].path}');
@@ -255,7 +256,7 @@ class CoverageTask extends Task {
 
 //        await new Future.delayed(new Duration(seconds: 30));
 
-        if(collection.lengthSync() == 0){
+        if (collection.lengthSync() == 0) {
           await new Future.delayed(new Duration(seconds: 5));
           print("waited");
           print(collection.lengthSync());
@@ -346,7 +347,7 @@ class CoverageTask extends Task {
 
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
-      if(!collections[i].existsSync()) continue;
+      if (!collections[i].existsSync()) continue;
       String coverage = collections[i].readAsStringSync();
       if (coverage.isEmpty) {
 //        mergedJson['coverage'].addAll({});

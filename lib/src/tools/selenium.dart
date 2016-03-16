@@ -107,6 +107,10 @@ class SeleniumHelper {
       ws.listen((message) {
         var response = JSON.decode(message);
         if (response['id'] != uuid) return;
+        print('result ${response['result']}');
+        print('isList ${response['result']['isolates'] is List}');
+        print('isNotEmpty ${response['result']['isolates'].isNotEmpty}');
+
         c.complete(response['result'] != null &&
             response['result']['isolates'] is List &&
             response['result']['isolates'].isNotEmpty);
