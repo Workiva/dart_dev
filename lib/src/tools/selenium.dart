@@ -85,6 +85,7 @@ class SeleniumHelper {
       }
     }
     for (int port in inactivePorts) {
+      print('removing $port');
       _observatoryPorts.remove(port);
     }
     return activePorts;
