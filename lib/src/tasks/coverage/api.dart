@@ -345,6 +345,7 @@ class CoverageTask extends Task {
 
   void _killTest() {
     if (_lastTestProcess != null) {
+      _lastTestProcess.killAllChildren();
       _lastTestProcess.kill();
     }
     _lastTestProcess = null;
