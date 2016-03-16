@@ -68,6 +68,7 @@ class TaskProcess {
     List<String> args = ['-${signal.toString()}'];
     args.addAll(cpids.map((pid) => pid.toString()));
     TaskProcess killTask = new TaskProcess('kill', args);
+    print(cpids);
     return (await killTask.exitCode) == 0;
   }
 
