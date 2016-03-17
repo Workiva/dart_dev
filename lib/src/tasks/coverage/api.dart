@@ -259,7 +259,6 @@ class CoverageTask extends Task {
       // Kill off any child selenium processes that may have been spawned for
       // functional tests.
       await SeleniumHelper.killChildrenProcesses();
-
     }
     // Merge all individual coverage collection files into one.
     _collection = _merge(collections);

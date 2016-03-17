@@ -62,13 +62,11 @@ class TaskProcess {
 
   Future<bool> killAllChildren(
       [ProcessSignal signal = ProcessSignal.SIGTERM]) async {
-    print('killing selenium');
     List<int> cpids = await _getChildPids();
     cpids.remove(_process.pid);
     List<String> args = ['-${signal.toString()}'];
     args.addAll(cpids.map((pid) => pid.toString()));
     TaskProcess killTask = new TaskProcess('kill', args);
-    print(cpids);
     return (await killTask.exitCode) == 0;
   }
 
@@ -82,14 +80,14 @@ class TaskProcess {
       args = [];
       args.add('-P');
       args.add(pid.toString());
-      var pgrep = new TaskProcess(executable,args);
+      var pgrep = new TaskProcess(executable, args);
       pgrep.stdout.listen((l) {
         cpids.add(int.parse(l));
       });
       pgrep.stderr.listen(print);
       pgreps.add(pgrep);
     }
-    for(int i=0;i<pgreps.length;i++){
+    for (int i = 0; i < pgreps.length; i++) {
       await pgreps[i].done;
     }
     if (cpids.isNotEmpty) {
