@@ -77,6 +77,7 @@ class TaskProcess {
     String executable = 'pgrep';
     List<TaskProcess> pgreps = [];
     var args = [];
+    List<int> cpids = [];
     for (int pid in pids) {
       args = [];
       args.add('-P');
@@ -90,7 +91,6 @@ class TaskProcess {
       pgreps.add(pgrep);
       print(executable + args.toString());
     }
-    List<int> cpids = [];
     for(int i=0;i<pgreps.length;i++){
       await pgreps[i].done;
     }
