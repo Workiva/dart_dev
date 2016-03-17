@@ -82,7 +82,9 @@ class TaskProcess {
     }
     var pgrep = new TaskProcess(executable, args);
     List<int> cpids = [];
+    print(executable + args.toString());
     pgrep.stdout.listen((l) {
+      print(l);
       cpids.add(int.parse(l));
     });
     pgrep.stderr.listen(print);
