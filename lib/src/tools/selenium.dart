@@ -85,7 +85,6 @@ class SeleniumHelper {
       }
     }
     for (int port in inactivePorts) {
-      print('removing $port');
       _observatoryPorts.remove(port);
     }
     return activePorts;
@@ -107,13 +106,6 @@ class SeleniumHelper {
       var uuid = _uuidGenerator.v1();
       ws.listen((message) {
         var response = JSON.decode(message);
-        print(
-            'reponse id ${response['id']} equals uuid $uuid, ${response['id'] != uuid}');
-        if (response['id'] != uuid) return;
-        print('result ${response['result']}');
-        print('isList ${response['result']['isolates'] is List}');
-        print('isNotEmpty ${response['result']['isolates'].isNotEmpty}');
-
         c.complete(response['result'] != null &&
             response['result']['isolates'] is List &&
             response['result']['isolates'].isNotEmpty);
@@ -122,7 +114,6 @@ class SeleniumHelper {
           {'jsonrpc': '2.0', 'method': 'getVM', 'params': {}, 'id': uuid,}));
       return c.future;
     } catch (e) {
-      print('port $port, $e');
       return false;
     }
   }

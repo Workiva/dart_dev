@@ -240,10 +240,6 @@ class CoverageTask extends Task {
           collection.path
         ];
 
-        print(
-            'selenium ports ${await SeleniumHelper.getActiveObservatoryPorts()}');
-        print('observatory ports $observatoryPorts');
-
         _coverageOutput.add('');
         _coverageOutput.add('Collecting coverage for ${_files[i].path}');
         _coverageOutput.add('$executable ${args.join(' ')}\n');
@@ -254,18 +250,6 @@ class CoverageTask extends Task {
 
         await process.done;
 
-//        await new Future.delayed(new Duration(seconds: 30));
-
-        if (collection.lengthSync() == 0) {
-          await new Future.delayed(new Duration(seconds: 5));
-          print("waited");
-          print(collection.lengthSync());
-        }
-
-        print(collection.path +
-            " " +
-            collection.readAsStringSync().isEmpty.toString());
-        print('\n');
         collections.add(collection);
       }
 
@@ -274,19 +258,8 @@ class CoverageTask extends Task {
 
       // Kill off any child selenium processes that may have been spawned for
       // functional tests.
-      TaskProcess tp = new TaskProcess('ps',['-ef']);
-      tp.stdout.listen((l){print(l);});
-      await tp.done;
-
       await SeleniumHelper.killChildrenProcesses();
-      await new Future.delayed(new Duration(seconds: 3));
 
-      tp = new TaskProcess('ps',['-ef']);
-      tp.stdout.listen((l){print(l);});
-      await tp.done;
-
-      print(
-          'selenium ports after tests are done ${await SeleniumHelper.getActiveObservatoryPorts()}');
     }
     // Merge all individual coverage collection files into one.
     _collection = _merge(collections);

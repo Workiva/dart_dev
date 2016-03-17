@@ -84,12 +84,10 @@ class TaskProcess {
       args.add(pid.toString());
       var pgrep = new TaskProcess(executable,args);
       pgrep.stdout.listen((l) {
-        print(l);
         cpids.add(int.parse(l));
       });
       pgrep.stderr.listen(print);
       pgreps.add(pgrep);
-      print(executable + args.toString());
     }
     for(int i=0;i<pgreps.length;i++){
       await pgreps[i].done;
