@@ -21,16 +21,16 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
-const String projectWithDartFile = 'test/fixtures/coverage/non_test_file';
-const String projectWithVmTests = 'test/fixtures/coverage/browser';
-const String projectWithBrowserTests = 'test/fixtures/coverage/vm';
+const String projectWithDartFile = 'test_fixtures/coverage/non_test_file';
+const String projectWithVmTests = 'test_fixtures/coverage/browser';
+const String projectWithBrowserTests = 'test_fixtures/coverage/vm';
 const String projectWithFunctionalTests =
-    'test/fixtures/coverage/functional_test/';
+    'test_fixtures/coverage/functional_test/';
 const String projectWithBrowserTestsThatNeedsPubServe =
-    'test/fixtures/coverage/browser_needs_pub_serve';
+    'test_fixtures/coverage/browser_needs_pub_serve';
 const String projectWithoutCoveragePackage =
-    'test/fixtures/coverage/no_coverage_package';
-const String projectWithFailingTests = 'test/fixtures/coverage/failing_test';
+    'test_fixtures/coverage/no_coverage_package';
+const String projectWithFailingTests = 'test_fixtures/coverage/failing_test';
 
 Future<bool> runCoverage(String projectPath,
     {bool html: false, bool functional: false}) async {
@@ -43,12 +43,11 @@ Future<bool> runCoverage(String projectPath,
   List args = ['run', 'dart_dev', 'coverage'];
   if (functional) {
     args.add('--functional');
+    args.add('--no-unit');
   }
   args.add(html ? '--html' : '--no-html');
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
-  process.stdout.listen((l){if(!l.contains('passed') && !l.contains('failed')){print(l);};});
-  process.stderr.listen((l){if(!l.contains('passed') && !l.contains('failed')){print(l);};});
   await process.done;
   return (await process.exitCode) == 0;
 }
@@ -96,7 +95,7 @@ void main() {
       File lcov =
           new File('$projectWithFunctionalTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 300)));
 
 //    TODO: Will need to mock out the `genhtml` command as well.
 //    test('should not fail if "lcov" is installed and --html is set', () async {

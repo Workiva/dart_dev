@@ -73,18 +73,23 @@ class TaskProcess {
   Future<List<int>> _getChildPids({List<int> pids}) async {
     pids = pids ?? [_process.pid];
     String executable = 'pgrep';
+    List<TaskProcess> pgreps = [];
     var args = [];
+    List<int> cpids = [];
     for (int pid in pids) {
+      args = [];
       args.add('-P');
       args.add(pid.toString());
+      var pgrep = new TaskProcess(executable, args);
+      pgrep.stdout.listen((l) {
+        cpids.add(int.parse(l));
+      });
+      pgrep.stderr.listen(print);
+      pgreps.add(pgrep);
     }
-    var pgrep = new TaskProcess(executable, args);
-    List<int> cpids = [];
-    pgrep.stdout.listen((l) {
-      cpids.add(int.parse(l));
-    });
-    pgrep.stderr.listen(print);
-    await pgrep.done;
+    for (int i = 0; i < pgreps.length; i++) {
+      await pgreps[i].done;
+    }
     if (cpids.isNotEmpty) {
       cpids.addAll(await _getChildPids(pids: cpids));
     }

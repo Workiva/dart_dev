@@ -1,5 +1,0 @@
-name: no_examples_dir
-version: 0.0.0
-dev_dependencies:
-  dart_dev:
-    path: ../../../..

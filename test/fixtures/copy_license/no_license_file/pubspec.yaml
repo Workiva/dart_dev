@@ -1,5 +1,0 @@
-name: copy_license_no_license_file
-version: 0.0.0
-dev_dependencies:
-  dart_dev:
-    path: ../../../..

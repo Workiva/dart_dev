@@ -10,10 +10,11 @@ pubspec.lock
 /coverage/
 
 # generated assets in test fixtures
-/test/fixtures/coverage/browser/coverage/
-/test/fixtures/coverage/functional_test/coverage
-/test/fixtures/coverage/browser_needs_pub_serve/coverage/
-/test/fixtures/coverage/failing_test/coverage/
-/test/fixtures/coverage/non_test_file/coverage/
-/test/fixtures/coverage/vm/coverage/
-/test/fixtures/docs/docs/doc/api/
+/test_fixtures/fixtures/coverage/browser/coverage/
+/test_fixtures/coverage/functional_test/coverage
+/test_fixtures/fixtures/coverage/browser_needs_pub_serve/coverage/
+/test_fixtures/fixtures/coverage/failing_test/coverage/
+/test_fixtures/fixtures/coverage/failing_test/test/failing_test.dart.temp.html
+/test_fixtures/fixtures/coverage/non_test_file/coverage/
+/test_fixtures/fixtures/coverage/vm/coverage/
+/test_fixtures/fixtures/docs/docs/doc/api/
