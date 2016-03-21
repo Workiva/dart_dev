@@ -22,11 +22,13 @@ import 'package:dart_dev/util.dart' show Reporter, TaskProcess, getOpenPort;
 import 'package:path/path.dart' as path;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
+import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
+import 'package:dart_dev/src/tools/selenium.dart';
 
 const String _dartFilePattern = '.dart';
 const String _testFilePattern = '_test.dart';
@@ -98,7 +100,7 @@ class CoverageTask extends Task {
       String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) {
     CoverageTask coverage = new CoverageTask._(tests, reportOn,
-        pubServe: pubServe, html: html, output: output);
+        html: html, output: output, pubServe: pubServe);
     coverage._run();
     return coverage;
   }
@@ -148,8 +150,8 @@ class CoverageTask extends Task {
 
   CoverageTask._(List<String> tests, List<String> reportOn,
       {bool html: defaultHtml,
-      bool this.pubServe: defaultPubServe,
-      String output: defaultOutput})
+      String output: defaultOutput,
+      bool this.pubServe: defaultPubServe})
       : _html = html,
         _outputDirectory = new Directory(output),
         _reportOn = reportOn {
@@ -213,41 +215,48 @@ class CoverageTask extends Task {
   Future _collect() async {
     List<File> collections = [];
     for (int i = 0; i < _files.length; i++) {
-      File collection =
-          new File(path.join(_collections.path, '${_files[i].path}.json'));
-      int observatoryPort;
+      List<int> observatoryPorts;
+      TaskProcess process;
 
       // Run the test and obtain the observatory port for coverage collection.
       try {
-        observatoryPort = await _test(_files[i]);
+        observatoryPorts = await _test(_files[i]);
       } on CoverageTestSuiteException {
         _coverageErrorOutput.add('Tests failed: ${_files[i].path}');
         continue;
       }
 
-      // Collect the coverage from observatory.
-      String executable = 'pub';
-      List args = [
-        'run',
-        'coverage:collect_coverage',
-        '--port=${observatoryPort}',
-        '-o',
-        collection.path
-      ];
+//      for (int j = 0; j < observatoryPorts.length; j++) {
+      for (int j = observatoryPorts.length - 1; j >= 0; j--) {
+        // Collect the coverage from observatory located at this port.
+        File collection =
+            new File(path.join(_collections.path, '${_files[i].path}$j.json'));
+        String executable = 'pub';
+        List args = [
+          'run',
+          'coverage:collect_coverage',
+          '--port=${observatoryPorts[j]}',
+          '-o',
+          collection.path
+        ];
 
-      _coverageOutput.add('');
-      _coverageOutput.add('Collecting coverage for ${_files[i].path}');
-      _coverageOutput.add('$executable ${args.join(' ')}\n');
+        _coverageOutput.add('');
+        _coverageOutput.add('Collecting coverage for ${_files[i].path}');
+        _coverageOutput.add('$executable ${args.join(' ')}\n');
 
-      TaskProcess process = new TaskProcess(executable, args);
-      process.stdout.listen((l) => _coverageOutput.add('    $l'));
-      process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
-      await process.done;
+        process = new TaskProcess(executable, args);
+        process.stdout.listen((l) => _coverageOutput.add('    $l'));
+        process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
+        await process.done;
+        collections.add(collection);
+      }
+
       _killTest();
-      if (await process.exitCode > 0) continue;
-      collections.add(collection);
-    }
 
+      // Kill off any child selenium processes that may have been spawned for
+      // functional tests.
+      await SeleniumHelper.killChildrenProcesses();
+    }
     // Merge all individual coverage collection files into one.
     _collection = _merge(collections);
   }
@@ -304,9 +313,11 @@ class CoverageTask extends Task {
   }
 
   void _killTest() {
-    _lastTestProcess.kill();
+    if (_lastTestProcess != null) {
+      _lastTestProcess.kill();
+    }
     _lastTestProcess = null;
-    if (_lastHtmlFile != null) {
+    if (_lastHtmlFile != null && _lastHtmlFile.existsSync()) {
       _lastHtmlFile.deleteSync();
     }
   }
@@ -317,8 +328,14 @@ class CoverageTask extends Task {
 
     Map mergedJson = JSON.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
-      Map coverageJson = JSON.decode(collections[i].readAsStringSync());
-      mergedJson['coverage'].addAll(coverageJson['coverage']);
+      if (!collections[i].existsSync()) continue;
+      String coverage = collections[i].readAsStringSync();
+      if (coverage.isEmpty) {
+//        mergedJson['coverage'].addAll({});
+      } else {
+        Map coverageJson = JSON.decode(collections[i].readAsStringSync());
+        mergedJson['coverage'].addAll(coverageJson['coverage']);
+      }
     }
     _collections.deleteSync(recursive: true);
 
@@ -330,6 +347,8 @@ class CoverageTask extends Task {
     coverage.writeAsStringSync(JSON.encode(mergedJson));
     return coverage;
   }
+
+  List<int> observatoryPort;
 
   Future _run() async {
     if (_html && !(await platform_util.isExecutableInstalled('lcov'))) {
@@ -353,7 +372,7 @@ class CoverageTask extends Task {
     }
   }
 
-  Future<int> _test(File file) async {
+  Future<List<int>> _test(File file) async {
     // Look for a correlating HTML file.
     String htmlPath = file.absolute.path;
     htmlPath = htmlPath.substring(0, htmlPath.length - '.dart'.length);
@@ -434,7 +453,8 @@ class CoverageTask extends Task {
           _coverageOutput.add('Starting Pub server...');
 
           // Start `pub serve` on the `test` directory.
-          pubServeTask = startPubServe(additionalArgs: ['test']);
+          pubServeTask = startPubServe(
+              port: config.test.pubServePort, additionalArgs: ['test']);
 
           _coverageOutput.add('::: ${pubServeTask.command}');
           String indentLine(String line) => '    $line';
@@ -515,7 +535,7 @@ class CoverageTask extends Task {
             break;
           }
         }
-        return observatoryPort;
+        return [observatoryPort];
       } finally {
         pubServeTask?.stop();
       }
@@ -546,8 +566,9 @@ class CoverageTask extends Task {
           break;
         }
       }
-
-      return port;
+      var observatoryPorts = await SeleniumHelper.getActiveObservatoryPorts();
+      SeleniumHelper.clearObservatoryPorts();
+      return [port]..addAll(observatoryPorts);
     }
   }
 }

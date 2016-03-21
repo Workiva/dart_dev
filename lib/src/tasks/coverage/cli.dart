@@ -36,6 +36,9 @@ class CoverageCli extends TaskCli {
     ..addFlag('integration',
         defaultsTo: defaultIntegration,
         help: 'Includes the integration test suite.')
+    ..addFlag('functional',
+        defaultsTo: defaultFunctional,
+        help: 'Includes the functional test suite.')
     ..addFlag('html',
         negatable: true,
         defaultsTo: defaultHtml,
@@ -58,10 +61,11 @@ class CoverageCli extends TaskCli {
 
     bool unit = parsedArgs['unit'];
     bool integration = parsedArgs['integration'];
+    bool functional = parsedArgs['functional'];
 
-    if (!unit && !integration) {
+    if (!unit && !integration && !functional) {
       return new CliResult.fail(
-          'No tests were selected. Include at least one of --unit or --integration.');
+          'No tests were selected. Include at least one of --unit, --integration or --functional.');
     }
 
     bool html = TaskCli.valueOf('html', parsedArgs, config.coverage.html);
@@ -70,11 +74,15 @@ class CoverageCli extends TaskCli {
     bool open = TaskCli.valueOf('open', parsedArgs, true);
 
     List<String> tests = [];
+
     if (unit) {
       tests.addAll(config.test.unitTests);
     }
     if (integration) {
       tests.addAll(config.test.integrationTests);
+    }
+    if (functional) {
+      tests.addAll(config.test.functionalTests);
     }
     if (tests.isEmpty) {
       if (unit && config.test.unitTests.isEmpty) {
@@ -84,6 +92,10 @@ class CoverageCli extends TaskCli {
       if (integration && config.test.integrationTests.isEmpty) {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
+      }
+      if (functional && config.test.functionalTests.isEmpty) {
+        return new CliResult.fail(
+            'This project does not specify any functional tests.');
       }
     }
 
@@ -99,6 +111,8 @@ class CoverageCli extends TaskCli {
       result = await task.done;
     } on MissingLcovException catch (e) {
       return new CliResult.fail(e.message);
+    } catch (e) {
+      return new CliResult.fail(e.toString());
     }
 
     if (result.successful && html && open) {

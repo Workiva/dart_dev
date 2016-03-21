@@ -19,6 +19,7 @@ import 'dart:async';
 import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
+import 'package:dart_dev/src/tools/selenium.dart' show SeleniumHelper;
 
 TestTask test(
     {int concurrency,
@@ -46,12 +47,13 @@ TestTask test(
   // RegExp resultPattern = new RegExp(r'(\d+:\d+) \+(\d+) ?~?(\d+)? ?-?(\d+)?: (All|Some) tests (failed|passed)');
 
   StreamController stdoutc = new StreamController();
-  process.stdout.listen((line) {
+  process.stdout.listen((line) async {
     stdoutc.add(line);
     if ((line.contains('All tests passed!') ||
             line.contains('Some tests failed.')) &&
         !outputProcessed.isCompleted) {
       task.testSummary = line;
+      await SeleniumHelper.killChildrenProcesses();
       outputProcessed.complete();
     }
   });
