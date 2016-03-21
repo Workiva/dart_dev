@@ -574,7 +574,7 @@ class CoverageTask extends Task {
       var observatoryPorts = await SeleniumHelper.getActiveObservatoryPorts();
 //      await new Future.delayed(new Duration(seconds: 3));
 
-      SeleniumHelper.clearObservatoryPorts();
+//      SeleniumHelper.clearObservatoryPorts();
       return [port]..addAll(observatoryPorts);
     }
   }
