@@ -140,7 +140,8 @@ Future _run(List<String> args) async {
 
   TaskConfig config = _cliConfigs[task];
   await _runAll(config.before);
-  CliResult result = await _cliTasks[task].run(env.command);
+  CliResult result =
+      await _cliTasks[task].run(env.command, color: env['color']);
   await _runAll(config.after);
 
   reporter.log('');

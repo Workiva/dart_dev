@@ -26,7 +26,7 @@ class InitCli extends TaskCli {
 
   final String command = 'init';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     InitTask task = init();
     await task.done;
     return task.successful

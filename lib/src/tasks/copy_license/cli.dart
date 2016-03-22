@@ -28,7 +28,7 @@ class CopyLicenseCli extends TaskCli {
 
   final String command = 'copy-license';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     List<String> directories = config.copyLicense.directories;
     String licensePath = config.copyLicense.licensePath;
 

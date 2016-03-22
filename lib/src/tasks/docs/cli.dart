@@ -31,7 +31,7 @@ class DocsCli extends TaskCli {
 
   final String command = 'docs';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (!hasImmediateDependency('dartdoc'))
       return new CliResult.fail(
           'Package "dartdoc" must be an immediate dependency in order to run its executables.');

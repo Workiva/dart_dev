@@ -44,7 +44,7 @@ class AnalyzeCli extends TaskCli {
 
   final String command = 'analyze';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     List<String> entryPoints = config.analyze.entryPoints;
     bool fatalWarnings = TaskCli.valueOf(
         'fatal-warnings', parsedArgs, config.analyze.fatalWarnings);
