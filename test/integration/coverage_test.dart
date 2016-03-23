@@ -48,6 +48,19 @@ Future<bool> runCoverage(String projectPath,
   args.add(html ? '--html' : '--no-html');
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
+  process.stdout.listen((l) {
+    if (!l.contains('passed') && !l.contains('failed')) {
+      print(l);
+    }
+    ;
+  });
+  process.stderr.listen((l) {
+    if (!l.contains('passed') && !l.contains('failed')) {
+      print(l);
+    }
+    ;
+  });
+
   await process.done;
   return (await process.exitCode) == 0;
 }

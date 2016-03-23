@@ -93,6 +93,7 @@ class TaskProcess {
     if (cpids.isNotEmpty) {
       cpids.addAll(await _getChildPids(pids: cpids));
     }
+    print(cpids);
     return cpids;
   }
 }
