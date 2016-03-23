@@ -15,6 +15,6 @@ script:
   - pub get
   - pub build
   - cd -
-  - pub run dart_dev test --integration test/integration/coverage_test.dart
+  - pub run dart_dev test --integration
   - pub run dart_dev coverage --integration --no-html
   - bash <(curl -s https://codecov.io/bash) -f coverage/coverage.lcov
