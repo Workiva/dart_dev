@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.2](https://github.com/Workiva/dart_dev/compare/1.1.1...1.1.2)
+_March 22, 2016_
+
+- **Bug fix:** The test reporter output now respects the `--no-color` flag.
+
+- **Bug fix:** The test task was previously running the unit test suite even
+  when it was disabled. This has been fixed. Additionally, passing in individual
+  test files/directories overrides the unit and integration suites.
+
 ## [1.1.1](https://github.com/Workiva/dart_dev/compare/1.1.0...1.1.1)
 _February 24, 2016_
 

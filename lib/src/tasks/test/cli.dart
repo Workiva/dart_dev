@@ -15,7 +15,6 @@
 library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:args/args.dart';
 
@@ -54,44 +53,21 @@ class TestCli extends TaskCli {
 
   final String command = 'test';
 
-  bool hasRestParams(ArgResults parsedArgs) {
-    return parsedArgs.rest.length > 0;
-  }
-
-  Future addToTestsFromRest(List<String> tests, List<String> rest) async {
-    int restLength = rest.length;
-    int individualTests = 0;
-    //verify this is a test-file and it exists.
-    for (var i = 0; i < restLength; i++) {
-      String filePath = rest[i];
-      await new File(filePath).exists().then((bool exists) {
-        if (exists) {
-          individualTests++;
-          tests.add(filePath);
-        } else {
-          print("Ignoring unknown argument");
-        }
-      });
-    }
-    return individualTests;
-  }
-
   bool isExplicitlyFalse(bool value) {
     return value != null && value == false;
   }
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (!platform_util.hasImmediateDependency('test'))
       return new CliResult.fail(
           'Package "test" must be an immediate dependency in order to run its executables.');
 
     List<String> additionalArgs = [];
-
-    bool unit = !isExplicitlyFalse(parsedArgs['unit']);
-    bool integration = parsedArgs['integration'];
-    bool testNamed = parsedArgs['name'] != null;
     List<String> tests = [];
-    int individualTests = 0;
+
+    if (!color) {
+      additionalArgs.add('--no-color');
+    }
 
     bool pubServe =
         TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
@@ -104,20 +80,37 @@ class TestCli extends TaskCli {
     List<String> platforms =
         TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
 
-    if (hasRestParams(parsedArgs)) {
-      individualTests = await addToTestsFromRest(tests, parsedArgs.rest);
-    }
+    // CLI user can specify individual test files to run.
+    bool individualTestsSpecified = parsedArgs.rest.isNotEmpty;
 
-    if (isExplicitlyFalse(unit) && !integration && individualTests == 0) {
+    // The unit test suite should be run by default.
+    bool unit = parsedArgs['unit'] ?? true;
+
+    // The integration suite should only be run if the --integration is set.
+    bool integration = parsedArgs['integration'] ?? false;
+
+    // CLI user can filter tests by name.
+    bool testNamed = parsedArgs['name'] != null;
+
+    if (!individualTestsSpecified && !unit && !integration) {
       return new CliResult.fail(
-          'No tests were selected. Include at least one of --unit or --integration.');
+          'No tests were selected. Include at least one of --unit or '
+          '--integration, or pass in one or more test files/directories');
     }
 
-    if (unit) {
-      tests.addAll(config.test.unitTests);
-    }
-    if (integration) {
-      tests.addAll(config.test.integrationTests);
+    // Build the list of tests to run.
+    if (individualTestsSpecified) {
+      // Individual tests explicitly passed in should override the test suites.
+      tests.addAll(parsedArgs.rest);
+    } else {
+      // Unit and/or integration suites should only run if individual tests
+      // were not specified.
+      if (unit) {
+        tests.addAll(config.test.unitTests);
+      }
+      if (integration) {
+        tests.addAll(config.test.integrationTests);
+      }
     }
 
     if (tests.isEmpty) {
