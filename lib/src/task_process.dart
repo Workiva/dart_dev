@@ -64,10 +64,15 @@ class TaskProcess {
       [ProcessSignal signal = ProcessSignal.SIGTERM]) async {
     List<int> cpids = await _getChildPids();
     cpids.remove(_process.pid);
-    List<String> args = ['-${signal.toString()}'];
-    args.addAll(cpids.map((pid) => pid.toString()));
-    TaskProcess killTask = new TaskProcess('kill', args);
-    return (await killTask.exitCode) == 0;
+    bool killed = true;
+    for(int i = 0;i <cpids.length;i++){
+      killed = killed && Process.killPid(cpids[i],signal);
+    }
+    return killed;
+//    List<String> args = ['-${signal.toString()}'];
+//    args.addAll(cpids.map((pid) => pid.toString()));
+//    TaskProcess killTask = new TaskProcess('kill', args);
+//    return (await killTask.exitCode) == 0;
   }
 
   Future<List<int>> _getChildPids({List<int> pids}) async {
