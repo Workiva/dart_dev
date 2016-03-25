@@ -18,7 +18,7 @@ import 'package:dart_dev/src/tasks/config.dart';
 
 const List<String> defaultDartHeaders = const [];
 const List<String> defaultPreTestCommands = const [];
-const String defaultDirectory = 'test';
+const String defaultDirectory = 'test/';
 const Environment defaultEnv = Environment.browser;
 const String defaultFilename = 'generated_runner';
 const bool defaultGenHtml = false;

@@ -465,7 +465,7 @@ object.
         <tr>
             <td><code>directory</code></td>
             <td><code>String</code></td>
-            <td><code>'test'</code></td>
+            <td><code>'test/'</code></td>
             <td>The directory to search for test files in</td>
         </tr>
         <tr>

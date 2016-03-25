@@ -28,11 +28,16 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   GenTestRunnerTask task =
       new GenTestRunnerTask('$taskTitle ${args.join(' ')}');
 
+  var currentDirectory = currentConfig.directory;
+  if (!currentDirectory.endsWith('/')) {
+    currentDirectory += '/';
+  }
+
   File generatedRunner =
-      new File('${currentConfig.directory}/${currentConfig.filename}.dart');
+      new File('${currentDirectory}/${currentConfig.filename}.dart');
   IOSink writer = generatedRunner.openWrite(mode: FileMode.WRITE);
 
-  Directory testDirectory = new Directory(currentConfig.directory);
+  Directory testDirectory = new Directory(currentDirectory);
   List<File> testFiles = [];
   List<FileSystemEntity> allFiles =
       testDirectory.listSync(recursive: true, followLinks: false);
@@ -42,7 +47,7 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
       if (entity.path.endsWith('_test.dart') && !isTestRunner) {
         testFiles.add(entity);
         task.testFiles.add(entity.path);
-      } else if (isTestRunner || entity.path.endsWith('.dart')) {
+      } else if (!isTestRunner && entity.path.endsWith('.dart')) {
         task.excludedFiles.add(entity.path);
       }
     }
@@ -50,22 +55,21 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   if (currentConfig.env == Environment.browser) {
     if (currentConfig.genHtml) {
-      await testHtmlFileGenerator(currentConfig.directory,
-          currentConfig.filename, currentConfig.htmlHeaders);
+      await testHtmlFileGenerator(
+          currentDirectory, currentConfig.filename, currentConfig.htmlHeaders);
     }
     writer.writeln('@TestOn(\'browser\')');
   } else {
     writer.writeln('@TestOn(\'vm\')');
   }
   writer.writeln(
-      'library ${currentConfig.directory.replaceAll('/','.')}.${currentConfig.filename};');
+      'library ${currentDirectory.replaceAll('/','.')}${currentConfig.filename};');
   writer.writeln();
 
   testFiles.forEach((File file) {
-    Match filenameMatch = new RegExp(r'([^/]+).dart$').firstMatch(file.path);
-    String filename = filenameMatch.group(1);
+    var testPath = file.path.replaceFirst(currentDirectory, '');
     writer.writeln(
-        'import \'${file.path.replaceFirst(currentConfig.directory, '.')}\' as ${filename};');
+        'import \'${'./'+testPath}\' as ${testPath.replaceAll('/','_').substring(0, testPath.length - 5)};');
   });
 
   writer.writeln('import \'package:test/test.dart\';');
@@ -86,14 +90,15 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   }
 
   testFiles.forEach((File file) {
-    Match filenameMatch = new RegExp(r'([^/]+).dart$').firstMatch(file.path);
-    writer.writeln('  ${filenameMatch.group(1)}.main();');
+    var testPath = file.path.replaceFirst(currentDirectory, '');
+    writer.writeln(
+        '  ${testPath.replaceAll('/','_').substring(0, testPath.length - 5)}.main();');
   });
 
   writer.writeln('}');
   await writer.close();
 
-  task.runnerFile = '${currentConfig.directory}/${currentConfig.filename}.dart';
+  task.runnerFile = '${currentDirectory}${currentConfig.filename}.dart';
 
   task.successful = true;
 
