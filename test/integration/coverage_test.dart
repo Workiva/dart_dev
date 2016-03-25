@@ -71,7 +71,7 @@ void main() {
       expect(await runCoverage(projectWithBrowserTests), isTrue);
       File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should generate coverage for Browser tests that require a Pub server',
         () async {
@@ -80,13 +80,13 @@ void main() {
       File lcov = new File(
           '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should generate coverage for VM tests', () async {
       expect(await runCoverage(projectWithVmTests), isTrue);
       File lcov = new File('$projectWithVmTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should fail if "coverage" package is missing', () async {
       expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
@@ -94,13 +94,13 @@ void main() {
 
     test('should fail if there is a test that fails', () async {
       expect(await runCoverage(projectWithFailingTests), isFalse);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should create coverage with non_test file specified', () async {
       expect(await runCoverage(projectWithDartFile), isTrue);
       File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 60)));
+    }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should generate coverage for Functional tests', () async {
       expect(await runCoverage(projectWithFunctionalTests, functional: true),

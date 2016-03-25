@@ -261,20 +261,11 @@ class CoverageTask extends Task {
         collections.add(collection);
       }
 
-//      await new Future.delayed(new Duration(seconds: 3));
       _killTest();
-      TaskProcess tp = new TaskProcess('ps',['-ef']);
-      tp.stdout.listen((l){print(l);});
-      await tp.done;
-
 
       // Kill off any child selenium processes that may have been spawned for
       // functional tests.
       await SeleniumHelper.killChildrenProcesses();
-
-      tp = new TaskProcess('ps',['-ef']);
-      tp.stdout.listen((l){print(l);});
-      await tp.done;
 
     }
     // Merge all individual coverage collection files into one.

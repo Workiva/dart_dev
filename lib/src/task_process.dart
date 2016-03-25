@@ -69,10 +69,6 @@ class TaskProcess {
       killed = killed && Process.killPid(cpids[i],signal);
     }
     return killed;
-//    List<String> args = ['-${signal.toString()}'];
-//    args.addAll(cpids.map((pid) => pid.toString()));
-//    TaskProcess killTask = new TaskProcess('kill', args);
-//    return (await killTask.exitCode) == 0;
   }
 
   Future<List<int>> _getChildPids({List<int> pids}) async {
@@ -98,7 +94,6 @@ class TaskProcess {
     if (cpids.isNotEmpty) {
       cpids.addAll(await _getChildPids(pids: cpids));
     }
-    print(cpids);
     return cpids;
   }
 }
