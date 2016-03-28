@@ -21,7 +21,9 @@ import 'package:dart_dev/src/tasks/docs/config.dart';
 import 'package:dart_dev/src/tasks/examples/config.dart';
 import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/init/config.dart';
+import 'package:dart_dev/src/tasks/link_dependency/config.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
+import 'package:dart_dev/src/tasks/unlink_dependency/config.dart';
 
 Config config = new Config();
 
@@ -33,7 +35,9 @@ class Config {
   ExamplesConfig examples = new ExamplesConfig();
   FormatConfig format = new FormatConfig();
   InitConfig init = new InitConfig();
+  LinkDependencyConfig linkDependency = new LinkDependencyConfig();
   TestConfig test = new TestConfig();
+  UnlinkDependencyConfig unlinkDependency = new UnlinkDependencyConfig();
 }
 
 class TaskConfig {

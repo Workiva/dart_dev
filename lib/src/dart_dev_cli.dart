@@ -36,7 +36,9 @@ import 'package:dart_dev/src/tasks/docs/cli.dart';
 import 'package:dart_dev/src/tasks/examples/cli.dart';
 import 'package:dart_dev/src/tasks/format/cli.dart';
 import 'package:dart_dev/src/tasks/init/cli.dart';
+import 'package:dart_dev/src/tasks/link_dependency/cli.dart';
 import 'package:dart_dev/src/tasks/test/cli.dart';
+import 'package:dart_dev/src/tasks/unlink_dependency/cli.dart';
 
 import 'package:dart_dev/src/version.dart' show printVersion;
 
@@ -61,7 +63,9 @@ dev(List<String> args) async {
   registerTask(new ExamplesCli(), config.examples);
   registerTask(new FormatCli(), config.format);
   registerTask(new InitCli(), config.init);
+  registerTask(new LinkDependencyCli(), config.linkDependency);
   registerTask(new TestCli(), config.test);
+  registerTask(new UnlinkDependencyCli(), config.linkDependency);
 
   await _run(args);
   exit(exitCode);
