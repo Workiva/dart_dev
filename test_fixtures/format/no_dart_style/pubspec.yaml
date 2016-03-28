@@ -1,0 +1,5 @@
+name: format_no_dart_style
+version: 0.0.0
+dev_dependencies:
+  dart_dev:
+    path: ../../..

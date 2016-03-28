@@ -18,6 +18,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
+import 'package:dart_dev/util.dart' show TaskProcess;
 
 void copyDirectory(Directory source, Directory dest) {
   if (!dest.existsSync()) {
@@ -42,6 +43,12 @@ void copyDirectory(Directory source, Directory dest) {
       copy.writeAsBytesSync(orig.readAsBytesSync());
     }
   });
+}
+
+/// Checks if an [executable] exists and is in the current path via `which`.
+Future<bool> executableExists(String executable) async {
+  var check = new TaskProcess('which', [executable]);
+  return (await check.exitCode) == 0;
 }
 
 /// Returns an open port by creating a temporary Socket.

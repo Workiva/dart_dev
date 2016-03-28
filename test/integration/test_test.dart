@@ -23,13 +23,13 @@ import 'package:test/test.dart';
 
 RegExp numTestsPassedPattern = new RegExp(r'\+(\d+)(:| )');
 const String projectToVerifyUnitTestsRunByDefault =
-    'test/fixtures/test/default_unit';
-const String projectWithoutTestPackage = 'test/fixtures/test/no_test_package';
-const String projectWithFailingTests = 'test/fixtures/test/failing';
-const String projectWithPassingTests = 'test/fixtures/test/passing';
+    'test_fixtures/test/default_unit';
+const String projectWithoutTestPackage = 'test_fixtures/test/no_test_package';
+const String projectWithFailingTests = 'test_fixtures/test/failing';
+const String projectWithPassingTests = 'test_fixtures/test/passing';
 const String projectWithPassingIntegrationTests =
-    'test/fixtures/test/passingIntegration';
-const String projectThatNeedsPubServe = 'test/fixtures/test/needs_pub_serve';
+    'test_fixtures/test/passingIntegration';
+const String projectThatNeedsPubServe = 'test_fixtures/test/needs_pub_serve';
 
 Future<int> runTests(String projectPath,
     {bool unit: true,
