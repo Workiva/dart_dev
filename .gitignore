@@ -11,7 +11,7 @@ pubspec.lock
 
 # generated assets in test fixtures
 /test_fixtures/coverage/browser/coverage/
-/test_fixtures/coverage/functional_test/coverage
+/test_fixtures/coverage/functional_test/coverage/
 /test_fixtures/coverage/browser_needs_pub_serve/coverage/
 /test_fixtures/coverage/failing_test/coverage/
 /test_fixtures/coverage/failing_test/test/failing_test.dart.temp.html
