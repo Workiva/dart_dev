@@ -32,5 +32,5 @@ abstract class TaskCli {
   ArgParser get argParser;
   String get command;
 
-  Future<CliResult> run(ArgResults parsedArgs);
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true});
 }

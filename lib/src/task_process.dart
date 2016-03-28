@@ -23,7 +23,6 @@ class TaskProcess {
   Completer _errc = new Completer();
   Completer _outc = new Completer();
   Completer<int> _procExitCode = new Completer();
-
   Process _process;
 
   StreamController<String> _stdout = new StreamController();
@@ -60,4 +59,40 @@ class TaskProcess {
 
   bool kill([ProcessSignal signal = ProcessSignal.SIGTERM]) =>
       _process.kill(signal);
+
+  Future<bool> killAllChildren(
+      [ProcessSignal signal = ProcessSignal.SIGTERM]) async {
+    List<int> cpids = await _getChildPids();
+    cpids.remove(_process.pid);
+    bool killed = true;
+    for (int i = 0; i < cpids.length; i++) {
+      killed = killed && Process.killPid(cpids[i], signal);
+    }
+    return killed;
+  }
+
+  Future<List<int>> _getChildPids({List<int> pids}) async {
+    pids = pids ?? [_process.pid];
+    String executable = 'pgrep';
+    List<TaskProcess> pgreps = [];
+    var args = [];
+    List<int> cpids = [];
+    for (int pid in pids) {
+      args = [];
+      args.add('-P');
+      args.add(pid.toString());
+      var pgrep = new TaskProcess(executable, args);
+      pgrep.stdout.listen((l) {
+        cpids.add(int.parse(l));
+      });
+      pgreps.add(pgrep);
+    }
+    for (int i = 0; i < pgreps.length; i++) {
+      await pgreps[i].done;
+    }
+    if (cpids.isNotEmpty) {
+      cpids.addAll(await _getChildPids(pids: cpids));
+    }
+    return cpids;
+  }
 }

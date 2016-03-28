@@ -21,11 +21,11 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess, copyDirectory;
 import 'package:test/test.dart';
 
-const String projectWithChangesNeeded = 'test/fixtures/format/changes_needed';
-const String projectWithExclusions = 'test/fixtures/format/exclusions';
+const String projectWithChangesNeeded = 'test_fixtures/format/changes_needed';
+const String projectWithExclusions = 'test_fixtures/format/exclusions';
 const String projectWithNoChangesNeeded =
-    'test/fixtures/format/no_changes_needed';
-const String projectWithoutDartStyle = 'test/fixtures/format/no_dart_style';
+    'test_fixtures/format/no_changes_needed';
+const String projectWithoutDartStyle = 'test_fixtures/format/no_dart_style';
 
 /// Runs dart formatter via dart_dev on given project.
 ///

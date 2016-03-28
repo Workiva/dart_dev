@@ -21,127 +21,123 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
+RegExp numTestsPassedPattern = new RegExp(r'\+(\d+)(:| )');
 const String projectToVerifyUnitTestsRunByDefault =
-    'test/fixtures/test/default_unit';
-const String projectWithoutTestPackage = 'test/fixtures/test/no_test_package';
-const String projectWithFailingTests = 'test/fixtures/test/failing';
-const String projectWithPassingTests = 'test/fixtures/test/passing';
+    'test_fixtures/test/default_unit';
+const String projectWithoutTestPackage = 'test_fixtures/test/no_test_package';
+const String projectWithFailingTests = 'test_fixtures/test/failing';
+const String projectWithPassingTests = 'test_fixtures/test/passing';
 const String projectWithPassingIntegrationTests =
-    'test/fixtures/test/passingIntegration';
-const String projectThatNeedsPubServe = 'test/fixtures/test/needs_pub_serve';
+    'test_fixtures/test/passingIntegration';
+const String projectThatNeedsPubServe = 'test_fixtures/test/needs_pub_serve';
 
-Future<bool> runTests(String projectPath,
+Future<int> runTests(String projectPath,
     {bool unit: true,
     bool integration: false,
     List<String> files,
     String testName: ''}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
-  List args = ['run', 'dart_dev', 'test'];
+  List args = ['run', 'dart_dev', 'test', '--no-color'];
   if (unit != null) args.add(unit ? '--unit' : '--no-unit');
   if (integration != null)
     args.add(integration ? '--integration' : '--no-integration');
-  int i;
-
-  if (files != null) {
-    int filesLength = files.length;
-    if (filesLength > 0) {
-      for (i = 0; i < filesLength; i++) {
-        args.add(files[i]);
-      }
-    }
-  }
 
   if (testName.isNotEmpty) {
     args.addAll(['-n', testName]);
   }
 
+  args.addAll(files ?? <String>[]);
+
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
 
   await process.done;
-  return (await process.exitCode) == 0;
+  if ((await process.exitCode) != 0)
+    throw new TestFailure('Expected test to pass.');
+
+  var lastLine = await process.stdout.last;
+  var numTestsRun = -1;
+  if (numTestsPassedPattern.hasMatch(lastLine)) {
+    numTestsRun =
+        int.parse(numTestsPassedPattern.firstMatch(lastLine).group(1));
+  }
+  return numTestsRun;
 }
 
 void main() {
   group('Test Task', () {
     test('should fail if some unit tests fail', () async {
-      expect(
-          await runTests(projectWithFailingTests,
-              unit: true, integration: false),
-          isFalse);
+      expect(runTests(projectWithFailingTests, unit: true, integration: false),
+          throwsA(new isInstanceOf<TestFailure>()));
     });
 
     test('should fail if some integration tests fail', () async {
-      expect(
-          await runTests(projectWithFailingTests,
-              unit: false, integration: true),
-          isFalse);
+      expect(runTests(projectWithFailingTests, unit: false, integration: true),
+          throwsA(new isInstanceOf<TestFailure>()));
     });
 
     test('should run individual unit test', () async {
       expect(
-          await runTests(projectWithPassingTests, files: [
-            'test/fixtures/test/passing/test/passing_unit_test.dart'
-          ]),
-          isTrue);
+          await runTests(projectWithPassingTests,
+              files: ['test/passing_unit_test.dart']),
+          equals(1));
     });
 
     test('should run individual unit tests', () async {
       expect(
           await runTests(projectWithPassingTests, files: [
-            'test/fixtures/test/passing/test/passing_unit_test.dart',
-            'test/fixtures/test/passing/test/passing_unit_integration.dart'
+            'test/passing_unit_test.dart',
+            'test/passing_integration_test.dart'
           ]),
-          isTrue);
+          equals(2));
     });
 
     test('should run unit tests', () async {
       expect(
           await runTests(projectWithPassingTests,
               unit: true, integration: false),
-          isTrue);
+          equals(1));
     });
 
     test('should run unit tests by default', () async {
       expect(
           await runTests(projectToVerifyUnitTestsRunByDefault,
               unit: null, integration: null),
-          isTrue);
+          equals(1));
     });
 
     test('should run integration tests and not unit tests', () async {
       expect(
           await runTests(projectWithPassingIntegrationTests,
               unit: false, integration: true),
-          isTrue);
+          equals(1));
     });
 
     test('should run unit and integration tests', () async {
       expect(
           await runTests(projectWithPassingTests,
               unit: true, integration: true),
-          isTrue);
+          equals(2));
     });
 
     test('should warn if "test" package is not immediate dependency', () async {
-      expect(await runTests(projectWithoutTestPackage), isFalse);
+      expect(runTests(projectWithoutTestPackage),
+          throwsA(new isInstanceOf<TestFailure>()));
     });
 
     test('should run tests that require a Pub server', () async {
-      expect(await runTests(projectThatNeedsPubServe), isTrue);
+      expect(await runTests(projectThatNeedsPubServe), equals(1));
     });
 
     test('should run tests with test name specified', () async {
-      expect(
-          await runTests(projectWithPassingTests, testName: 'passes'), isTrue);
+      expect(await runTests(projectWithPassingTests, testName: 'passes'),
+          equals(1));
     });
 
     test('should fail if named test does not exist', () async {
-      expect(
-          await runTests(projectWithPassingTests,
-              testName: 'non-existent test'),
-          isFalse);
+      expect(runTests(projectWithPassingTests, testName: 'non-existent test'),
+          throwsA(new isInstanceOf<TestFailure>()));
     });
   });
 }
