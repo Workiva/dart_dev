@@ -65,8 +65,8 @@ class TaskProcess {
     List<int> cpids = await _getChildPids();
     cpids.remove(_process.pid);
     bool killed = true;
-    for(int i = 0;i <cpids.length;i++){
-      killed = killed && Process.killPid(cpids[i],signal);
+    for (int i = 0; i < cpids.length; i++) {
+      killed = killed && Process.killPid(cpids[i], signal);
     }
     return killed;
   }
@@ -85,7 +85,6 @@ class TaskProcess {
       pgrep.stdout.listen((l) {
         cpids.add(int.parse(l));
       });
-      pgrep.stderr.listen(print);
       pgreps.add(pgrep);
     }
     for (int i = 0; i < pgreps.length; i++) {
