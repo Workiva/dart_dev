@@ -81,6 +81,7 @@ class SauceRunnerCli extends TaskCli {
     var failed = false;
 
     for (var i = 0; i < results['js tests'].length; i++) {
+      print(results['js tests'][i]['result']);
       if (results['js tests'][i]['result']['failed'] > 0) {
         failed = true;
       }

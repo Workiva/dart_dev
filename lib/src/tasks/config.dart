@@ -34,7 +34,7 @@ class Config {
   ExamplesConfig examples = new ExamplesConfig();
   FormatConfig format = new FormatConfig();
   InitConfig init = new InitConfig();
-  SauceLabTestsConfig saucelabTests = new SauceLabTestsConfig();
+  SaucelabTestsConfig saucelabTests = new SaucelabTestsConfig();
   TestConfig test = new TestConfig();
 }
 
