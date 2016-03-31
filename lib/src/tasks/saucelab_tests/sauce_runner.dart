@@ -14,8 +14,7 @@ import 'platforms.dart';
 import 'sauce_api.dart';
 import 'sauce_unit_test_driver.dart';
 
-const String iframeRunnerPath =
-    'packages/dart_dev/src/tasks/saucelab_tests/sauce_iframe_runner/sauce_iframe_runner.html';
+const String iframeRunnerPath = 'sauce_iframe_runner/sauce_iframe_runner.html';
 
 /// Runs the specified [tests] in Sauce Labs the specified [platforms], and returns a Future
 /// that completes with the test resuls after they've finished running.

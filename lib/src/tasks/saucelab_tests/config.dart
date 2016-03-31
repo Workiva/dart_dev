@@ -29,7 +29,7 @@ const int defaultPubServer = 0;
 const String defaultSauceConnectTunnelIdentifier = null;
 const String defaultTestReportsPath = 'test_reports/sauce_labs_unit_tests.xml';
 
-class SauceLabTestsConfig extends TaskConfig {
+class SaucelabTestsConfig extends TaskConfig {
   List<String> filesToTest = [];
   List<SaucePlatform> platforms = defaultPlatforms;
   int pubServer = defaultPubServer;

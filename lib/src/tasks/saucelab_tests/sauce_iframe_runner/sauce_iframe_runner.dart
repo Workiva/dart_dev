@@ -1,5 +1,3 @@
-library dart_dev.src.tasks.saucelab_tests.sauce_iframe_runner.sauce_iframe_runner;
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';

@@ -100,8 +100,7 @@ class SauceRunnerCli extends TaskCli {
           ' please review the output above and the test report located at'
           ' ${config.saucelabTests.testReportPath}.');
     } else {
-      return new CliResult.success(
-          'Success, your tests completely successfully'
+      return new CliResult.success('Success, your tests completely successfully'
           ' on saucelabs.');
     }
   }
