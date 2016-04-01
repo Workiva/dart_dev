@@ -31,9 +31,6 @@ environment:
   sdk: ">=1.9.0 <2.0.0"
 
 transformers:
-  - sass:
-      $include: ["web/**", "test/**", "lib/src/tasks/saucelab_tests/sauce_iframe_runner/**"]
-      executable: sass
   - test/pub_serve:
       $include: test/**_test{.*,}.dart
   - dart_dev/src/sauce_test_harness_transformer:

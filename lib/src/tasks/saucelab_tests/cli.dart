@@ -57,15 +57,15 @@ class SauceRunnerCli extends TaskCli {
       sauceTests.add(new sauceRunner.SauceTest(file, file));
     }
 
-    var pubServe = env['PUB_SERVE'];
+    var pubServe = config.saucelabTests.pubServer;
     final int pubServePort =
         pubServe != null ? config.saucelabTests.pubServer : 0;
 
     var autoSauceConnect;
     var tunnelIdentifier;
-    if (env['SAUCE_CONNECT_TUNNEL_IDENTIFIER'] != null) {
+    if (config.saucelabTests.sauceConnectTunnelIdentifier != null) {
       autoSauceConnect = false;
-      tunnelIdentifier = env['SAUCE_CONNECT_TUNNEL_IDENTIFIER'];
+      tunnelIdentifier = config.saucelabTests.sauceConnectTunnelIdentifier;
     } else {
       autoSauceConnect = true;
       tunnelIdentifier = generateTunnelIdentifier();
@@ -81,7 +81,6 @@ class SauceRunnerCli extends TaskCli {
     var failed = false;
 
     for (var i = 0; i < results['js tests'].length; i++) {
-      print(results['js tests'][i]['result']);
       if (results['js tests'][i]['result']['failed'] > 0) {
         failed = true;
       }

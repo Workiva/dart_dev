@@ -471,6 +471,8 @@ object.
       ]
 ```
 
+* The html files to be transformed should have the `packages/test/dart.js` script tag listed last.
+
 #### `test` Config
 All configuration options for the `test` task are found on the `config.test`
 object.

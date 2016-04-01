@@ -104,26 +104,14 @@ class SauceTestHarnessTransformer extends Transformer
     if (!proxiedIframeRunnerFiles.contains(id.path) && proxied) {
       var package = transform.primaryInput.id.package;
 
-      var htmlFile = new File(
-          'packages/dart_dev/src/tasks/saucelab_tests/sauce_iframe_runner/sauce_iframe_runner.html');
-      var htmlAssetId = new AssetId(
-          package, 'test/sauce_iframe_runner/sauce_iframe_runner.html');
-      var htmlAsset = new Asset.fromStream(htmlAssetId, htmlFile.openRead());
-      transform.addOutput(htmlAsset);
-
-      var dartFile = new File(
-          'packages/dart_dev/src/tasks/saucelab_tests/sauce_iframe_runner/sauce_iframe_runner.dart');
-      var dartAssetId = new AssetId(
-          package, 'test/sauce_iframe_runner/sauce_iframe_runner.dart');
-      var dartAsset = new Asset.fromStream(dartAssetId, dartFile.openRead());
-      transform.addOutput(dartAsset);
-
-      var cssFile = new File(
-          'packages/dart_dev/src/tasks/saucelab_tests/sauce_iframe_runner/sauce_iframe_runner.css');
-      var cssAssetId = new AssetId(
-          package, 'test/sauce_iframe_runner/sauce_iframe_runner.css');
-      var cssAsset = new Asset.fromStream(cssAssetId, cssFile.openRead());
-      transform.addOutput(cssAsset);
+      for (String proxiedFile in proxiedIframeRunnerFiles) {
+        var file = new File(
+            'packages/dart_dev/src/tasks/saucelab_tests/sauce_iframe_runner/$proxiedFile');
+        var assetId =
+            new AssetId(package, 'test/sauce_iframe_runner/$proxiedFile');
+        var asset = new Asset.fromStream(assetId, file.openRead());
+        transform.addOutput(asset);
+      }
       proxied = false;
     }
   }
