@@ -333,7 +333,7 @@ class CoverageTask extends Task {
       if (!collections[i].existsSync()) continue;
       String coverage = collections[i].readAsStringSync();
       if (coverage.isNotEmpty) {
-        Map coverageJson = JSON.decode(collections[i].readAsStringSync());
+        Map coverageJson = JSON.decode(coverage);
         mergedJson['coverage'].addAll(coverageJson['coverage']);
       }
     }
