@@ -2,6 +2,7 @@
 .pub
 packages
 pubspec.lock
+test_reports/
 
 # generated docs
 /doc/api/

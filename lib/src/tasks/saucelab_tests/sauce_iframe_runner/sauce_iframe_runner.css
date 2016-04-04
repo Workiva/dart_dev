@@ -1,0 +1,74 @@
+* {
+    box-sizing: border-box; }
+
+html {
+    font-size: 10px; }
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #eee;
+    font-family: sans-serif; }
+
+code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace; }
+
+.notice-header {
+    height: 2rem;
+    line-height: 2rem;
+    padding: 0 1rem;
+    font-size: 1rem;
+    background: #c22;
+    color: white; }
+
+.test-header {
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0 1rem;
+    font-size: 1.2rem; }
+
+.log-container {
+    position: fixed;
+    top: 5rem;
+    bottom: 0;
+    width: 100%;
+    padding: .5rem;
+    margin: 0;
+    overflow-y: scroll;
+    white-space: pre-wrap;
+    background: #222;
+    color: lightgray; }
+
+.logs {
+    font-size: 1rem; }
+
+.test-iframe iframe {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 100%;
+    left: 0; }
+
+.ansi-black {
+    color: black; }
+
+.ansi-red {
+    color: red; }
+
+.ansi-green {
+    color: limegreen; }
+
+.ansi-yellow {
+    color: yellow; }
+
+.ansi-blue {
+    color: blue; }
+
+.ansi-magenta {
+    color: magenta; }
+
+.ansi-cyan {
+    color: cyan; }
+
+.ansi-white {
+    color: white; }
