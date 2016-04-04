@@ -61,7 +61,8 @@ import 'package:path/path.dart' as p;
 ///     - Out: `foo.dart.sauce_browser_test.json`, a new file.
 ///         - Contains a list of files referred to by `<link rel="x-dart-test" ...>`.
 ///
-class SauceTestHarnessTransformer extends Transformer implements DeclaringTransformer {
+class SauceTestHarnessTransformer extends Transformer
+    implements DeclaringTransformer {
   final allowedExtensions = '.dart .html';
 
   static const String sauceDartExtension = '.sauce_browser_test.dart';
@@ -92,7 +93,8 @@ class SauceTestHarnessTransformer extends Transformer implements DeclaringTransf
   }
 
   Future generateHtml(Transform transform) async {
-    var html = new HtmlParser(await transform.primaryInput.readAsString()).parse();
+    var html =
+        new HtmlParser(await transform.primaryInput.readAsString()).parse();
 
     // Undo the test transformer's change from "packages/browser/dart.js" to "packages/test/dart.js"
     html.querySelectorAll('script').forEach((Element script) {
@@ -135,20 +137,19 @@ class SauceTestHarnessTransformer extends Transformer implements DeclaringTransf
 
     var id = transform.primaryInput.id;
 
-    transform.addOutput(
-        new Asset.fromString(id.addExtension(sauceHtmlExtension), html.outerHtml)
-    );
+    transform.addOutput(new Asset.fromString(
+        id.addExtension(sauceHtmlExtension), html.outerHtml));
 
-    transform.addOutput(
-        new Asset.fromString(id.addExtension(sauceDartListExtension), JSON.encode(dartScripts))
-    );
+    transform.addOutput(new Asset.fromString(
+        id.addExtension(sauceDartListExtension), JSON.encode(dartScripts)));
   }
 
   void generateDart(Transform transform) {
     var id = transform.primaryInput.id;
 
-    transform.addOutput(
-        new Asset.fromString(id.addExtension('.sauce_browser_test.dart'), '''
+    transform.addOutput(new Asset.fromString(
+        id.addExtension('.sauce_browser_test.dart'),
+        '''
           import 'dart:async';
           import 'dart:html';
 
@@ -207,7 +208,6 @@ class SauceTestHarnessTransformer extends Transformer implements DeclaringTransf
             displayPause() =>
                 throw new UnsupportedError("SauceBrowserEnvironment.displayPause is not supported.");
           }
-        ''')
-    );
+        '''));
   }
 }

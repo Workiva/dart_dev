@@ -16,7 +16,8 @@ const String sauceApiUrl = 'https://saucelabs.com/rest/v1/';
 /// a Future that completes with the Process when the tunnel is ready to be used.
 ///
 /// Logs live output to the console via [reporter].
-Future<Process> startSauceConnection(String username, String accessKey, {String tunnelIdentifier}) async {
+Future<Process> startSauceConnection(String username, String accessKey,
+    {String tunnelIdentifier}) async {
   var args = ['--user', username, '--api-key', accessKey];
 
   if (tunnelIdentifier != null) {
@@ -25,10 +26,17 @@ Future<Process> startSauceConnection(String username, String accessKey, {String 
 
   var process = await Process.start('sc', args);
 
-  var stdout = process.stdout.transform(new Utf8Decoder()).transform(new LineSplitter()).asBroadcastStream();
-  var stderr = process.stderr.transform(new Utf8Decoder()).transform(new LineSplitter()).asBroadcastStream();
+  var stdout = process.stdout
+      .transform(new Utf8Decoder())
+      .transform(new LineSplitter())
+      .asBroadcastStream();
+  var stderr = process.stderr
+      .transform(new Utf8Decoder())
+      .transform(new LineSplitter())
+      .asBroadcastStream();
 
-  reporter.logGroup('Starting Sauce Connect tunnel', outputStream: stdout, errorStream: stderr);
+  reporter.logGroup('Starting Sauce Connect tunnel',
+      outputStream: stdout, errorStream: stderr);
 
   await for (String line in stdout) {
     if (line.contains('Sauce Connect is up, you may start your tests.')) {
@@ -39,7 +47,6 @@ Future<Process> startSauceConnection(String username, String accessKey, {String 
   throw new Exception('Sauce Connection failed.');
 }
 
-
 /// Kicks off a set of runs for the test at [testUrl] on the specified [platforms], and returns a
 /// Future that completes with the corresponding drivers once all tests have been started.
 ///
@@ -48,16 +55,18 @@ Future<Process> startSauceConnection(String username, String accessKey, {String 
 /// Optional [options] are also allowed (see <https://wiki.saucelabs.com/display/DOCS/Test+Configuration+Options>).
 ///
 /// [js-unit-api]: https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-StartJSUnitTests
-Future<List<SauceUnitTestDriver>> startSauceTests(String testName, String testUrl, List platforms,
-    String username, String accessKey, {Map options: const {}}
-) async {
-  List<Future<SauceUnitTestDriver>> driversFutures = platforms.map((platform) async {
+Future<List<SauceUnitTestDriver>> startSauceTests(String testName,
+    String testUrl, List platforms, String username, String accessKey,
+    {Map options: const {}}) async {
+  List<Future<SauceUnitTestDriver>> driversFutures =
+      platforms.map((platform) async {
     var testRunName = '$platform - $testName';
-    var testDriver = new SauceUnitTestDriver(testRunName, testUrl, platform, username, accessKey, options);
+    var testDriver = new SauceUnitTestDriver(
+        testRunName, testUrl, platform, username, accessKey, options);
 
     try {
       await testDriver.start();
-    } catch(e) {
+    } catch (e) {
       reporter.log('Failure starting $testDriver.\n$e');
     }
 
@@ -72,12 +81,13 @@ Future<List<SauceUnitTestDriver>> startSauceTests(String testName, String testUr
 /// Returns a Future that completes with the JS test results once all [testDrivers] have finished running.
 ///
 /// Results are of the format returned by <https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-GetJSUnitTestStatus>.
-Future<Map> waitForTestsToComplete(List<SauceUnitTestDriver> testDrivers) async {
+Future<Map> waitForTestsToComplete(
+    List<SauceUnitTestDriver> testDrivers) async {
   List<Future<Map>> jsTestsFutures = testDrivers.map((testDriver) async {
     Map result = null;
     try {
       result = await testDriver.results;
-    } catch(e) {
+    } catch (e) {
       reporter.log('Failure fetching results from $testDriver.\n$e');
     }
 
@@ -96,8 +106,5 @@ Future<Map> waitForTestsToComplete(List<SauceUnitTestDriver> testDrivers) async 
 
   List<Map> jsTests = await Future.wait(jsTestsFutures);
 
-  return {
-    'completed': true,
-    'js tests': jsTests
-  };
+  return {'completed': true, 'js tests': jsTests};
 }

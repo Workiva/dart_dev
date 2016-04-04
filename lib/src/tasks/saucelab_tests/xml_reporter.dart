@@ -27,10 +27,8 @@ String sauceResultsToXunitXml(Map results, {bool prettyXml: true}) {
           'tests': 1,
           'time': 0,
         }, nest: () {
-          builder.element('testcase', attributes: {
-            'name': '',
-            'time': 0,
-          }, nest: () {
+          builder.element('testcase', attributes: {'name': '', 'time': 0,},
+              nest: () {
             builder.element('failure', nest: () {
               builder.cdata('An error occurred while running this suite.\n\n'
                   'Result: $suiteResults.\n\n'
@@ -76,10 +74,9 @@ String sauceResultsToXunitXml(Map results, {bool prettyXml: true}) {
         });
 
         if (!reportedAtLeastOneTestCase) {
-          builder.element('testcase', attributes: {
-            'name': '(all tests in this suite)',
-            'time': 0,
-          }, nest: () {
+          builder.element('testcase',
+              attributes: {'name': '(all tests in this suite)', 'time': 0,},
+              nest: () {
             builder.text('All tests in this suite passed.\n\n'
                 '(Passing tests are ommitted, and this placeholder is here to '
                 'ensure this test is visible.)');

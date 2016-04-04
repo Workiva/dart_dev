@@ -5,7 +5,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_dev/util.dart';
-import 'package:webdriver/io.dart' show BrowserPlatform, Capabilities, WebDriver, createDriver;
+import 'package:webdriver/io.dart'
+    show BrowserPlatform, Capabilities, WebDriver, createDriver;
 
 import './platforms.dart';
 import 'sauce_runner.dart';
@@ -90,9 +91,9 @@ class SauceUnitTestDriver {
 
       /// Wrap with _runAndHandleUncaughtErrors so that uncaught async errors caused
       /// by failed WebDriver calls don't cause the script to exit.
-      results = await _runAndHandleUncaughtErrors(() =>
-          _driver.execute('return window.global_test_results_untruncated || window.global_test_results;', [])
-      );
+      results = await _runAndHandleUncaughtErrors(() => _driver.execute(
+          'return window.global_test_results_untruncated || window.global_test_results;',
+          []));
     }
 
     return results;
@@ -111,8 +112,9 @@ class SauceUnitTestDriver {
     try {
       /// Wrap with _runAndHandleUncaughtErrors so that uncaught async errors caused
       /// by failed WebDriver calls don't cause the script to exit.
-      await _runAndHandleUncaughtErrors(() => _driver?.quit(closeSession: true));
-    } catch(error) {
+      await _runAndHandleUncaughtErrors(
+          () => _driver?.quit(closeSession: true));
+    } catch (error) {
       // The driver fails to quit if Sauce Labs has timed out the session,
       // so just catch the error here and print it.
       print('Error quitting driver: $error');
@@ -130,8 +132,7 @@ class SauceUnitTestDriver {
       SaucePlatform this.platform,
       String this.username,
       String this.accessKey,
-      Map this.desiredCapabilities
-  );
+      Map this.desiredCapabilities);
 
   /// Starts running these tests and returns a future that completes when the test URL has been fully loaded.
   Future start() async {
@@ -142,24 +143,24 @@ class SauceUnitTestDriver {
 
       /// Wrap with _runAndHandleUncaughtErrors so that uncaught async errors caused
       /// by failed WebDriver calls don't cause the script to exit.
-      _driver = await _runAndHandleUncaughtErrors(() =>
-          createDriver(
-              uri: Uri.parse('http://$username:$accessKey@ondemand.saucelabs.com/wd/hub/'),
-              desired: capabilities
-          )
-      );
+      _driver = await _runAndHandleUncaughtErrors(() => createDriver(
+          uri: Uri.parse(
+              'http://$username:$accessKey@ondemand.saucelabs.com/wd/hub/'),
+          desired: capabilities));
 
       reporter.log('- Loading: $this');
 
       // Quit the web driver when this process is interrupted.
       _processSignalListeners
-        ..add(ProcessSignal.SIGTERM.watch().take(1).listen((_) => _quitDriver()))
-        ..add(ProcessSignal.SIGINT.watch().take(1).listen((_) => _quitDriver()));
+        ..add(
+            ProcessSignal.SIGTERM.watch().take(1).listen((_) => _quitDriver()))
+        ..add(
+            ProcessSignal.SIGINT.watch().take(1).listen((_) => _quitDriver()));
 
       await _driver.get(testUrl);
 
       _status = 'running';
-    } catch(_) {
+    } catch (_) {
       _status = 'test error';
       _quitDriver();
       rethrow;
@@ -194,7 +195,8 @@ class SauceUnitTestDriver {
   /// The URL to the Sauce Labs job for this test run.
   ///
   /// Will be `null` until [start] is called.
-  String get jobUrl => jobId == null ? null : 'https://saucelabs.com/tests/$jobId';
+  String get jobUrl =>
+      jobId == null ? null : 'https://saucelabs.com/tests/$jobId';
 
   /// Returns a String representation of this driver, containing [testRunName] and [jobUrl].
   @override

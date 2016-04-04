@@ -17,7 +17,8 @@ class SaucePlatform {
   ///
   /// See <https://wiki.saucelabs.com/display/DOCS/JavaScript+Unit+Testing+Methods#JavaScriptUnitTestingMethods-StartJSUnitTests>.
   SaucePlatform.fromJson(List platformJson)
-      : this(platformJson[1], browserVersion: platformJson[2], os: platformJson[0]);
+      : this(platformJson[1],
+            browserVersion: platformJson[2], os: platformJson[0]);
 
   /// Returns the JSON representation of this platform, as expected by the Sauce Labs API.
   ///
@@ -97,22 +98,27 @@ const _osWindows = 'Windows';
 const SaucePlatform chrome = const SaucePlatform(Browser.chrome);
 
 /// Chrome on Windows (version agnostic).
-const SaucePlatform chromeWindows = const SaucePlatform(Browser.chrome, os: _osWindows);
+const SaucePlatform chromeWindows =
+    const SaucePlatform(Browser.chrome, os: _osWindows);
 
 /// Chrome on OS X (version agnostic).
 const SaucePlatform chromeOsx = const SaucePlatform(Browser.chrome, os: _osOsx);
 
 /// Firefox on Windows (version agnostic).
-const SaucePlatform firefoxWindows = const SaucePlatform(Browser.firefox, os: _osWindows);
+const SaucePlatform firefoxWindows =
+    const SaucePlatform(Browser.firefox, os: _osWindows);
 
 /// Firefox on OS X (version agnostic).
-const SaucePlatform firefoxOsx = const SaucePlatform(Browser.firefox, os: _osOsx);
+const SaucePlatform firefoxOsx =
+    const SaucePlatform(Browser.firefox, os: _osOsx);
 
 /// Safari (OS and version agnostic).
 const SaucePlatform safari = const SaucePlatform(Browser.safari, os: _osOsx);
 
 /// Internet Explorer 10 (OS agnostic).
-const SaucePlatform ie10 = const SaucePlatform(Browser.ie, browserVersion: '10');
+const SaucePlatform ie10 =
+    const SaucePlatform(Browser.ie, browserVersion: '10');
 
 /// Internet Explorer 11 (OS agnostic).
-const SaucePlatform ie11 = const SaucePlatform(Browser.ie, browserVersion: '11');
+const SaucePlatform ie11 =
+    const SaucePlatform(Browser.ie, browserVersion: '11');

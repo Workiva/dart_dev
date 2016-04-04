@@ -8,7 +8,8 @@ import 'package:fluri/fluri.dart';
 import 'package:rate_limit/rate_limit.dart';
 
 const String testsPassedMessage = 'All tests passed';
-final RegExp testsFinishedPattern = new RegExp(r'All tests passed|Some tests failed');
+final RegExp testsFinishedPattern =
+    new RegExp(r'All tests passed|Some tests failed');
 
 /// Uses an iframe to run the test at the url specified by the `test_url` query parameter,
 /// and then exposes the test results at `window.global_test_results` for Sauce Labs to consume.
@@ -18,9 +19,11 @@ final RegExp testsFinishedPattern = new RegExp(r'All tests passed|Some tests fai
 /// This runner also provides a basic UI that displays the current platform, the path to the test,
 /// the test's status, and live test logs.
 main() async {
-  final String testUrl = Uri.parse(window.location.toString()).queryParameters['test_url'];
+  final String testUrl =
+      Uri.parse(window.location.toString()).queryParameters['test_url'];
   if (testUrl == null) {
-    throw new ArgumentError('Must specify test to run via the `test_url` query string.');
+    throw new ArgumentError(
+        'Must specify test to run via the `test_url` query string.');
   }
 
   var friendlyTestName = testUrl
@@ -28,7 +31,8 @@ main() async {
       .replaceFirst(new RegExp(r'^/'), '');
 
   // Display test status for convenience.
-  displayTestTitle('$friendlyTestName - ${getTestPlatform(friendlyName: true)} - ');
+  displayTestTitle(
+      '$friendlyTestName - ${getTestPlatform(friendlyName: true)} - ');
   displayTestStatus('Running tests...');
 
   initLogScrolling();
@@ -38,7 +42,8 @@ main() async {
   Stopwatch timer = new Stopwatch();
 
   timer.start();
-  var testLogs = await runTests(testUrl, getTestPlatform(), onLog: displayTestLog);
+  var testLogs =
+      await runTests(testUrl, getTestPlatform(), onLog: displayTestLog);
   timer.stop();
 
   // Parse the logs to get the status output lines.
@@ -74,19 +79,13 @@ main() async {
     }
 
     if (passed) {
-      tests.insert(0, {
-        'name': status.testDescription,
-        'result': true,
-      });
+      tests.insert(0, {'name': status.testDescription, 'result': true,});
     } else {
       // The output displays status lines for failing tests twice:
       //   1. Once with the status before the test
       //   2. Once with the status after the test
       // We want #2, since that one contains all of the error messages.
-      var test = {
-        'name': lastStatus.testDescription,
-        'result': false,
-      };
+      var test = {'name': lastStatus.testDescription, 'result': false,};
 
       var message = lastStatus.otherLogs.join('\n');
       if (!message.isEmpty) {
@@ -110,8 +109,10 @@ main() async {
     'tests': tests,
   };
 
-  context['global_test_results_untruncated'] = new JsObject.jsify(globalTestResults);
-  context['global_test_results_summary'] = 'Failing tests:\n' + tests.map((test) => '- ${test['name']}').join('\n');
+  context['global_test_results_untruncated'] =
+      new JsObject.jsify(globalTestResults);
+  context['global_test_results_summary'] =
+      'Failing tests:\n' + tests.map((test) => '- ${test['name']}').join('\n');
   window.console.debug('If you\'re debugging failing tests, check out '
       '`global_test_results_untruncated` and `global_test_results_summary`.');
 
@@ -132,7 +133,7 @@ main() async {
           ..add({
             'name': 'TRUNCATED',
             'message': 'Test results are too long to display in Sauce Labs.\n\n'
-                       'See the captured HTML for full test output.',
+                'See the captured HTML for full test output.',
           });
       }
     }
@@ -142,7 +143,8 @@ main() async {
   context['global_test_results'] = new JsObject.jsify(globalTestResults);
 
   // Also display results in the page for convenience.
-  displayTestStatus('Tests finished: $passedCount passed, $failedCount failed.');
+  displayTestStatus(
+      'Tests finished: $passedCount passed, $failedCount failed.');
 }
 
 /// By default ([friendlyName]: false), returns the `test` package [platform selector](https://github.com/dart-lang/test#platform-selectors)
@@ -166,7 +168,8 @@ String getTestPlatform({bool friendlyName: false}) {
     return friendlyName ? 'Internet Explorer' : 'ie';
   }
 
-  throw new Exception('Unable to detect browser test platform. User agent: ${window.navigator.userAgent}');
+  throw new Exception(
+      'Unable to detect browser test platform. User agent: ${window.navigator.userAgent}');
 }
 
 /// Returns whether the JSON-serialized version of [globalTestResults] exceeds the maximum
@@ -209,7 +212,8 @@ class Status {
   /// Returns a status object parsed from [line], or null if it does not represent a status log.
   factory Status.fromLog(String line) {
     line = stripAnsiColors(line);
-    var match = new RegExp(r'^(\d\d(?::\d\d)+) \+(\d+)(?: \-(\d+))?: ').firstMatch(line);
+    var match = new RegExp(r'^(\d\d(?::\d\d)+) \+(\d+)(?: \-(\d+))?: ')
+        .firstMatch(line);
 
     if (match == null) {
       // If the regex didn't match anything, then the specified line doesn't correspond
@@ -221,12 +225,12 @@ class Status {
         clock: match[1],
         passCount: int.parse(match[2]),
         failCount: match[3] == null ? 0 : int.parse(match[3]),
-        testDescription: match.input.substring(match.end)
-    );
+        testDescription: match.input.substring(match.end));
   }
 
   /// An empty, initial log for utility purposes.
-  static final Status initial = new Status._(clock: '00:00', passCount: 0, failCount: 0, testDescription: null);
+  static final Status initial = new Status._(
+      clock: '00:00', passCount: 0, failCount: 0, testDescription: null);
 }
 
 /// Runs the test at [testUrl] in this page's iframe, and returns a Future that completes
@@ -236,12 +240,15 @@ class Status {
 /// corresponding to the current platform these tests are being run on.
 ///
 /// Also calls the optional [onLog] whenever the test logs something.
-Future<List<String>> runTests(String testUrl, String platform, {onLog(String log)}) {
+Future<List<String>> runTests(String testUrl, String platform,
+    {onLog(String log)}) {
   var completer = new Completer<List<String>>();
 
   // Listen to logs
 
-  Stream<String> testConsoleLogs = window.onMessage.map((event) => event.data.toString()).asBroadcastStream();
+  Stream<String> testConsoleLogs = window.onMessage
+      .map((event) => event.data.toString())
+      .asBroadcastStream();
 
   if (onLog != null) {
     testConsoleLogs.listen(onLog);
@@ -250,7 +257,8 @@ Future<List<String>> runTests(String testUrl, String platform, {onLog(String log
   var allLogs = <String>[];
   var allLogsListener = testConsoleLogs.listen(allLogs.add);
 
-  testConsoleLogs.firstWhere((log) => log.contains(testsFinishedPattern)).then((_) {
+  testConsoleLogs.firstWhere((log) => log.contains(testsFinishedPattern)).then(
+      (_) {
     if (!completer.isCompleted) {
       allLogsListener.cancel();
       completer.complete(allLogs);
@@ -267,14 +275,20 @@ Future<List<String>> runTests(String testUrl, String platform, {onLog(String log
   testConsoleLogs.first.timeout(loadTimeoutDuration, onTimeout: () {
     if (!completer.isCompleted) {
       allLogsListener.cancel();
-      completer.completeError(new TimeoutException('Timed out waiting for tests to load', loadTimeoutDuration));
+      completer.completeError(new TimeoutException(
+          'Timed out waiting for tests to load', loadTimeoutDuration));
     }
   });
 
-  testConsoleLogs.skip(1).transform(new Debouncer(testTimeoutDuration)).first.then((_) {
+  testConsoleLogs
+      .skip(1)
+      .transform(new Debouncer(testTimeoutDuration))
+      .first
+      .then((_) {
     if (!completer.isCompleted) {
       allLogsListener.cancel();
-      completer.completeError(new TimeoutException('Timed out waiting for test to run', testTimeoutDuration));
+      completer.completeError(new TimeoutException(
+          'Timed out waiting for test to run', testTimeoutDuration));
     }
   });
 
@@ -283,8 +297,7 @@ Future<List<String>> runTests(String testUrl, String platform, {onLog(String log
   var augmentedTestUrl = new Fluri(testUrl)
     ..setQueryParam('platform', platform);
 
-  var iframe = new IFrameElement()
-    ..src = augmentedTestUrl.toString();
+  var iframe = new IFrameElement()..src = augmentedTestUrl.toString();
 
   querySelector('#iframe_container').append(iframe);
 
@@ -309,7 +322,9 @@ void initLogScrolling() {
 
   logContainer.onMouseWheel.listen((e) {
     const snapThreshold = 10;
-    bool nearBottom = (logContainer.scrollHeight - logContainer.clientHeight) - logContainer.scrollTop < snapThreshold;
+    bool nearBottom = (logContainer.scrollHeight - logContainer.clientHeight) -
+            logContainer.scrollTop <
+        snapThreshold;
 
     if (e.deltaY >= 0 && nearBottom) {
       scrollLogsToBottom = true;
@@ -331,6 +346,7 @@ void displayTestLog(String log) {
 void displayTestTitle(String title) {
   querySelector('#test_title').text = title;
 }
+
 void displayTestStatus(String status) {
   querySelector('#test_status').text = status;
 }

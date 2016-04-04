@@ -29,12 +29,12 @@ const String iframeRunnerPath = 'sauce_iframe_runner/sauce_iframe_runner.html';
 /// If [autoSauceConnect] is `true`, then a Sauce Connect tunnel will be automatically started,
 /// with the optional [tunnelIdentifier], if specified.
 /// If `false`, it will be assumed that Sauce Connect is already running (with [tunnelIdentifier], if specified).
-Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms, String sauceUserName, String sauceAccessKey, {
-    Map options: const {},
+Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms,
+    String sauceUserName, String sauceAccessKey,
+    {Map options: const {},
     int pubServePort: 0,
     bool autoSauceConnect: true,
-    String tunnelIdentifier
-}) async {
+    String tunnelIdentifier}) async {
   PubServeTask pubServeTask;
   PubServeInfo serveInfo;
   Process sauceConnect;
@@ -59,14 +59,16 @@ Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms, String sau
 
     reporter.log('');
     reporter.log('Precompiling Dart test files...');
-    var allDartFiles = testHarnesses.expand((SauceTestHarness test) => test.dartScripts);
+    var allDartFiles =
+        testHarnesses.expand((SauceTestHarness test) => test.dartScripts);
     await Future.wait(allDartFiles.map((String dartScript) async {
       reporter.log('- Precompiling $dartScript');
       await get('$pubServerBaseUrl$dartScript.js');
     }));
 
     if (autoSauceConnect) {
-      sauceConnect = await startSauceConnection(sauceUserName, sauceAccessKey, tunnelIdentifier: tunnelIdentifier);
+      sauceConnect = await startSauceConnection(sauceUserName, sauceAccessKey,
+          tunnelIdentifier: tunnelIdentifier);
     }
 
     reporter.log('');
@@ -75,25 +77,21 @@ Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms, String sau
     await Future.forEach(testHarnesses, (SauceTestHarness harness) async {
       var name = harness.test.name;
 
-      var mergedOptions = {}
-        ..addAll(options)
-        ..addAll({
-          'name': name,
-        });
+      var mergedOptions = {}..addAll(options)..addAll({'name': name,});
 
       if (tunnelIdentifier != null) {
         mergedOptions['tunnelIdentifier'] = tunnelIdentifier;
       }
 
-      var testDrivers = await startSauceTests(name, harness.iframeRunnerUrl, platforms,
-          sauceUserName, sauceAccessKey,
-          options: mergedOptions
-      );
+      var testDrivers = await startSauceTests(name, harness.iframeRunnerUrl,
+          platforms, sauceUserName, sauceAccessKey,
+          options: mergedOptions);
       allTestDrivers.addAll(testDrivers);
     });
 
     reporter.log('');
-    reporter.log('Waiting for tests to complete... (See https://saucelabs.com/tests for overall status.)');
+    reporter.log(
+        'Waiting for tests to complete... (See https://saucelabs.com/tests for overall status.)');
 
     final Map results = await waitForTestsToComplete(allTestDrivers);
 
@@ -147,7 +145,8 @@ Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms, String sau
 
 /// Returns a Future that completes with a list of SauceTestHarness instances corresponding to
 /// [tests], with iframe runner URLS based on [pubServerBaseUrl].
-Future<List<SauceTestHarness>> getTestHarnesses(List<SauceTest> tests, String pubServerBaseUrl) {
+Future<List<SauceTestHarness>> getTestHarnesses(
+    List<SauceTest> tests, String pubServerBaseUrl) {
   return Future.wait(tests.map((SauceTest test) async {
     final testPath = test.path;
 
@@ -159,15 +158,16 @@ Future<List<SauceTestHarness>> getTestHarnesses(List<SauceTest> tests, String pu
 
     var harnessPath = '$testPath.sauce_browser_test.html';
     var harnessAbsolutePath = '/$harnessPath';
-    var dartScripts = JSON.decode(
-        (await get('$pubServerBaseUrl$testPath.dart_file_list.json',headers: {'Accept': 'application/json'})).body
-    );
+    var dartScripts = JSON.decode((await get(
+            '$pubServerBaseUrl$testPath.dart_file_list.json',
+            headers: {'Accept': 'application/json'}))
+        .body);
 
     return new SauceTestHarness(
         test: test,
-        iframeRunnerUrl: '$pubServerBaseUrl$iframeRunnerPath?test_url=${Uri.encodeQueryComponent(harnessAbsolutePath)}',
-        dartScripts: dartScripts
-    );
+        iframeRunnerUrl:
+            '$pubServerBaseUrl$iframeRunnerPath?test_url=${Uri.encodeQueryComponent(harnessAbsolutePath)}',
+        dartScripts: dartScripts);
   }));
 }
 
@@ -176,11 +176,14 @@ Future<List<SauceTestHarness>> getTestHarnesses(List<SauceTest> tests, String pu
 ///
 /// Until the Future completes, all `pub serve` output will logged live, and all subsequent
 /// output will be buffered until the `pub serve` process terminates.
-Future<PubServeInfo> logPubServeUntilFirstInfo(PubServeTask pubServeTask) async {
+Future<PubServeInfo> logPubServeUntilFirstInfo(
+    PubServeTask pubServeTask) async {
   var startupLogFinished = new Completer();
   reporter.logGroup(pubServeTask.command,
-      outputStream: pubServeTask.stdOut.transform(until(startupLogFinished.future)),
-      errorStream: pubServeTask.stdErr.transform(until(startupLogFinished.future)));
+      outputStream:
+          pubServeTask.stdOut.transform(until(startupLogFinished.future)),
+      errorStream:
+          pubServeTask.stdErr.transform(until(startupLogFinished.future)));
 
   var serveInfo = await pubServeTask.serveInfos.first;
 
@@ -188,13 +191,15 @@ Future<PubServeInfo> logPubServeUntilFirstInfo(PubServeTask pubServeTask) async 
 
   pubServeTask.stdOut.join('\n').then((stdOut) {
     if (stdOut.isNotEmpty) {
-      reporter.logGroup('`${pubServeTask.command}` (buffered stdout)', output: stdOut);
+      reporter.logGroup('`${pubServeTask.command}` (buffered stdout)',
+          output: stdOut);
     }
   });
 
   pubServeTask.stdErr.join('\n').then((stdErr) {
     if (stdErr.isNotEmpty) {
-      reporter.logGroup('`${pubServeTask.command}` (buffered stderr)', error: stdErr);
+      reporter.logGroup('`${pubServeTask.command}` (buffered stderr)',
+          error: stdErr);
     }
   });
 
