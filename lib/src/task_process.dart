@@ -87,7 +87,7 @@ class TaskProcess {
       });
       pgreps.add(pgrep);
     }
-    await new Future.wait(pgreps.map((pgrep) => pgrep.done));
+    await Future.wait(pgreps.map((pgrep) => pgrep.done));
 
     if (cpids.isNotEmpty) {
       cpids.addAll(await _getChildPids(pids: cpids));

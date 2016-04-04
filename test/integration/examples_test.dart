@@ -36,7 +36,6 @@ Future<bool> serveExamplesFor(String projectPath) async {
   process.stdout.listen((line) async {
     if (line.contains(pubServePattern)) {
       served = true;
-      await process.killAllChildren();
       process.kill();
     }
   });
