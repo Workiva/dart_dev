@@ -226,8 +226,7 @@ class CoverageTask extends Task {
         continue;
       }
 
-//      for (int j = 0; j < observatoryPorts.length; j++) {
-      for (int j = observatoryPorts.length - 1; j >= 0; j--) {
+      for (int j = 0; j < observatoryPorts.length; j++) {
         // Collect the coverage from observatory located at this port.
         File collection =
             new File(path.join(_collections.path, '${_files[i].path}$j.json'));
@@ -350,8 +349,6 @@ class CoverageTask extends Task {
     coverage.writeAsStringSync(JSON.encode(mergedJson));
     return coverage;
   }
-
-  List<int> observatoryPort;
 
   Future _run() async {
     if (_html && !(await platform_util.isExecutableInstalled('lcov'))) {

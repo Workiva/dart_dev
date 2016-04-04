@@ -23,7 +23,7 @@ import 'package:uuid/uuid.dart';
 import 'package:dart_dev/src/task_process.dart';
 import 'package:dart_dev/src/util.dart';
 
-/// An installer and runner for a standalone Selenium server.
+/// Initiates a standalone Selenium server.
 ///
 /// Once constructed, the [start] and [stop] methods can be used as
 /// before and after hooks for dart_dev tasks, respectively.
