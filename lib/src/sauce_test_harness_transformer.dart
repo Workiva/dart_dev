@@ -29,6 +29,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:barback/barback.dart';
 import 'package:fluri/fluri.dart';
@@ -68,6 +69,11 @@ class SauceTestHarnessTransformer extends Transformer
   static const String sauceDartExtension = '.sauce_browser_test.dart';
   static const String sauceHtmlExtension = '.sauce_browser_test.html';
   static const String sauceDartListExtension = '.dart_file_list.json';
+  static const List<String> proxiedIframeRunnerFiles = const <String>[
+    'sauce_iframe_runner.css',
+    'sauce_iframe_runner.dart',
+    'sauce_iframe_runner.html'
+  ];
 
   SauceTestHarnessTransformer.asPlugin();
 
@@ -82,13 +88,31 @@ class SauceTestHarnessTransformer extends Transformer
     }
   }
 
+  var proxied = true;
+
   Future apply(Transform transform) async {
     var id = transform.primaryInput.id;
 
-    if (id.extension == '.html') {
+    if (id.extension == '.html' &&
+        !proxiedIframeRunnerFiles.contains(id.path)) {
       await generateHtml(transform);
-    } else if (id.extension == '.dart') {
+    } else if (id.extension == '.dart' &&
+        !proxiedIframeRunnerFiles.contains(id.path)) {
       await generateDart(transform);
+    }
+
+    if (!proxiedIframeRunnerFiles.contains(id.path) && proxied) {
+      var package = transform.primaryInput.id.package;
+
+      for (String proxiedFile in proxiedIframeRunnerFiles) {
+        var file = new File(
+            'packages/dart_dev/src/tasks/saucelab_tests/sauce_iframe_runner/$proxiedFile');
+        var assetId =
+            new AssetId(package, 'test/sauce_iframe_runner/$proxiedFile');
+        var asset = new Asset.fromStream(assetId, file.openRead());
+        transform.addOutput(asset);
+      }
+      proxied = false;
     }
   }
 
