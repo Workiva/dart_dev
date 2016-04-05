@@ -23,6 +23,7 @@ import 'package:dart_dev/src/tasks/examples/config.dart';
 import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/gen_test_runner/config.dart';
 import 'package:dart_dev/src/tasks/init/config.dart';
+import 'package:dart_dev/src/tasks/saucelabs_tests/config.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
 import 'package:dart_dev/src/tasks/local/config.dart';
 
@@ -39,6 +40,7 @@ class Config {
   FormatConfig format = new FormatConfig();
   GenTestRunnerConfig genTestRunner = new GenTestRunnerConfig();
   InitConfig init = new InitConfig();
+  SaucelabsTestsConfig saucelabsTests = new SaucelabsTestsConfig();
   TestConfig test = new TestConfig();
 }
 

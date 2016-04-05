@@ -27,6 +27,7 @@ development requirements:
 - Documentation generation
 - Examples for manual testing/exploration
 - Applying a LICENSE file to all source files
+- Running dart unit tests on Sauce Labs
 
 Together, the Dart SDK and a couple of packages from the Dart team supply the
 necessary tooling to support the above requirements. But, the usage is
@@ -86,7 +87,7 @@ local tasks.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Generate a test runner file:** that allows for faster test execution.
-
+- **Running dart unit tests on Sauce Labs** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
 
 ### Local Tasks
 
@@ -241,6 +242,7 @@ ddev docs
 ddev examples
 ddev format
 ddev gen-test-runner
+ddev saucelabs-tests
 ddev test
 
 # without the alias
@@ -251,6 +253,7 @@ pub run dart_dev docs
 pub run dart_dev examples
 pub run dart_dev format
 pub run dart_dev gen-test-runner
+pub run dart_dev saucelabs-tests
 pub run dart_dev test
 ```
 
@@ -276,6 +279,7 @@ main(args) async {
   config.format
   config.genTestRunner
   config.init
+  config.saucelabsTests
   config.test
 
   await dev(args);
@@ -614,6 +618,65 @@ All configuration options for the local task discovery are found on the
     </tbody>
 </table>
 
+#### `saucelabs-tests` Config
+All configuration options for the `saucelabs-test` task are found on the `config.saucelabsTests`
+object.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>filesToTest</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>[]</code></td>
+            <td>Html files related to browser tests to be executed on saucelabs</td>
+        </tr>
+        <tr>
+            <td><code>platforms</code></td>
+            <td><code>List&lt;SaucePlatforms&gt;</code></td>
+            <td><code>[chromeWindows, firefoxWindows, chromeOsx, firefoxOsx, ie10, ie11]</code></td>
+            <td>Platforms to be executed on saucelabs</td>
+        </tr>
+        <tr>
+            <td><code>pubServer</code></td>
+            <td><code>int</code></td>
+            <td><code>0</code></td>
+            <td>Specify the port to run the tests on, otherwise specifying 0 will use a random port</td>
+        </tr>
+        <tr>
+            <td><code>sauceConnectTunnelIdentifier</code></td>
+            <td><code>String</code></td>
+            <td><code>null</code></td>
+            <td>The sauce connect tunnel to use, if null then a tunnel will be automatically started</td>
+        </tr>
+        <tr>
+            <td><code>testReportPath</code></td>
+            <td><code>String</code></td>
+            <td><code>test_reports/sauce_labs_unit_tests.xml</code></td>
+            <td>Path for test_report</td>
+        </tr>        
+    </tbody>
+</table>
+
+* In order to use this the following transformer needs to be added to your pubspec.yaml, it must also be applied after the test transformer
+
+```
+- dart_dev/src/sauce_test_harness_transformer:
+    $include: [
+       "test/**_test{.*,}.dart",
+       "test/**_test{.*,}.html",
+      ]
+```
+
+* The html files to be transformed should have the `packages/test/dart.js` script tag listed last.
+
 #### `test` Config
 All configuration options for the `test` task are found on the `config.test`
 object.
@@ -718,6 +781,7 @@ Supported tasks:
     format
     gen-test-runner
     init
+    saucelabs-tests
     test
 ```
 

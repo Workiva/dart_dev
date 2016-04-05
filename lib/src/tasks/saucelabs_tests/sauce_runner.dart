@@ -1,6 +1,6 @@
 /// A library for running Dart unit tests on Sauce Labs from start to finish,
 /// with automatic (and optional) management of the Pub server and Sauce Connect tunnel.
-library dart_dev.src.tasks.saucelab_tests.sauce_runner;
+library dart_dev.src.tasks.saucelabs_tests.sauce_runner;
 
 import 'dart:async';
 import 'dart:convert';
@@ -43,8 +43,9 @@ Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms,
   try {
     if (pubServePort == 0) {
       reporter.log('Starting pub server...');
-      // Start `pub serve` on the `test` directory
-      pubServeTask = startPubServe(additionalArgs: ['test']);
+      // Start `pub serve` on the `test` directory utilizing force-poll to better monitor
+      // in use files during the testing process
+      pubServeTask = startPubServe(additionalArgs: ['test', '--force-poll']);
       serveInfo = await logPubServeUntilFirstInfo(pubServeTask);
       reporter.log('');
     } else {

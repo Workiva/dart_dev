@@ -1,6 +1,6 @@
 /// Methods for starting Sauce Connect and running tests in Sauce Labs via
 /// [SauceUnitTestDriver].
-library dart_dev.src.tasks.saucelab_tests.sauce_api;
+library dart_dev.src.tasks.saucelabs_tests.sauce_api;
 
 import 'dart:async';
 import 'dart:convert';
