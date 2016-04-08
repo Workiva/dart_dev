@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library dart_dev.src.tasks.saucelab_tests.config;
+library dart_dev.src.tasks.saucelabs_tests.config;
 
 import 'package:dart_dev/src/tasks/config.dart';
-import 'package:dart_dev/src/tasks/saucelab_tests/platforms.dart';
+import 'package:dart_dev/src/tasks/saucelabs_tests/platforms.dart';
 
+const String defaultBuildName = 'saucelabs-run';
 const List<SaucePlatform> defaultPlatforms = const <SaucePlatform>[
   chromeWindows,
   firefoxWindows,
@@ -29,7 +30,8 @@ const int defaultPubServer = 0;
 const String defaultSauceConnectTunnelIdentifier = null;
 const String defaultTestReportsPath = 'test_reports/sauce_labs_unit_tests.xml';
 
-class SaucelabTestsConfig extends TaskConfig {
+class SaucelabsTestsConfig extends TaskConfig {
+  String buildName = defaultBuildName;
   List<String> filesToTest = [];
   List<SaucePlatform> platforms = defaultPlatforms;
   int pubServer = defaultPubServer;

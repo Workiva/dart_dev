@@ -1,5 +1,5 @@
 /// A method to convert Sauce Labs JS unit test results into a xUnit XML report.
-library dart_dev.src.tasks.saucelab_tests.xml_reporter;
+library dart_dev.src.tasks.saucelabs_tests.xml_reporter;
 
 import 'package:xml/xml.dart';
 

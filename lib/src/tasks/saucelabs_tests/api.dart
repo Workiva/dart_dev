@@ -1,4 +1,4 @@
-library dart_dev.src.tasks.saucelab_tests.api;
+library dart_dev.src.tasks.saucelabs_tests.api;
 
 import 'dart:io';
 
@@ -8,23 +8,13 @@ String commandOutput(String cmd, [List args = const []]) =>
     (Process.runSync(cmd, args).stdout as String).trim();
 
 /// Returns options for the Sauce Labs build, supplied by environment variables and Git.
-///     * the Sauce build name will be the name of the current branch.
-///     * the `manual_run` tag will be added to the build.
 ///
 /// The commit SHA is also always included in the custom data field.
-Map getSauceBuildOptions() {
-  String buildName;
+Map getSauceBuildOptions(String buildName) {
   List<String> tags = <String>[];
   Map customData = {};
 
   final String commit = commandOutput('git', ['rev-parse', 'HEAD']);
-  final String shortCommit =
-      commandOutput('git', ['rev-parse', '--short', 'HEAD']);
-  final String branch =
-      commandOutput('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
-
-  buildName = '$branch - $shortCommit';
-  tags.add('manual');
 
   customData['commit'] = commit;
 

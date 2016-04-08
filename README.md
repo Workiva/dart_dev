@@ -26,7 +26,7 @@ development requirements:
 - Documentation generation
 - Examples for manual testing/exploration
 - Applying a LICENSE file to all source files
-- Running dart unit tests on saucelabs
+- Running dart unit tests on Sauce Labs
 
 Together, the Dart SDK and a couple of packages from the Dart team supply the
 necessary tooling to support the above requirements. But, the usage is
@@ -78,7 +78,7 @@ need to know how to use the `dart_dev` tool.
 - **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
-- **Running dart unit tests on saucelabs** compiles dart unit tests that can be run in the browser and executes them on various platforms using saucelabs.
+- **Running dart unit tests on Sauce Labs** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
 
 
 ## Getting Started
@@ -186,7 +186,7 @@ ddev coverage
 ddev docs
 ddev examples
 ddev format
-ddev saucelab-tests
+ddev saucelabs-tests
 ddev test
 
 # without the alias
@@ -196,7 +196,7 @@ pub run dart_dev coverage
 pub run dart_dev docs
 pub run dart_dev examples
 pub run dart_dev format
-pub run dart_dev saucelab-tests
+pub run dart_dev saucelabs-tests
 pub run dart_dev test
 ```
 
@@ -221,7 +221,7 @@ main(args) async {
   config.examples
   config.format
   config.init
-  config.saucelabTests
+  config.saucelabsTests
   config.test
   
   await dev(args);
@@ -414,8 +414,8 @@ object.
     </tbody>
 </table>
 
-#### `saucelab-tests` Config
-All configuration options for the `saucelabs-test` task are found on the `config.saucelabTests`
+#### `saucelabs-tests` Config
+All configuration options for the `saucelabs-test` task are found on the `config.saucelabsTests`
 object.
 
 <table>
@@ -560,7 +560,7 @@ Supported tasks:
     examples
     format
     init
-    saucelab-tests
+    saucelabs-tests
     test
 ```
 

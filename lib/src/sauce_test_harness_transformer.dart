@@ -106,7 +106,7 @@ class SauceTestHarnessTransformer extends Transformer
 
       for (String proxiedFile in proxiedIframeRunnerFiles) {
         var file = new File(
-            'packages/dart_dev/src/tasks/saucelab_tests/sauce_iframe_runner/$proxiedFile');
+            'packages/dart_dev/src/tasks/saucelabs_tests/sauce_iframe_runner/$proxiedFile');
         var assetId =
             new AssetId(package, 'test/sauce_iframe_runner/$proxiedFile');
         var asset = new Asset.fromStream(assetId, file.openRead());

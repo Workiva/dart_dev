@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library dart_dev.src.tasks.saucelab_tests.cli;
+library dart_dev.src.tasks.saucelabs_tests.cli;
 
 import 'dart:async';
 import 'dart:io';
@@ -23,15 +23,19 @@ import 'package:dart_dev/util.dart' show reporter, TaskProcess;
 
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
-import 'package:dart_dev/src/tasks/saucelab_tests/api.dart';
-import 'package:dart_dev/src/tasks/saucelab_tests/sauce_runner.dart'
+import 'package:dart_dev/src/tasks/saucelabs_tests/api.dart';
+import 'package:dart_dev/src/tasks/saucelabs_tests/sauce_runner.dart'
     as sauceRunner;
-import 'package:dart_dev/src/tasks/saucelab_tests/xml_reporter.dart';
+import 'package:dart_dev/src/tasks/saucelabs_tests/xml_reporter.dart';
 
 class SauceRunnerCli extends TaskCli {
-  final ArgParser argParser = new ArgParser();
+  final ArgParser argParser = new ArgParser()
+    ..addOption('build-name',
+        abbr: 'b',
+        defaultsTo: 'saucelabs-run',
+        help: 'Build name for the run.');
 
-  final String command = 'saucelab-tests';
+  final String command = 'saucelabs-tests';
 
   final String sauceAccessKey = env['SAUCE_ACCESS_KEY'];
   final String sauceUserName = env['SAUCE_USERNAME'];
@@ -42,40 +46,36 @@ class SauceRunnerCli extends TaskCli {
           'the `SAUCE_ACCESS_KEY` and `SAUCE_USERNAME` SauceRunnerConfig instance.');
     }
 
-    if (config.saucelabTests.filesToTest.isEmpty) {
+    if (config.saucelabsTests.filesToTest.isEmpty) {
       return new CliResult.fail('You must specify files to test.');
     }
 
     List<sauceRunner.SauceTest> sauceTests = [];
 
-    for (String file in config.saucelabTests.filesToTest) {
-      String filePath = '${Directory.current.path}/test/$file';
-      var tempFile = new File(filePath);
-      if (!tempFile.existsSync()) {
-        return new CliResult.fail('$filePath doesn\'t exist in this project.');
-      }
+    for (String file in config.saucelabsTests.filesToTest) {
       sauceTests.add(new sauceRunner.SauceTest(file, file));
     }
 
-    var pubServe = config.saucelabTests.pubServer;
-    final int pubServePort =
-        pubServe != null ? config.saucelabTests.pubServer : 0;
+    var buildName = TaskCli.valueOf(
+        'build-name', parsedArgs, config.saucelabsTests.buildName);
+
+    final int pubServePort = config.saucelabsTests.pubServer ?? 0;
 
     var autoSauceConnect;
     var tunnelIdentifier;
-    if (config.saucelabTests.sauceConnectTunnelIdentifier != null) {
+    if (config.saucelabsTests.sauceConnectTunnelIdentifier != null) {
       autoSauceConnect = false;
-      tunnelIdentifier = config.saucelabTests.sauceConnectTunnelIdentifier;
+      tunnelIdentifier = config.saucelabsTests.sauceConnectTunnelIdentifier;
     } else {
       autoSauceConnect = true;
       tunnelIdentifier = generateTunnelIdentifier();
     }
 
     var results = await sauceRunner.run(sauceTests,
-        config.saucelabTests.platforms, sauceUserName, sauceAccessKey,
+        config.saucelabsTests.platforms, sauceUserName, sauceAccessKey,
         autoSauceConnect: autoSauceConnect,
         tunnelIdentifier: tunnelIdentifier,
-        options: getSauceBuildOptions(),
+        options: getSauceBuildOptions(buildName),
         pubServePort: pubServePort);
 
     var failed = false;
@@ -88,16 +88,16 @@ class SauceRunnerCli extends TaskCli {
 
     reporter.log('');
     reporter.log(
-        'Writing xUnit test report to ${config.saucelabTests.testReportPath}.');
+        'Writing xUnit test report to ${config.saucelabsTests.testReportPath}.');
     var reportXml = sauceResultsToXunitXml(results);
-    var reportOutput = new File(config.saucelabTests.testReportPath);
+    var reportOutput = new File(config.saucelabsTests.testReportPath);
     await reportOutput.create(recursive: true);
     await reportOutput.writeAsString(reportXml);
 
     if (failed) {
       return new CliResult.fail('Fail, there was an error in running your tests'
           ' please review the output above and the test report located at'
-          ' ${config.saucelabTests.testReportPath}.');
+          ' ${config.saucelabsTests.testReportPath}.');
     } else {
       return new CliResult.success('Success, your tests completely successfully'
           ' on saucelabs.');
