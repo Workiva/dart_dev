@@ -23,7 +23,7 @@ const List<String> defaultReportOn = const ['lib/'];
 
 class CoverageConfig extends TaskConfig {
   bool html = defaultHtml;
-  bool pubServe = defaultPubServe;
   String output = defaultOutput;
+  bool pubServe = defaultPubServe;
   List<String> reportOn = defaultReportOn;
 }
