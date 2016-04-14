@@ -1,7 +1,0 @@
-name: coverage_browser
-version: 0.0.0
-dev_dependencies:
-  coverage: "^0.7.2"
-  dart_dev:
-    path: ../../../..
-  test: "^0.12.0"

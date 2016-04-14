@@ -33,6 +33,9 @@ class TestCli extends TaskCli {
     ..addFlag('integration',
         defaultsTo: defaultIntegration,
         help: 'Includes the integration test suite.')
+    ..addFlag('functional',
+        defaultsTo: defaultFunctional,
+        help: 'Includes the functional test suite.')
     ..addOption('concurrency',
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
@@ -89,13 +92,17 @@ class TestCli extends TaskCli {
     // The integration suite should only be run if the --integration is set.
     bool integration = parsedArgs['integration'] ?? false;
 
+    // The functional suite should only be run if the --functional is set.
+    bool functional = parsedArgs['functional'] ?? false;
+
     // CLI user can filter tests by name.
     bool testNamed = parsedArgs['name'] != null;
 
-    if (!individualTestsSpecified && !unit && !integration) {
+    if (!individualTestsSpecified && !unit && !integration && !functional) {
       return new CliResult.fail(
-          'No tests were selected. Include at least one of --unit or '
-          '--integration, or pass in one or more test files/directories');
+          'No tests were selected. Include at least one of --unit, '
+          '--integration, --functional or pass in one or more test '
+          'files/directories');
     }
 
     // Build the list of tests to run.
@@ -111,6 +118,9 @@ class TestCli extends TaskCli {
       if (integration) {
         tests.addAll(config.test.integrationTests);
       }
+      if (functional) {
+        tests.addAll(config.test.functionalTests);
+      }
     }
 
     if (tests.isEmpty) {
@@ -122,12 +132,17 @@ class TestCli extends TaskCli {
         return new CliResult.fail(
             'This project does not specify any integration tests.');
       }
+      if (functional && config.test.functionalTests.isEmpty) {
+        return new CliResult.fail(
+            'This project does not specify any functional tests.');
+      }
     }
 
     PubServeTask pubServeTask;
     if (pubServe) {
       // Start `pub serve` on the `test` directory
-      pubServeTask = startPubServe(additionalArgs: ['test']);
+      pubServeTask = startPubServe(
+          port: config.test.pubServePort, additionalArgs: ['test']);
 
       var startupLogFinished = new Completer();
       reporter.logGroup(pubServeTask.command,

@@ -13,6 +13,7 @@
 - [**Project Configuration**](#project-configuration)
 - [**CLI Usage**](#cli-usage)
 - [**Programmatic Usage**](#programmatic-usage)
+- [**BONUS: Functional Test Code Coverage**](#functional-test-code-coverage)
 
 ## Motivation
 
@@ -146,24 +147,25 @@ import 'package:dart_dev/dart_dev.dart';
 main(args) async {
   // Define the entry points for static analysis.
   config.analyze.entryPoints = ['lib/', 'test/', 'tool/'];
-  
+
   // Define the directories where the LICENSE should be applied.
   config.copyLicense.directories = ['example/', 'lib/'];
 
   // Configure whether or not the HTML coverage report should be generated.
   config.coverage.html = false;
-  
+
   // Configure the port on which examples should be served.
   config.examples.port = 9000;
-  
+
   // Define the directories to include when running the
   // Dart formatter.
   config.format.directories = ['lib/', 'test/', 'tool/'];
-  
+
   // Define the location of your test suites.
   config.test
     ..unitTests = ['test/unit/']
-    ..integrationTests = ['test/integration/'];
+    ..integrationTests = ['test/integration/']
+    ..functionalTests = ['test/functional'];
 
   // Execute the dart_dev tooling.
   await dev(args);
@@ -223,7 +225,7 @@ main(args) async {
   config.init
   config.saucelabsTests
   config.test
-  
+
   await dev(args);
 }
 ```
@@ -342,6 +344,18 @@ configuration from the `config.test` object.
             <td><code>bool</code></td>
             <td><code>false</code></td>
             <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
+        </tr>
+        <tr>
+            <td><code>seleniumCommand</code></td>
+            <td><code>String</code></td>
+            <td><code>"selenium-server"</code></td>
+            <td>Command used to execute Selenium for functional testing.</td>
+        </tr>
+        <tr>
+            <td><code>seleniumSuccess</code></td>
+            <td><code>String</code></td>
+            <td><code>"Selenium Server is up and running"</code></td>
+            <td>Value used to verify that Selenium has been started successfully.  This value is accurate for v2.48.0 of Selenium Server.</td>
         </tr>
     </tbody>
 </table>
@@ -494,6 +508,12 @@ object.
             <td>Number of concurrent test suites run.</td>
         </tr>
         <tr>
+            <td><code>functionalTests</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>[]</code></td>
+            <td>Functional test locations. Items in this list can be directories and/or files.</td>
+        </tr>
+        <tr>
             <td><code>integrationTests</code></td>
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
@@ -518,6 +538,12 @@ object.
             <td><code>bool</code></td>
             <td><code>false</code></td>
             <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
+        </tr>
+        <tr>
+            <td><code>pubServePort</code></td>
+            <td><code>int</code></td>
+            <td><code>0</code></td>
+            <td>Port used by the Pub server for browser tests.  The default value will randomly select an open port to use.</td>
         </tr>
     </tbody>
 </table>
@@ -602,3 +628,105 @@ Check out the source of these API methods for additional documentation.
 > configuration instances that the command-line interfaces do. Because of this,
 > the default usage may be different. You can access said configurations from
 > the main `package:dart_dev/dart_dev.dart` import.
+
+## Functional Test Code Coverage
+
+If you're running functional tests with [Selenium](http://www.seleniumhq.org/)
+and [webdriver.dart](https://github.com/google/webdriver.dart), dart_dev can
+help you run the Selenium standalone server and collect coverage from those
+functional tests.
+
+As the webdriver.dart project documents, `selenium-server-standalone` and
+`chromedriver` are required dependencies.
+
+### `selenium-server-standalone`
+
+```
+brew install selenium-server-standalone
+```
+
+> If you need to use multiple versions of Selenium, you can create a local
+> executable and store it in your project's `tool/` directory (and check it in
+> to version control). You can then pass the path to this local executable to
+> the Selenium helper (see [configuring dart_dev to run Selenium](#configuring-dart_dev-to-run-selenium)).
+>
+> ```
+> cd tool/
+> curl -o selenium-server-standalone.jar http://selenium-release.storage.googleapis.com/2.48/selenium-server-standalone-2.48.2.jar
+> echo '#!/usr/bin/env bash' | tee -a selenium-server
+> echo 'DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"' | tee -a selenium-server
+> echo 'exec java -jar $DIR/selenium-server-standalone.jar "$@"' | tee -a selenium-server
+> chmod +x selenium-server
+> ```
+
+### `chromedriver`
+
+Normally, `chromedriver` could be installed with brew, but to collect coverage,
+the functional tests need to be run in Dartium, which requires an older version
+of `chromedriver` (currently 2.14).
+
+Download `chromedriver` 2.14 here:
+```
+https://chromedriver.storage.googleapis.com/index.html?path=2.14/
+```
+
+Unzip and run the executable once to place it in `/usr/local/bin/`.
+
+### Configuring dart_dev to run Selenium
+
+**tool/dev.dart**
+```dart
+import 'package:dart_dev/dart_dev.dart';
+import 'package:dart_dev/util.dart' show SeleniumHelper;
+
+main() async {
+  // By default, this helper assumes the `selenium-server` executable is in the path
+  var selenium = new SeleniumHelper();
+
+  // If you have a local executable, point to it like so:
+  var selenium = new SeleniumHelper(executablePath: 'tool/selenium-server');
+
+  config.test
+    ..before = [selenium.start]
+    ..after = [selenium.stop];
+}
+```
+
+> **Note:** you may also want to spin up a pub instance here to serve the
+> application that will be exercised in your functional tests.
+
+### Example functional test
+
+```dart
+import 'package:test/test.dart';
+import 'package:webdriver/io.dart';
+
+WebDriver driver;
+
+void main() {
+  setUp(() async {
+    var options = {
+      'browserName': 'chrome',
+      'chromeOptions': {
+        'binary': 'path/to/dartium'
+      }
+    };
+    driver = await createDriver(desired: options);
+  });
+
+  // Do not quit the webdriver because the test and coverage tasks will handle
+  // closing the browser when complete.
+  //tearDown(() => driver.quit());
+
+  test('test', () async {
+    // This requires that your application is being served at localhost:8080
+    await driver.get('http://localhost:8080');
+    // interact with application
+  });
+}
+```
+
+> The `coverage` and `test` tasks will both handle closing any Dartium instances
+> that were opened via the `WebDriver` once the tests are complete. You will
+> need to omit the standard `tearDown(() => driver.quit());` from your test
+> setups or code coverage cannot be collected.

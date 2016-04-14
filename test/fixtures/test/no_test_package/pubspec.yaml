@@ -1,5 +1,0 @@
-name: test_no_test_package
-version: 0.0.0
-dev_dependencies:
-  dart_dev:
-    path: ../../../..
