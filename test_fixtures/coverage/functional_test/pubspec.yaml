@@ -4,6 +4,6 @@ dev_dependencies:
   browser: any
   coverage: "^0.7.2"
   test: '0.12.0'
-  webdriver: '0.10.0-pre.13'
+  webdriver: '^1.0.0'
   dart_dev:
     path: ../../..

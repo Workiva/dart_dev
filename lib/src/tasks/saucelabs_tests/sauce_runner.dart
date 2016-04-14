@@ -43,7 +43,8 @@ Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms,
   try {
     if (pubServePort == 0) {
       reporter.log('Starting pub server...');
-      // Start `pub serve` on the `test` directory
+      // Start `pub serve` on the `test` directory utilizing force-poll to better monitor
+      // in use files during the testing process
       pubServeTask = startPubServe(additionalArgs: ['test', '--force-poll']);
       serveInfo = await logPubServeUntilFirstInfo(pubServeTask);
       reporter.log('');
