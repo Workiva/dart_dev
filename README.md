@@ -134,6 +134,11 @@ bashcompinit
 source <path/to/ddev-completion.sh>
 ```
 
+#### Fish Completion
+
+Symlink or copy the file `tool/ddev.fish` into `~/.config/fish/` (or wherever
+your completion scripts live).
+
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
 `pub run dart_dev init` to generate the configuration file. This should create a
