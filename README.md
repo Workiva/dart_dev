@@ -136,7 +136,7 @@ source <path/to/ddev-completion.sh>
 
 #### Fish Completion
 
-Symlink or copy the file `tool/ddev.fish` into `~/.config/fish/` (or wherever
+Symlink or copy the file `tool/ddev.fish` into `~/.config/fish/completions/` (or wherever
 your completion scripts live).
 
 #### Configuration
