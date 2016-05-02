@@ -69,7 +69,14 @@ need to know how to use the `dart_dev` tool.
 > interface for interacting with said tooling in a simplified manner.
 
 
-## Supported Tasks
+## Tasks
+
+A task is a single unit of execution within `dart_dev`. They are identified by
+a name and may or may not take arguments. Several supported tasks are provided
+by default. Consumers can supplement the supported tasks with project specific
+local tasks.
+
+### Supported Tasks
 
 - **Tests:** runs test suites (unit, integration, and functional) via the [`test` package test runner](https://github.com/dart-lang/test).
 - **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
@@ -80,6 +87,17 @@ need to know how to use the `dart_dev` tool.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Generate a test runner file:** that allows for faster test execution.
 
+
+### Local Tasks
+
+A local task is a script or program that is discovered by `dart_dev`. By default
+, dart dev will recursively look for files in the `tool` project level directory
+that match the filename pattern `(task_name)_task.(executable_type)`. Any file
+matching this pattern will be parsed and registered as a task.
+
+Executable types identify how a given task should execute. Dart and bash scripts
+are supported out of the box. The set of available executable types can be
+expanded in the configuration as documented below.
 
 ## Getting Started
 
@@ -159,6 +177,12 @@ main(args) async {
   // Define the directories to include when running the
   // Dart formatter.
   config.format.directories = ['lib/', 'test/', 'tool/'];
+
+  // Define overrides for local task discovery
+  config.local
+    ..taskPaths.add('bin')
+    ..commandFilePattern = '([a-zA-Z0-9]+)_task.([a-zA-Z0-9]+)'
+    ..executables['go'] = ['go', 'run'];
 
   // Define the location of your test suites.
   config.test
@@ -448,6 +472,42 @@ object.
             <td><code>List&lt;TestRunnerConfig&gt;</code></td>
             <td><code>[TestRunnerConfig()]</code></td>
             <td>The list of runner configurations used to create individual test runners</td>
+        </tr>
+    </tbody>
+</table>
+
+#### Local Config
+All configuration options for the local task discovery are found on the
+`config.local` object.
+
+##### Local Discovery
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>taskPaths</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>['tool']</code></td>
+            <td>A list of project level paths to search for file matching the task pattern.</td>
+        </tr>
+        <tr>
+            <td><code>commandFilePattern</code></td>
+            <td><code>String</code></td>
+            <td><code>'([a-zA-Z0-9]+)_task.([a-zA-Z0-9]+)'</code></td>
+            <td>A Regular Expression which matches two groups that represent the task name and executable type.</td>
+        </tr>
+        <tr>
+            <td><code>commandFilePattern</code></td>
+            <td><code>Map&lt;String, List&lt;String&gt;&gt;</code></td>
+            <td><code>'{'dart': ['dart'], 'sh': ['bash'] }'</code></td>
+            <td>A lookup table that matches an executable type to a set strings to prefix the execution of a task file with.</td>
         </tr>
     </tbody>
 </table>

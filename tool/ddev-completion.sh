@@ -36,6 +36,10 @@ _ddev()
         cmds="--help --unit --no-unit --integration --no-integration --concurrency --platform"
     fi
 
+    if [[ " ${COMP_WORDS[*]} " == *" local "* ]]; then
+        cmds="--help"
+    fi
+
     COMPREPLY=($(compgen -W "${cmds}" -- ${cur}))  
     return 0
 }

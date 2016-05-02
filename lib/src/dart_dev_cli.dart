@@ -37,6 +37,7 @@ import 'package:dart_dev/src/tasks/examples/cli.dart';
 import 'package:dart_dev/src/tasks/format/cli.dart';
 import 'package:dart_dev/src/tasks/gen_test_runner/cli.dart';
 import 'package:dart_dev/src/tasks/init/cli.dart';
+import 'package:dart_dev/src/tasks/local/cli.dart';
 import 'package:dart_dev/src/tasks/test/cli.dart';
 
 import 'package:dart_dev/src/version.dart' show printVersion;
@@ -65,11 +66,27 @@ dev(List<String> args) async {
   registerTask(new InitCli(), config.init);
   registerTask(new TestCli(), config.test);
 
+  try {
+    LocalCli.discover(config.local.taskPaths).forEach((task, exec) {
+      registerTask(new LocalCli(task, exec), config.local);
+    });
+  } on ArgumentError catch (e) {
+    reporter.error('${e.message}\n\nPlease update your local configuration.',
+        shout: true);
+    exit(exitCode);
+  }
+
   await _run(args);
   exit(exitCode);
 }
 
 void registerTask(TaskCli cli, TaskConfig config) {
+  if (_cliTasks[cli.command] != null) {
+    throw new ArgumentError(
+        'A task is attempting to use the task name "${cli.command}" which'
+        ' has already been registered.');
+  }
+
   _cliTasks[cli.command] = cli;
   _cliConfigs[cli.command] = config;
 }
