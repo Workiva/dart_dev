@@ -18,7 +18,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
-
+import 'package:completion/completion.dart';
 import 'package:dart_dev/util.dart'
     show
         TaskProcess,
@@ -101,7 +101,7 @@ Future _run(List<String> args) async {
 
   ArgResults env;
   try {
-    env = _parser.parse(args);
+    env = tryArgsCompletion(args, _parser);
   } on FormatException catch (e) {
     reporter.error('${e.message}\n', shout: true);
     reporter.log(_generateUsage(), shout: true);
