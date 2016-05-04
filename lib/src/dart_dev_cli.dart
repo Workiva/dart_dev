@@ -30,6 +30,7 @@ import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
 import 'package:dart_dev/src/tasks/analyze/cli.dart';
+import 'package:dart_dev/src/tasks/bash_completion/cli.dart';
 import 'package:dart_dev/src/tasks/copy_license/cli.dart';
 import 'package:dart_dev/src/tasks/coverage/cli.dart';
 import 'package:dart_dev/src/tasks/docs/cli.dart';
@@ -55,6 +56,7 @@ String _topLevelUsage = _parser.usage;
 
 dev(List<String> args) async {
   registerTask(new AnalyzeCli(), config.analyze);
+  registerTask(new BashCompletionCli(), config.bashCompletion);
   registerTask(new CopyLicenseCli(), config.copyLicense);
   registerTask(new CoverageCli(), config.coverage);
   registerTask(new DocsCli(), config.docs);
