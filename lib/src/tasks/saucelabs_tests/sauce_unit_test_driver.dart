@@ -6,7 +6,7 @@ import 'dart:io';
 
 import 'package:dart_dev/util.dart';
 import 'package:webdriver/io.dart'
-    show BrowserPlatform, Capabilities, WebDriver, createDriver;
+    show By, Capabilities, WebDriver, createDriver;
 
 import './platforms.dart';
 import 'sauce_runner.dart';
@@ -156,6 +156,18 @@ class SauceUnitTestDriver {
             ProcessSignal.SIGTERM.watch().take(1).listen((_) => _quitDriver()))
         ..add(
             ProcessSignal.SIGINT.watch().take(1).listen((_) => _quitDriver()));
+
+      // If the browser window is not active, focus events won't be dispatched in Firefox as expected.
+      //
+      // So, before running any tests, we'll ensure the browser window is active by clicking on the page with WebDriver.
+      //
+      // 1. Load `about:blank` to ensure that clicking on the page does nothing.
+      // 2. Move the cursor over a valid element so that the WebDriver doesn't break itself trying to click on nothing.
+      // 3. Click.
+      await _driver.get('about:blank'); // [1]
+      await _driver.mouse.moveTo(
+          element: await _driver.findElement(const By.tagName('body'))); // [2]
+      await _driver.mouse.click(); // [3]
 
       await _driver.get(testUrl);
 
