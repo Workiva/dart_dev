@@ -44,6 +44,13 @@ class TestCli extends TaskCli {
         negatable: true,
         defaultsTo: defaultPubServe,
         help: 'Serves browser tests using a Pub server.')
+    ..addOption('pub-serve-port',
+        help:
+            'Port used by the Pub server for browser tests. The default value will randomly select an open port to use.')
+    ..addFlag('pub-serve-started',
+        defaultsTo: false,
+        help:
+            'pub serve is already running and uses pub-serve-port as the port passed to the test command.')
     ..addOption('platform',
         abbr: 'p',
         allowMultiple: true,
@@ -63,7 +70,7 @@ class TestCli extends TaskCli {
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (!platform_util.hasImmediateDependency('test'))
       return new CliResult.fail(
-          'Package "test" must be an immediate dependency in order to run its executables.');
+        'Package "test" must be an immediate dependency in order to run its executables.');
 
     List<String> additionalArgs = [];
     List<String> tests = [];
@@ -74,6 +81,11 @@ class TestCli extends TaskCli {
 
     bool pubServe =
         TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
+
+    int pubServePort =
+        TaskCli.valueOf('pub-serve-port', parsedArgs, config.test.pubServePort);
+
+    bool isPubServeRunning = parsedArgs['pub-serve-started'] ?? true;
 
     var concurrency =
         TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
@@ -139,10 +151,17 @@ class TestCli extends TaskCli {
     }
 
     PubServeTask pubServeTask;
-    if (pubServe) {
+
+    if (isPubServeRunning && pubServePort == 0) {
+      return new CliResult.fail(
+          'pub-serve-started option passed in without a --pub-serve-port arg or config.test.pubServePort value.');
+    } else if (isPubServeRunning) {
+      // `pub serve` is already running so pass the provided port
+      additionalArgs.add('--pub-serve=$pubServePort');
+    } else if (pubServe) {
       // Start `pub serve` on the `test` directory
       pubServeTask = startPubServe(
-          port: config.test.pubServePort, additionalArgs: ['test']);
+          port: pubServePort, additionalArgs: ['test']);
 
       var startupLogFinished = new Completer();
       reporter.logGroup(pubServeTask.command,
