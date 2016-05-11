@@ -36,7 +36,7 @@ class GenTestRunnerCli extends TaskCli {
 
   final String command = 'gen-test-runner';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     GenResultGroup results = new GenResultGroup();
 
     for (var currentConfig in config.genTestRunner.configs) {
