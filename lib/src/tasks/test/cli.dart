@@ -15,11 +15,10 @@
 library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter, isPortBound;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -208,21 +207,5 @@ class TestCli extends TaskCli {
     return task.successful
         ? new CliResult.success(task.testSummary)
         : new CliResult.fail(task.testSummary);
-  }
-
-  Future<bool> isPortBound(int port) async {
-    if (port == 0) {
-      return false;
-    }
-
-    ServerSocket socket;
-    try {
-      socket = await ServerSocket.bind('localhost', port);
-      return false;
-    } on SocketException {
-      return true;
-    } finally {
-      await socket?.close();
-    }
   }
 }
