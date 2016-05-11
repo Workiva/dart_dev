@@ -56,8 +56,6 @@ Future<int> runTests(String projectPath,
         'pub', ['serve', '--port=$pubServePort', 'test'],
         workingDirectory: '$projectPath');
 
-    args.add('--pub-serve-started');
-
     // A port of 0 is ignored to validate a failure scenario for no port + pub-serve-started flag
     if (pubServePort > 0) {
       args.add('--pub-serve-port=$pubServePort');
@@ -154,11 +152,6 @@ void main() {
     test('should run tests that provides a Pub server', () async {
       expect(await runTests(projectThatNeedsPubServe, runCustomPubServe: true),
           equals(1));
-    });
-
-    test('should warn if "pub-serve-started" argument passed without port', () async {
-      expect(runTests(projectWithoutTestPackage, runCustomPubServe: true, pubServePort: 0),
-          throwsA(new isInstanceOf<TestFailure>()));
     });
 
     test('should run tests with test name specified', () async {
