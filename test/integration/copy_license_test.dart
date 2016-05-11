@@ -21,12 +21,12 @@ import 'dart:io';
 import 'package:dart_dev/util.dart' show TaskProcess, copyDirectory;
 import 'package:test/test.dart';
 
-const String projectWithLicenses = 'test/fixtures/copy_license/has_licenses';
+const String projectWithLicenses = 'test_fixtures/copy_license/has_licenses';
 const String projectWithoutLicenseFile =
-    'test/fixtures/copy_license/no_license_file';
-const String projectWithoutLicenses = 'test/fixtures/copy_license/no_licenses';
+    'test_fixtures/copy_license/no_license_file';
+const String projectWithoutLicenses = 'test_fixtures/copy_license/no_licenses';
 const String projectWithUntrimmedLicense =
-    'test/fixtures/copy_license/license_with_empty_lines';
+    'test_fixtures/copy_license/license_with_empty_lines';
 
 Future<String> createTemporaryProject(String source) async {
   String tempProject = '${source}_temp';

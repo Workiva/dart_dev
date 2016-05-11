@@ -38,7 +38,7 @@ class FormatCli extends TaskCli {
 
   final String command = 'format';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     try {
       if (!platform_util.hasImmediateDependency('dart_style'))
         return new CliResult.fail(

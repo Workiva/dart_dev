@@ -35,7 +35,7 @@ class ExamplesCli extends TaskCli {
 
   final String command = 'examples';
 
-  Future<CliResult> run(ArgResults parsedArgs) async {
+  Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     String hostname =
         TaskCli.valueOf('hostname', parsedArgs, config.examples.hostname);
     var port = TaskCli.valueOf('port', parsedArgs, config.examples.port);

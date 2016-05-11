@@ -1,0 +1,15 @@
+name: test_needs_pub_serve
+version: 0.0.0
+dev_dependencies:
+  dart_dev:
+    path: ../../..
+  test: "^0.12.0"
+  barback: "^0.15.2"
+transformers:
+  # Add the necessary `test` package transformer
+  # See https://github.com/dart-lang/test#testing-with-barback
+  - test/pub_serve:
+      $include: test/**_test{.*,}.dart
+  # Add a custom transformer that makes the test pass.
+  - test_needs_pub_serve:
+      $include: test/unit_test.dart
