@@ -484,7 +484,6 @@ object.
     </tbody>
 </table>
 * Individual test files can be executed by appending their path to the end of the command.
-
 ```
 ddev test path/to/test_name path/to/another/test_name
 ```
@@ -494,6 +493,11 @@ ddev test path/to/test_name path/to/another/test_name
 ddev test -n 'run only this test'
 ```
 
+* A new `pub serve` instance is created for every test run. To use a specific `pub serve` instance, pass `--pub-serve-port` to the CLI.
+```
+$ pub serve --port 56001 test
+$ ddev test --pub-serve-port 56001
+```
 
 ## CLI Usage
 This package comes with a single executable: `dart_dev`. To run this executable:
