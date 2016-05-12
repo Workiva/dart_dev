@@ -70,7 +70,7 @@ void main() {
 
     test('should contain discovered tasks when no dart_dev task given',
         () async {
-      await expectOutput(local(validTaskProject), "exampleTask");
+      await expectOutput(local(validTaskProject), 'exampleTask');
     });
 
     test('should execute a task when given the local task', () async {
@@ -78,7 +78,7 @@ void main() {
           // Executes the example local task which appends the first argument
           // provided to a the 'Hello ' string.
           local(validTaskProject, taskArgs: ['exampleTask', 'world!']),
-          "Hello world!");
+          'Hello world!');
     });
   });
 }

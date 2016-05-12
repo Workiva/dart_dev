@@ -90,14 +90,14 @@ local tasks.
 
 ### Local Tasks
 
-A local task is a script or program that is discovered by `dart_dev`. By default
-, dart dev will recursively look for files in the `tool` project level directory
-that match the filename pattern `(task_name)_task.(executable_type)`. Any file
-matching this pattern will be parsed and registered as a task.
+A local task is a script or program that is discovered by `dart_dev`. By
+default, dart dev will recursively look for files in the `tool` project level
+directory that match the filename pattern `(task_name)_task.(executable_type)`.
+Any file matching this pattern will be parsed and registered as a task.
 
-Executable types identify how a given task should execute. Dart and bash scripts
-are supported out of the box. The set of available executable types can be
-expanded in the configuration as documented below.
+Executable types identify how a given task should execute. Dart and bash
+scripts are supported out of the box. The set of available executable types can
+be expanded in the configuration as documented below.
 
 ## Getting Started
 
@@ -504,10 +504,10 @@ All configuration options for the local task discovery are found on the
             <td>A Regular Expression which matches two groups that represent the task name and executable type.</td>
         </tr>
         <tr>
-            <td><code>commandFilePattern</code></td>
+            <td><code>executables</code></td>
             <td><code>Map&lt;String, List&lt;String&gt;&gt;</code></td>
             <td><code>'{'dart': ['dart'], 'sh': ['bash'] }'</code></td>
-            <td>A lookup table that matches an executable type to a set strings to prefix the execution of a task file with.</td>
+            <td>A lookup table that matches an executable type to a set of strings to prefix the execution of a task file with.</td>
         </tr>
     </tbody>
 </table>
