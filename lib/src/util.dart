@@ -71,6 +71,22 @@ Future<int> getOpenPort() async {
   }
 }
 
+Future<bool> isPortBound(int port) async {
+  if (port == 0) {
+    return false;
+  }
+
+  ServerSocket socket;
+  try {
+    socket = await ServerSocket.bind('localhost', port);
+    return false;
+  } on SocketException {
+    return true;
+  } finally {
+    await socket?.close();
+  }
+}
+
 String parseExecutableFromCommand(String command) {
   return command.split(' ').first;
 }

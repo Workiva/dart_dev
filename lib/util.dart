@@ -23,5 +23,6 @@ export 'package:dart_dev/src/util.dart'
     show
         copyDirectory,
         getOpenPort,
+        isPortBound,
         parseArgsFromCommand,
         parseExecutableFromCommand;
