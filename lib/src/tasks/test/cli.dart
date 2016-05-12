@@ -66,7 +66,7 @@ class TestCli extends TaskCli {
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (!platform_util.hasImmediateDependency('test'))
       return new CliResult.fail(
-        'Package "test" must be an immediate dependency in order to run its executables.');
+          'Package "test" must be an immediate dependency in order to run its executables.');
 
     List<String> additionalArgs = [];
     List<String> tests = [];
@@ -154,15 +154,15 @@ class TestCli extends TaskCli {
 
       if (!isPubServeRunning) {
         // Start `pub serve` on the `test` directory
-        pubServeTask = startPubServe(
-            port: pubServePort, additionalArgs: ['test']);
+        pubServeTask =
+            startPubServe(port: pubServePort, additionalArgs: ['test']);
 
         var startupLogFinished = new Completer();
         reporter.logGroup(pubServeTask.command,
             outputStream:
                 pubServeTask.stdOut.transform(until(startupLogFinished.future)),
-            errorStream:
-                pubServeTask.stdErr.transform(until(startupLogFinished.future)));
+            errorStream: pubServeTask.stdErr
+                .transform(until(startupLogFinished.future)));
 
         var serveInfo = await pubServeTask.serveInfos.first;
         pubServePort = serveInfo.port;
