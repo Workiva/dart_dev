@@ -106,7 +106,7 @@ class SauceTestHarnessTransformer extends Transformer
 
       for (String proxiedFile in proxiedIframeRunnerFiles) {
         var file = new File(
-            'packages/dart_dev/src/tasks/saucelabs_tests/sauce_iframe_runner/$proxiedFile');
+            'packages/dart_dev/src/tasks/saucelabs/sauce_iframe_runner/$proxiedFile');
         var assetId =
             new AssetId(package, 'test/sauce_iframe_runner/$proxiedFile');
         var asset = new Asset.fromStream(assetId, file.openRead());
@@ -231,6 +231,9 @@ class SauceTestHarnessTransformer extends Transformer
             @override
             displayPause() =>
                 throw new UnsupportedError("SauceBrowserEnvironment.displayPause is not supported.");
+
+            @override
+            bool get supportsDebugging => false;
           }
         '''));
   }

@@ -1,4 +1,4 @@
-library dart_dev.src.tasks.saucelabs_tests.api;
+library dart_dev.src.tasks.saucelabs.api;
 
 import 'dart:io';
 

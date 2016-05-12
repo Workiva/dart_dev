@@ -1,6 +1,6 @@
 /// A utility class for representing and displaying Sauce Labs platform configurations,
 /// as well as constants for commonly-used platforms.
-library dart_dev.src.tasks.saucelabs_tests.platforms;
+library dart_dev.src.tasks.saucelabs.platforms;
 
 import 'package:webdriver/io.dart' show Browser, BrowserPlatform, Capabilities;
 

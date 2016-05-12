@@ -1,10 +1,9 @@
 /// A library for running Dart unit tests on Sauce Labs from start to finish,
 /// with automatic (and optional) management of the Pub server and Sauce Connect tunnel.
-library dart_dev.src.tasks.saucelabs_tests.sauce_runner;
+library dart_dev.src.tasks.saucelabs.sauce_runner;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/util.dart';
@@ -37,7 +36,7 @@ Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms,
     String tunnelIdentifier}) async {
   PubServeTask pubServeTask;
   PubServeInfo serveInfo;
-  Process sauceConnect;
+  TaskProcess sauceConnect;
   List<SauceTestHarness> testHarnesses;
 
   try {
@@ -78,7 +77,11 @@ Future<Map> run(List<SauceTest> tests, List<SaucePlatform> platforms,
     await Future.forEach(testHarnesses, (SauceTestHarness harness) async {
       var name = harness.test.name;
 
-      var mergedOptions = {}..addAll(options)..addAll({'name': name,});
+      var mergedOptions = {}
+        ..addAll(options)
+        ..addAll({
+          'name': name,
+        });
 
       if (tunnelIdentifier != null) {
         mergedOptions['tunnelIdentifier'] = tunnelIdentifier;

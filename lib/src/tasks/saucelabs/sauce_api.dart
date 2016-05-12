@@ -1,10 +1,8 @@
 /// Methods for starting Sauce Connect and running tests in Sauce Labs via
 /// [SauceUnitTestDriver].
-library dart_dev.src.tasks.saucelabs_tests.sauce_api;
+library dart_dev.src.tasks.saucelabs.sauce_api;
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:dart_dev/util.dart';
 
@@ -16,7 +14,7 @@ const String sauceApiUrl = 'https://saucelabs.com/rest/v1/';
 /// a Future that completes with the Process when the tunnel is ready to be used.
 ///
 /// Logs live output to the console via [reporter].
-Future<Process> startSauceConnection(String username, String accessKey,
+Future<TaskProcess> startSauceConnection(String username, String accessKey,
     {String tunnelIdentifier}) async {
   var args = ['--user', username, '--api-key', accessKey];
 
@@ -24,19 +22,12 @@ Future<Process> startSauceConnection(String username, String accessKey,
     args.addAll(['--tunnel-identifier', tunnelIdentifier]);
   }
 
-  var process = await Process.start('sc', args);
+  var process = new TaskProcess('sc', args);
 
-  var stdout = process.stdout
-      .transform(new Utf8Decoder())
-      .transform(new LineSplitter())
-      .asBroadcastStream();
-  var stderr = process.stderr
-      .transform(new Utf8Decoder())
-      .transform(new LineSplitter())
-      .asBroadcastStream();
+  var stdout = process.stdout.asBroadcastStream();
 
   reporter.logGroup('Starting Sauce Connect tunnel',
-      outputStream: stdout, errorStream: stderr);
+      outputStream: stdout, errorStream: process.stderr);
 
   await for (String line in stdout) {
     if (line.contains('Sauce Connect is up, you may start your tests.')) {
@@ -73,9 +64,7 @@ Future<List<SauceUnitTestDriver>> startSauceTests(String testName,
     return testDriver;
   }).toList(); // Iterate immediately so that the each runner doesn't have to wait for the previous.
 
-  List<SauceUnitTestDriver> drivers = await Future.wait(driversFutures);
-
-  return drivers;
+  return Future.wait(driversFutures);
 }
 
 /// Returns a Future that completes with the JS test results once all [testDrivers] have finished running.

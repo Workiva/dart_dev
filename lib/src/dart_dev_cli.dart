@@ -39,7 +39,7 @@ import 'package:dart_dev/src/tasks/format/cli.dart';
 import 'package:dart_dev/src/tasks/gen_test_runner/cli.dart';
 import 'package:dart_dev/src/tasks/init/cli.dart';
 import 'package:dart_dev/src/tasks/local/cli.dart';
-import 'package:dart_dev/src/tasks/saucelabs_tests/cli.dart';
+import 'package:dart_dev/src/tasks/saucelabs/cli.dart';
 import 'package:dart_dev/src/tasks/test/cli.dart';
 
 import 'package:dart_dev/src/version.dart' show printVersion;
@@ -67,7 +67,7 @@ dev(List<String> args) async {
   registerTask(new FormatCli(), config.format);
   registerTask(new GenTestRunnerCli(), config.genTestRunner);
   registerTask(new InitCli(), config.init);
-  registerTask(new SauceRunnerCli(), config.saucelabsTests);
+  registerTask(new SauceRunnerCli(), config.saucelabs);
   registerTask(new TestCli(), config.test);
 
   try {

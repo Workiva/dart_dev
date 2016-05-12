@@ -242,7 +242,7 @@ ddev docs
 ddev examples
 ddev format
 ddev gen-test-runner
-ddev saucelabs-tests
+ddev saucelabs
 ddev test
 
 # without the alias
@@ -253,7 +253,7 @@ pub run dart_dev docs
 pub run dart_dev examples
 pub run dart_dev format
 pub run dart_dev gen-test-runner
-pub run dart_dev saucelabs-tests
+pub run dart_dev saucelabs
 pub run dart_dev test
 ```
 
@@ -279,7 +279,7 @@ main(args) async {
   config.format
   config.genTestRunner
   config.init
-  config.saucelabsTests
+  config.saucelabs
   config.test
 
   await dev(args);
@@ -618,8 +618,8 @@ All configuration options for the local task discovery are found on the
     </tbody>
 </table>
 
-#### `saucelabs-tests` Config
-All configuration options for the `saucelabs-test` task are found on the `config.saucelabsTests`
+#### `saucelabs` Config
+All configuration options for the `saucelabs` task are found on the `config.saucelabs`
 object.
 
 <table>
@@ -636,11 +636,11 @@ object.
             <td><code>filesToTest</code></td>
             <td><code>List&lt;String&gt;</code></td>
             <td><code>[]</code></td>
-            <td>Html files related to browser tests to be executed on saucelabs</td>
+            <td>Html files related to browser tests to be executed on saucelabs (the path will be relative to the test directory)</td>
         </tr>
         <tr>
             <td><code>platforms</code></td>
-            <td><code>List&lt;SaucePlatforms&gt;</code></td>
+            <td><code>List&lt;SaucePlatform&gt;</code></td>
             <td><code>[chromeWindows, firefoxWindows, chromeOsx, firefoxOsx, ie10, ie11]</code></td>
             <td>Platforms to be executed on saucelabs</td>
         </tr>
@@ -676,6 +676,8 @@ object.
 ```
 
 * The html files to be transformed should have the `packages/test/dart.js` script tag listed last.
+
+* During this process the test directory will be served which means that the `filesToTest` must be within the test directory and their path will be relative to the test directory.
 
 #### `test` Config
 All configuration options for the `test` task are found on the `config.test`
@@ -781,7 +783,7 @@ Supported tasks:
     format
     gen-test-runner
     init
-    saucelabs-tests
+    saucelabs
     test
 ```
 

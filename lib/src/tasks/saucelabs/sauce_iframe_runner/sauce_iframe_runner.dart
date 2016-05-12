@@ -79,13 +79,19 @@ main() async {
     }
 
     if (passed) {
-      tests.insert(0, {'name': status.testDescription, 'result': true,});
+      tests.insert(0, {
+        'name': status.testDescription,
+        'result': true,
+      });
     } else {
       // The output displays status lines for failing tests twice:
       //   1. Once with the status before the test
       //   2. Once with the status after the test
       // We want #2, since that one contains all of the error messages.
-      var test = {'name': lastStatus.testDescription, 'result': false,};
+      var test = {
+        'name': lastStatus.testDescription,
+        'result': false,
+      };
 
       var message = lastStatus.otherLogs.join('\n');
       if (!message.isEmpty) {

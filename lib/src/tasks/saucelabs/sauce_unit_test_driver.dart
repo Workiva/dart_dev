@@ -1,5 +1,5 @@
 /// A library with a class that can be used to run JS unit tests on Sauce Labs via WebDriver.
-library dart_dev.src.tasks.saucelabs_tests.sauce_unit_test_driver;
+library dart_dev.src.tasks.saucelabs.sauce_unit_test_driver;
 
 import 'dart:async';
 import 'dart:io';
