@@ -139,7 +139,7 @@ source <path/to/ddev-completion.sh>
 Symlink or copy the file `tool/ddev.fish` into `~/.config/fish/completions/`
 (or wherever your completion scripts live).
 
-The completions expect a function called `ddev` to meet this expectation create
+The completions expect a function called `ddev`. To meet this expectation create
 a new file in `~/.config/fish/functions` called `ddev.fish` and add the
 following content to the file.
 
