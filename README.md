@@ -135,6 +135,21 @@ bashcompinit
 source <path/to/ddev-completion.sh>
 ```
 
+#### Fish Completion
+
+Symlink or copy the file `tool/ddev.fish` into `~/.config/fish/completions/`
+(or wherever your completion scripts live).
+
+The completions expect a function called `ddev`. To meet this expectation create
+a new file in `~/.config/fish/functions` called `ddev.fish` and add the
+following content to the file.
+
+```fish
+function ddev
+  pub run dart_dev $argv
+end
+```
+
 #### Configuration
 In order to configure `dart_dev` for a specific project, run `ddev init` or
 `pub run dart_dev init` to generate the configuration file. This should create a
