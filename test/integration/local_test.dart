@@ -25,13 +25,10 @@ const String noTaskProject = 'test_fixtures/local/no_tasks';
 const String noExecutableProject = 'test_fixtures/local/no_executable';
 const String validTaskProject = 'test_fixtures/local/good_tasks';
 
-Future<TaskProcess> local(String projectPath,
-    {List<String> taskArgs: const []}) async {
+Future<TaskProcess> local(String projectPath, {List<String> taskArgs: const []}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
-  var p = new TaskProcess('pub', ['run', 'dart_dev']..addAll(taskArgs),
+  return new TaskProcess('pub', ['run', 'dart_dev']..addAll(taskArgs),
       workingDirectory: projectPath);
-
-  return p;
 }
 
 Future expectExitWith(Future<TaskProcess> process, Matcher match) async {
@@ -40,18 +37,18 @@ Future expectExitWith(Future<TaskProcess> process, Matcher match) async {
 
   var statusCode = await p.exitCode;
 
-  expect(statusCode, match,
-      reason: 'Expected process to exit with given exit code');
+  expect(statusCode, match, reason: 'Expected process to exit with given exit code');
 }
 
 Future expectOutput(Future<TaskProcess> process, String pattern) async {
   var p = await process;
   await p.done;
+  var outputContainsPattern = await p.stdout.any((line) => line.contains(pattern));
+  var errorOutputContainsPattern = await p.stderr.any((line) => line.contains(pattern));
 
-  var outputContainsPattern =
-      await p.stdout.any((line) => line.contains(pattern));
-  expect(outputContainsPattern, isTrue,
-      reason: 'Expected process output to contain ${pattern} but did not');
+  expect(outputContainsPattern || errorOutputContainsPattern, isTrue,
+      reason:
+          'The following pattern was expected in the output but was not found:\n\n\t"${pattern}"');
 }
 
 void main() {
@@ -60,16 +57,16 @@ void main() {
       await expectExitWith(local(noTaskProject), equals(0));
     });
 
-    test('should return with non zero when unknown executable task is called',
-        () async {
-      await expectExitWith(
-          local(noExecutableProject, taskArgs: ['noExec']), isNot(0));
+    test('should return with non zero when unknown executable task is called', () async {
+      await expectExitWith(local(noExecutableProject, taskArgs: ['noExec']), isNot(0));
+    });
+
+    test('should report error when attempting a task with an unknown executable', () async {
       await expectOutput(local(noExecutableProject, taskArgs: ['noExec']),
           'A executable was not defined for the discovered task noExec.');
     });
 
-    test('should contain discovered tasks when no dart_dev task given',
-        () async {
+    test('should contain discovered tasks when no dart_dev task given', () async {
       await expectOutput(local(validTaskProject), 'exampleTask');
     });
 
