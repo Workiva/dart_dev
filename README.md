@@ -102,10 +102,14 @@ alias ddev='pub run dart_dev'
 
 #### Bash Completion
 
-Symlink or copy the file `tool/ddev-completion.sh` into
-`/etc/bash_completion.d/` (or wherever your completion scripts live, if you
-have installed Bash through Homebrew on a Mac, for instance, this will be
-`/usr/local/etc/bash_completion.d/`).
+Bash command completion is available and easy to use. You'll want to install
+dart_dev globally: `pub global activate dart_dev`.
+
+Add the following to your `.bashrc`:
+
+```
+eval "$(pub global run dart_dev bash-completion)"
+```
 
 If you are using Bash installed through Homebrew, you'll also need to install
 the completion machinery with `brew install bash-completion`. Then make sure
@@ -132,7 +136,7 @@ autoload -U compinit
 compinit
 autoload -U bashcompinit
 bashcompinit
-source <path/to/ddev-completion.sh>
+eval "$(pub global run dart_dev bash-completion)"
 ```
 
 #### Fish Completion
