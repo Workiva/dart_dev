@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library dart_dev.src.tasks.local_commands.config;
+library dart_dev.src.tasks.local.config;
 
 import 'package:dart_dev/src/tasks/config.dart';
 
