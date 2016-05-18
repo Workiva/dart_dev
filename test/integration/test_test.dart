@@ -35,7 +35,9 @@ Future<int> runTests(String projectPath,
     {bool unit: true,
     bool integration: false,
     List<String> files,
-    String testName: ''}) async {
+    String testName: '',
+    bool runCustomPubServe: false,
+    int pubServePort: 56090}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
   List args = ['run', 'dart_dev', 'test', '--no-color'];
@@ -47,8 +49,20 @@ Future<int> runTests(String projectPath,
     args.addAll(['-n', testName]);
   }
 
-  args.addAll(files ?? <String>[]);
+  Process pubServeProcess;
+  if (runCustomPubServe) {
+    // start a default pub server
+    pubServeProcess = await Process.start(
+        'pub', ['serve', '--port=$pubServePort', 'test'],
+        workingDirectory: '$projectPath');
 
+    // A port of 0 is ignored to validate a failure scenario for no port + pub-serve-started flag
+    if (pubServePort > 0) {
+      args.add('--pub-serve-port=$pubServePort');
+    }
+  }
+
+  args.addAll(files ?? <String>[]);
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
 
@@ -56,7 +70,12 @@ Future<int> runTests(String projectPath,
   if ((await process.exitCode) != 0)
     throw new TestFailure('Expected test to pass.');
 
-  var lastLine = await process.stdout.last;
+  String lastLine = await process.stdout.last;
+
+  if (pubServeProcess != null) {
+    pubServeProcess.kill();
+  }
+
   var numTestsRun = -1;
   if (numTestsPassedPattern.hasMatch(lastLine)) {
     numTestsRun =
@@ -128,6 +147,11 @@ void main() {
 
     test('should run tests that require a Pub server', () async {
       expect(await runTests(projectThatNeedsPubServe), equals(1));
+    });
+
+    test('should run tests that provides a Pub server', () async {
+      expect(await runTests(projectThatNeedsPubServe, runCustomPubServe: true),
+          equals(1));
     });
 
     test('should run tests with test name specified', () async {

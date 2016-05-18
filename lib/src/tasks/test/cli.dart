@@ -18,7 +18,7 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter, isPortBound;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -44,6 +44,9 @@ class TestCli extends TaskCli {
         negatable: true,
         defaultsTo: defaultPubServe,
         help: 'Serves browser tests using a Pub server.')
+    ..addOption('pub-serve-port',
+        help:
+            'Port used by the Pub server for browser tests. The default value will randomly select an open port to use.')
     ..addOption('platform',
         abbr: 'p',
         allowMultiple: true,
@@ -74,6 +77,12 @@ class TestCli extends TaskCli {
 
     bool pubServe =
         TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
+
+    var pubServePort =
+        TaskCli.valueOf('pub-serve-port', parsedArgs, config.test.pubServePort);
+    if (pubServePort is String) {
+      pubServePort = int.parse(pubServePort);
+    }
 
     var concurrency =
         TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
@@ -139,34 +148,41 @@ class TestCli extends TaskCli {
     }
 
     PubServeTask pubServeTask;
+
     if (pubServe) {
-      // Start `pub serve` on the `test` directory
-      pubServeTask = startPubServe(
-          port: config.test.pubServePort, additionalArgs: ['test']);
+      bool isPubServeRunning = await isPortBound(pubServePort);
 
-      var startupLogFinished = new Completer();
-      reporter.logGroup(pubServeTask.command,
-          outputStream:
-              pubServeTask.stdOut.transform(until(startupLogFinished.future)),
-          errorStream:
-              pubServeTask.stdErr.transform(until(startupLogFinished.future)));
+      if (!isPubServeRunning) {
+        // Start `pub serve` on the `test` directory
+        pubServeTask =
+            startPubServe(port: pubServePort, additionalArgs: ['test']);
 
-      var serveInfo = await pubServeTask.serveInfos.first;
-      additionalArgs.add('--pub-serve=${serveInfo.port}');
+        var startupLogFinished = new Completer();
+        reporter.logGroup(pubServeTask.command,
+            outputStream:
+                pubServeTask.stdOut.transform(until(startupLogFinished.future)),
+            errorStream: pubServeTask.stdErr
+                .transform(until(startupLogFinished.future)));
 
-      startupLogFinished.complete();
-      pubServeTask.stdOut.join('\n').then((stdOut) {
-        if (stdOut.isNotEmpty) {
-          reporter.logGroup('`${pubServeTask.command}` (buffered stdout)',
-              output: stdOut);
-        }
-      });
-      pubServeTask.stdErr.join('\n').then((stdErr) {
-        if (stdErr.isNotEmpty) {
-          reporter.logGroup('`${pubServeTask.command}` (buffered stderr)',
-              error: stdErr);
-        }
-      });
+        var serveInfo = await pubServeTask.serveInfos.first;
+        pubServePort = serveInfo.port;
+
+        startupLogFinished.complete();
+        pubServeTask.stdOut.join('\n').then((stdOut) {
+          if (stdOut.isNotEmpty) {
+            reporter.logGroup('`${pubServeTask.command}` (buffered stdout)',
+                output: stdOut);
+          }
+        });
+        pubServeTask.stdErr.join('\n').then((stdErr) {
+          if (stdErr.isNotEmpty) {
+            reporter.logGroup('`${pubServeTask.command}` (buffered stderr)',
+                error: stdErr);
+          }
+        });
+      }
+
+      additionalArgs.add('--pub-serve=$pubServePort');
     }
 
     if (testNamed) {

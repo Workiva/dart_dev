@@ -12,17 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library dart_dev.util;
+import 'package:dart_dev/src/tasks/config.dart';
 
-export 'package:dart_dev/src/platform_util/api.dart'
-    show hasImmediateDependency;
-export 'package:dart_dev/src/reporter.dart' show Reporter, reporter;
-export 'package:dart_dev/src/task_process.dart' show TaskProcess;
-export 'package:dart_dev/src/tools/selenium.dart' show SeleniumHelper;
-export 'package:dart_dev/src/util.dart'
-    show
-        copyDirectory,
-        getOpenPort,
-        isPortBound,
-        parseArgsFromCommand,
-        parseExecutableFromCommand;
+class BashCompletionConfig extends TaskConfig {}

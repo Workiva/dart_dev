@@ -15,6 +15,7 @@
 library dart_dev.src.tasks.config;
 
 import 'package:dart_dev/src/tasks/analyze/config.dart';
+import 'package:dart_dev/src/tasks/bash_completion/config.dart';
 import 'package:dart_dev/src/tasks/copy_license/config.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/docs/config.dart';
@@ -29,6 +30,7 @@ Config config = new Config();
 
 class Config {
   AnalyzeConfig analyze = new AnalyzeConfig();
+  BashCompletionConfig bashCompletion = new BashCompletionConfig();
   CopyLicenseConfig copyLicense = new CopyLicenseConfig();
   CoverageConfig coverage = new CoverageConfig();
   DocsConfig docs = new DocsConfig();

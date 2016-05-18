@@ -120,10 +120,14 @@ alias ddev='pub run dart_dev'
 
 #### Bash Completion
 
-Symlink or copy the file `tool/ddev-completion.sh` into
-`/etc/bash_completion.d/` (or wherever your completion scripts live, if you
-have installed Bash through Homebrew on a Mac, for instance, this will be
-`/usr/local/etc/bash_completion.d/`).
+Bash command completion is available and easy to use. You'll want to install
+dart_dev globally: `pub global activate dart_dev`.
+
+Add the following to your `.bashrc`:
+
+```
+eval "$(pub global run dart_dev bash-completion)"
+```
 
 If you are using Bash installed through Homebrew, you'll also need to install
 the completion machinery with `brew install bash-completion`. Then make sure
@@ -150,7 +154,22 @@ autoload -U compinit
 compinit
 autoload -U bashcompinit
 bashcompinit
-source <path/to/ddev-completion.sh>
+eval "$(pub global run dart_dev bash-completion)"
+```
+
+#### Fish Completion
+
+Symlink or copy the file `tool/ddev.fish` into `~/.config/fish/completions/`
+(or wherever your completion scripts live).
+
+The completions expect a function called `ddev`. To meet this expectation create
+a new file in `~/.config/fish/functions` called `ddev.fish` and add the
+following content to the file.
+
+```fish
+function ddev
+  pub run dart_dev $argv
+end
 ```
 
 #### Configuration
@@ -630,7 +649,6 @@ object.
     </tbody>
 </table>
 * Individual test files can be executed by appending their path to the end of the command.
-
 ```
 ddev test path/to/test_name path/to/another/test_name
 ```
@@ -640,6 +658,11 @@ ddev test path/to/test_name path/to/another/test_name
 ddev test -n 'run only this test'
 ```
 
+* A new `pub serve` instance is created for every test run. To use a specific `pub serve` instance, pass `--pub-serve-port` to the CLI.
+```
+$ pub serve --port 56001 test
+$ ddev test --pub-serve --pub-serve-port 56001
+```
 
 ## CLI Usage
 This package comes with a single executable: `dart_dev`. To run this executable:
