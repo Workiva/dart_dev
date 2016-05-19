@@ -70,8 +70,8 @@ class LocalCli extends TaskCli {
 
     if (executableParams == null) {
       var failedExecutableLookup =
-          'A executable was not defined for the discovered task '
-          '${executable.name}.\n\nPlease provide a updated local configuration '
+          'An executable was not defined for the discovered task '
+          '${executable.name}.\n\nPlease provide an updated local configuration '
           'which defines what executable to use for the '
           '"${executable.extension}" file extension.';
 
