@@ -24,6 +24,7 @@ import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/gen_test_runner/config.dart';
 import 'package:dart_dev/src/tasks/init/config.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
+import 'package:dart_dev/src/tasks/local/config.dart';
 
 Config config = new Config();
 
@@ -34,6 +35,7 @@ class Config {
   CoverageConfig coverage = new CoverageConfig();
   DocsConfig docs = new DocsConfig();
   ExamplesConfig examples = new ExamplesConfig();
+  LocalConfig local = new LocalConfig();
   FormatConfig format = new FormatConfig();
   GenTestRunnerConfig genTestRunner = new GenTestRunnerConfig();
   InitConfig init = new InitConfig();

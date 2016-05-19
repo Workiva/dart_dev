@@ -18,7 +18,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dart_dev/util.dart' show Reporter, TaskProcess, getOpenPort;
+import 'package:dart_dev/util.dart' show TaskProcess, getOpenPort;
 import 'package:path/path.dart' as path;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
