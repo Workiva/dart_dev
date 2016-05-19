@@ -61,7 +61,8 @@ void main() {
       await expectExitWith(local(noTaskProject), equals(0));
     });
 
-    test('should return with non zero when unknown executable task is called',
+    test(
+        'should return with non zero exit code when unknown executable task is called',
         () async {
       await expectExitWith(
           local(noExecutableProject, taskArgs: ['noExec']), isNot(0));
@@ -71,7 +72,7 @@ void main() {
         'should report error when attempting a task with an unknown executable',
         () async {
       await expectOutput(local(noExecutableProject, taskArgs: ['noExec']),
-          'A executable was not defined for the discovered task noExec.');
+          'An executable was not defined for the discovered task noExec.');
     });
 
     test('should contain discovered tasks when no dart_dev task given',
