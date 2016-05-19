@@ -23,7 +23,8 @@ import 'package:dart_dev/src/tasks/task.dart';
 LocalTask local(String executable, Iterable<String> args) {
   TaskProcess process = new TaskProcess(executable, args);
 
-  LocalTask task = new LocalTask('$executable ${args.join(' ')}', Future.wait([process.done]));
+  LocalTask task = new LocalTask(
+      '$executable ${args.join(' ')}', Future.wait([process.done]));
 
   process.stdout.listen(task._commandOutput.add);
   process.stderr.listen(task._commandOutput.addError);
