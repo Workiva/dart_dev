@@ -70,7 +70,8 @@ dev(List<String> args) async {
 
   try {
     LocalCli.discover(config.local.taskPaths).forEach((task, exec) {
-      registerTask(new LocalCli(task, exec), config.local);
+      LocalCli localTask = new LocalCli(task, exec, originalArgs: args);
+      registerTask(localTask, config.local);
     });
   } on ArgumentError catch (e) {
     reporter.error('${e.message}\n\nPlease update your local configuration.',
@@ -122,7 +123,19 @@ Future _run(List<String> args) async {
 
   ArgResults env;
   try {
-    env = tryArgsCompletion(args, _parser);
+    String commandArg =
+        args.firstWhere(_cliTasks.containsKey, orElse: () => null);
+
+    if (commandArg != null && _cliTasks[commandArg] is LocalCli) {
+      // Only parse the leading arguments up to a recognized local task. This
+      // allows global dart_dev arguments to prefix a local command name. Any
+      // trailing arguments are not parsed.
+      env = _parser.parse(args.sublist(0, args.indexOf(commandArg) + 1));
+    } else {
+      // Allow the arg parser to parse the entire argument list if no matching
+      // local command
+      env = _parser.parse(args);
+    }
   } on FormatException catch (e) {
     reporter.error('${e.message}\n', shout: true);
     reporter.log(_generateUsage(), shout: true);

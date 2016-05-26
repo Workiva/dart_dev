@@ -91,9 +91,11 @@ local tasks.
 ### Local Tasks
 
 A local task is a script or program that is discovered by `dart_dev`. By
-default, dart dev will recursively look for files in the project level `tool` 
+default, dart dev will recursively look for files in the project level `tool`
 directory that match the filename pattern `(task_name)_task.(executable_type)`.
-Any file matching this pattern will be parsed and registered as a task.
+Any file matching this pattern is parsed and registered as a task. All of the
+original arguments to the dart_dev class are passed unparsed to the task
+program. 
 
 Executable types identify how a given task should execute. Dart and bash
 scripts are supported out of the box. The set of available executable types can
@@ -515,6 +517,12 @@ All configuration options for the local task discovery are found on the
             <td><code>List&lt;String&gt;</code></td>
             <td><code>['tool']</code></td>
             <td>A list of project level paths to search for file matching the task pattern.</td>
+        </tr>
+        <tr>
+            <td><code>followSymlinks</code></td>
+            <td><code>bool</code></td>
+            <td><code>false</code></td>
+            <td>Should dart dev expand on symbolic links encountered in any <code>taskPath</code>?</td>
         </tr>
         <tr>
             <td><code>commandFilePattern</code></td>
