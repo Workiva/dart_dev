@@ -24,6 +24,8 @@ import 'package:test/test.dart';
 const String noTaskProject = 'test_fixtures/local/no_tasks';
 const String noExecutableProject = 'test_fixtures/local/no_executable';
 const String validTaskProject = 'test_fixtures/local/good_tasks';
+const String followSymlinkProject = 'test_fixtures/local/follow_symlinks';
+const String noFollowSymlinkProject = 'test_fixtures/local/no_follow_symlinks';
 
 Future<TaskProcess> local(String projectPath,
     {List<String> taskArgs: const []}) async {
@@ -42,17 +44,28 @@ Future expectExitWith(Future<TaskProcess> process, Matcher match) async {
       reason: 'Expected process to exit with given exit code');
 }
 
-Future expectOutput(Future<TaskProcess> process, String pattern) async {
+Future<bool> _parseOuput(Future<TaskProcess> process, String pattern) async {
   var p = await process;
   await p.done;
+
   var outputContainsPattern =
       await p.stdout.any((line) => line.contains(pattern));
   var errorOutputContainsPattern =
       await p.stderr.any((line) => line.contains(pattern));
 
-  expect(outputContainsPattern || errorOutputContainsPattern, isTrue,
+  return (outputContainsPattern || errorOutputContainsPattern);
+}
+
+Future expectOutput(Future<TaskProcess> process, String pattern) async {
+  expect(await _parseOuput(process, pattern), isTrue,
       reason:
           'The following pattern was expected in the output but was not found:\n\n\t"${pattern}"');
+}
+
+Future expectNotInOutput(Future<TaskProcess> process, String pattern) async {
+  expect(await _parseOuput(process, pattern), isFalse,
+      reason:
+          'The following pattern was not expected in the output but was found:\n\n\t"${pattern}"');
 }
 
 void main() {
@@ -84,8 +97,35 @@ void main() {
       await expectOutput(
           // Executes the example local task which appends the first argument
           // provided to a the 'Hello ' string.
+          local(validTaskProject, taskArgs: ['exampleTask']),
+          'Hello');
+    });
+
+    test('should allow all arguments formats to be passed to underlying task',
+        () async {
+      // Value arguments are allowed
+      await expectOutput(
           local(validTaskProject, taskArgs: ['exampleTask', 'world!']),
           'Hello world!');
+
+      // Single dash option arguments are allowed
+      await expectOutput(
+          local(validTaskProject, taskArgs: ['exampleTask', 'world!', '-l']),
+          'HELLO WORLD!');
+
+      // Double dashed arguments are allowed
+      await expectOutput(
+          local(validTaskProject,
+              taskArgs: ['exampleTask', 'world!', '--loud']),
+          'HELLO WORLD!');
+    });
+
+    test('should not follow symlink directories when configured', () async {
+      await expectNotInOutput(local(noFollowSymlinkProject), 'exampleTask');
+    });
+
+    test('should follow symlink directories when configured', () async {
+      await expectOutput(local(followSymlinkProject), 'exampleTask');
     });
   });
 }
