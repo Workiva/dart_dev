@@ -93,9 +93,17 @@ local tasks.
 A local task is a script or program that is discovered by `dart_dev`. By
 default, dart dev will recursively look for files in the project level `tool`
 directory that match the filename pattern `(task_name)_task.(executable_type)`.
-Any file matching this pattern is parsed and registered as a task. All of the
-original arguments to the dart_dev class are passed unparsed to the task
-program. 
+Any file matching this pattern is parsed and registered as a task.  The task
+discovery will not follow symlink directories by default. Symlink directory
+expansion can be enabled using the `followSymlinks` property in the `local`
+configuration field.
+
+Any additional arguments specified after the command name are passed to the
+underlying task process as additional command line arguments. For instance `pub
+run dart_dev exampleTask --example-argument 23` would pass the example argument
+and value as additions to call to `dart exampleTask_task.dart
+--example-argument 23`. This allows the task to parse it's arguments
+independently.
 
 Executable types identify how a given task should execute. Dart and bash
 scripts are supported out of the box. The set of available executable types can
