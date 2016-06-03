@@ -16,6 +16,7 @@
 library dart_dev.test.integration.test_test;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_dev/util.dart' show TaskProcess;
@@ -55,6 +56,19 @@ Future<int> runTests(String projectPath,
     pubServeProcess = await Process.start(
         'pub', ['serve', '--port=$pubServePort', 'test'],
         workingDirectory: '$projectPath');
+
+    Completer completer = new Completer();
+
+    pubServeProcess.stdout
+        .transform(UTF8.decoder)
+        .transform(new LineSplitter())
+        .listen((var line) {
+      if (line.contains('Build completed successfully')) {
+        completer.complete();
+      }
+    });
+
+    await completer.future;
 
     // A port of 0 is ignored to validate a failure scenario for no port + pub-serve-started flag
     if (pubServePort > 0) {
