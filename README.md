@@ -98,12 +98,12 @@ discovery will not follow symlink directories by default. Symlink directory
 expansion can be enabled using the `followSymlinks` property in the `local`
 configuration field.
 
-Any additional arguments specified after the command name are passed to the
-underlying task process as additional command line arguments. For instance `pub
-run dart_dev exampleTask --example-argument 23` would pass the example argument
-and value as additions to call to `dart exampleTask_task.dart
---example-argument 23`. This allows the task to parse it's arguments
-independently.
+Any arguments specified after the local task name are passed to the underlying
+task process as command line arguments. For instance, 
+`pub run dart_dev exampleTask --example-argument 23` would pass the example
+argument and value as additions to the underlying system command
+`dart exampleTask_task.dart --example-argument 23`. This allows the task to
+parse its arguments independently of dart_dev.
 
 Executable types identify how a given task should execute. Dart and bash
 scripts are supported out of the box. The set of available executable types can
