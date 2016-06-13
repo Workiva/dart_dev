@@ -46,13 +46,15 @@ class LocalCli extends TaskCli {
   final ArgParser argParser = new ArgParser();
   final String command;
   final Executable executable;
+  final List<String> originalArgs;
 
   static Map<String, Executable> discover(List<String> paths) {
     List<File> commandFiles = paths
         .map((String path) => new Directory(path))
         .where((Directory directory) => directory.existsSync())
-        .expand((Directory directory) =>
-            directory.listSync(recursive: true).toList())
+        .expand((Directory directory) => directory
+            .listSync(recursive: true, followLinks: config.local.followSymlinks)
+            .toList())
         .where(_commandPatternMatcher(config.local.commandFilePattern));
 
     return commandFiles
@@ -63,7 +65,7 @@ class LocalCli extends TaskCli {
     });
   }
 
-  LocalCli(this.command, this.executable);
+  LocalCli(this.command, this.executable, {List<String> this.originalArgs});
 
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     var executableParams = config.local.executables[executable.extension];
@@ -82,7 +84,7 @@ class LocalCli extends TaskCli {
         '${executableParams.first}',
         executableParams.sublist(1)
           ..add(executable.path)
-          ..addAll(parsedArgs.arguments));
+          ..addAll(this.originalArgs.sublist(1) ?? parsedArgs.arguments));
 
     var title = task.localCommand;
 
