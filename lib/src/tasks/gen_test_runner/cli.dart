@@ -22,6 +22,7 @@ import 'package:args/args.dart';
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/gen_test_runner/api.dart';
+import 'package:dart_dev/src/tasks/gen_test_runner/config.dart';
 
 class GenResultGroup {
   List<bool> passing = [];
@@ -30,6 +31,10 @@ class GenResultGroup {
 
 class GenTestRunnerCli extends TaskCli {
   final ArgParser argParser = new ArgParser()
+    ..addFlag('check',
+        defaultsTo: defaultCheck,
+        negatable: false,
+        help: 'Check whether the generated runner is up-to-date')
     ..addOption('config',
         help:
             'Configuration options should be performed in local dev.dart file');
@@ -39,11 +44,15 @@ class GenTestRunnerCli extends TaskCli {
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     GenResultGroup results = new GenResultGroup();
 
+    bool check = parsedArgs['check'];
+
     for (var currentConfig in config.genTestRunner.configs) {
       if (!new Directory(currentConfig.directory).existsSync()) {
         return new CliResult.fail(
             'Must return a valid directory path, ${currentConfig.directory} is not a valid path');
       }
+
+      currentConfig.check = check;
 
       GenTestRunnerTask task = await genTestRunner(currentConfig);
       await task.done;
@@ -52,6 +61,9 @@ class GenTestRunnerCli extends TaskCli {
     }
 
     if (results.passing.contains(false)) {
+      if (check) {
+        return new CliResult.fail('Generated test runner is not up-to-date.');
+      }
       var failedFiles = '';
       for (var task in results.tasks) {
         if (!task.successful) {
@@ -61,6 +73,9 @@ class GenTestRunnerCli extends TaskCli {
       return new CliResult.fail('Failed to generate test runner.'
           '\nThe following file(s) failed to generate:$failedFiles');
     } else {
+      if (check) {
+        return new CliResult.success('Generated test runner is up-to-date.');
+      }
       String resultMessage = '';
       for (var i = 0; i < results.tasks.length; i++) {
         resultMessage +=

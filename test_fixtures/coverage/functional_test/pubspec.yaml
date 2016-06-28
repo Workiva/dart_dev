@@ -3,7 +3,7 @@ version: 0.0.0
 dev_dependencies:
   browser: any
   coverage: "^0.7.2"
-  test: '0.12.0'
+  test: '^0.12.0'
   webdriver: '0.10.0-pre.13'
   dart_dev:
     path: ../../..

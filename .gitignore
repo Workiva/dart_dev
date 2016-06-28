@@ -2,6 +2,7 @@
 .pub
 packages
 pubspec.lock
+build/
 
 # generated docs
 /doc/api/
@@ -10,11 +11,15 @@ pubspec.lock
 /coverage/
 
 # generated assets in test fixtures
+/test_fixtures/copy_license/license_with_empty_lines_temp/
+/test_fixtures/copy_license/no_licenses_temp/
 /test_fixtures/coverage/browser/coverage/
-/test_fixtures/coverage/functional_test/coverage/
 /test_fixtures/coverage/browser_needs_pub_serve/coverage/
 /test_fixtures/coverage/failing_test/coverage/
 /test_fixtures/coverage/failing_test/test/failing_test.dart.temp.html
+/test_fixtures/coverage/functional_test/coverage/
+/test_fixtures/coverage/functional_test/test/functional/simple_test.dart.temp.html
 /test_fixtures/coverage/non_test_file/coverage/
 /test_fixtures/coverage/vm/coverage/
 /test_fixtures/docs/docs/doc/api/
+/test_fixtures/format/changes_needed_temp/
