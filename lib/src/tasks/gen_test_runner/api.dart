@@ -35,7 +35,17 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   File generatedRunner =
       new File('${currentDirectory}/${currentConfig.filename}.dart');
-  IOSink writer = generatedRunner.openWrite(mode: FileMode.WRITE);
+
+  String existingContent;
+  if (currentConfig.check) {
+    try {
+      existingContent = generatedRunner.readAsStringSync();
+    } catch (_) {
+      existingContent = '';
+    }
+  }
+
+  List<String> runnerLines = [];
 
   Directory testDirectory = new Directory(currentDirectory);
   List<File> testFiles = [];
@@ -58,49 +68,54 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
       await testHtmlFileGenerator(
           currentDirectory, currentConfig.filename, currentConfig.htmlHeaders);
     }
-    writer.writeln('@TestOn(\'browser\')');
+    runnerLines.add('@TestOn(\'browser\')');
   } else {
-    writer.writeln('@TestOn(\'vm\')');
+    runnerLines.add('@TestOn(\'vm\')');
   }
-  writer.writeln(
+  runnerLines.add(
       'library ${currentDirectory.replaceAll('/','.')}${currentConfig.filename};');
-  writer.writeln();
+  runnerLines.add('');
 
   testFiles.forEach((File file) {
     var testPath = file.path.replaceFirst(currentDirectory, '');
-    writer.writeln(
+    runnerLines.add(
         'import \'${'./'+testPath}\' as ${testPath.replaceAll('/','_').substring(0, testPath.length - 5)};');
   });
 
-  writer.writeln('import \'package:test/test.dart\';');
+  runnerLines.add('import \'package:test/test.dart\';');
 
   if (currentConfig.dartHeaders.isNotEmpty) {
     currentConfig.dartHeaders.forEach((String header) {
-      writer.writeln(header);
+      runnerLines.add(header);
     });
   }
 
-  writer.writeln('');
-  writer.writeln('void main() {');
+  runnerLines.add('');
+  runnerLines.add('void main() {');
 
   if (currentConfig.preTestCommands.isNotEmpty) {
     currentConfig.preTestCommands.forEach((String command) {
-      writer.writeln('  $command');
+      runnerLines.add('  $command');
     });
   }
 
   testFiles.forEach((File file) {
     var testPath = file.path.replaceFirst(currentDirectory, '');
-    writer.writeln(
+    runnerLines.add(
         '  ${testPath.replaceAll('/','_').substring(0, testPath.length - 5)}.main();');
   });
 
-  writer.writeln('}');
-  await writer.close();
+  runnerLines.add('}');
+  String updatedContent = runnerLines.join('\n');
 
-  task.runnerFile = '${currentDirectory}${currentConfig.filename}.dart';
+  task.runnerFile = generatedRunner.path;
 
-  task.successful = true;
+  if (currentConfig.check) {
+    task.successful = existingContent == updatedContent;
+  } else {
+    generatedRunner.writeAsStringSync(updatedContent);
+    task.successful = true;
+  }
 
   return task;
 }

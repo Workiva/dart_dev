@@ -502,8 +502,18 @@ object.
             <td><code>[TestRunnerConfig()]</code></td>
             <td>The list of runner configurations used to create individual test runners</td>
         </tr>
+        <tr>
+            <td><code>check</code></td>
+            <td><code>bool/code></td>
+            <td><code>false</code></td>
+            <td>If true, will only check to ensure the runner is up-to-date</td>
+        </tr>
     </tbody>
 </table>
+
+**Note:** if you plan to use the `--check` option, be sure to exclude
+the `generated_runner_test.dart` file from formatting. This can be done
+by adding it to the `config.format.exclude` list.
 
 #### Local Config
 All configuration options for the local task discovery are found on the

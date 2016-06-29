@@ -16,6 +16,7 @@ library dart_dev.src.tasks.gen_test_runner.config;
 
 import 'package:dart_dev/src/tasks/config.dart';
 
+const bool defaultCheck = false;
 const List<String> defaultDartHeaders = const [];
 const List<String> defaultPreTestCommands = const [];
 const String defaultDirectory = 'test/';
@@ -28,6 +29,7 @@ const List<String> defaultHtmlHeaders = const [];
 enum Environment { vm, browser }
 
 class TestRunnerConfig {
+  bool check = defaultCheck;
   List<String> dartHeaders = defaultDartHeaders;
   List<String> preTestCommands = defaultPreTestCommands;
   String directory = defaultDirectory;
