@@ -110,8 +110,12 @@ class SeleniumHelper {
             response['result']['isolates'] is List &&
             response['result']['isolates'].isNotEmpty);
       });
-      ws.add(JSON.encode(
-          {'jsonrpc': '2.0', 'method': 'getVM', 'params': {}, 'id': uuid,}));
+      ws.add(JSON.encode({
+        'jsonrpc': '2.0',
+        'method': 'getVM',
+        'params': {},
+        'id': uuid,
+      }));
       return c.future;
     } catch (e) {
       return false;
