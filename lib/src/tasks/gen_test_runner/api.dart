@@ -49,10 +49,15 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   Directory testDirectory = new Directory(currentDirectory);
   List<File> testFiles = [];
-  List<File> allFiles =
-      testDirectory.listSync(recursive: true, followLinks: false).where((FileSystemEntity entity) => entity is File).toList();
+  List<File> allFiles = testDirectory
+      .listSync(recursive: true, followLinks: false)
+      .where((FileSystemEntity entity) => entity is File)
+      .toList();
   allFiles.sort((File left, File right) => left.path.compareTo(right.path));
-  allFiles.where((File entity) => !entity.path.endsWith('${currentConfig.filename}.dart')).forEach((File entity) {
+  allFiles
+      .where((File entity) =>
+          !entity.path.endsWith('${currentConfig.filename}.dart'))
+      .forEach((File entity) {
     if (entity.path.endsWith('_test.dart')) {
       testFiles.add(entity);
       task.testFiles.add(entity.path);
