@@ -50,7 +50,7 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   Directory testDirectory = new Directory(currentDirectory);
   List<File> testFiles = [];
   List<FileSystemEntity> allFiles =
-      testDirectory.listSync(recursive: true, followLinks: false);
+      testDirectory.listSync(recursive: true, followLinks: false).where((FileSystemEntity entity) => entity is File);
   allFiles.forEach((FileSystemEntity entity) {
     var isTestRunner = entity.path.endsWith('${currentConfig.filename}.dart');
     if (entity is File) {
