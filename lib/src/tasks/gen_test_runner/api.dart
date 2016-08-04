@@ -108,21 +108,20 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   task.runnerFile = generatedRunner.path;
 
-  print('New lines:\n${runnerLines.join("\n")}');
-  print('Old lines:\n${existingLines.join("\n")}');
-
   if (currentConfig.check) {
+    task.newLength = runnerLines.length;
+    task.oldLength = existingLines.length;
+
     bool success = true;
     if (existingLines.length != runnerLines.length) {
       success = false;
-      print('New and existing runners have different number of lines.');
     }
     for (int i = 0; i < existingLines.length; i++) {
       if (existingLines[i] != runnerLines[i]) {
         success = false;
-        print('Mismatch starting at line ${i + 1}:');
-        print('New: ${runnerLines[i]}');
-        print('Old: ${existingLines[i]}');
+        task.mismatchedLineNumber = i + 1;
+        task.newMismatchedLine = runnerLines[i];
+        task.oldMismatchedLine = existingLines[i];
         break;
       }
     }
@@ -159,6 +158,11 @@ class GenTestRunnerTask extends Task {
   List<String> excludedFiles = [];
   final String generateCommand;
   List<String> testFiles = [];
+  int newLength;
+  int oldLength;
+  int mismatchedLineNumber;
+  String newMismatchedLine = '';
+  String oldMismatchedLine = '';
   String runnerFile;
 
   GenTestRunnerTask(String this.generateCommand);
