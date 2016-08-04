@@ -36,12 +36,12 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   File generatedRunner =
       new File('${currentDirectory}/${currentConfig.filename}.dart');
 
-  String existingContent;
+  List<String> existingLines;
   if (currentConfig.check) {
     try {
-      existingContent = generatedRunner.readAsStringSync();
+      existingLines = generatedRunner.readAsStringSync().split('\n');
     } catch (_) {
-      existingContent = '';
+      existingLines = [];
     }
   }
 
@@ -111,7 +111,20 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   task.runnerFile = generatedRunner.path;
 
   if (currentConfig.check) {
-    task.successful = existingContent == updatedContent;
+    bool success = true;
+    if (existingLines.length != runnerLines.length) {
+      success = false;
+      print('New and existing runners have different number of lines.');
+    }
+    for (int i = 0; i < existingLines.length; i++) {
+      if (existingLines[i] != runnerLines[i]) {
+        success = false;
+        print('New:\n${runnerLines[i]}');
+        print('Existing:\n${existingLines[i]}');
+        break;
+      }
+    }
+    task.successful = success;
   } else {
     generatedRunner.writeAsStringSync(updatedContent);
     task.successful = true;
