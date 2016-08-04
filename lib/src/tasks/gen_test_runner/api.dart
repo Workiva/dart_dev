@@ -49,17 +49,15 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   Directory testDirectory = new Directory(currentDirectory);
   List<File> testFiles = [];
-  List<FileSystemEntity> allFiles =
-      testDirectory.listSync(recursive: true, followLinks: false).where((FileSystemEntity entity) => entity is File);
-  allFiles.forEach((FileSystemEntity entity) {
-    var isTestRunner = entity.path.endsWith('${currentConfig.filename}.dart');
-    if (entity is File) {
-      if (entity.path.endsWith('_test.dart') && !isTestRunner) {
-        testFiles.add(entity);
-        task.testFiles.add(entity.path);
-      } else if (!isTestRunner && entity.path.endsWith('.dart')) {
-        task.excludedFiles.add(entity.path);
-      }
+  List<File> allFiles =
+      testDirectory.listSync(recursive: true, followLinks: false).where((FileSystemEntity entity) => entity is File).toList();
+  allFiles.sort((File left, File right) => left.path.compareTo(right.path));
+  allFiles.where((File entity) => !entity.path.endsWith('${currentConfig.filename}.dart')).forEach((File entity) {
+    if (entity.path.endsWith('_test.dart')) {
+      testFiles.add(entity);
+      task.testFiles.add(entity.path);
+    } else if (entity.path.endsWith('.dart')) {
+      task.excludedFiles.add(entity.path);
     }
   });
 
@@ -110,6 +108,9 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   task.runnerFile = generatedRunner.path;
 
+  print('New lines:\n${runnerLines.join("\n")}');
+  print('Old lines:\n${existingLines.join("\n")}');
+
   if (currentConfig.check) {
     bool success = true;
     if (existingLines.length != runnerLines.length) {
@@ -119,8 +120,9 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
     for (int i = 0; i < existingLines.length; i++) {
       if (existingLines[i] != runnerLines[i]) {
         success = false;
-        print('New:\n${runnerLines[i]}');
-        print('Existing:\n${existingLines[i]}');
+        print('Mismatch starting at line ${i + 1}:');
+        print('New: ${runnerLines[i]}');
+        print('Old: ${existingLines[i]}');
         break;
       }
     }
