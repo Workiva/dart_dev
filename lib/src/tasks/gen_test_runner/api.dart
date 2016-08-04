@@ -34,7 +34,7 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   }
 
   File generatedRunner =
-      new File('${currentDirectory}/${currentConfig.filename}.dart');
+      new File('${currentDirectory}${currentConfig.filename}.dart');
 
   String existingContent;
   if (currentConfig.check) {
