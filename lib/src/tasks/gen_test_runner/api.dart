@@ -36,12 +36,12 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   File generatedRunner =
       new File('${currentDirectory}${currentConfig.filename}.dart');
 
-  String existingContent;
+  List<String> existingLines;
   if (currentConfig.check) {
     try {
-      existingContent = generatedRunner.readAsStringSync();
+      existingLines = generatedRunner.readAsStringSync().split('\n');
     } catch (_) {
-      existingContent = '';
+      existingLines = [];
     }
   }
 
@@ -49,17 +49,20 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   Directory testDirectory = new Directory(currentDirectory);
   List<File> testFiles = [];
-  List<FileSystemEntity> allFiles =
-      testDirectory.listSync(recursive: true, followLinks: false);
-  allFiles.forEach((FileSystemEntity entity) {
-    var isTestRunner = entity.path.endsWith('${currentConfig.filename}.dart');
-    if (entity is File) {
-      if (entity.path.endsWith('_test.dart') && !isTestRunner) {
-        testFiles.add(entity);
-        task.testFiles.add(entity.path);
-      } else if (!isTestRunner && entity.path.endsWith('.dart')) {
-        task.excludedFiles.add(entity.path);
-      }
+  List<File> allFiles = testDirectory
+      .listSync(recursive: true, followLinks: false)
+      .where((FileSystemEntity entity) => entity is File)
+      .toList();
+  allFiles.sort((File left, File right) => left.path.compareTo(right.path));
+  allFiles
+      .where((File entity) =>
+          !entity.path.endsWith('${currentConfig.filename}.dart'))
+      .forEach((File entity) {
+    if (entity.path.endsWith('_test.dart')) {
+      testFiles.add(entity);
+      task.testFiles.add(entity.path);
+    } else if (entity.path.endsWith('.dart')) {
+      task.excludedFiles.add(entity.path);
     }
   });
 
@@ -111,7 +114,23 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   task.runnerFile = generatedRunner.path;
 
   if (currentConfig.check) {
-    task.successful = existingContent == updatedContent;
+    task.newLength = runnerLines.length;
+    task.oldLength = existingLines.length;
+
+    bool success = true;
+    if (existingLines.length != runnerLines.length) {
+      success = false;
+    }
+    for (int i = 0; i < existingLines.length; i++) {
+      if (existingLines[i] != runnerLines[i]) {
+        success = false;
+        task.mismatchedLineNumber = i + 1;
+        task.newMismatchedLine = runnerLines[i];
+        task.oldMismatchedLine = existingLines[i];
+        break;
+      }
+    }
+    task.successful = success;
   } else {
     generatedRunner.writeAsStringSync(updatedContent);
     task.successful = true;
@@ -144,6 +163,11 @@ class GenTestRunnerTask extends Task {
   List<String> excludedFiles = [];
   final String generateCommand;
   List<String> testFiles = [];
+  int newLength;
+  int oldLength;
+  int mismatchedLineNumber;
+  String newMismatchedLine = '';
+  String oldMismatchedLine = '';
   String runnerFile;
 
   GenTestRunnerTask(String this.generateCommand);

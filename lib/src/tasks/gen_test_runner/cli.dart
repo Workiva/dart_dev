@@ -62,7 +62,23 @@ class GenTestRunnerCli extends TaskCli {
 
     if (results.passing.contains(false)) {
       if (check) {
-        return new CliResult.fail('Generated test runner is not up-to-date.');
+        String message = '';
+        for (var task in results.tasks) {
+          if (!task.successful) {
+            if (task.newLength != task.oldLength) {
+              message += 'New and old runners have different length:\n';
+              message += 'New length: ${task.newLength}\n';
+              message += 'Old length: ${task.oldLength}\n';
+            }
+            if (task.mismatchedLineNumber != null) {
+              message += 'Mismatch on line ${task.mismatchedLineNumber}:\n';
+              message += 'New line: ${task.newMismatchedLine}\n';
+              message += 'Old line: ${task.oldMismatchedLine}\n';
+            }
+          }
+        }
+        message += 'Generated test runner is not up-to-date.';
+        return new CliResult.fail(message);
       }
       var failedFiles = '';
       for (var task in results.tasks) {
