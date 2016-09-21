@@ -46,7 +46,7 @@ class SauceRunnerCli extends TaskCli {
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (sauceUserName == null || sauceAccessKey == null) {
       return new CliResult.fail('Sauce Labs credentials must be available via '
-          'the `SAUCE_ACCESS_KEY` and `SAUCE_USERNAME` SauceRunnerConfig instance.');
+          'the `SAUCE_ACCESS_KEY` and `SAUCE_USERNAME` environment variables.');
     }
 
     if (config.saucelabs.filesToTest.isEmpty) {

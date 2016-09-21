@@ -645,7 +645,7 @@ object.
             <td>Platforms to be executed on saucelabs</td>
         </tr>
         <tr>
-            <td><code>pubServer</code></td>
+            <td><code>pubServePort</code></td>
             <td><code>int</code></td>
             <td><code>0</code></td>
             <td>Specify the port to run the tests on, otherwise specifying 0 will use a random port</td>
