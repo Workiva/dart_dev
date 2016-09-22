@@ -6,6 +6,7 @@ build/
 
 # generated docs
 /doc/api/
+test_reports/
 
 # generated coverage
 /coverage/
