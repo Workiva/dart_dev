@@ -270,7 +270,7 @@ class CoverageTask extends Task {
       'run',
       'coverage:format_coverage',
       '-l',
-      '--package-root=packages',
+      '--packages=.packages',
       '-i',
       collection.path,
       '-o',
@@ -424,7 +424,7 @@ class CoverageTask extends Task {
           [
             '--analyze-only',
             '--categories=Server',
-            '--package-root=packages',
+            '--packages=.packages',
             file.path
           ],
           runInShell: true);
