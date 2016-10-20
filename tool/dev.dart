@@ -21,7 +21,9 @@ main(args) async {
   config.analyze.entryPoints = directories;
   config.copyLicense.directories = directories;
   config.coverage.reportOn = ['bin/', 'lib/'];
-  config.format.directories = directories;
+  config.format
+    ..directories = directories
+    ..exclude = ['test/integration/generated_runner.dart'];
   config.genTestRunner.configs = [
     new TestRunnerConfig(directory: 'test/integration', env: Environment.vm)
   ];
