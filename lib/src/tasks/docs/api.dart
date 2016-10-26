@@ -42,9 +42,11 @@ class DocsTask extends Task {
     return task._run();
   }
 
+  static String _executable = 'pub';
+  static List<String> _args = ['run', 'dartdoc'];
+
   Stream<String> _dartdocStderr;
   Stream<String> _dartdocStdout;
-  String _pubCommand;
 
   Completer<DocsResult> _done = new Completer();
 
@@ -53,13 +55,10 @@ class DocsTask extends Task {
   Future<DocsResult> get done => _done.future;
   Stream<String> get errorOutput => _dartdocStderr;
   Stream<String> get output => _dartdocStdout;
-  String get pubCommand => _pubCommand;
+  String get pubCommand => '$_executable ${_args.join(' ')}';
 
   Future<DocsResult> _run() async {
-    var executable = 'pub';
-    var args = ['run', 'dartdoc'];
-    _pubCommand = '$executable ${args.join(' ')}';
-    TaskProcess process = new TaskProcess(executable, args);
+    TaskProcess process = new TaskProcess(_executable, _args);
     _dartdocStderr = process.stderr;
     _dartdocStdout = process.stdout;
     await process.done;

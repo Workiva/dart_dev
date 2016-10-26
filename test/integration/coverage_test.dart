@@ -22,8 +22,8 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
 const String projectWithDartFile = 'test_fixtures/coverage/non_test_file';
-const String projectWithVmTests = 'test_fixtures/coverage/browser';
-const String projectWithBrowserTests = 'test_fixtures/coverage/vm';
+const String projectWithBrowserTests = 'test_fixtures/coverage/browser';
+const String projectWithVmTests = 'test_fixtures/coverage/vm';
 const String projectWithFunctionalTests =
     'test_fixtures/coverage/functional_test/';
 const String projectWithBrowserTestsThatNeedsPubServe =
