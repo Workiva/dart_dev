@@ -1,0 +1,18 @@
+analyze:
+  libraries:
+    - bin/dart_dev.dart
+    - lib/executable.dart
+    - lib/hooks.dart
+
+apply-license:
+  license: LICENSE
+  include:
+    - lib/src/config/**
+  exclude:
+    - lib/src/config/utils.dart
+
+format:
+  include:
+    - lib/
+  exclude:
+    - lib/src/v1/

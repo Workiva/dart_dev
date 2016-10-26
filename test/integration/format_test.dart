@@ -98,5 +98,5 @@ void main() {
       String contentsAfter = file.readAsStringSync();
       expect(contentsBefore, equals(contentsAfter));
     });
-  });
+  }, skip: true);
 }

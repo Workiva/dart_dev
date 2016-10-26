@@ -53,5 +53,5 @@ void main() {
     test('should serve if examples directory found', () async {
       expect(await serveExamplesFor(projectWithExamples), isTrue);
     });
-  });
+  }, skip: true);
 }
