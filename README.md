@@ -686,6 +686,8 @@ object.
 * The html files to be transformed should have the `packages/test/dart.js` script tag listed last.
 
 * During this process the test directory will be served which means that the `filesToTest` must be within the test directory and their path will be relative to the test directory.
+ 
+* This process requires that the `packages` directory is present, something to consider on dart sdk versions 1.20.0+.
 
 #### `test` Config
 All configuration options for the `test` task are found on the `config.test`

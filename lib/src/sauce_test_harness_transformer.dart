@@ -32,7 +32,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:barback/barback.dart';
-import 'package:fluri/fluri.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:path/path.dart' as p;
@@ -132,10 +131,7 @@ class SauceTestHarnessTransformer extends Transformer
 
     // Change the Dart test file's <link rel="x-dart-test"> to a real <script> tag.
     html.querySelectorAll('link[rel="x-dart-test"]').forEach((Element link) {
-      var dartScriptFluri = new Fluri(link.attributes['href'])
-        ..appendToPath(sauceDartExtension);
-
-      var dartScriptUrl = dartScriptFluri.toString();
+      var dartScriptUrl = link.attributes['href'] + sauceDartExtension;
 
       dartScripts.add(dartScriptUrl);
 
