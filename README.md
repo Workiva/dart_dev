@@ -7,6 +7,14 @@
 > Centralized tooling for Dart projects. Consistent interface across projects.
 > Easily configurable.
 
+---
+
+#### Looking for the 2.0.0 Alpha?
+
+https://github.com/Workiva/dart_dev/blob/2.0.0-alpha/README.md
+
+---
+
 - [**Motivation**](#motivation)
 - [**Supported Tasks**](#supported-tasks)
 - [**Getting Started**](#getting-started)
