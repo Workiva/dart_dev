@@ -79,7 +79,7 @@ Add the following to your `pubspec.yaml`:
 ```yaml
 dev_dependencies:
   coverage: ^0.8.0
-  dart_dev: 2.0.0-rc.1
+  dart_dev: 2.0.0-alpha
   dart_style: ^0.2.0
   dartdoc: ^0.9.0
   test: ^0.12.0
