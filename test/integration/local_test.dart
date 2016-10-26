@@ -127,5 +127,5 @@ void main() {
     test('should follow symlink directories when configured', () async {
       await expectOutput(local(followSymlinkProject), 'exampleTask');
     });
-  });
+  }, skip: true);
 }

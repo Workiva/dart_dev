@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:async';
+class DocsConfig {
+  static const String key = 'docs';
 
-import 'package:args/args.dart';
-
-import 'package:dart_dev/src/config/dart_dev_config.dart';
-import 'package:dart_dev/src/lenient_args/lenient_arg_results.dart';
-import 'package:dart_dev/src/utils/text_utils.dart' as text;
-
-abstract class Task {
-  ArgParser get argParser;
-
-  String get command;
-
-  Future<Null> help(DartDevConfig config, text.Reporter reporter,
-      {bool verbose});
-
-  Future<int /* exit code */ > run(DartDevConfig config,
-      LenientArgResults parsedArgs, text.Reporter reporter);
+  static DocsConfig parse(Map dartDevApplyLicenseYaml) {
+    return new DocsConfig();
+  }
 }
