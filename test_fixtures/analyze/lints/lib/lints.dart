@@ -1,7 +1,11 @@
-library analyze_hints;
+library analyze_lints;
 
 class BaseClass {
   void doSomeStuff(bool ifTrue) {
+
+  }
+
+  void doSomeOtherStuff() {
 
   }
 }
@@ -9,5 +13,10 @@ class BaseClass {
 class ExtendoClass extends BaseClass {
   void doSomeStuff(bool ifTrue) {
     // yuno @override?
+  }
+
+  @override
+  void doSomeOtherStuff() {
+
   }
 }

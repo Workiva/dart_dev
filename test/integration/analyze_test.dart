@@ -40,8 +40,8 @@ Future<Analysis> analyzeProject(String projectPath,
   args.add(fatalWarnings ? '--fatal-warnings' : '--no-fatal-warnings');
   args.add(hints ? '--hints' : '--no-hints');
   args.add(strong ? '--strong' : '--no-strong');
-  args.add(fatalHints ? '--fatal-hints' : ' --no-fatal-hints');
-  args.add(fatalLints ? '--fatal-lints' : ' --no-fatal-lints');
+  args.add(fatalHints ? '--fatal-hints' : '--no-fatal-hints');
+  args.add(fatalLints ? '--fatal-lints' : '--no-fatal-lints');
 
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);

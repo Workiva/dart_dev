@@ -43,6 +43,7 @@ class AnalyzeCli extends TaskCli {
         help: 'Enable strong static checks (https://goo.gl/DqcBsw)')
     ..addFlag('fatal-lints',
         defaultsTo: defaultFatalLints,
+        negatable: true,
         help: 'Treat lints as fatal.');
 
   final String command = 'analyze';
@@ -55,7 +56,8 @@ class AnalyzeCli extends TaskCli {
     bool fatalHints =
         TaskCli.valueOf('fatal-hints', parsedArgs, config.analyze.fatalHints);
     bool strong = TaskCli.valueOf('strong', parsedArgs, config.analyze.strong);
-    bool fatalLints = TaskCli.valueOf('fatal-lints', parsedArgs, config.analyze.fatalLints);
+    bool fatalLints =
+        TaskCli.valueOf('fatal-lints', parsedArgs, config.analyze.fatalLints);
 
     if (!hints && fatalHints) {
       return new CliResult.fail('You must enable hints to fail on hints.');
