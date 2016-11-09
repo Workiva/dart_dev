@@ -129,6 +129,7 @@ void main() {
     test('should not report hints as fatal if none existed', () async {
       Analysis analysis =
           await analyzeProject(projectWithNoIssues, fatalHints: true);
+      expect(analysis.numErrors, equals(0));
       expect(analysis.numHints, equals(0));
       expect(analysis.exitCode, equals(0));
     });
@@ -141,9 +142,10 @@ void main() {
       expect(analysis.exitCode, greaterThan(0));
     });
 
-    test('should not report hints as fatal if none existed', () async {
+    test('should not report lints as fatal if none existed', () async {
       Analysis analysis =
           await analyzeProject(projectWithNoIssues, fatalLints: true);
+      expect(analysis.numErrors, equals(0));
       expect(analysis.numHints, equals(0));
       expect(analysis.exitCode, equals(0));
     });
