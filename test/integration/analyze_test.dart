@@ -23,6 +23,7 @@ import 'package:test/test.dart';
 
 const String projectWithErrors = 'test_fixtures/analyze/errors';
 const String projectWithHints = 'test_fixtures/analyze/hints';
+const String projectWithLints = 'test_fixtures/analyze/lints';
 const String projectWithNoIssues = 'test_fixtures/analyze/no_issues';
 const String projectWithStaticTypingIssues = 'test_fixtures/analyze/strong';
 const String projectWithWarnings = 'test_fixtures/analyze/warnings';
@@ -31,14 +32,16 @@ Future<Analysis> analyzeProject(String projectPath,
     {bool fatalWarnings: true,
     bool hints: true,
     bool fatalHints: false,
-    bool strong: false}) async {
+    bool strong: false,
+    bool fatalLints: false}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
   var args = ['run', 'dart_dev', 'analyze'];
   args.add(fatalWarnings ? '--fatal-warnings' : '--no-fatal-warnings');
   args.add(hints ? '--hints' : '--no-hints');
   args.add(strong ? '--strong' : '--no-strong');
-  args.add(fatalHints ? '--fatal-hints' : ' --no-fatal-hints');
+  args.add(fatalHints ? '--fatal-hints' : '--no-fatal-hints');
+  args.add(fatalLints ? '--fatal-lints' : '--no-fatal-lints');
 
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
@@ -126,6 +129,23 @@ void main() {
     test('should not report hints as fatal if none existed', () async {
       Analysis analysis =
           await analyzeProject(projectWithNoIssues, fatalHints: true);
+      expect(analysis.numErrors, equals(0));
+      expect(analysis.numHints, equals(0));
+      expect(analysis.exitCode, equals(0));
+    });
+
+    test('should report lints as fatal if configured to do so', () async {
+      Analysis analysis =
+          await analyzeProject(projectWithLints, fatalLints: true);
+      expect(analysis.numErrors, equals(1));
+      expect(analysis.numHints, equals(0));
+      expect(analysis.exitCode, greaterThan(0));
+    });
+
+    test('should not report lints as fatal if none existed', () async {
+      Analysis analysis =
+          await analyzeProject(projectWithNoIssues, fatalLints: true);
+      expect(analysis.numErrors, equals(0));
       expect(analysis.numHints, equals(0));
       expect(analysis.exitCode, equals(0));
     });
