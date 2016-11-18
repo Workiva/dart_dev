@@ -126,8 +126,8 @@ Add the following to your `pubspec.yaml`:
 dev_dependencies:
   coverage: "^0.7.3"
   dart_dev: "^1.0.0"
-  dart_style: ">=0.1.8 <0.3.0"
-  dartdoc: "^0.4.0"
+  dart_style: ">=0.2.0 <0.3.0"
+  dartdoc: ">=0.8.0 <=0.10.0"
   test: "^0.12.0"
 ```
 
