@@ -80,7 +80,8 @@ class TestCli extends TaskCli {
       additionalArgs.add('--no-color');
     }
 
-    bool debug = TaskCli.valueOf('debug', parsedArgs, config.test.debug);
+    bool pauseAfterLoad =
+        TaskCli.valueOf('pause-after-load', parsedArgs, defaultPauseAfterLoad);
 
     bool pubServe =
         TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
@@ -154,7 +155,7 @@ class TestCli extends TaskCli {
       }
     }
 
-    if (debug) {
+    if (pauseAfterLoad) {
       additionalArgs.add('--pause-after-load');
     }
 
