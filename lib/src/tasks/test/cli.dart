@@ -45,10 +45,10 @@ class TestCli extends TaskCli {
         defaultsTo: defaultPubServe,
         help: 'Serves browser tests using a Pub server.')
     ..addFlag('pause-after-load',
-        abbr: 'w',
-        negatable: true,
-        defaultsTo: defaultPauseAfterLoad,
-        help: 'Debug browser tests using the "--pause-after-load" flag.')
+        help: 'Pauses for debugging before any tests execute.\n'
+            'Implies --concurrency=1 and --timeout=none.\n'
+            'Currently only supported for browser tests.',
+        negatable: false)
     ..addOption('pub-serve-port',
         help:
             'Port used by the Pub server for browser tests. The default value will randomly select an open port to use.')
