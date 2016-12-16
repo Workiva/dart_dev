@@ -1,0 +1,6 @@
+name: task_runner_passing
+version: 0.0.0
+dev_dependencies:
+  dart_dev:
+    path: ../../..
+  dart_style: ">=0.1.8 <0.3.0"
