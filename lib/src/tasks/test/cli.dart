@@ -18,7 +18,7 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter, isPortBound, runAll;
+import 'package:dart_dev/util.dart' show reporter, isPortBound;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -26,6 +26,7 @@ import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/src/tasks/test/api.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
+import 'package:dart_dev/src/util.dart' show runAll;
 
 class TestCli extends TaskCli {
   final ArgParser argParser = new ArgParser()

@@ -24,8 +24,7 @@ import 'package:dart_dev/util.dart'
         TaskProcess,
         parseArgsFromCommand,
         parseExecutableFromCommand,
-        reporter,
-        runAll;
+        reporter;
 
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
@@ -42,6 +41,7 @@ import 'package:dart_dev/src/tasks/init/cli.dart';
 import 'package:dart_dev/src/tasks/local/cli.dart';
 import 'package:dart_dev/src/tasks/saucelabs/cli.dart';
 import 'package:dart_dev/src/tasks/test/cli.dart';
+import 'package:dart_dev/src/util.dart' show runAll;
 
 import 'package:dart_dev/src/version.dart' show printVersion;
 

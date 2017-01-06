@@ -19,7 +19,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter, runAll;
+import 'package:dart_dev/util.dart' show reporter;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -28,6 +28,7 @@ import 'package:dart_dev/src/tasks/coverage/api.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
+import 'package:dart_dev/src/util.dart' show runAll;
 
 class CoverageCli extends TaskCli {
   final ArgParser argParser = new ArgParser()

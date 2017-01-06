@@ -25,5 +25,4 @@ export 'package:dart_dev/src/util.dart'
         getOpenPort,
         isPortBound,
         parseArgsFromCommand,
-        parseExecutableFromCommand,
-        runAll;
+        parseExecutableFromCommand;
