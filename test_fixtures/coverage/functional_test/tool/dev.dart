@@ -26,11 +26,11 @@ main(List<String> args) async {
   config.test
     ..unitTests = []
     ..functionalTests = ['test/functional/']
-    ..before = [startSeleniumAndServeWebDir]
-    ..after = [stopSeleniumAndPubServe];
+    ..beforeFunctionalTests = [startSeleniumAndServeWebDir]
+    ..afterFunctionalTests = [stopSeleniumAndPubServe];
   config.coverage
-    ..before = [startSeleniumAndServeWebDir]
-    ..after = [stopSeleniumAndPubServe];
+    ..beforeFunctionalTests = [startSeleniumAndServeWebDir]
+    ..afterFunctionalTests = [stopSeleniumAndPubServe];
 
   await dev(args);
 }

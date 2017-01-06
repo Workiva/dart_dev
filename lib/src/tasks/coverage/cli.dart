@@ -19,7 +19,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter;
+import 'package:dart_dev/util.dart' show reporter, runAll;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -99,6 +99,10 @@ class CoverageCli extends TaskCli {
       }
     }
 
+    if (functional && config.coverage.beforeFunctionalTests.isNotEmpty) {
+      await runAll(config.coverage.beforeFunctionalTests);
+    }
+
     CoverageResult result;
     try {
       CoverageTask task = CoverageTask.start(tests,
@@ -113,6 +117,10 @@ class CoverageCli extends TaskCli {
       return new CliResult.fail(e.message);
     } catch (e) {
       return new CliResult.fail(e.toString());
+    } finally {
+      if (functional && config.coverage.afterFunctionalTests.isNotEmpty) {
+        await runAll(config.coverage.afterFunctionalTests);
+      }
     }
 
     if (result.successful && html && open) {
