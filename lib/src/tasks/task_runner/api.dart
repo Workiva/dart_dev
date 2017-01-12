@@ -28,7 +28,7 @@ class TaskRunner extends Task {
 
 class SubTask {
   /// Process to be executed
-  String command;
+  final String command;
 
   /// A string consisting of all the subtask's output
   String taskOutput = '';
@@ -38,9 +38,7 @@ class SubTask {
 
   TaskProcess taskProcess;
 
-  SubTask(String task) {
-    command = task;
-  }
+  SubTask(this.command);
 
   /// Starts the provided subtask and wires up a stream to allow
   /// the TaskGroup to listen for subtask completion.

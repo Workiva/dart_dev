@@ -96,7 +96,7 @@ local tasks.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Generate a test runner file:** that allows for faster test execution.
 - **Running dart unit tests on Sauce Labs** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
-- **Running concurrent dart commands** allows for continuous integration systems to run concurrently rather then serially.
+- **Running concurrent dart commands** allows continuous integration systems to run concurrently rather then serially.
 
 ### Local Tasks
 
@@ -252,7 +252,7 @@ ddev examples
 ddev format
 ddev gen-test-runner
 ddev saucelabs
-ddev task-runner
+ddev run-ci
 ddev test
 
 # without the alias
@@ -264,7 +264,7 @@ pub run dart_dev examples
 pub run dart_dev format
 pub run dart_dev gen-test-runner
 pub run dart_dev saucelabs
-pub run dart_dev task-runner
+pub run dart_dev run-ci
 pub run dart_dev test
 ```
 
