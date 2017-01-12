@@ -7,8 +7,8 @@ import 'package:dart_dev/src/tasks/task.dart';
 
 Future<TaskRunner> runTasks({List<String> tasksToRun}) async {
   var taskGroup = new TaskGroup(tasksToRun);
-  await taskGroup.startTaskGroup();
-  taskGroup.taskGroupOutput();
+  await taskGroup.start();
+  taskGroup.output();
 
   TaskRunner task = new TaskRunner(await taskGroup.checkExitCodes(),
       taskGroup.taskGroupStdout, taskGroup.taskGroupStderr);
@@ -22,7 +22,7 @@ class TaskRunner extends Task {
   bool successful;
 
   TaskRunner(int exitCode, String this.stdout, String this.stderr) {
-    exitCode == 0 ? this.successful = true : this.successful = false;
+    this.successful = exitCode == 0;
   }
 }
 
@@ -79,7 +79,7 @@ class TaskGroup {
   }
 
   /// Begin each subtask and wait for completion
-  startTaskGroup() async {
+  start() async {
     List<Future> futures = [];
     var timer = new Timer.periodic(new Duration(seconds: 30), (_) {
       reporter.log('Tasks running...');
@@ -93,7 +93,7 @@ class TaskGroup {
   }
 
   /// Retrieve output from subtasks
-  taskGroupOutput() {
+  output() {
     String output = '';
     for (SubTask task in subTasks) {
       output += task.taskOutput + '\n';

@@ -25,6 +25,7 @@ const String projectFailingTasks = 'test_fixtures/task_runner/failing_tasks';
 const String failedFormatting = 'The Dart formatter needs to be run.';
 const String successfulFormatting = 'Your Dart code is good to go!';
 const String successfulAnalysis = 'Analysis completed.';
+const String successfulTesting = 'All tests passed!';
 
 /// Runs the task-runner task via dart_dev on a given project.
 Future<TasksRun> runTasks(String projectPath) async {
@@ -44,6 +45,9 @@ Future<TasksRun> runTasks(String projectPath) async {
     }
     if (line.contains(failedFormatting)) {
       failedTasks.add(failedFormatting);
+    }
+    if (line.contains(successfulTesting)) {
+      successfulTasks.add(successfulTesting);
     }
   });
 
@@ -66,6 +70,7 @@ void main() {
       expect(tasks.exitCode, isZero);
       expect(tasks.successfulTasks.contains(successfulAnalysis), isTrue);
       expect(tasks.successfulTasks.contains(successfulFormatting), isTrue);
+      expect(tasks.successfulTasks.contains(successfulTesting), isTrue);
     });
 
     test('a task failed', () async {
@@ -74,6 +79,7 @@ void main() {
       expect(tasks.successfulTasks.contains(successfulAnalysis), isTrue);
       expect(tasks.successfulTasks.contains(successfulFormatting), isFalse);
       expect(tasks.failedTasks.contains(failedFormatting), isTrue);
+      expect(tasks.successfulTasks.contains(successfulTesting), isTrue);
     });
   });
 }
