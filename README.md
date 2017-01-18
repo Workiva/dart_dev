@@ -710,7 +710,7 @@ object.
         <tr>
             <td><code>tasksToRun</code></td>
             <td><code>List&lt;String&gt;</code></td>
-            <td><code>['pub run dart_dev format --check','pub run dart_dev analyze']</code></td>
+            <td><code>['pub run dart_dev format --check','pub run dart_dev analyze','pub run dart_dev test']</code></td>
             <td>The list of tasks to run</td>
         </tr>
     </tbody>
