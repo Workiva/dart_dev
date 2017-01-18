@@ -95,8 +95,8 @@ local tasks.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Generate a test runner file:** that allows for faster test execution.
-- **Running dart unit tests on Sauce Labs** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
-- **Running concurrent dart commands** allows continuous integration systems to run concurrently rather then serially.
+- **Running dart unit tests on Sauce Labs:** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
+- **Running concurrent dart commands:** allows continuous integration systems to run concurrently rather then serially.
 
 ### Local Tasks
 

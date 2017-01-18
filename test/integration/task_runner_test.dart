@@ -33,8 +33,8 @@ Future<TasksRun> runTasks(String projectPath) async {
   var args = ['run', 'dart_dev', 'task-runner'];
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
-  List<String> failedTasks = [];
-  List<String> successfulTasks = [];
+  List<String> failedTasks = <String>[];
+  List<String> successfulTasks = <String>[];
 
   process.stdout.listen((line) {
     if (line.contains(successfulFormatting)) {

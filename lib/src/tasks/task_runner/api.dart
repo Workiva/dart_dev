@@ -58,10 +58,10 @@ class SubTask {
 
 class TaskGroup {
   /// List of the individual subtasks executed
-  List<String> subTaskCommands = [];
+  List<String> subTaskCommands = <String>[];
 
   /// List of the subtasks making up the TaskGroup
-  List<SubTask> subTasks = [];
+  List<SubTask> subTasks = <SubTask>[];
 
   /// TaskGroup stdout
   String taskGroupStdout = '';
@@ -69,7 +69,7 @@ class TaskGroup {
   /// TaskGroup stderr
   String taskGroupStderr = '';
 
-  TaskGroup(List<String> this.subTaskCommands) {
+  TaskGroup(this.subTaskCommands) {
     for (String taskCommand in subTaskCommands) {
       SubTask task = new SubTask(taskCommand);
       subTasks.add(task);
@@ -77,8 +77,8 @@ class TaskGroup {
   }
 
   /// Begin each subtask and wait for completion
-  start() async {
-    List<Future> futures = [];
+  Future start() async {
+    List<Future> futures = <Future>[];
     var timer = new Timer.periodic(new Duration(seconds: 30), (_) {
       reporter.log('Tasks running...');
     });
@@ -91,7 +91,7 @@ class TaskGroup {
   }
 
   /// Retrieve output from subtasks
-  output() {
+  void output() {
     String output = '';
     for (SubTask task in subTasks) {
       output += task.taskOutput + '\n';
