@@ -41,6 +41,7 @@ import 'package:dart_dev/src/tasks/init/cli.dart';
 import 'package:dart_dev/src/tasks/local/cli.dart';
 import 'package:dart_dev/src/tasks/saucelabs/cli.dart';
 import 'package:dart_dev/src/tasks/test/cli.dart';
+import 'package:dart_dev/src/util.dart' show runAll;
 
 import 'package:dart_dev/src/version.dart' show printVersion;
 
@@ -175,10 +176,10 @@ Future _run(List<String> args) async {
   }
 
   TaskConfig config = _cliConfigs[task];
-  await _runAll(config.before);
+  await runAll(config.before);
   CliResult result =
       await _cliTasks[task].run(env.command, color: env['color']);
-  await _runAll(config.after);
+  await runAll(config.after);
 
   reporter.log('');
   if (result.successful) {
@@ -186,19 +187,5 @@ Future _run(List<String> args) async {
   } else {
     reporter.error(result.message, shout: true);
     exitCode = 1;
-  }
-}
-
-Future _runAll(List tasks) async {
-  for (int i = 0; i < tasks.length; i++) {
-    if (tasks[i] is Function) {
-      await tasks[i]();
-    } else if (tasks[i] is String) {
-      TaskProcess process = new TaskProcess(
-          parseExecutableFromCommand(tasks[i]), parseArgsFromCommand(tasks[i]));
-      reporter.logGroup(tasks[i],
-          outputStream: process.stdout, errorStream: process.stderr);
-      await process.done;
-    }
   }
 }

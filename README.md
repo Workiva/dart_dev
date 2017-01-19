@@ -893,8 +893,8 @@ main() async {
   var selenium = new SeleniumHelper(executablePath: 'tool/selenium-server');
 
   config.test
-    ..before = [selenium.start]
-    ..after = [selenium.stop];
+    ..beforeFunctionalTests = [selenium.start]
+    ..afterFunctionalTests = [selenium.stop];
 }
 ```
 
