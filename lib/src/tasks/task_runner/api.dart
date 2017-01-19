@@ -5,7 +5,7 @@ import 'package:dart_dev/util.dart' show reporter, TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
 
-Future<TaskRunner> runTasks({List<String> tasksToRun}) async {
+Future<TaskRunner> runTasks(tasksToRun) async {
   var taskGroup = new TaskGroup(tasksToRun);
   await taskGroup.start();
   taskGroup.output();

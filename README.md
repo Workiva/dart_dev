@@ -252,7 +252,7 @@ ddev examples
 ddev format
 ddev gen-test-runner
 ddev saucelabs
-ddev run-ci
+ddev task-runner
 ddev test
 
 # without the alias
@@ -264,7 +264,7 @@ pub run dart_dev examples
 pub run dart_dev format
 pub run dart_dev gen-test-runner
 pub run dart_dev saucelabs
-pub run dart_dev run-ci
+pub run dart_dev task-runner
 pub run dart_dev test
 ```
 

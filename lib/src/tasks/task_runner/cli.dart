@@ -24,7 +24,7 @@ class TaskRunnerCli extends TaskCli {
           'There are no currently defined tasks in your dev.dart file.');
     }
 
-    TaskRunner task = await runTasks(tasksToRun: tasksToRun);
+    TaskRunner task = await runTasks(tasksToRun);
 
     reporter.logGroup('Tasks run: \'${tasksToRun.join('\', \'')}\'',
         output: task.stdout);
