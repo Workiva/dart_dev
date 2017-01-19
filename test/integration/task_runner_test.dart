@@ -29,7 +29,7 @@ const String successfulTesting = 'All tests passed!';
 
 /// Runs the task-runner task via dart_dev on a given project.
 Future<TasksRun> runTasks(String projectPath) async {
-  await Process.run('pub', ['get'], workingDirectory: projectPath);
+  await Process.run('pub', ['get','--packages-dir'], workingDirectory: projectPath);
   var args = ['run', 'dart_dev', 'task-runner'];
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
