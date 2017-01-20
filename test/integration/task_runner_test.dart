@@ -52,7 +52,7 @@ Future<TasksRun> runTasks(String projectPath) async {
     }
   });
 
-  process.stderr.listen((line){
+  process.stderr.listen((line) {
     print(line);
   });
 
