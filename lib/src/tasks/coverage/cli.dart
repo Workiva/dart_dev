@@ -28,6 +28,7 @@ import 'package:dart_dev/src/tasks/coverage/api.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
+import 'package:dart_dev/src/util.dart' show runAll;
 
 class CoverageCli extends TaskCli {
   final ArgParser argParser = new ArgParser()
@@ -99,6 +100,10 @@ class CoverageCli extends TaskCli {
       }
     }
 
+    if (functional && config.coverage.beforeFunctionalTests.isNotEmpty) {
+      await runAll(config.coverage.beforeFunctionalTests);
+    }
+
     CoverageResult result;
     try {
       CoverageTask task = CoverageTask.start(tests,
@@ -113,6 +118,10 @@ class CoverageCli extends TaskCli {
       return new CliResult.fail(e.message);
     } catch (e) {
       return new CliResult.fail(e.toString());
+    } finally {
+      if (functional && config.coverage.afterFunctionalTests.isNotEmpty) {
+        await runAll(config.coverage.afterFunctionalTests);
+      }
     }
 
     if (result.successful && html && open) {
