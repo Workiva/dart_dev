@@ -37,6 +37,7 @@ Future<TasksRun> runTasks(String projectPath) async {
   List<String> successfulTasks = <String>[];
 
   process.stdout.listen((line) {
+    print(line);
     if (line.contains(successfulFormatting)) {
       successfulTasks.add(successfulFormatting);
     }
@@ -49,6 +50,10 @@ Future<TasksRun> runTasks(String projectPath) async {
     if (line.contains(successfulTesting)) {
       successfulTasks.add(successfulTesting);
     }
+  });
+
+  process.stderr.listen((line) {
+    print(line);
   });
 
   await process.done;
