@@ -16,6 +16,8 @@ library dart_dev.src.tasks.test.config;
 
 import 'package:dart_dev/src/tasks/config.dart';
 
+const List defaultAfterFunctional = const [];
+const List defaultBeforeFunctional = const [];
 const int defaultConcurrency = 4;
 const bool defaultPauseAfterLoad = false;
 const bool defaultPubServe = false;
@@ -29,6 +31,8 @@ const List<String> defaultFunctionalTests = const [];
 const List<String> defaultPlatforms = const [];
 
 class TestConfig extends TaskConfig {
+  List afterFunctionalTests = defaultAfterFunctional;
+  List beforeFunctionalTests = defaultBeforeFunctional;
   int concurrency = defaultConcurrency;
   List<String> functionalTests = defaultFunctionalTests;
   List<String> integrationTests = defaultIntegrationTests;

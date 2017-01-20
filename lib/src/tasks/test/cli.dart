@@ -26,6 +26,7 @@ import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/src/tasks/test/api.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
+import 'package:dart_dev/src/util.dart' show runAll;
 
 class TestCli extends TaskCli {
   final ArgParser argParser = new ArgParser()
@@ -201,6 +202,10 @@ class TestCli extends TaskCli {
       additionalArgs.addAll(['-n', '${parsedArgs['name']}']);
     }
 
+    if (functional && config.test.beforeFunctionalTests.isNotEmpty) {
+      await runAll(config.test.beforeFunctionalTests);
+    }
+
     TestTask task = test(
         tests: tests,
         concurrency: concurrency,
@@ -214,6 +219,10 @@ class TestCli extends TaskCli {
       pubServeTask.stop();
       // Wait for the task to finish to flush its output.
       await pubServeTask.done;
+    }
+
+    if (functional && config.test.afterFunctionalTests.isNotEmpty) {
+      await runAll(config.test.after = config.test.afterFunctionalTests);
     }
 
     return task.successful

@@ -18,7 +18,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
-import 'package:dart_dev/util.dart' show TaskProcess;
+import 'package:dart_dev/util.dart' show TaskProcess, reporter;
 
 void copyDirectory(Directory source, Directory dest) {
   if (!dest.existsSync()) {
@@ -95,4 +95,18 @@ List<String> parseArgsFromCommand(String command) {
   var parts = command.split(' ');
   if (parts.length <= 1) return [];
   return parts.getRange(1, parts.length).toList();
+}
+
+Future runAll(List tasks) async {
+  for (int i = 0; i < tasks.length; i++) {
+    if (tasks[i] is Function) {
+      await tasks[i]();
+    } else if (tasks[i] is String) {
+      TaskProcess process = new TaskProcess(
+          parseExecutableFromCommand(tasks[i]), parseArgsFromCommand(tasks[i]));
+      reporter.logGroup(tasks[i],
+          outputStream: process.stdout, errorStream: process.stderr);
+      await process.done;
+    }
+  }
 }
