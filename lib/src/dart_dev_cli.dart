@@ -40,6 +40,7 @@ import 'package:dart_dev/src/tasks/gen_test_runner/cli.dart';
 import 'package:dart_dev/src/tasks/init/cli.dart';
 import 'package:dart_dev/src/tasks/local/cli.dart';
 import 'package:dart_dev/src/tasks/saucelabs/cli.dart';
+import 'package:dart_dev/src/tasks/task_runner/cli.dart';
 import 'package:dart_dev/src/tasks/test/cli.dart';
 import 'package:dart_dev/src/util.dart' show runAll;
 
@@ -69,6 +70,7 @@ dev(List<String> args) async {
   registerTask(new GenTestRunnerCli(), config.genTestRunner);
   registerTask(new InitCli(), config.init);
   registerTask(new SauceRunnerCli(), config.saucelabs);
+  registerTask(new TaskRunnerCli(), config.taskRunner);
   registerTask(new TestCli(), config.test);
 
   try {
