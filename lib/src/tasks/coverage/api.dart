@@ -60,6 +60,11 @@ class CoverageResult extends TaskResult {
 }
 
 class CoverageTask extends Task {
+  static const String _observatoryFailPattern =
+      'Could not start Observatory HTTP server';
+  static const String _testsFailedPattern = 'Some tests failed.';
+  static const String _testsPassedPattern = 'All tests passed!';
+
   /// Collect and format coverage for the given suite of [tests]. The result of
   /// the coverage task will be returned once it has completed.
   ///
@@ -214,13 +219,44 @@ class CoverageTask extends Task {
 
   Future _collect() async {
     List<File> collections = [];
+    PubServeTask pubServeTask;
+    PubServeInfo serveInfo;
+
+    if (pubServe) {
+      pubServeTask = await _startServeForCoverage();
+      serveInfo = await pubServeTask.serveInfos.first;
+    }
+
     for (int i = 0; i < _files.length; i++) {
       List<int> observatoryPorts;
       TaskProcess process;
 
       // Run the test and obtain the observatory port for coverage collection.
       try {
-        observatoryPorts = await _test(_files[i]);
+        // Look for a correlating HTML file.
+        File customHtmlFile = _correspondingHtmlForTest(_files[i]);
+
+        // Determine if this is a VM test or a browser test.
+        bool isBrowserTest =
+            customHtmlFile.existsSync() || await _usesHtmlOrJsLib(_files[i]);
+
+        if (isBrowserTest) {
+          // Build or modify the HTML file to properly load the test.
+          File htmlFile = _createOrModifyHtmlForTest(_files[i], customHtmlFile);
+
+          String testPath;
+          if (pubServe) {
+            var relativeHtmlPath =
+                path.relative(htmlFile.path, from: serveInfo.directory);
+            testPath = 'http://localhost:${serveInfo.port}/$relativeHtmlPath';
+          } else {
+            testPath = htmlFile.path;
+          }
+
+          observatoryPorts = await _runTestInBrowser(testPath);
+        } else {
+          observatoryPorts = await _runTestOnVm(_files[i].path);
+        }
       } on CoverageTestSuiteException {
         _coverageErrorOutput.add('Tests failed: ${_files[i].path}');
         continue;
@@ -258,6 +294,7 @@ class CoverageTask extends Task {
       // functional tests.
       await SeleniumHelper.killChildrenProcesses();
     }
+    pubServeTask?.stop();
     // Merge all individual coverage collection files into one.
     _collection = _merge(collections);
   }
@@ -370,22 +407,22 @@ class CoverageTask extends Task {
     }
   }
 
-  Future<List<int>> _test(File file) async {
-    // Look for a correlating HTML file.
-    String htmlPath = file.absolute.path;
+  File _correspondingHtmlForTest(File test) {
+    String htmlPath = test.absolute.path;
     htmlPath = htmlPath.substring(0, htmlPath.length - '.dart'.length);
     htmlPath = '$htmlPath.html';
-    File customHtmlFile = new File(htmlPath);
+    return new File(htmlPath);
+  }
 
-    // Build or modify the HTML file to properly load the test.
+  File _createOrModifyHtmlForTest(File test, File customHtml) {
     File htmlFile;
-    if (customHtmlFile.existsSync()) {
+    if (customHtml.existsSync()) {
       // A custom HTML file exists, but is designed for the test package's
       // test runner. A slightly modified version of that file is needed.
-      htmlFile = _lastHtmlFile = new File('${customHtmlFile.path}.temp.html');
-      file.createSync();
-      String contents = customHtmlFile.readAsStringSync();
-      String testFile = file.uri.pathSegments.last;
+      htmlFile = _lastHtmlFile = new File('${customHtml.path}.temp.html');
+      test.createSync();
+      String contents = customHtml.readAsStringSync();
+      String testFile = test.uri.pathSegments.last;
       var linkP1 =
           new RegExp(r'<link .*rel="x-dart-test" .*href="([\w/]+\.dart)"');
       var linkP2 =
@@ -405,168 +442,146 @@ class CoverageTask extends Task {
       htmlFile.writeAsStringSync(contents);
     } else {
       // Create an HTML file that simply loads the test file.
-      htmlFile = _lastHtmlFile = new File('${file.path}.temp.html');
+      htmlFile = _lastHtmlFile = new File('${test.path}.temp.html');
       htmlFile.createSync();
-      String testFile = file.uri.pathSegments.last;
+      String testFile = test.uri.pathSegments.last;
       htmlFile.writeAsStringSync(
           '<script type="application/dart" src="$testFile"></script>');
     }
 
-    // Determine if this is a VM test or a browser test.
-    bool isBrowserTest;
-    if (customHtmlFile.existsSync()) {
-      isBrowserTest = true;
-    } else {
-      // Run analysis on file in "Server" category and look for "Library not
-      // found" errors, which indicates a `dart:html` import.
-      ProcessResult pr = await Process.run(
-          'dart2js',
-          [
-            '--analyze-only',
-            '--categories=Server',
-            '--packages=.packages',
-            file.path
-          ],
-          runInShell: true);
-      // TODO: When dart2js has fixed the issue with their exitcode we should
-      //       rely on the exitcode instead of the stdout.
-      isBrowserTest = pr.stdout != null &&
-          (pr.stdout as String)
-              .contains(new RegExp(r'Error: Library not (found|supported)'));
-    }
+    return htmlFile;
+  }
 
-    String _observatoryFailPattern = 'Could not start Observatory HTTP server';
-    RegExp _observatoryPortPattern = new RegExp(
+  Future<bool> _usesHtmlOrJsLib(File test) async {
+    // Run analysis on file in "Server" category and look for "Library not
+    // found" errors, which indicates a `dart:html` import.
+    ProcessResult pr = await Process.run(
+        'dart2js',
+        [
+          '--analyze-only',
+          '--categories=Server',
+          '--packages=.packages',
+          test.path
+        ],
+        runInShell: true);
+    // TODO: When dart2js has fixed the issue with their exitcode we should
+    //       rely on the exitcode instead of the stdout.
+    return pr.stdout != null &&
+        (pr.stdout as String)
+            .contains(new RegExp(r'Error: Library not (found|supported)'));
+  }
+
+  PubServeTask _startServeForCoverage() {
+    PubServeTask pubServeTask;
+    _coverageOutput.add('Starting Pub server...');
+
+    // Start `pub serve` on the `test` directory.
+    pubServeTask =
+        startPubServe(port: config.test.pubServePort, additionalArgs: ['test']);
+
+    _coverageOutput.add('::: ${pubServeTask.command}');
+    String indentLine(String line) => '    $line';
+
+    var startupLogFinished = new Completer();
+    pubServeTask.stdOut
+        .transform(until(startupLogFinished.future))
+        .map(indentLine)
+        .listen(_coverageOutput.add);
+    pubServeTask.stdErr
+        .transform(until(startupLogFinished.future))
+        .map(indentLine)
+        .listen(_coverageErrorOutput.add);
+
+    startupLogFinished.complete();
+    pubServeTask.stdOut.map(indentLine).join('\n').then((stdOut) {
+      if (stdOut.isNotEmpty) {
+        _coverageOutput.add('`${pubServeTask.command}` (buffered stdout)');
+        _coverageOutput.add(stdOut);
+      }
+    });
+    pubServeTask.stdErr.map(indentLine).join('\n').then((stdErr) {
+      if (stdErr.isNotEmpty) {
+        _coverageOutput.add('`${pubServeTask.command}` (buffered stdout)');
+        _coverageOutput.add(stdErr);
+      }
+    });
+
+    return pubServeTask;
+  }
+
+  Future<List<int>> _runTestOnVm(String testPath) async {
+    // Find an open port to observe the Dart VM on.
+    int port = await getOpenPort();
+
+    // Run the test on the Dart VM.
+    String executable = 'dart';
+    List args = ['--observe=$port', testPath];
+    _coverageOutput.add('');
+    _coverageOutput.add('Running VM test suite ${testPath}');
+    _coverageOutput.add('$executable ${args.join(' ')}\n');
+    TaskProcess process = _lastTestProcess = new TaskProcess(executable, args);
+    process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
+
+    await for (String line in process.stdout) {
+      _coverageOutput.add('    $line');
+      if (line.contains(_observatoryFailPattern)) {
+        throw new CoverageTestSuiteException(testPath);
+      }
+      if (line.contains(_testsFailedPattern)) {
+        _failingTest = true;
+        throw new CoverageTestSuiteException(testPath);
+      }
+      if (line.contains(_testsPassedPattern)) {
+        break;
+      }
+    }
+    var observatoryPorts = await SeleniumHelper.getActiveObservatoryPorts();
+    SeleniumHelper.clearObservatoryPorts();
+    return [port]..addAll(observatoryPorts);
+  }
+
+  Future<List<int>> _runTestInBrowser(String testPath) async {
+    final RegExp _observatoryPortPattern = new RegExp(
         r'Observatory listening (at|on) http:\/\/127\.0\.0\.1:(\d+)');
 
-    String _testsFailedPattern = 'Some tests failed.';
-    String _testsPassedPattern = 'All tests passed!';
+    // Run the test in content-shell.
+    String executable = 'content_shell';
+    List args = [testPath];
+    _coverageOutput.add('');
+    _coverageOutput.add('Running test suite ${testPath}');
+    _coverageOutput.add('$executable ${args.join(' ')}\n');
+    TaskProcess process =
+        _lastTestProcess = new TaskProcess('content_shell', args);
 
-    if (isBrowserTest) {
-      PubServeTask pubServeTask;
-
-      try {
-        String testPath;
-        if (pubServe) {
-          _coverageOutput.add('Starting Pub server...');
-
-          // Start `pub serve` on the `test` directory.
-          pubServeTask = startPubServe(
-              port: config.test.pubServePort, additionalArgs: ['test']);
-
-          _coverageOutput.add('::: ${pubServeTask.command}');
-          String indentLine(String line) => '    $line';
-
-          var startupLogFinished = new Completer();
-          pubServeTask.stdOut
-              .transform(until(startupLogFinished.future))
-              .map(indentLine)
-              .listen(_coverageOutput.add);
-          pubServeTask.stdErr
-              .transform(until(startupLogFinished.future))
-              .map(indentLine)
-              .listen(_coverageErrorOutput.add);
-
-          PubServeInfo serveInfo = await pubServeTask.serveInfos.first;
-          if (!path.isWithin(serveInfo.directory, htmlFile.path)) {
-            throw '`pub serve` directory does not contain test file: ${htmlFile.path}';
-          }
-
-          var relativeHtmlPath =
-              path.relative(htmlFile.path, from: serveInfo.directory);
-          testPath = 'http://localhost:${serveInfo.port}/$relativeHtmlPath';
-
-          startupLogFinished.complete();
-          pubServeTask.stdOut.map(indentLine).join('\n').then((stdOut) {
-            if (stdOut.isNotEmpty) {
-              _coverageOutput
-                  .add('`${pubServeTask.command}` (buffered stdout)');
-              _coverageOutput.add(stdOut);
-            }
-          });
-          pubServeTask.stdErr.map(indentLine).join('\n').then((stdErr) {
-            if (stdErr.isNotEmpty) {
-              _coverageOutput
-                  .add('`${pubServeTask.command}` (buffered stdout)');
-              _coverageOutput.add(stdErr);
-            }
-          });
-        } else {
-          testPath = htmlFile.path;
-        }
-
-        // Run the test in content-shell.
-        String executable = 'content_shell';
-        List args = [testPath];
-        _coverageOutput.add('');
-        _coverageOutput.add('Running test suite ${file.path}');
-        _coverageOutput.add('$executable ${args.join(' ')}\n');
-        TaskProcess process =
-            _lastTestProcess = new TaskProcess('content_shell', args);
-
-        // Content-shell dumps render tree to stderr, which is where the test
-        // results will be. The observatory port should be output to stderr as
-        // well, but it is sometimes malformed. In those cases, the correct
-        // observatory port is output to stdout. So we listen to both.
-        int observatoryPort;
-        process.stdout.listen((line) {
-          _coverageOutput.add('    $line');
-          if (line.contains(_observatoryPortPattern)) {
-            Match m = _observatoryPortPattern.firstMatch(line);
-            observatoryPort = int.parse(m.group(2));
-          }
-        });
-        await for (String line in process.stderr) {
-          _coverageOutput.add('    $line');
-          if (line.contains(_observatoryFailPattern)) {
-            throw new CoverageTestSuiteException(file.path);
-          }
-          if (line.contains(_observatoryPortPattern)) {
-            Match m = _observatoryPortPattern.firstMatch(line);
-            observatoryPort = int.parse(m.group(2));
-          }
-          if (line.contains(_testsFailedPattern)) {
-            _failingTest = true;
-            throw new CoverageTestSuiteException(file.path);
-          }
-          if (line.contains(_testsPassedPattern)) {
-            break;
-          }
-        }
-        return [observatoryPort];
-      } finally {
-        pubServeTask?.stop();
+    // Content-shell dumps render tree to stderr, which is where the test
+    // results will be. The observatory port should be output to stderr as
+    // well, but it is sometimes malformed. In those cases, the correct
+    // observatory port is output to stdout. So we listen to both.
+    int observatoryPort;
+    process.stdout.listen((line) {
+      _coverageOutput.add('    $line');
+      if (line.contains(_observatoryPortPattern)) {
+        Match m = _observatoryPortPattern.firstMatch(line);
+        observatoryPort = int.parse(m.group(2));
       }
-    } else {
-      // Find an open port to observe the Dart VM on.
-      int port = await getOpenPort();
-
-      // Run the test on the Dart VM.
-      String executable = 'dart';
-      List args = ['--observe=$port', file.path];
-      _coverageOutput.add('');
-      _coverageOutput.add('Running test suite ${file.path}');
-      _coverageOutput.add('$executable ${args.join(' ')}\n');
-      TaskProcess process =
-          _lastTestProcess = new TaskProcess(executable, args);
-      process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
-
-      await for (String line in process.stdout) {
-        _coverageOutput.add('    $line');
-        if (line.contains(_observatoryFailPattern)) {
-          throw new CoverageTestSuiteException(file.path);
-        }
-        if (line.contains(_testsFailedPattern)) {
-          _failingTest = true;
-          throw new CoverageTestSuiteException(file.path);
-        }
-        if (line.contains(_testsPassedPattern)) {
-          break;
-        }
+    });
+    await for (String line in process.stderr) {
+      _coverageOutput.add('    $line');
+      if (line.contains(_observatoryFailPattern)) {
+        throw new CoverageTestSuiteException(testPath);
       }
-      var observatoryPorts = await SeleniumHelper.getActiveObservatoryPorts();
-      SeleniumHelper.clearObservatoryPorts();
-      return [port]..addAll(observatoryPorts);
+      if (line.contains(_observatoryPortPattern)) {
+        Match m = _observatoryPortPattern.firstMatch(line);
+        observatoryPort = int.parse(m.group(2));
+      }
+      if (line.contains(_testsFailedPattern)) {
+        _failingTest = true;
+        throw new CoverageTestSuiteException(testPath);
+      }
+      if (line.contains(_testsPassedPattern)) {
+        break;
+      }
     }
+    return [observatoryPort];
   }
 }
