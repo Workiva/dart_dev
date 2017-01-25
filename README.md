@@ -95,7 +95,8 @@ local tasks.
 - **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Generate a test runner file:** that allows for faster test execution.
-- **Running dart unit tests on Sauce Labs** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
+- **Running dart unit tests on Sauce Labs:** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
+- **Running concurrent dart commands:** allows continuous integration systems to run concurrently rather then serially.
 
 ### Local Tasks
 
@@ -251,6 +252,7 @@ ddev examples
 ddev format
 ddev gen-test-runner
 ddev saucelabs
+ddev task-runner
 ddev test
 
 # without the alias
@@ -262,6 +264,7 @@ pub run dart_dev examples
 pub run dart_dev format
 pub run dart_dev gen-test-runner
 pub run dart_dev saucelabs
+pub run dart_dev task-runner
 pub run dart_dev test
 ```
 
@@ -288,6 +291,7 @@ main(args) async {
   config.genTestRunner
   config.init
   config.saucelabs
+  config.taskRunner
   config.test
 
   await dev(args);
@@ -686,6 +690,31 @@ object.
 * The html files to be transformed should have the `packages/test/dart.js` script tag listed last.
 
 * During this process the test directory will be served which means that the `filesToTest` must be within the test directory and their path will be relative to the test directory.
+
+#### `task-runner` Config
+All configuration options for the `task-runner` task are found on the `config.taskRunnerConfig`
+object.
+
+##### `TaskRunnerConfig`
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>tasksToRun</code></td>
+            <td><code>List&lt;String&gt;</code></td>
+            <td><code>['pub run dart_dev format --check','pub run dart_dev analyze','pub run dart_dev test']</code></td>
+            <td>The list of tasks to run</td>
+        </tr>
+    </tbody>
+</table>
 
 #### `test` Config
 All configuration options for the `test` task are found on the `config.test`
