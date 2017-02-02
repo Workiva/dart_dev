@@ -66,9 +66,13 @@ class Reporter {
 
       outputStream?.listen((line) {
         log(_indent(line));
+      })?.onError((line){
+        warning(_indent(line));
       });
       errorStream?.listen((line) {
         warning(_indent(line));
+      })?.onError((line){
+        this.error(_indent(line));
       });
     }
   }

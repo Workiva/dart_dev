@@ -3,6 +3,7 @@
 packages
 pubspec.lock
 build/
+.idea/
 
 # generated docs
 /doc/api/
