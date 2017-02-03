@@ -59,7 +59,13 @@ TestTask test(
   });
 
   stdoutc.stream.listen(task._testOutput.add);
-  process.stderr.listen(task._testOutput.addError);
+  process.stderr.listen((line) async {
+    task._testOutput.addError(line);
+    if (line.contains('No tests match regular expression')) {
+      await SeleniumHelper.killChildrenProcesses();
+      outputProcessed.complete();
+    }
+  });
   process.exitCode.then((code) {
     if (task.successful == null) {
       task.successful = code <= 0;
