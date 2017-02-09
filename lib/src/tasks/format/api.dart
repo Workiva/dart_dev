@@ -62,6 +62,8 @@ FormatTask format(
         if (!entity.path.endsWith('.dart')) continue;
         // Skip dependency files.
         if (entity.absolute.path.contains('/packages/')) continue;
+        // Skip contents of .pub directories.
+        if (entity.absolute.path.contains('/.pub/')) continue;
 
         // Skip excluded files.
         bool isExcluded = false;

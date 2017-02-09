@@ -98,5 +98,21 @@ void main() {
       String contentsAfter = file.readAsStringSync();
       expect(contentsBefore, equals(contentsAfter));
     });
+
+    test('should skip files in "packages" when excludes specified', () async {
+      File file = new File('$projectWithExclusions/lib/packages/main.dart');
+      String contentsBefore = file.readAsStringSync();
+      expect(await formatProject(projectWithExclusions), isTrue);
+      String contentsAfter = file.readAsStringSync();
+      expect(contentsBefore, equals(contentsAfter));
+    });
+
+    test('should skip files in ".pub" when excludes specified', () async {
+      File file = new File('$projectWithExclusions/lib/.pub/main.dart');
+      String contentsBefore = file.readAsStringSync();
+      expect(await formatProject(projectWithExclusions), isTrue);
+      String contentsAfter = file.readAsStringSync();
+      expect(contentsBefore, equals(contentsAfter));
+    });
   });
 }
