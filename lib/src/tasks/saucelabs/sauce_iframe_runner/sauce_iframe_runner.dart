@@ -4,8 +4,8 @@ import 'dart:html';
 import 'dart:js';
 
 import 'package:browser_detect/browser_detect.dart';
-import 'package:fluri/fluri.dart';
 import 'package:rate_limit/rate_limit.dart';
+import 'package:uri/uri.dart';
 
 const String testsPassedMessage = 'All tests passed';
 final RegExp testsFinishedPattern =
@@ -300,8 +300,8 @@ Future<List<String>> runTests(String testUrl, String platform,
 
   // Load the tests
 
-  var augmentedTestUrl = new Fluri(testUrl)
-    ..setQueryParam('platform', platform);
+  var augmentedTestUrl = new UriBuilder.fromUri(Uri.parse(testUrl))
+    ..queryParameters = {'platform': platform};
 
   var iframe = new IFrameElement()..src = augmentedTestUrl.toString();
 
