@@ -87,8 +87,9 @@ FormatTask format(
   }
 
   TaskProcess process = new TaskProcess(executable, args);
-  FormatTask task = new FormatTask(
-      '$executable ${args.join(' ')}', process.done)..isDryRun = check;
+  FormatTask task =
+      new FormatTask('$executable ${args.join(' ')}', process.done)
+        ..isDryRun = check;
 
   RegExp cwdPattern = new RegExp('Formatting directory (.+):');
   RegExp formattedPattern = new RegExp('Formatted (.+\.dart)');
