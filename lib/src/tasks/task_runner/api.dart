@@ -8,17 +8,20 @@ Future<TaskRunner> runTasks(tasksToRun) async {
   var taskGroup = new TaskGroup(tasksToRun);
   await taskGroup.run();
 
-  TaskRunner task =
-      new TaskRunner(taskGroup.successful, taskGroup.taskGroupStderr);
+  TaskRunner task = new TaskRunner(taskGroup.failedTask, taskGroup.successful,
+      taskGroup.taskGroupStderr, taskGroup.tasksNotCompleted);
   return task;
 }
 
 class TaskRunner extends Task {
   final Future done = new Future.value();
+  String failedTask;
   final String stderr;
   bool successful;
+  List<String> tasksNotCompleted;
 
-  TaskRunner(bool this.successful, String this.stderr);
+  TaskRunner(this.failedTask, bool this.successful, String this.stderr,
+      List<String> this.tasksNotCompleted);
 }
 
 class SubTask {
@@ -51,6 +54,9 @@ class SubTask {
 }
 
 class TaskGroup {
+  /// Failed task
+  String failedTask = '';
+
   /// List of the individual subtasks executed
   List<String> subTaskCommands = <String>[];
 
@@ -62,6 +68,9 @@ class TaskGroup {
 
   /// Status of TaskGroup
   bool successful = true;
+
+  /// Tasks cancelled prior to completion
+  List<String> tasksNotCompleted = [];
 
   TaskGroup(this.subTaskCommands) {
     for (String taskCommand in subTaskCommands) {
@@ -80,7 +89,9 @@ class TaskGroup {
       task.startProcess();
       task.taskProcess.exitCode.then((int exitCode) {
         reporter.log(task.taskOutput);
-        if (exitCode != 0) {
+        // if the task runner kills outstanding tasks it currently sets the exit code to -15
+        if (exitCode != 0 && exitCode != -15) {
+          failedTask = task.command;
           successful = false;
           reporter.log(task.taskError);
           this.taskGroupStderr +=
@@ -94,6 +105,11 @@ class TaskGroup {
     }
     await Future.wait(futures);
 
+    for (SubTask task in subTasks) {
+      if (await task.taskProcess.exitCode == -15) {
+        tasksNotCompleted.add(task.command);
+      }
+    }
     timer.cancel();
   }
 }

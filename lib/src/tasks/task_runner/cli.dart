@@ -37,6 +37,8 @@ class TaskRunnerCli extends TaskCli {
 
     return task.successful
         ? new CliResult.success('Tasks completed successfuly.')
-        : new CliResult.fail('Some task / tasks failed.');
+        : new CliResult.fail('Some task failed: ${task.failedTask}'
+            '\n\nThe following tasks were stopped prior to completion:'
+            '\n${task.tasksNotCompleted.join('\n')}');
   }
 }
