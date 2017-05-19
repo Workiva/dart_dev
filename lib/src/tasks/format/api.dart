@@ -46,33 +46,32 @@ FormatTask format(
     // formatter expand the files.
     args.addAll(directories);
   } else {
-    // Convert exclude paths to absolute paths.
-    exclude = exclude.map((e) => path.absolute(e)).toList();
+    // Convert exclude paths to relative paths, so they can be efficiently compared to
+    // the files we're listing.
+    exclude = exclude.map(path.relative).toList();
 
     // Build the list of files by expanding the given directories, looking for
     // all .dart files that don't match any excluded path.
     List<String> filesToFormat = [];
     for (var p in directories) {
       Directory dir = new Directory(p);
-      var files = dir.listSync(recursive: true);
+      var files = dir.listSync(recursive: true, followLinks: false);
       for (FileSystemEntity entity in files) {
         // Skip directories and links.
-        if (!FileSystemEntity.isFileSync(entity.path)) continue;
+        if (entity is! File) continue;
         // Skip non-dart files.
         if (!entity.path.endsWith('.dart')) continue;
+
+        var pathParts = path.split(entity.path);
         // Skip dependency files.
-        if (entity.absolute.path.contains('/packages/')) continue;
+        if (pathParts.contains('packages')) continue;
         // Skip contents of .pub directories.
-        if (entity.absolute.path.contains('/.pub/')) continue;
+        if (pathParts.contains('.pub')) continue;
 
         // Skip excluded files.
-        bool isExcluded = false;
-        for (var excluded in exclude) {
-          if (entity.absolute.path.startsWith(excluded)) {
-            isExcluded = true;
-            break;
-          }
-        }
+        bool isExcluded = exclude.any((excluded) =>
+            entity.path == excluded || path.isWithin(excluded, entity.path));
+
         if (isExcluded) {
           excludedFiles.add(entity.path);
           continue;
