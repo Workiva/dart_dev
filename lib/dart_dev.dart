@@ -20,4 +20,4 @@ export 'package:dart_dev/src/tasks/cli.dart' show CliResult, TaskCli;
 export 'package:dart_dev/src/tasks/gen_test_runner/config.dart'
     show TestRunnerConfig, Environment;
 export 'package:dart_dev/src/tasks/saucelabs/platforms.dart';
-export 'package:dart_dev/src/tasks/task.dart' show Task;
+export 'package:dart_dev/src/tasks/task.dart' show Task, TaskResult;

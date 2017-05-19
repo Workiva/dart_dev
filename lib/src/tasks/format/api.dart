@@ -84,10 +84,11 @@ FormatTask format({
 FilesToFormat getFilesToFormat({
   List<String> directories: defaultDirectories,
   List<String> exclude: defaultExclude,
+  bool alwaysExpand: false,
 }) {
   var filesToFormat = new FilesToFormat();
 
-  if (exclude.isEmpty) {
+  if (exclude.isEmpty && !alwaysExpand) {
     // If no files are excluded, we can use the directories and let the dart
     // formatter expand the files.
     filesToFormat.files.addAll(directories);
