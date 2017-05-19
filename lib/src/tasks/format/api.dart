@@ -23,11 +23,12 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
-FormatTask format(
-    {bool check: defaultCheck,
-    List<String> directories: defaultDirectories,
-    List<String> exclude: defaultExclude,
-    int lineLength: defaultLineLength}) {
+FormatTask format({
+  bool check: defaultCheck,
+  List<String> directories: defaultDirectories,
+  List<String> exclude: defaultExclude,
+  int lineLength: defaultLineLength,
+}) {
   var executable = 'pub';
   var args = ['run', 'dart_style:format'];
 
@@ -39,51 +40,10 @@ FormatTask format(
     args.add('-w');
   }
 
-  List<String> excludedFiles = [];
+  var filesToFormat = getFilesToFormat(
+      directories: defaultDirectories, exclude: defaultExclude);
 
-  if (exclude.isEmpty) {
-    // If no files are excluded, we can use the directories and let the dart
-    // formatter expand the files.
-    args.addAll(directories);
-  } else {
-    // Convert exclude paths to relative paths, so they can be efficiently compared to
-    // the files we're listing.
-    exclude = exclude.map(path.relative).toList();
-
-    // Build the list of files by expanding the given directories, looking for
-    // all .dart files that don't match any excluded path.
-    List<String> filesToFormat = [];
-    for (var p in directories) {
-      Directory dir = new Directory(p);
-      var files = dir.listSync(recursive: true, followLinks: false);
-      for (FileSystemEntity entity in files) {
-        // Skip directories and links.
-        if (entity is! File) continue;
-        // Skip non-dart files.
-        if (!entity.path.endsWith('.dart')) continue;
-
-        var pathParts = path.split(entity.path);
-        // Skip dependency files.
-        if (pathParts.contains('packages')) continue;
-        // Skip contents of .pub directories.
-        if (pathParts.contains('.pub')) continue;
-
-        // Skip excluded files.
-        bool isExcluded = exclude.any((excluded) =>
-            entity.path == excluded || path.isWithin(excluded, entity.path));
-
-        if (isExcluded) {
-          excludedFiles.add(entity.path);
-          continue;
-        }
-
-        // File should be formatted.
-        filesToFormat.add(entity.path);
-      }
-    }
-
-    args.addAll(filesToFormat);
-  }
+  args.addAll(filesToFormat.files);
 
   TaskProcess process = new TaskProcess(executable, args);
   FormatTask task =
@@ -94,7 +54,7 @@ FormatTask format(
   RegExp formattedPattern = new RegExp('Formatted (.+\.dart)');
   RegExp unchangedPattern = new RegExp('Unchanged (.+\.dart)');
 
-  task.excludedFiles.addAll(excludedFiles);
+  task.excludedFiles.addAll(filesToFormat.excluded);
 
   String cwd = '';
   process.stdout.listen((line) {
@@ -119,6 +79,61 @@ FormatTask format(
   });
 
   return task;
+}
+
+FilesToFormat getFilesToFormat({
+  List<String> directories: defaultDirectories,
+  List<String> exclude: defaultExclude,
+}) {
+  var filesToFormat = new FilesToFormat();
+
+  if (exclude.isEmpty) {
+    // If no files are excluded, we can use the directories and let the dart
+    // formatter expand the files.
+    filesToFormat.files.addAll(directories);
+  } else {
+    // Convert exclude paths to relative paths, so they can be efficiently compared to
+    // the files we're listing.
+    exclude = exclude.map(path.relative).toList();
+
+    // Build the list of files by expanding the given directories, looking for
+    // all .dart files that don't match any excluded path.
+    for (var p in directories) {
+      Directory dir = new Directory(p);
+      var files = dir.listSync(recursive: true, followLinks: false);
+      for (FileSystemEntity entity in files) {
+        // Skip directories and links.
+        if (entity is! File) continue;
+        // Skip non-dart files.
+        if (!entity.path.endsWith('.dart')) continue;
+
+        var pathParts = path.split(entity.path);
+        // Skip dependency files.
+        if (pathParts.contains('packages')) continue;
+        // Skip contents of .pub directories.
+        if (pathParts.contains('.pub')) continue;
+
+        // Skip excluded files.
+        bool isExcluded = exclude.any((excluded) =>
+            entity.path == excluded || path.isWithin(excluded, entity.path));
+
+        if (isExcluded) {
+          filesToFormat.excluded.add(entity.path);
+          continue;
+        }
+
+        // File should be formatted.
+        filesToFormat.files.add(entity.path);
+      }
+    }
+  }
+
+  return filesToFormat;
+}
+
+class FilesToFormat {
+  List<String> files = [];
+  List<String> excluded = [];
 }
 
 class FormatTask extends Task {
