@@ -89,12 +89,6 @@ dev(List<String> args) async {
 }
 
 void registerTask(TaskCli cli, TaskConfig config) {
-  if (_cliTasks[cli.command] != null) {
-    throw new ArgumentError(
-        'A task is attempting to use the task name "${cli.command}" which'
-        ' has already been registered.');
-  }
-
   _cliTasks[cli.command] = cli;
   _cliConfigs[cli.command] = config;
 }
