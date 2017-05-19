@@ -23,6 +23,7 @@ const String projectPassingTasks = 'test_fixtures/task_runner/passing_tasks';
 const String projectFailingTasks = 'test_fixtures/task_runner/failing_tasks';
 
 const String failedFormatting = 'The Dart formatter needs to be run.';
+const String failedTesting = 'Some tests failed.';
 const String successfulFormatting = 'Your Dart code is good to go!';
 const String successfulAnalysis = 'Analysis completed.';
 const String successfulTesting = 'All tests passed!';
@@ -37,6 +38,8 @@ Future<TasksRun> runTasks(String projectPath) async {
   List<String> successfulTasks = <String>[];
 
   process.stdout.listen((line) {
+    // leaving this logging in to help debug issues
+    print(line);
     if (line.contains(successfulFormatting)) {
       successfulTasks.add(successfulFormatting);
     }
@@ -48,6 +51,9 @@ Future<TasksRun> runTasks(String projectPath) async {
     }
     if (line.contains(successfulTesting)) {
       successfulTasks.add(successfulTesting);
+    }
+    if (line.contains(failedTesting)) {
+      failedTasks.add(failedTesting);
     }
   });
 
@@ -73,13 +79,13 @@ void main() {
       expect(tasks.successfulTasks.contains(successfulTesting), isTrue);
     });
 
-    test('a task failed', () async {
+    test('a task failed causing the task runner to exit', () async {
       TasksRun tasks = await runTasks(projectFailingTasks);
       expect(tasks.exitCode, isNonZero);
-      expect(tasks.successfulTasks.contains(successfulAnalysis), isTrue);
       expect(tasks.successfulTasks.contains(successfulFormatting), isFalse);
+      expect(tasks.successfulTasks.contains(successfulTesting), isFalse);
       expect(tasks.failedTasks.contains(failedFormatting), isTrue);
-      expect(tasks.successfulTasks.contains(successfulTesting), isTrue);
+      expect(tasks.failedTasks.contains(failedTesting), isFalse);
     });
   });
 }

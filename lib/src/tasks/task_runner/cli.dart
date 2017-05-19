@@ -26,14 +26,19 @@ class TaskRunnerCli extends TaskCli {
 
     TaskRunner task = await runTasks(tasksToRun);
 
-    reporter.logGroup('Tasks run: \'${tasksToRun.join('\', \'')}\'',
-        output: task.stdout);
+    reporter.logGroup('Tasks run: \'${tasksToRun.join('\', \'')}\'');
     if (!task.successful) {
-      reporter.logGroup('Failure output:', error: task.stderr);
+      reporter.logGroup(
+          'Failure output: '
+          'One of your subtasks exited with a non-zero exit code. '
+          'See the output below for more information:',
+          error: task.stderr);
     }
 
     return task.successful
         ? new CliResult.success('Tasks completed successfuly.')
-        : new CliResult.fail('Some task / tasks failed.');
+        : new CliResult.fail('Some task failed: ${task.failedTask}'
+            '\n\nThe following tasks were stopped prior to completion:'
+            '\n${task.tasksNotCompleted.join('\n')}');
   }
 }
