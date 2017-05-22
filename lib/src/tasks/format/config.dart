@@ -26,4 +26,11 @@ class FormatConfig extends TaskConfig {
   List<String> directories = defaultDirectories;
   List<String> exclude = defaultExclude;
   int lineLength = defaultLineLength;
+
+  Map<String, dynamic> toJson() => {
+    'check': check,
+    'directories': directories,
+    'exclude': exclude,
+    'lineLength': lineLength,
+  };
 }

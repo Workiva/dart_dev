@@ -89,7 +89,8 @@ class Reporter {
     _log(stderr, colorYellow(message), shout: shout);
   }
 
-  String _color(AnsiPen pen, String message) => color ? pen(message) : message;
+  String _color(AnsiPen pen, String message) =>
+      color && message.isNotEmpty ? pen(message) : message;
 
   void _log(IOSink sink, String message, {bool shout: false}) {
     if (quiet && !shout) return;
