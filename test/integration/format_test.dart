@@ -92,11 +92,26 @@ void main() {
     });
 
     test('should allow files/directories to be excluded', () async {
-      File file = new File('$projectWithExclusions/lib/main.dart');
-      String contentsBefore = file.readAsStringSync();
+      const expectedUntouchedFiles = const [
+        '$projectWithExclusions/lib/excluded_file.dart',
+        '$projectWithExclusions/lib/excluded_dir_1/inside_excluded_dir.dart',
+        '$projectWithExclusions/lib/excluded_dir_2/inside_excluded_dir.dart',
+      ];
+
+      var contentsBefore = new Map<String, String>.fromIterable(
+          expectedUntouchedFiles,
+          value: (file) => new File(file).readAsStringSync());
+
       expect(await formatProject(projectWithExclusions), isTrue);
-      String contentsAfter = file.readAsStringSync();
-      expect(contentsBefore, equals(contentsAfter));
+
+      var contentsAfter = new Map<String, String>.fromIterable(
+          expectedUntouchedFiles,
+          value: (file) => new File(file).readAsStringSync());
+
+      for (var file in expectedUntouchedFiles) {
+        expect(contentsBefore[file], contentsAfter[file],
+            reason: '$file should not have been formatted');
+      }
     });
 
     test('should skip files in "packages" when excludes specified', () async {
