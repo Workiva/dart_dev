@@ -46,20 +46,20 @@ class Config {
   TestConfig test = new TestConfig();
 
   Map<String, dynamic> toJson() => {
-    'analyze': analyze,
-    'bashCompletion': bashCompletion,
-    'copyLicense': copyLicense,
-    'coverage': coverage,
-    'docs': docs,
-    'examples': examples,
-    'local': local,
-    'format': format,
-    'genTestRunner': genTestRunner,
-    'init': init,
-    'saucelabs': saucelabs,
-    'taskRunner': taskRunner,
-    'test': test,
-  };
+        'analyze': analyze,
+        'bashCompletion': bashCompletion,
+        'copyLicense': copyLicense,
+        'coverage': coverage,
+        'docs': docs,
+        'examples': examples,
+        'local': local,
+        'format': format,
+        'genTestRunner': genTestRunner,
+        'init': init,
+        'saucelabs': saucelabs,
+        'taskRunner': taskRunner,
+        'test': test,
+      };
 }
 
 class TaskConfig {

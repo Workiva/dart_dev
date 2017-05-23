@@ -29,7 +29,7 @@ class ExportConfigCli extends TaskCli {
       // Attempt to convert the config into JSON.
       try {
         return obj.toJson();
-      } catch(_) {}
+      } catch (_) {}
 
       // If the given object doesn't support JSON serialization, skip it.
       // This allows us to not implement serialization in all configs up-front,
