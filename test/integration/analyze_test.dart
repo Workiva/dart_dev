@@ -51,14 +51,15 @@ Future<Analysis> analyzeProject(String projectPath,
   int numHints = 0;
   int numWarnings = 0;
 
-  RegExp filesPattern = new RegExp(r'Analyzing \[(.*)\]');
+  RegExp filesPattern = new RegExp(r'Analyzing (?:\[?(.+)\]|(.+))...$');
   RegExp errorsPattern = new RegExp(r'(\d+) error.* found');
   RegExp hintsPattern = new RegExp(r'(\d+) hint.* found');
   RegExp warningsPattern = new RegExp(r'(\d+) warning.* found');
 
   process.stdout.listen((line) {
     if (line.contains(filesPattern)) {
-      files = filesPattern.firstMatch(line).group(1).split(', ');
+      var match = filesPattern.firstMatch(line);
+      files = (match[1] ?? match[2]).split(', ');
     }
     if (line.contains(errorsPattern)) {
       numErrors += int.parse(errorsPattern.firstMatch(line).group(1));
