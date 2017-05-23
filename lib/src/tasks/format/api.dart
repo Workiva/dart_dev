@@ -40,8 +40,8 @@ FormatTask format({
     args.add('-w');
   }
 
-  var filesToFormat = getFilesToFormat(
-      directories: defaultDirectories, exclude: defaultExclude);
+  var filesToFormat =
+      getFilesToFormat(directories: directories, exclude: exclude);
 
   args.addAll(filesToFormat.files);
 
