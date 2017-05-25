@@ -19,7 +19,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter, TaskProcess;
+import 'package:dart_dev/util.dart' show reporter;
 
 import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
