@@ -81,6 +81,13 @@ FormatTask format({
   return task;
 }
 
+/// Returns a set of files/directories within [directories] to be formatted,
+/// with [exclude] excluded.
+///
+/// If [exclude] is not empty, then [directories] will be expanded recursively
+/// (ignoring symlinks) to all of its files. Otherwise, it will not be expanded.
+///
+/// To force expansion of [directories], set [alwaysExpand] to `true`.
 FilesToFormat getFilesToFormat({
   List<String> directories: defaultDirectories,
   List<String> exclude: defaultExclude,
@@ -93,8 +100,8 @@ FilesToFormat getFilesToFormat({
     // formatter expand the files.
     filesToFormat.files.addAll(directories);
   } else {
-    // Convert exclude paths to relative paths, so they can be efficiently compared to
-    // the files we're listing.
+    // Convert exclude paths to relative paths, so they can be efficiently
+    // compared to the files we're listing.
     exclude = exclude.map(path.relative).toList();
 
     // Build the list of files by expanding the given directories, looking for
@@ -132,8 +139,12 @@ FilesToFormat getFilesToFormat({
   return filesToFormat;
 }
 
+/// Data around included/excluded files, returned [getFilesToFormat].
 class FilesToFormat {
+  /// Matching/included that should be formatted.
   List<String> files = [];
+
+  /// Excluded files that should not be formatted.
   List<String> excluded = [];
 }
 
