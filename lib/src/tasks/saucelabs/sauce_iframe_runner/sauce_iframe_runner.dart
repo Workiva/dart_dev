@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:js';
 
-import 'package:browser_detect/browser_detect.dart';
+import 'package:platform_detect/platform_detect.dart';
 import 'package:fluri/fluri.dart';
 import 'package:rate_limit/rate_limit.dart';
 
@@ -170,7 +170,7 @@ String getTestPlatform({bool friendlyName: false}) {
   if (browser.isSafari) {
     return friendlyName ? 'Safari' : 'safari';
   }
-  if (browser.isIe) {
+  if (browser.isInternetExplorer) {
     return friendlyName ? 'Internet Explorer' : 'ie';
   }
 
