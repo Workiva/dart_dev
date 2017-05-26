@@ -52,7 +52,10 @@ class FormatCli extends TaskCli {
     }
 
     bool check = TaskCli.valueOf('check', parsedArgs, config.format.check);
-    List<String> directories = config.format.directories;
+    List<String> paths = parsedArgs.rest.isNotEmpty
+        ? parsedArgs.rest
+        : config.format.directories;
+
     List<String> exclude = config.format.exclude;
     var lineLength =
         TaskCli.valueOf('line-length', parsedArgs, config.format.lineLength);
@@ -61,10 +64,11 @@ class FormatCli extends TaskCli {
     }
 
     FormatTask task = format(
-        check: check,
-        directories: directories,
-        exclude: exclude,
-        lineLength: lineLength);
+      check: check,
+      directories: paths,
+      exclude: exclude,
+      lineLength: lineLength,
+    );
     reporter.logGroup(task.formatterCommand,
         outputStream: task.formatterOutput);
     await task.done;
