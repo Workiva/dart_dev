@@ -31,6 +31,7 @@ abstract class TaskCli {
 
   ArgParser get argParser;
   String get command;
+  String get usage => '$command [options]';
 
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true});
 }

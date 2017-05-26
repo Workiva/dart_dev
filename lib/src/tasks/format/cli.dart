@@ -38,6 +38,8 @@ class FormatCli extends TaskCli {
 
   final String command = 'format';
 
+  String get usage => '${super.usage} [files or directories...]';
+
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     try {
       if (!platform_util.hasImmediateDependency('dart_style'))
