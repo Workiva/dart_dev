@@ -54,9 +54,8 @@ class FormatCli extends TaskCli {
     }
 
     bool check = TaskCli.valueOf('check', parsedArgs, config.format.check);
-    List<String> paths = parsedArgs.rest.isNotEmpty
-        ? parsedArgs.rest
-        : config.format.directories;
+    List<String> paths =
+        parsedArgs.rest.isNotEmpty ? parsedArgs.rest : config.format.paths;
 
     List<String> exclude = config.format.exclude;
     var lineLength =
@@ -67,7 +66,7 @@ class FormatCli extends TaskCli {
 
     FormatTask task = format(
       check: check,
-      directories: paths,
+      paths: paths,
       exclude: exclude,
       lineLength: lineLength,
     );

@@ -17,19 +17,31 @@ library dart_dev.src.tasks.format.config;
 import 'package:dart_dev/src/tasks/config.dart';
 
 const bool defaultCheck = false;
-const List<String> defaultDirectories = const ['lib/'];
+const List<String> defaultPaths = const ['lib/'];
 const List<String> defaultExclude = const [];
 const int defaultLineLength = 80;
 
+/// Deprecated; use [defaultPaths] instead.
+@Deprecated('2.0.0')
+const List<String> defaultDirectories = defaultPaths;
+
 class FormatConfig extends TaskConfig {
   bool check = defaultCheck;
-  List<String> directories = defaultDirectories;
+  List<String> paths = defaultPaths;
   List<String> exclude = defaultExclude;
   int lineLength = defaultLineLength;
 
+  /// Deprecated; use [paths] instead.
+  @Deprecated('2.0.0')
+  List<String> get directories => paths;
+
+  /// Deprecated; use [paths] instead.
+  @Deprecated('2.0.0')
+  set directories(List<String> value) => paths = value;
+
   Map<String, dynamic> toJson() => {
         'check': check,
-        'directories': directories,
+        'paths': paths,
         'exclude': exclude,
         'lineLength': lineLength,
       };

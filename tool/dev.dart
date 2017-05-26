@@ -22,7 +22,7 @@ main(args) async {
   config.copyLicense.directories = directories;
   config.coverage.reportOn = ['bin/', 'lib/'];
   config.format
-    ..directories = directories
+    ..paths = directories
     ..exclude = ['test/integration/generated_runner.dart'];
   config.genTestRunner.configs = [
     new TestRunnerConfig(directory: 'test/integration', env: Environment.vm)

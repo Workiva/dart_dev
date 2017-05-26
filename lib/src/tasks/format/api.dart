@@ -23,12 +23,18 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
+// ignore: deprecated_member_use
+/// [directories] is deprecated; use [paths] instead.
 FormatTask format({
   bool check: defaultCheck,
-  List<String> directories: defaultDirectories,
   List<String> exclude: defaultExclude,
   int lineLength: defaultLineLength,
+  List<String> paths: defaultPaths,
+  @Deprecated('2.0.0') List<String> directories,
 }) {
+  // ignore: deprecated_member_use
+  if (directories != null) paths = directories;
+
   var executable = 'pub';
   var args = ['run', 'dart_style:format'];
 
@@ -40,7 +46,7 @@ FormatTask format({
     args.add('-w');
   }
 
-  var filesToFormat = getFilesToFormat(paths: directories, exclude: exclude);
+  var filesToFormat = getFilesToFormat(paths: paths, exclude: exclude);
 
   args.addAll(filesToFormat.files);
 
@@ -80,7 +86,7 @@ FormatTask format({
   return task;
 }
 
-/// Returns a set of files to be formatted, with [exclude] excluded.
+/// Returns a set of files within [paths] to be formatted, with [exclude] excluded.
 ///
 /// [paths] can contain both files and directories. Files within directories
 /// will be processed recursively, ignoring symlinks.
@@ -88,9 +94,9 @@ FormatTask format({
 /// If [exclude] is not empty, the return value will include [paths], expanded
 /// to all matching files. Otherwise, it will not be expanded.
 ///
-/// To force expansion , set [alwaysExpand] to `true`.
+/// To force expansion, set [alwaysExpand] to `true`.
 FilesToFormat getFilesToFormat({
-  List<String> paths: defaultDirectories,
+  List<String> paths: defaultPaths,
   List<String> exclude: defaultExclude,
   bool alwaysExpand: false,
 }) {
