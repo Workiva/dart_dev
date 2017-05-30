@@ -36,8 +36,8 @@ const String projectWithoutDartStyle = 'test_fixtures/format/no_dart_style';
 /// formatting was successful, false otherwise.
 Future<bool> formatProject(
   String projectPath, {
-  bool check: false,
   Iterable additionalArgs: const [],
+  bool check: false,
 }) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
   var args = ['run', 'dart_dev', 'format'];
