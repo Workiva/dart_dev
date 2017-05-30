@@ -23,6 +23,9 @@ import 'package:test/test.dart';
 
 const String projectWithChangesNeeded = 'test_fixtures/format/changes_needed';
 const String projectWithExclusions = 'test_fixtures/format/exclusions';
+const String projectWithInclusions = 'test_fixtures/format/inclusions';
+const String projectWithInclusionsDeprecated =
+    'test_fixtures/format/inclusions_deprecated';
 const String projectWithNoChangesNeeded =
     'test_fixtures/format/no_changes_needed';
 const String projectWithoutDartStyle = 'test_fixtures/format/no_dart_style';
@@ -163,6 +166,89 @@ void main() {
         expect(contentsBefore[file], contentsAfter[file],
             reason: '$file should not have been formatted');
       }
+    });
+
+    group('should allow files/directories to be explicitly included', () {
+      const allFiles = const [
+        'lib/included_dir_1/inside_included_dir.dart',
+        'lib/included_dir_2/inside_included_dir.dart',
+        'lib/included.dart',
+        'lib/not_included.dart',
+      ];
+
+      test('using `config.format.paths`', () async {
+        const project = projectWithInclusions;
+        const String testProject = '${project}_temp';
+        // Copy the ill-formatted project fixture to a temporary directory for
+        // testing purposes (necessary since formatter will make changes).
+        Directory temp = new Directory(testProject);
+        copyDirectory(new Directory(project), temp);
+
+        addTearDown(() {
+          // Clean up the temporary test project created for this test case.
+          temp.deleteSync(recursive: true);
+        });
+
+        // It's important that these are relative paths to the project root
+        const expectedUntouchedFiles = const [
+          'lib/not_included.dart',
+        ];
+
+        Map<String, String> getAllFilesContents() => new Map.fromIterable(
+            allFiles,
+            value: (file) => new File('$testProject/$file').readAsStringSync());
+
+        var contentsBefore = getAllFilesContents();
+        expect(await formatProject(testProject), isTrue);
+        var contentsAfter = getAllFilesContents();
+
+        for (var file in allFiles) {
+          if (expectedUntouchedFiles.contains(file)) {
+            expect(contentsBefore[file], contentsAfter[file],
+                reason: '$file should not have been formatted');
+          } else {
+            expect(contentsBefore[file], isNot(contentsAfter[file]),
+                reason: '$file should have been formatted');
+          }
+        }
+      });
+
+      test('using the deprecated `config.format.directories`', () async {
+        const project = projectWithInclusionsDeprecated;
+        const String testProject = '${project}_temp';
+        // Copy the ill-formatted project fixture to a temporary directory for
+        // testing purposes (necessary since formatter will make changes).
+        Directory temp = new Directory(testProject);
+        copyDirectory(new Directory(project), temp);
+
+        addTearDown(() {
+          // Clean up the temporary test project created for this test case.
+          temp.deleteSync(recursive: true);
+        });
+
+        // It's important that these are relative paths to the project root
+        const expectedUntouchedFiles = const [
+          'lib/not_included.dart',
+        ];
+
+        Map<String, String> getAllFilesContents() => new Map.fromIterable(
+            allFiles,
+            value: (file) => new File('$testProject/$file').readAsStringSync());
+
+        var contentsBefore = getAllFilesContents();
+        expect(await formatProject(testProject), isTrue);
+        var contentsAfter = getAllFilesContents();
+
+        for (var file in allFiles) {
+          if (expectedUntouchedFiles.contains(file)) {
+            expect(contentsBefore[file], contentsAfter[file],
+                reason: '$file should not have been formatted');
+          } else {
+            expect(contentsBefore[file], isNot(contentsAfter[file]),
+                reason: '$file should have been formatted');
+          }
+        }
+      });
     });
 
     test('should skip files in "packages" when excludes specified', () async {
