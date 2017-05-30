@@ -23,12 +23,18 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
+// ignore: deprecated_member_use
+/// [directories] is deprecated; use [paths] instead.
 FormatTask format({
   bool check: defaultCheck,
-  List<String> directories: defaultDirectories,
   List<String> exclude: defaultExclude,
   int lineLength: defaultLineLength,
+  List<String> paths: defaultPaths,
+  @Deprecated('2.0.0') List<String> directories,
 }) {
+  // ignore: deprecated_member_use
+  if (directories != null) paths = directories;
+
   var executable = 'pub';
   var args = ['run', 'dart_style:format'];
 
@@ -40,8 +46,7 @@ FormatTask format({
     args.add('-w');
   }
 
-  var filesToFormat =
-      getFilesToFormat(directories: directories, exclude: exclude);
+  var filesToFormat = getFilesToFormat(paths: paths, exclude: exclude);
 
   args.addAll(filesToFormat.files);
 
@@ -81,34 +86,38 @@ FormatTask format({
   return task;
 }
 
-/// Returns a set of files/directories within [directories] to be formatted,
-/// with [exclude] excluded.
+/// Returns a set of files within [paths] to be formatted, with [exclude] excluded.
 ///
-/// If [exclude] is not empty, then [directories] will be expanded recursively
-/// (ignoring symlinks) to all of its files. Otherwise, it will not be expanded.
+/// [paths] can contain both files and directories. Files within directories
+/// will be processed recursively, ignoring symlinks.
 ///
-/// To force expansion of [directories], set [alwaysExpand] to `true`.
+/// If [exclude] is not empty, the return value will include [paths], expanded
+/// to all matching files. Otherwise, it will not be expanded.
+///
+/// To force expansion, set [alwaysExpand] to `true`.
 FilesToFormat getFilesToFormat({
-  List<String> directories: defaultDirectories,
+  List<String> paths: defaultPaths,
   List<String> exclude: defaultExclude,
   bool alwaysExpand: false,
 }) {
   var filesToFormat = new FilesToFormat();
 
   if (exclude.isEmpty && !alwaysExpand) {
-    // If no files are excluded, we can use the directories and let the dart
+    // If no files are excluded, we can use the paths and let the dart
     // formatter expand the files.
-    filesToFormat.files.addAll(directories);
+    filesToFormat.files.addAll(paths);
   } else {
     // Convert exclude paths to relative paths, so they can be efficiently
     // compared to the files we're listing.
     exclude = exclude.map(path.relative).toList();
 
-    // Build the list of files by expanding the given directories, looking for
+    // Build the list of files by expanding the given paths, looking for
     // all .dart files that don't match any excluded path.
-    for (var p in directories) {
-      Directory dir = new Directory(p);
-      var files = dir.listSync(recursive: true, followLinks: false);
+    for (var p in paths) {
+      List<FileSystemEntity> files = FileSystemEntity.isFileSync(p)
+          ? [new File(p)]
+          : new Directory(p).listSync(recursive: true, followLinks: false);
+
       for (FileSystemEntity entity in files) {
         // Skip directories and links.
         if (entity is! File) continue;

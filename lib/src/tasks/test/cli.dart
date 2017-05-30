@@ -65,6 +65,8 @@ class TestCli extends TaskCli {
 
   final String command = 'test';
 
+  String get usage => '${super.usage} [files or directories...]';
+
   bool isExplicitlyFalse(bool value) {
     return value != null && value == false;
   }

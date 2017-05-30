@@ -101,7 +101,7 @@ String _generateUsage([String task]) {
   u.writeln();
 
   if (task != null && _cliTasks.containsKey(task)) {
-    u.writeln('Usage: pub run dart_dev $task [options]');
+    u.writeln('Usage: pub run dart_dev ${_cliTasks[task].usage}');
     u.writeln();
     u.writeln(_cliTasks[task].argParser.usage);
   } else {

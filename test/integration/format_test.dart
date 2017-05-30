@@ -23,6 +23,9 @@ import 'package:test/test.dart';
 
 const String projectWithChangesNeeded = 'test_fixtures/format/changes_needed';
 const String projectWithExclusions = 'test_fixtures/format/exclusions';
+const String projectWithInclusions = 'test_fixtures/format/inclusions';
+const String projectWithInclusionsDeprecated =
+    'test_fixtures/format/inclusions_deprecated';
 const String projectWithNoChangesNeeded =
     'test_fixtures/format/no_changes_needed';
 const String projectWithoutDartStyle = 'test_fixtures/format/no_dart_style';
@@ -34,11 +37,18 @@ const String projectWithoutDartStyle = 'test_fixtures/format/no_dart_style';
 ///
 /// If [check] is false, an actual formatting run is run. Returns true if
 /// formatting was successful, false otherwise.
-Future<bool> formatProject(String projectPath, {bool check: false}) async {
+Future<bool> formatProject(
+  String projectPath, {
+  Iterable additionalArgs: const [],
+  bool check: false,
+}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
   var args = ['run', 'dart_dev', 'format'];
   if (check) {
     args.add('--check');
+  }
+  if (additionalArgs != null) {
+    args.addAll(additionalArgs);
   }
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
@@ -67,23 +77,67 @@ void main() {
       expect(contentsBefore, equals(contentsAfter));
     });
 
-    test('should format an ill-formatted project', () async {
-      // Copy the ill-formatted project fixture to a temporary directory for
-      // testing purposes (necessary since formatter will make changes).
-      String testProject = '${projectWithChangesNeeded}_temp';
-      Directory temp = new Directory(testProject);
-      copyDirectory(new Directory(projectWithChangesNeeded), temp);
+    group('should format an ill-formatted project', () {
+      const String testProject = '${projectWithChangesNeeded}_temp';
 
-      File dirtyFile = new File('$testProject/lib/main.dart');
-      File cleanFile = new File('$projectWithNoChangesNeeded/lib/main.dart');
-      String contentsBefore = dirtyFile.readAsStringSync();
-      expect(await formatProject(testProject), isTrue);
-      String contentsAfter = dirtyFile.readAsStringSync();
-      expect(contentsBefore, isNot(equals(contentsAfter)));
-      expect(contentsAfter, equals(cleanFile.readAsStringSync()));
+      const allFiles = const [
+        'lib/library_1.dart',
+        'lib/library_2.dart',
+      ];
 
-      // Clean up the temporary test project created for this test case.
-      temp.deleteSync(recursive: true);
+      Directory temp;
+      setUp(() {
+        // Copy the ill-formatted project fixture to a temporary directory for
+        // testing purposes (necessary since formatter will make changes).
+        temp = new Directory(testProject);
+        copyDirectory(new Directory(projectWithChangesNeeded), temp);
+      });
+
+      tearDown(() {
+        // Clean up the temporary test project created for this test case.
+        temp.deleteSync(recursive: true);
+      });
+
+      Map<String, String> getAllFilesContents() => new Map.fromIterable(
+          allFiles,
+          value: (file) => new File('$testProject/$file').readAsStringSync());
+
+      test('should format an ill-formatted project', () async {
+        var contentsBefore = getAllFilesContents();
+        expect(await formatProject(testProject), isTrue);
+        var contentsAfter = getAllFilesContents();
+
+        for (var file in allFiles) {
+          expect(contentsBefore[file], isNot(contentsAfter[file]),
+              reason: '$file should have been formatted');
+        }
+      });
+
+      test(
+          'should format only the paths specified as arguments'
+          ' within an ill-formatted project', () async {
+        // It's important that these are relative paths to the project root
+        const expectedModifiedFiles = const [
+          'lib/library_1.dart',
+        ];
+
+        var contentsBefore = getAllFilesContents();
+        expect(
+            await formatProject(testProject,
+                additionalArgs: expectedModifiedFiles),
+            isTrue);
+        var contentsAfter = getAllFilesContents();
+
+        for (var file in allFiles) {
+          if (expectedModifiedFiles.contains(file)) {
+            expect(contentsBefore[file], isNot(contentsAfter[file]),
+                reason: '$file should have been formatted');
+          } else {
+            expect(contentsBefore[file], contentsAfter[file],
+                reason: '$file should not have been formatted');
+          }
+        }
+      });
     });
 
     test('should warn if "dart_style" is not an immediate dependency',
@@ -112,6 +166,89 @@ void main() {
         expect(contentsBefore[file], contentsAfter[file],
             reason: '$file should not have been formatted');
       }
+    });
+
+    group('should allow files/directories to be explicitly included', () {
+      const allFiles = const [
+        'lib/included_dir_1/inside_included_dir.dart',
+        'lib/included_dir_2/inside_included_dir.dart',
+        'lib/included.dart',
+        'lib/not_included.dart',
+      ];
+
+      test('using `config.format.paths`', () async {
+        const project = projectWithInclusions;
+        const String testProject = '${project}_temp';
+        // Copy the ill-formatted project fixture to a temporary directory for
+        // testing purposes (necessary since formatter will make changes).
+        Directory temp = new Directory(testProject);
+        copyDirectory(new Directory(project), temp);
+
+        addTearDown(() {
+          // Clean up the temporary test project created for this test case.
+          temp.deleteSync(recursive: true);
+        });
+
+        // It's important that these are relative paths to the project root
+        const expectedUntouchedFiles = const [
+          'lib/not_included.dart',
+        ];
+
+        Map<String, String> getAllFilesContents() => new Map.fromIterable(
+            allFiles,
+            value: (file) => new File('$testProject/$file').readAsStringSync());
+
+        var contentsBefore = getAllFilesContents();
+        expect(await formatProject(testProject), isTrue);
+        var contentsAfter = getAllFilesContents();
+
+        for (var file in allFiles) {
+          if (expectedUntouchedFiles.contains(file)) {
+            expect(contentsBefore[file], contentsAfter[file],
+                reason: '$file should not have been formatted');
+          } else {
+            expect(contentsBefore[file], isNot(contentsAfter[file]),
+                reason: '$file should have been formatted');
+          }
+        }
+      });
+
+      test('using the deprecated `config.format.directories`', () async {
+        const project = projectWithInclusionsDeprecated;
+        const String testProject = '${project}_temp';
+        // Copy the ill-formatted project fixture to a temporary directory for
+        // testing purposes (necessary since formatter will make changes).
+        Directory temp = new Directory(testProject);
+        copyDirectory(new Directory(project), temp);
+
+        addTearDown(() {
+          // Clean up the temporary test project created for this test case.
+          temp.deleteSync(recursive: true);
+        });
+
+        // It's important that these are relative paths to the project root
+        const expectedUntouchedFiles = const [
+          'lib/not_included.dart',
+        ];
+
+        Map<String, String> getAllFilesContents() => new Map.fromIterable(
+            allFiles,
+            value: (file) => new File('$testProject/$file').readAsStringSync());
+
+        var contentsBefore = getAllFilesContents();
+        expect(await formatProject(testProject), isTrue);
+        var contentsAfter = getAllFilesContents();
+
+        for (var file in allFiles) {
+          if (expectedUntouchedFiles.contains(file)) {
+            expect(contentsBefore[file], contentsAfter[file],
+                reason: '$file should not have been formatted');
+          } else {
+            expect(contentsBefore[file], isNot(contentsAfter[file]),
+                reason: '$file should have been formatted');
+          }
+        }
+      });
     });
 
     test('should skip files in "packages" when excludes specified', () async {

@@ -38,6 +38,8 @@ class FormatCli extends TaskCli {
 
   final String command = 'format';
 
+  String get usage => '${super.usage} [files or directories...]';
+
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     try {
       if (!platform_util.hasImmediateDependency('dart_style'))
@@ -52,7 +54,9 @@ class FormatCli extends TaskCli {
     }
 
     bool check = TaskCli.valueOf('check', parsedArgs, config.format.check);
-    List<String> directories = config.format.directories;
+    List<String> paths =
+        parsedArgs.rest.isNotEmpty ? parsedArgs.rest : config.format.paths;
+
     List<String> exclude = config.format.exclude;
     var lineLength =
         TaskCli.valueOf('line-length', parsedArgs, config.format.lineLength);
@@ -61,10 +65,11 @@ class FormatCli extends TaskCli {
     }
 
     FormatTask task = format(
-        check: check,
-        directories: directories,
-        exclude: exclude,
-        lineLength: lineLength);
+      check: check,
+      paths: paths,
+      exclude: exclude,
+      lineLength: lineLength,
+    );
     reporter.logGroup(task.formatterCommand,
         outputStream: task.formatterOutput);
     await task.done;
