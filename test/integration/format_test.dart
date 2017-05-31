@@ -57,6 +57,21 @@ Future<bool> formatProject(
   return (await process.exitCode) == 0;
 }
 
+// Returns the path to a new temporary copy of the [project] fixture
+// testing purposes, necessary since formatter may make changes to ill-formatted files.
+String copyProject(String project) {
+  final String testProject = '${project}_temp';
+
+  final Directory temp = new Directory(testProject);
+  copyDirectory(new Directory(project), temp);
+  addTearDown(() {
+    // Clean up the temporary test project created for this test case.
+    temp.deleteSync(recursive: true);
+  });
+
+  return testProject;
+}
+
 void main() {
   group('Format Task', () {
     test('--check should succeed if no files need formatting', () async {
@@ -78,24 +93,15 @@ void main() {
     });
 
     group('should format an ill-formatted project', () {
-      const String testProject = '${projectWithChangesNeeded}_temp';
+      String testProject;
 
       const allFiles = const [
         'lib/library_1.dart',
         'lib/library_2.dart',
       ];
 
-      Directory temp;
       setUp(() {
-        // Copy the ill-formatted project fixture to a temporary directory for
-        // testing purposes (necessary since formatter will make changes).
-        temp = new Directory(testProject);
-        copyDirectory(new Directory(projectWithChangesNeeded), temp);
-      });
-
-      tearDown(() {
-        // Clean up the temporary test project created for this test case.
-        temp.deleteSync(recursive: true);
+        testProject = copyProject(projectWithChangesNeeded);
       });
 
       Map<String, String> getAllFilesContents() => new Map.fromIterable(
@@ -177,17 +183,7 @@ void main() {
       ];
 
       test('using `config.format.paths`', () async {
-        const project = projectWithInclusions;
-        const String testProject = '${project}_temp';
-        // Copy the ill-formatted project fixture to a temporary directory for
-        // testing purposes (necessary since formatter will make changes).
-        Directory temp = new Directory(testProject);
-        copyDirectory(new Directory(project), temp);
-
-        addTearDown(() {
-          // Clean up the temporary test project created for this test case.
-          temp.deleteSync(recursive: true);
-        });
+        var testProject = copyProject(projectWithInclusions);
 
         // It's important that these are relative paths to the project root
         const expectedUntouchedFiles = const [
@@ -214,17 +210,7 @@ void main() {
       });
 
       test('using the deprecated `config.format.directories`', () async {
-        const project = projectWithInclusionsDeprecated;
-        const String testProject = '${project}_temp';
-        // Copy the ill-formatted project fixture to a temporary directory for
-        // testing purposes (necessary since formatter will make changes).
-        Directory temp = new Directory(testProject);
-        copyDirectory(new Directory(project), temp);
-
-        addTearDown(() {
-          // Clean up the temporary test project created for this test case.
-          temp.deleteSync(recursive: true);
-        });
+        var testProject = copyProject(projectWithInclusionsDeprecated);
 
         // It's important that these are relative paths to the project root
         const expectedUntouchedFiles = const [
