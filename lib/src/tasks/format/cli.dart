@@ -70,8 +70,10 @@ class FormatCli extends TaskCli {
       exclude: exclude,
       lineLength: lineLength,
     );
-    reporter.logGroup(task.formatterCommand,
-        outputStream: task.formatterOutput);
+    if (task.formatterCommand != null) {
+      reporter.logGroup(task.formatterCommand,
+          outputStream: task.formatterOutput);
+    }
     await task.done;
 
     String excludedFilesWarning = '';

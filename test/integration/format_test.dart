@@ -146,6 +146,23 @@ void main() {
       });
     });
 
+    test('should handle when all files specified as arguments are excluded',
+        () async {
+      const excludedFile = 'lib/excluded_file.dart';
+
+      var contentsBefore =
+          new File('$projectWithExclusions/$excludedFile').readAsStringSync();
+      expect(
+          await formatProject(projectWithExclusions,
+              additionalArgs: [excludedFile]),
+          isTrue);
+      var contentsAfter =
+          new File('$projectWithExclusions/$excludedFile').readAsStringSync();
+
+      expect(contentsBefore, contentsAfter,
+          reason: '$excludedFile should not have been formatted');
+    });
+
     test('should warn if "dart_style" is not an immediate dependency',
         () async {
       expect(await formatProject(projectWithoutDartStyle), isFalse);

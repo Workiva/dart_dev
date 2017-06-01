@@ -48,40 +48,45 @@ FormatTask format({
 
   var filesToFormat = getFilesToFormat(paths: paths, exclude: exclude);
 
-  args.addAll(filesToFormat.files);
+  FormatTask task;
+  if (filesToFormat.files.isEmpty) {
+    task = new FormatTask(null, new Future(() {}))..successful = true;
+  } else {
+    args.addAll(filesToFormat.files);
 
-  TaskProcess process = new TaskProcess(executable, args);
-  FormatTask task =
-      new FormatTask('$executable ${args.join(' ')}', process.done)
-        ..isDryRun = check;
+    TaskProcess process = new TaskProcess(executable, args);
+    task = new FormatTask('$executable ${args.join(' ')}', process.done);
 
-  RegExp cwdPattern = new RegExp('Formatting directory (.+):');
-  RegExp formattedPattern = new RegExp('Formatted (.+\.dart)');
-  RegExp unchangedPattern = new RegExp('Unchanged (.+\.dart)');
+    RegExp cwdPattern = new RegExp('Formatting directory (.+):');
+    RegExp formattedPattern = new RegExp('Formatted (.+\.dart)');
+    RegExp unchangedPattern = new RegExp('Unchanged (.+\.dart)');
 
-  task.excludedFiles.addAll(filesToFormat.excluded);
-
-  String cwd = '';
-  process.stdout.listen((line) {
-    if (check) {
-      task.affectedFiles.add(line.trim());
-    } else {
-      if (cwdPattern.hasMatch(line)) {
-        cwd = cwdPattern.firstMatch(line).group(1);
-      } else if (formattedPattern.hasMatch(line)) {
-        task.affectedFiles
-            .add('$cwd${formattedPattern.firstMatch(line).group(1)}');
-      } else if (unchangedPattern.hasMatch(line)) {
-        task.unaffectedFiles
-            .add('$cwd${unchangedPattern.firstMatch(line).group(1)}');
+    String cwd = '';
+    process.stdout.listen((line) {
+      if (check) {
+        task.affectedFiles.add(line.trim());
+      } else {
+        if (cwdPattern.hasMatch(line)) {
+          cwd = cwdPattern.firstMatch(line).group(1);
+        } else if (formattedPattern.hasMatch(line)) {
+          task.affectedFiles
+              .add('$cwd${formattedPattern.firstMatch(line).group(1)}');
+        } else if (unchangedPattern.hasMatch(line)) {
+          task.unaffectedFiles
+              .add('$cwd${unchangedPattern.firstMatch(line).group(1)}');
+        }
       }
-    }
-    task._formatterOutput.add(line);
-  });
-  process.stderr.listen(task._formatterOutput.addError);
-  process.exitCode.then((code) {
-    task.successful = check ? task.affectedFiles.isEmpty : code <= 0;
-  });
+      task._formatterOutput.add(line);
+    });
+    process.stderr.listen(task._formatterOutput.addError);
+    process.exitCode.then((code) {
+      task.successful = check ? task.affectedFiles.isEmpty : code <= 0;
+    });
+  }
+
+  task
+    ..isDryRun = check
+    ..excludedFiles.addAll(filesToFormat.excluded);
 
   return task;
 }
