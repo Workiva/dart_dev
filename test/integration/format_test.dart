@@ -18,8 +18,10 @@ library dart_dev.test.integration.format_test;
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dart_dev/util.dart' show TaskProcess, copyDirectory;
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
+
+import 'package:dart_dev/util.dart' show TaskProcess, copyDirectory;
 
 const String projectWithChangesNeeded = 'test_fixtures/format/changes_needed';
 const String projectWithExclusions = 'test_fixtures/format/exclusions';
@@ -158,6 +160,25 @@ void main() {
           isTrue);
       var contentsAfter =
           new File('$projectWithExclusions/$excludedFile').readAsStringSync();
+
+      expect(contentsBefore, contentsAfter,
+          reason: '$excludedFile should not have been formatted');
+    });
+
+    test('should resolve absolute paths for files specified as arguments',
+        () async {
+      const excludedFile = 'lib/excluded_file.dart';
+      const relativeExcludedFilePath = '$projectWithExclusions/$excludedFile';
+
+      final absoluteExcludedFilePath = p.absolute(relativeExcludedFilePath);
+
+      var contentsBefore =
+          new File(relativeExcludedFilePath).readAsStringSync();
+      expect(
+          await formatProject(projectWithExclusions,
+              additionalArgs: [absoluteExcludedFilePath]),
+          isTrue);
+      var contentsAfter = new File(relativeExcludedFilePath).readAsStringSync();
 
       expect(contentsBefore, contentsAfter,
           reason: '$excludedFile should not have been formatted');

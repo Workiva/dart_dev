@@ -112,8 +112,9 @@ FilesToFormat getFilesToFormat({
     // formatter expand the files.
     filesToFormat.files.addAll(paths);
   } else {
-    // Convert exclude paths to relative paths, so they can be efficiently
+    // Convert paths to relative paths, so they can be efficiently
     // compared to the files we're listing.
+    paths = paths.map(path.relative).toList();
     exclude = exclude.map(path.relative).toList();
 
     // Build the list of files by expanding the given paths, looking for
