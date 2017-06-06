@@ -213,9 +213,9 @@ main(args) async {
   // Configure the port on which examples should be served.
   config.examples.port = 9000;
 
-  // Define the directories to include when running the
+  // Define the paths to include when running the
   // Dart formatter.
-  config.format.directories = ['lib/', 'test/', 'tool/'];
+  config.format.paths = ['lib/', 'test/', 'tool/'];
 
   // Define overrides for local task discovery
   config.local
@@ -488,10 +488,10 @@ object.
             <td>Dry-run; checks if formatter needs to be run and sets exit code accordingly.</td>
         </tr>
         <tr>
-            <td><code>directories</code></td>
+            <td><code>paths</code></td>
             <td><code>List&lt;String&gt;</code></td>
             <td><code>['lib/']</code></td>
-            <td>Directories to run the formatter on. All files (any depth) in the given directories will be formatted.</td>
+            <td>Files/directories to run the formatter on. All files (any depth) in the given directories will be formatted.</td>
         </tr>
     </tbody>
 </table>

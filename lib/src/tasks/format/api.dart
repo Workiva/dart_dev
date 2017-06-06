@@ -23,11 +23,18 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
-FormatTask format(
-    {bool check: defaultCheck,
-    List<String> directories: defaultDirectories,
-    List<String> exclude: defaultExclude,
-    int lineLength: defaultLineLength}) {
+// ignore: deprecated_member_use
+/// [directories] is deprecated; use [paths] instead.
+FormatTask format({
+  bool check: defaultCheck,
+  List<String> exclude: defaultExclude,
+  int lineLength: defaultLineLength,
+  List<String> paths: defaultPaths,
+  @Deprecated('2.0.0') List<String> directories,
+}) {
+  // ignore: deprecated_member_use
+  if (directories != null) paths = directories;
+
   var executable = 'pub';
   var args = ['run', 'dart_style:format'];
 
@@ -39,87 +46,121 @@ FormatTask format(
     args.add('-w');
   }
 
-  List<String> excludedFiles = [];
+  var filesToFormat = getFilesToFormat(paths: paths, exclude: exclude);
 
-  if (exclude.isEmpty) {
-    // If no files are excluded, we can use the directories and let the dart
-    // formatter expand the files.
-    args.addAll(directories);
+  FormatTask task;
+  if (filesToFormat.files.isEmpty) {
+    task = new FormatTask(null, new Future(() {}))..successful = true;
   } else {
-    // Convert exclude paths to absolute paths.
-    exclude = exclude.map((e) => path.absolute(e)).toList();
+    args.addAll(filesToFormat.files);
 
-    // Build the list of files by expanding the given directories, looking for
+    TaskProcess process = new TaskProcess(executable, args);
+    task = new FormatTask('$executable ${args.join(' ')}', process.done);
+
+    RegExp cwdPattern = new RegExp('Formatting directory (.+):');
+    RegExp formattedPattern = new RegExp('Formatted (.+\.dart)');
+    RegExp unchangedPattern = new RegExp('Unchanged (.+\.dart)');
+
+    String cwd = '';
+    process.stdout.listen((line) {
+      if (check) {
+        task.affectedFiles.add(line.trim());
+      } else {
+        if (cwdPattern.hasMatch(line)) {
+          cwd = cwdPattern.firstMatch(line).group(1);
+        } else if (formattedPattern.hasMatch(line)) {
+          task.affectedFiles
+              .add('$cwd${formattedPattern.firstMatch(line).group(1)}');
+        } else if (unchangedPattern.hasMatch(line)) {
+          task.unaffectedFiles
+              .add('$cwd${unchangedPattern.firstMatch(line).group(1)}');
+        }
+      }
+      task._formatterOutput.add(line);
+    });
+    process.stderr.listen(task._formatterOutput.addError);
+    process.exitCode.then((code) {
+      task.successful = check ? task.affectedFiles.isEmpty : code <= 0;
+    });
+  }
+
+  task
+    ..isDryRun = check
+    ..excludedFiles.addAll(filesToFormat.excluded);
+
+  return task;
+}
+
+/// Returns a set of files within [paths] to be formatted, with [exclude] excluded.
+///
+/// [paths] can contain both files and directories. Files within directories
+/// will be processed recursively, ignoring symlinks.
+///
+/// If [exclude] is not empty, the return value will include [paths], expanded
+/// to all matching files. Otherwise, it will not be expanded.
+///
+/// To force expansion, set [alwaysExpand] to `true`.
+FilesToFormat getFilesToFormat({
+  List<String> paths: defaultPaths,
+  List<String> exclude: defaultExclude,
+  bool alwaysExpand: false,
+}) {
+  var filesToFormat = new FilesToFormat();
+
+  if (exclude.isEmpty && !alwaysExpand) {
+    // If no files are excluded, we can use the paths and let the dart
+    // formatter expand the files.
+    filesToFormat.files.addAll(paths);
+  } else {
+    // Convert paths to relative paths, so they can be efficiently
+    // compared to the files we're listing.
+    paths = paths.map(path.relative).toList();
+    exclude = exclude.map(path.relative).toList();
+
+    // Build the list of files by expanding the given paths, looking for
     // all .dart files that don't match any excluded path.
-    List<String> filesToFormat = [];
-    for (var p in directories) {
-      Directory dir = new Directory(p);
-      var files = dir.listSync(recursive: true);
+    for (var p in paths) {
+      List<FileSystemEntity> files = FileSystemEntity.isFileSync(p)
+          ? [new File(p)]
+          : new Directory(p).listSync(recursive: true, followLinks: false);
+
       for (FileSystemEntity entity in files) {
         // Skip directories and links.
-        if (!FileSystemEntity.isFileSync(entity.path)) continue;
+        if (entity is! File) continue;
         // Skip non-dart files.
         if (!entity.path.endsWith('.dart')) continue;
+
+        var pathParts = path.split(entity.path);
         // Skip dependency files.
-        if (entity.absolute.path.contains('/packages/')) continue;
+        if (pathParts.contains('packages')) continue;
         // Skip contents of .pub directories.
-        if (entity.absolute.path.contains('/.pub/')) continue;
+        if (pathParts.contains('.pub')) continue;
 
         // Skip excluded files.
-        bool isExcluded = false;
-        for (var excluded in exclude) {
-          if (entity.absolute.path.startsWith(excluded)) {
-            isExcluded = true;
-            break;
-          }
-        }
+        bool isExcluded = exclude.any((excluded) =>
+            entity.path == excluded || path.isWithin(excluded, entity.path));
+
         if (isExcluded) {
-          excludedFiles.add(entity.path);
+          filesToFormat.excluded.add(entity.path);
           continue;
         }
 
         // File should be formatted.
-        filesToFormat.add(entity.path);
+        filesToFormat.files.add(entity.path);
       }
     }
-
-    args.addAll(filesToFormat);
   }
 
-  TaskProcess process = new TaskProcess(executable, args);
-  FormatTask task =
-      new FormatTask('$executable ${args.join(' ')}', process.done)
-        ..isDryRun = check;
+  return filesToFormat;
+}
 
-  RegExp cwdPattern = new RegExp('Formatting directory (.+):');
-  RegExp formattedPattern = new RegExp('Formatted (.+\.dart)');
-  RegExp unchangedPattern = new RegExp('Unchanged (.+\.dart)');
+/// Data around included/excluded files, returned [getFilesToFormat].
+class FilesToFormat {
+  /// Matching/included that should be formatted.
+  List<String> files = [];
 
-  task.excludedFiles.addAll(excludedFiles);
-
-  String cwd = '';
-  process.stdout.listen((line) {
-    if (check) {
-      task.affectedFiles.add(line.trim());
-    } else {
-      if (cwdPattern.hasMatch(line)) {
-        cwd = cwdPattern.firstMatch(line).group(1);
-      } else if (formattedPattern.hasMatch(line)) {
-        task.affectedFiles
-            .add('$cwd${formattedPattern.firstMatch(line).group(1)}');
-      } else if (unchangedPattern.hasMatch(line)) {
-        task.unaffectedFiles
-            .add('$cwd${unchangedPattern.firstMatch(line).group(1)}');
-      }
-    }
-    task._formatterOutput.add(line);
-  });
-  process.stderr.listen(task._formatterOutput.addError);
-  process.exitCode.then((code) {
-    task.successful = check ? task.affectedFiles.isEmpty : code <= 0;
-  });
-
-  return task;
+  /// Excluded files that should not be formatted.
+  List<String> excluded = [];
 }
 
 class FormatTask extends Task {

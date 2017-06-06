@@ -29,6 +29,7 @@ import 'package:dart_dev/src/tasks/copy_license/cli.dart';
 import 'package:dart_dev/src/tasks/coverage/cli.dart';
 import 'package:dart_dev/src/tasks/docs/cli.dart';
 import 'package:dart_dev/src/tasks/examples/cli.dart';
+import 'package:dart_dev/src/tasks/export_config/cli.dart';
 import 'package:dart_dev/src/tasks/format/cli.dart';
 import 'package:dart_dev/src/tasks/gen_test_runner/cli.dart';
 import 'package:dart_dev/src/tasks/init/cli.dart';
@@ -60,6 +61,7 @@ dev(List<String> args) async {
   registerTask(new CoverageCli(), config.coverage);
   registerTask(new DocsCli(), config.docs);
   registerTask(new ExamplesCli(), config.examples);
+  registerTask(new ExportConfigCli(), new TaskConfig());
   registerTask(new FormatCli(), config.format);
   registerTask(new GenTestRunnerCli(), config.genTestRunner);
   registerTask(new InitCli(), config.init);
@@ -83,12 +85,6 @@ dev(List<String> args) async {
 }
 
 void registerTask(TaskCli cli, TaskConfig config) {
-  if (_cliTasks[cli.command] != null) {
-    throw new ArgumentError(
-        'A task is attempting to use the task name "${cli.command}" which'
-        ' has already been registered.');
-  }
-
   _cliTasks[cli.command] = cli;
   _cliConfigs[cli.command] = config;
 }
@@ -99,7 +95,7 @@ String _generateUsage([String task]) {
   u.writeln();
 
   if (task != null && _cliTasks.containsKey(task)) {
-    u.writeln('Usage: pub run dart_dev $task [options]');
+    u.writeln('Usage: pub run dart_dev ${_cliTasks[task].usage}');
     u.writeln();
     u.writeln(_cliTasks[task].argParser.usage);
   } else {
