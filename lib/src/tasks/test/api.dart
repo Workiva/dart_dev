@@ -41,7 +41,7 @@ TestTask test(
   TaskProcess process = new TaskProcess(executable, args);
   Completer outputProcessed = new Completer();
   TestTask task = new TestTask('$executable ${args.join(' ')}',
-      Future.wait([process.done, outputProcessed.future]));
+      TaskResult.fromList([process.done, outputProcessed.future]));
 
   // TODO: Use this pattern to better parse the test summary even when the output is colorized
   // RegExp resultPattern = new RegExp(r'(\d+:\d+) \+(\d+) ?~?(\d+)? ?-?(\d+)?: (All|Some) tests (failed|passed)');
@@ -72,17 +72,19 @@ TestTask test(
     }
   });
 
-  return task;
+  return task..done.whenComplete(() => stdoutc.close());
 }
 
 class TestTask extends Task {
-  final Future done;
+  final Future<TaskResult> done;
   final String testCommand;
   String testSummary;
 
   StreamController<String> _testOutput = new StreamController();
 
-  TestTask(String this.testCommand, Future this.done);
+  TestTask(String this.testCommand, Future<TaskResult> this.done) {
+    done.whenComplete(() => _testOutput.close());
+  }
 
   Stream<String> get testOutput => _testOutput.stream;
 }

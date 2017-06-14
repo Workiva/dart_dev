@@ -26,8 +26,8 @@ class DocsFailure implements Exception {}
 class DocsResult extends TaskResult {
   final Directory output;
   DocsResult()
-      : super.success(),
-        output = new Directory('doc/api/');
+      : output = new Directory('doc/api/'),
+        super.success();
 }
 
 class DocsTask extends Task {

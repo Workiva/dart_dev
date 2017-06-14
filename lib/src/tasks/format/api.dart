@@ -166,14 +166,16 @@ class FilesToFormat {
 class FormatTask extends Task {
   List<String> affectedFiles = [];
   List<String> excludedFiles = [];
-  final Future done;
+  final Future<TaskResult> done;
   final String formatterCommand;
   bool isDryRun;
   List<String> unaffectedFiles = [];
 
   StreamController<String> _formatterOutput = new StreamController();
 
-  FormatTask(String this.formatterCommand, Future this.done);
+  FormatTask(String this.formatterCommand, Future<TaskResult> this.done) {
+    done.whenComplete(() => _formatterOutput.close());
+  }
 
   Stream<String> get formatterOutput => _formatterOutput.stream;
 }

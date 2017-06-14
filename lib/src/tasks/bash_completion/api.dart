@@ -37,7 +37,7 @@ BashCompletionTask bashCompletion() {
 }
 
 class BashCompletionTask extends Task {
-  final Future done;
+  final Future<TaskResult> done;
   String completionScript;
-  BashCompletionTask(Future this.done);
+  BashCompletionTask(Future<TaskResult> this.done);
 }

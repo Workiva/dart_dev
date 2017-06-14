@@ -14,7 +14,7 @@ Future<TaskRunner> runTasks(tasksToRun) async {
 }
 
 class TaskRunner extends Task {
-  final Future done = new Future.value();
+  final Future<TaskResult> done = new Future.value();
   String failedTask;
   final String stderr;
   bool successful;

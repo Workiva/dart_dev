@@ -1,0 +1,9 @@
+analyzer:
+  strong-mode: true
+  exclude:
+    - 'test_fixtures'
+  
+linter:
+  rules:
+    - cancel_subscriptions
+    - close_sinks   
