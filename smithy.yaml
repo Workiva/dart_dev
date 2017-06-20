@@ -1,8 +1,8 @@
 project: dart
 language: dart
 
-# dart 1.19.1, built from https://github.com/Workiva/smithy-runner-dart/tree/0.0.4
-runner_image: drydock-prod.workiva.org/workiva/smithy-runner-dart:74173
+# dart 1.23.0, built from https://github.com/Workiva/smithy-runner-generator/tree/56.0.0
+runner_image: drydock-prod.workiva.net/workiva/smithy-runner-generator:153818
 
 script:
   - pub get

@@ -5,7 +5,7 @@ import 'dart:js';
 
 import 'package:platform_detect/platform_detect.dart';
 import 'package:fluri/fluri.dart';
-import 'package:rate_limit/rate_limit.dart';
+import 'package:rxdart/rxdart.dart';
 
 const String testsPassedMessage = 'All tests passed';
 final RegExp testsFinishedPattern =
@@ -288,7 +288,7 @@ Future<List<String>> runTests(String testUrl, String platform,
 
   testConsoleLogs
       .skip(1)
-      .transform(new Debouncer(testTimeoutDuration))
+      .transform(new DebounceStreamTransformer(testTimeoutDuration))
       .first
       .then((_) {
     if (!completer.isCompleted) {
