@@ -87,5 +87,5 @@ void main() {
       expect(tasks.failedTasks.contains(failedFormatting), isTrue);
       expect(tasks.failedTasks.contains(failedTesting), isFalse);
     });
-  });
+  }, timeout: const Timeout(const Duration(minutes: 1)));
 }
