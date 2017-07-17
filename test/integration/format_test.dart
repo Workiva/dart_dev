@@ -94,7 +94,7 @@ void main() {
       expect(contentsBefore, equals(contentsAfter));
     });
 
-    group('should format an ill-formatted project', () {
+    group('on an ill-formatted project', () {
       String testProject;
 
       const allFiles = const [
@@ -110,7 +110,7 @@ void main() {
           allFiles,
           value: (file) => new File('$testProject/$file').readAsStringSync());
 
-      test('should format an ill-formatted project', () async {
+      test('should format all ill-formatted files', () async {
         var contentsBefore = getAllFilesContents();
         expect(await formatProject(testProject), isTrue);
         var contentsAfter = getAllFilesContents();
@@ -121,9 +121,7 @@ void main() {
         }
       });
 
-      test(
-          'should format only the paths specified as arguments'
-          ' within an ill-formatted project', () async {
+      test('should format only the paths specified as arguments', () async {
         // It's important that these are relative paths to the project root
         const expectedModifiedFiles = const [
           'lib/library_1.dart',

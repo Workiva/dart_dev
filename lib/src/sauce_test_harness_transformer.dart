@@ -171,9 +171,8 @@ class SauceTestHarnessTransformer extends Transformer
   void generateDart(Transform transform) {
     var id = transform.primaryInput.id;
 
-    transform.addOutput(new Asset.fromString(
-        id.addExtension('.sauce_browser_test.dart'),
-        '''
+    transform.addOutput(
+        new Asset.fromString(id.addExtension('.sauce_browser_test.dart'), '''
           import 'dart:async';
           import 'dart:html';
 
