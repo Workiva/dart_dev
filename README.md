@@ -125,11 +125,11 @@ be expanded in the configuration as documented below.
 Add the following to your `pubspec.yaml`:
 ```yaml
 dev_dependencies:
-  coverage: "^0.7.3"
-  dart_dev: "^1.0.0"
-  dart_style: ">=0.2.0 <0.3.0"
-  dartdoc: ">=0.8.0 <=0.10.0"
-  test: "^0.12.0"
+  coverage: ^0.8.0 # dart_dev is currently untested with coverage ^0.9.0
+  dart_dev: ^1.7.8
+  dart_style: ^1.0.7
+  dartdoc: ^0.13.0
+  test: ^0.12.24
 ```
 
 #### Create an Alias (optional)

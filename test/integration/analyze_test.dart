@@ -125,7 +125,7 @@ void main() {
       expect(analysis.numErrors, equals(2));
       expect(analysis.numHints, equals(0));
       expect(analysis.exitCode, greaterThan(0));
-    });
+    }, skip: 'dartanalyzer now treats --fatal-hints as a no-op');
 
     test('should not report hints as fatal if none existed', () async {
       Analysis analysis =
