@@ -37,9 +37,7 @@ Future<TasksRun> runTasks(String projectPath) async {
   List<String> failedTasks = <String>[];
   List<String> successfulTasks = <String>[];
 
-  process.stdout.listen((line) {
-    // leaving this logging in to help debug issues
-    print(line);
+  void processLine(String line, IOSink debugSink) {
     if (line.contains(successfulFormatting)) {
       successfulTasks.add(successfulFormatting);
     }
@@ -55,7 +53,13 @@ Future<TasksRun> runTasks(String projectPath) async {
     if (line.contains(failedTesting)) {
       failedTasks.add(failedTesting);
     }
-  });
+
+    // Leave this logging in for debugging.
+    debugSink.writeln('\t$line');
+  }
+
+  process.stdout.listen((line) => processLine(line, stdout));
+  process.stderr.listen((line) => processLine(line, stderr));
 
   await process.done;
 
@@ -84,8 +88,11 @@ void main() {
       expect(tasks.exitCode, isNonZero);
       expect(tasks.successfulTasks.contains(successfulFormatting), isFalse);
       expect(tasks.successfulTasks.contains(successfulTesting), isFalse);
+      expect(
+          tasks.failedTasks.contains(failedFormatting) ||
+              tasks.failedTasks.contains(failedTesting),
+          isTrue);
       expect(tasks.failedTasks.contains(failedFormatting), isTrue);
-      expect(tasks.failedTasks.contains(failedTesting), isFalse);
     });
   }, timeout: const Timeout(const Duration(minutes: 1)));
 }

@@ -36,7 +36,11 @@ class SubTask {
 
   TaskProcess taskProcess;
 
+  Completer<Null> _done = new Completer<Null>();
+
   SubTask(this.command);
+
+  Future<Null> get done => _done.future;
 
   /// Starts the provided subtask and wires up a stream to allow
   /// the TaskGroup to listen for subtask completion.
@@ -44,12 +48,19 @@ class SubTask {
     var taskArguments = command.split(' ');
     taskProcess =
         new TaskProcess(taskArguments.first, taskArguments.sublist(1));
+
+    final stdoutc = new Completer<Null>();
+    final stderrc = new Completer<Null>();
     taskProcess.stdout.listen((line) {
       this.taskOutput += '\n$line';
-    });
+    }, onDone: () => stdoutc.complete());
     taskProcess.stderr.listen((line) {
       this.taskError += '\n$line';
-    });
+    }, onDone: () => stderrc.complete());
+    Future
+        .wait([taskProcess.done, stdoutc.future, stderrc.future])
+        .then((_) => _done.complete())
+        .catchError((e) => _done.completeError(e));
   }
 }
 
@@ -87,7 +98,8 @@ class TaskGroup {
     });
     for (SubTask task in subTasks) {
       task.startProcess();
-      task.taskProcess.exitCode.then((int exitCode) {
+      task.done.then((_) async {
+        final exitCode = await task.taskProcess.exitCode;
         reporter.log(task.taskOutput);
         // if the task runner kills outstanding tasks it currently sets the exit code to -15
         if (exitCode != 0 && exitCode != -15) {
@@ -106,6 +118,7 @@ class TaskGroup {
     await Future.wait(futures);
 
     for (SubTask task in subTasks) {
+      await task.done;
       if (await task.taskProcess.exitCode == -15) {
         tasksNotCompleted.add(task.command);
       }
