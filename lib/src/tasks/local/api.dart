@@ -23,8 +23,7 @@ import 'package:dart_dev/src/tasks/task.dart';
 LocalTask local(String executable, Iterable<String> args) {
   TaskProcess process = new TaskProcess(executable, args);
 
-  LocalTask task = new LocalTask(
-      '$executable ${args.join(' ')}', Future.wait([process.done]));
+  LocalTask task = new LocalTask('$executable ${args.join(' ')}', process.done);
 
   process.stdout.listen(task._commandOutput.add);
   process.stderr.listen(task._commandOutput.addError);
@@ -38,12 +37,14 @@ LocalTask local(String executable, Iterable<String> args) {
 }
 
 class LocalTask extends Task {
-  final Future done;
+  final Future<TaskResult> done;
   final String localCommand;
 
   StreamController<String> _commandOutput = new StreamController();
 
-  LocalTask(String this.localCommand, Future this.done);
+  LocalTask(String this.localCommand, Future<TaskResult> this.done) {
+    done.whenComplete(() => _commandOutput.close());
+  }
 
   Stream<String> get localOutput => _commandOutput.stream;
 }

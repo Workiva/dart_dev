@@ -50,7 +50,7 @@ ExamplesTask serveExamples(
   ExamplesTask task = new ExamplesTask(
       '$dartiumExecutable ${dartiumArgs.join(' ')}',
       '$pubServeExecutable ${pubServeArgs.join(' ')}',
-      Future.wait([dartiumProcess.done, pubServeProcess.done]));
+      TaskResult.fromList([dartiumProcess.done, pubServeProcess.done]));
 
   pubServeProcess.stdout.listen(task._pubServeStdOut.add);
   pubServeProcess.stderr.listen(task._pubServeStdErr.add);
@@ -65,7 +65,7 @@ ExamplesTask serveExamples(
 }
 
 class ExamplesTask extends Task {
-  final Future done;
+  final Future<TaskResult> done;
   final String dartiumCommand;
   final String pubServeCommand;
 
@@ -74,7 +74,7 @@ class ExamplesTask extends Task {
   StreamController<String> _pubServeStdErr = new StreamController();
 
   ExamplesTask(String this.dartiumCommand, String this.pubServeCommand,
-      Future this.done) {
+      Future<TaskResult> this.done) {
     done.then((_) {
       _dartiumOutput.close();
       _pubServeStdOut.close();

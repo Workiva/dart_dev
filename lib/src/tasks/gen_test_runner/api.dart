@@ -162,7 +162,7 @@ Future testHtmlFileGenerator(
 }
 
 class GenTestRunnerTask extends Task {
-  final Future done = new Future.value();
+  final Future<TaskResult> done = new Future.value();
   List<String> excludedFiles = [];
   final String generateCommand;
   List<String> testFiles = [];

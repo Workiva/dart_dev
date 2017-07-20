@@ -26,4 +26,16 @@ abstract class TaskResult {
   TaskResult.fail() : _successful = false;
   TaskResult.success() : _successful = true;
   bool get successful => _successful;
+
+  static Future<TaskResult> fromList(List<Future<TaskResult>> tasks) async {
+    TaskResult lastTask;
+    for (Future<TaskResult> task in tasks) {
+      var result = await task;
+      if (!result.successful) {
+        return result;
+      }
+      lastTask = result;
+    }
+    return lastTask;
+  }
 }

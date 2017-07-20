@@ -82,9 +82,11 @@ List<String> _findFilesFromEntryPoints(List<String> entryPoints) {
 
 class AnalyzeTask extends Task {
   final String analyzerCommand;
-  final Future done;
+  final Future<TaskResult> done;
 
   StreamController<String> _analyzerOutput = new StreamController();
   Stream<String> get analyzerOutput => _analyzerOutput.stream;
-  AnalyzeTask(String this.analyzerCommand, Future this.done);
+  AnalyzeTask(String this.analyzerCommand, Future<TaskResult> this.done) {
+    done.whenComplete(() => _analyzerOutput.close());
+  }
 }

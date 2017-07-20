@@ -36,27 +36,30 @@ const String _testFilePattern = '_test.dart';
 class CoverageResult extends TaskResult {
   final File collection;
   final Directory report;
-  final File reportIndex;
+  File get reportIndex => _reportIndex;
+  File _reportIndex;
   final File lcov;
   final Iterable<String> tests;
 
   CoverageResult.fail(
       Iterable<String> this.tests, File this.collection, File this.lcov,
       {Directory report})
-      : super.fail(),
-        this.report = report,
-        reportIndex = report != null
-            ? new File(path.join(report.path, 'index.html'))
-            : null;
+      : this.report = report,
+        super.fail() {
+    if (report != null) {
+      _reportIndex = new File(path.join(report.path, 'index.html'));
+    }
+  }
 
   CoverageResult.success(
       Iterable<String> this.tests, File this.collection, File this.lcov,
       {Directory report})
-      : super.success(),
-        this.report = report,
-        reportIndex = report != null
-            ? new File(path.join(report.path, 'index.html'))
-            : null;
+      : this.report = report,
+        super.success() {
+    if (report != null) {
+      _reportIndex = new File(path.join(report.path, 'index.html'));
+    }
+  }
 }
 
 class CoverageTask extends Task {

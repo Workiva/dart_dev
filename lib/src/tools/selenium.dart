@@ -116,7 +116,7 @@ class SeleniumHelper {
         'params': {},
         'id': uuid,
       }));
-      return c.future;
+      return c.future..whenComplete(() => ws.close());
     } catch (e) {
       return false;
     }
