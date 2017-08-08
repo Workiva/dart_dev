@@ -38,7 +38,8 @@ Future<int> runTests(String projectPath,
     List<String> files,
     String testName: '',
     bool runCustomPubServe: false,
-    int pubServePort: 56090}) async {
+    int pubServePort: 56090,
+    String webCompiler}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
   List args = ['run', 'dart_dev', 'test', '--no-color'];
@@ -77,24 +78,44 @@ Future<int> runTests(String projectPath,
   }
 
   args.addAll(files ?? <String>[]);
+
+  String webCompilerArg;
+
+  if (webCompiler != null) {
+    webCompilerArg = '--web-compiler=${webCompiler}';
+    args.add(webCompilerArg);
+  }
+
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
+
+  var numTestsRun = -1;
+  var webCompilerSpecified = false;
+
+  process.stdout.listen((output) {
+    if (numTestsPassedPattern.hasMatch(output)) {
+      numTestsRun =
+          int.parse(numTestsPassedPattern.firstMatch(output).group(1));
+    }
+    if (webCompiler != null && output.contains(webCompilerArg)) {
+      webCompilerSpecified = true;
+    }
+  });
 
   await process.done;
   if ((await process.exitCode) != 0)
     throw new TestFailure('Expected test to pass.');
 
-  String lastLine = await process.stdout.last;
-
   if (pubServeProcess != null) {
     pubServeProcess.kill();
   }
 
-  var numTestsRun = -1;
-  if (numTestsPassedPattern.hasMatch(lastLine)) {
-    numTestsRun =
-        int.parse(numTestsPassedPattern.firstMatch(lastLine).group(1));
+  if (webCompiler != null) {
+    expect(webCompilerSpecified, isTrue,
+        reason:
+            '$webCompiler was not approriately applied to the pub serve task');
   }
+
   return numTestsRun;
 }
 
@@ -176,6 +197,11 @@ void main() {
     test('should fail if named test does not exist', () async {
       expect(runTests(projectWithPassingTests, testName: 'non-existent test'),
           throwsA(new isInstanceOf<TestFailure>()));
+    });
+
+    test('should allow you to specify a web-compiler', () async {
+      expect(await runTests(projectThatNeedsPubServe, webCompiler: 'dartdevc'),
+          equals(1));
     });
   });
 }
