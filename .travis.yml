@@ -14,6 +14,8 @@ addons:
     - fonts-tlwg-garuda
 
 before_install:
+  # Workaround for https://github.com/travis-ci/travis-ci/issues/8607
+  - sudo rm -vf /etc/apt/sources.list.d/*riak*
   # Content shell needs this font. Since it has a EULA, we need to manually
   # install it.
   #
