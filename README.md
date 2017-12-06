@@ -607,7 +607,7 @@ All configuration options for the local task discovery are found on the
             <td><code>env</code></td>
             <td><code>Environment</code></td>
             <td><code>Environment.browser</code></td>
-            <td>The environment to run tests in ('vm' or 'browser')</td>
+            <td>The environment to run tests in ('vm', 'browser', 'both')</td>
         </tr>
         <tr>
             <td><code>filename</code></td>

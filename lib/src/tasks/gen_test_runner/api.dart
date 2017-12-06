@@ -66,14 +66,17 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
     }
   });
 
+  if (currentConfig.genHtml && !currentConfig.check) {
+    await testHtmlFileGenerator(
+        currentDirectory, currentConfig.filename, currentConfig.htmlHeaders);
+  }
+
   if (currentConfig.env == Environment.browser) {
-    if (currentConfig.genHtml && !currentConfig.check) {
-      await testHtmlFileGenerator(
-          currentDirectory, currentConfig.filename, currentConfig.htmlHeaders);
-    }
     runnerLines.add('@TestOn(\'browser\')');
-  } else {
+  } else if (currentConfig.env == Environment.vm) {
     runnerLines.add('@TestOn(\'vm\')');
+  } else {
+    runnerLines.add('@TestOn(\'browser || vm\')');
   }
   runnerLines.add(
       'library ${currentDirectory.replaceAll('/','.')}${currentConfig.filename};');
