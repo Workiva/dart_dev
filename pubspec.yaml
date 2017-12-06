@@ -1,5 +1,5 @@
 name: dart_dev
-version: 1.8.2
+version: 1.9.0
 description: Centralized tooling for Dart projects. Consistent interface across projects. Easily configurable.
 authors:
   - Workiva Client Platform Team <clientplatform@workiva.com>
