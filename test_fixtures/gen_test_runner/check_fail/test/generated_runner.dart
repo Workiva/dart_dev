@@ -1,8 +1,8 @@
 @TestOn('browser')
 library test.generated_runner;
 
-import './browser_test.dart' as browser_test;
 import 'package:test/test.dart';
+import './browser_test.dart' as browser_test;
 
 void main() {
   browser_test.main();
