@@ -93,7 +93,6 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
         'import \'${'./'+testPath}\' as ${testPath.replaceAll('/','_').substring(0, testPath.length - 5)};');
   });
 
-
   if (currentConfig.dartHeaders.isNotEmpty) {
     currentConfig.dartHeaders.forEach((String header) {
       runnerLines.add(header);
