@@ -61,7 +61,9 @@ class TestCli extends TaskCli {
     ..addOption('name',
         abbr: 'n',
         help:
-            'A substring of the name of the test to run.\nRegular expression syntax is supported.');
+            'A substring of the name of the test to run.\nRegular expression syntax is supported.')
+    ..addOption('web-compiler',
+        abbr: 'w', help: ' The JavaScript compiler to use to serve the tests.');
 
   final String command = 'test';
 
@@ -118,6 +120,8 @@ class TestCli extends TaskCli {
     // CLI user can filter tests by name.
     bool testNamed = parsedArgs['name'] != null;
 
+    bool compilerSpecified = parsedArgs['web-compiler'] != null;
+
     if (!individualTestsSpecified && !unit && !integration && !functional) {
       return new CliResult.fail(
           'No tests were selected. Include at least one of --unit, '
@@ -169,8 +173,13 @@ class TestCli extends TaskCli {
 
       if (!isPubServeRunning) {
         // Start `pub serve` on the `test` directory
+        var additionalArgs = ['test'];
+        if (compilerSpecified) {
+          additionalArgs.add('--web-compiler=${parsedArgs['web-compiler']}');
+        }
+
         pubServeTask =
-            startPubServe(port: pubServePort, additionalArgs: ['test']);
+            startPubServe(port: pubServePort, additionalArgs: additionalArgs);
 
         var startupLogFinished = new Completer();
         reporter.logGroup(pubServeTask.command,

@@ -26,7 +26,7 @@ const bool defaultGenHtml = false;
 const bool defaultReact = true;
 const List<String> defaultHtmlHeaders = const [];
 
-enum Environment { vm, browser }
+enum Environment { vm, browser, both }
 
 class TestRunnerConfig {
   bool check = defaultCheck;

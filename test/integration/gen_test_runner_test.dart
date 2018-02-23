@@ -23,6 +23,8 @@ import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
 const String browserAndVm = 'test_fixtures/gen_test_runner/browser_and_vm';
+const String browserAndVmRunner =
+    'test_fixtures/gen_test_runner/browser_and_vm_runner';
 const String checkFail = 'test_fixtures/gen_test_runner/check_fail';
 const String checkPass = 'test_fixtures/gen_test_runner/check_pass';
 const String defaultConfig = 'test_fixtures/gen_test_runner/default_config';
@@ -99,6 +101,17 @@ void main() {
       verifyExistenceAndCleanup(
           path.join(browserAndVm, 'test/vm/generated_runner.html'),
           shouldFileExist: false);
+    });
+
+    test('should create runner with both vm and browser annotation', () async {
+      Runner runner = await generateTestRunner(browserAndVmRunner);
+      expect(runner.exitCode, isZero);
+      String runnerPath =
+          path.join(browserAndVmRunner, 'test/generated_runner.dart');
+      File testRunner = new File(runnerPath);
+      String fileContents = testRunner.readAsStringSync();
+      expect(fileContents.contains('@TestOn(\'browser || vm\')'), isTrue);
+      verifyExistenceAndCleanup(runnerPath, shouldFileExist: true);
     });
 
     group('--check flag', () {

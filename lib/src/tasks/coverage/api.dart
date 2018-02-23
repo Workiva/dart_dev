@@ -546,7 +546,9 @@ class CoverageTask extends Task {
 
     // Run the test in content-shell.
     String executable = 'content_shell';
-    List args = [testPath];
+    // The window size is specified to correspond to the size of the window in the
+    // dart test package, https://github.com/dart-lang/test/blob/ec1b57647df74293d7a71316020e39702735b3f7/CHANGELOG.md#012201
+    List args = ['--content-shell-host-window-size=1024x768', testPath];
     _coverageOutput.add('');
     _coverageOutput.add('Running test suite ${testPath}');
     _coverageOutput.add('$executable ${args.join(' ')}\n');
