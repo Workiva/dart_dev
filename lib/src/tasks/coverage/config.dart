@@ -26,20 +26,20 @@ const List<String> defaultReportOn = const ['lib/'];
 class CoverageConfig extends TaskConfig {
   List afterFunctionalTests = defaultAfterFunctional;
   List beforeFunctionalTests = defaultBeforeFunctional;
-  
+
   /// Enable or disable HTML generation.
   /// Defaults to true.
   bool html = defaultHtml;
-  
+
   /// Output directory for coverage artifacts.
   /// Defaults to 'coverage/'.
   String output = defaultOutput;
-  
+
   /// Whether or not to serve browser tests using a Pub server.
   /// If true, make sure to follow the test package's setup instructions and include the test/pub_serve transformer.
   /// Defaults to false.
   bool pubServe = defaultPubServe;
-  
+
   /// List of paths to include in the generated coverage report (LCOV and HTML).
   /// Defaults to 'lib/'.
   List<String> reportOn = defaultReportOn;
