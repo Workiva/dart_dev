@@ -32,7 +32,13 @@ const String projectWithoutCoveragePackage =
     'test_fixtures/coverage/no_coverage_package';
 const String projectWithFailingTests = 'test_fixtures/coverage/failing_test';
 
-Future<bool> runCoverage(String projectPath,
+class CoverageResponse {
+  bool successfulExit;
+  List<String> outputs = [];
+  List<String> errors = [];
+}
+
+Future<CoverageResponse> runCoverage(String projectPath,
     {bool html: false, bool functional: false}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
   Directory oldCoverage = new Directory('$projectPath/coverage');
@@ -48,15 +54,31 @@ Future<bool> runCoverage(String projectPath,
   args.add(html ? '--html' : '--no-html');
   TaskProcess process =
       new TaskProcess('pub', args, workingDirectory: projectPath);
+  var response = new CoverageResponse();
+  StreamSubscription<String> outSub =
+      process.stdout.listen(response.outputs.add);
+  StreamSubscription<String> errSub =
+      process.stderr.listen(response.errors.add);
 
-  await process.done;
-  return (await process.exitCode) == 0;
+  try {
+    await process.done;
+    response.successfulExit = (await process.exitCode) == 0;
+    return response;
+  } finally {
+    try {
+      await outSub.cancel();
+      await errSub.cancel();
+    } catch (e) {
+      print(e);
+    }
+  }
 }
 
 void main() {
   group('Coverage Task', () {
     test('should generate coverage for Browser tests', () async {
-      expect(await runCoverage(projectWithBrowserTests), isTrue);
+      expect(
+          (await runCoverage(projectWithBrowserTests)).successfulExit, isTrue);
       File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 90)));
@@ -64,34 +86,59 @@ void main() {
     test('should generate coverage for Browser tests that require a Pub server',
         () async {
       expect(
-          await runCoverage(projectWithBrowserTestsThatNeedsPubServe), isTrue);
+          (await runCoverage(projectWithBrowserTestsThatNeedsPubServe))
+              .successfulExit,
+          isTrue);
       File lcov = new File(
           '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should generate coverage for VM tests', () async {
-      expect(await runCoverage(projectWithVmTests), isTrue);
+      expect((await runCoverage(projectWithVmTests)).successfulExit, isTrue);
       File lcov = new File('$projectWithVmTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should fail if "coverage" package is missing', () async {
-      expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
+      expect((await runCoverage(projectWithoutCoveragePackage)).successfulExit,
+          isFalse);
     });
 
     test('should fail if there is a test that fails', () async {
-      expect(await runCoverage(projectWithFailingTests), isFalse);
+      expect(
+          (await runCoverage(projectWithFailingTests)).successfulExit, isFalse);
+    }, timeout: new Timeout(new Duration(seconds: 90)));
+
+    test(
+        'should output test failure info to stderr if there is a test that fails',
+        () async {
+      CoverageResponse response = (await runCoverage(projectWithFailingTests));
+      expect(response.successfulExit, isFalse);
+      print(response.errors.join('\n'));
+      print('err len=${response.errors.length}');
+      expect(response.errors, isNotEmpty);
+
+      expect(
+          response.errors.join(),
+          stringContainsInOrder([
+            '00:00 +0 -1: fails [E]',
+            'Expected: true',
+            'Actual: <1>',
+            'package:test/src/frontend/expect.dart',
+          ]));
     }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should create coverage with non_test file specified', () async {
-      expect(await runCoverage(projectWithDartFile), isTrue);
+      expect((await runCoverage(projectWithDartFile)).successfulExit, isTrue);
       File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
     }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should generate coverage for Functional tests', () async {
-      expect(await runCoverage(projectWithFunctionalTests, functional: true),
+      expect(
+          (await runCoverage(projectWithFunctionalTests, functional: true))
+              .successfulExit,
           isTrue);
       File lcov =
           new File('$projectWithFunctionalTests/coverage/coverage.lcov');
@@ -102,7 +149,7 @@ void main() {
 //    test('should not fail if "lcov" is installed and --html is set', () async {
 //       MockPlatformUtil.install();
 //       expect(MockPlatformUtil.installedExecutables, contains('lcov'));
-//       expect(await runCoverage(projectWithVmTests, html: true), isTrue);
+//       expect((await runCoverage(projectWithVmTests, html: true)).successfulExit, isTrue);
 //       MockPlatformUtil.uninstall();
 //    });
 
@@ -110,13 +157,13 @@ void main() {
 //    test('should fail if "lcov" is not installed and --html is set', () async {
 //      MockPlatformUtil.install();
 //      MockPlatformUtil.installedExecutables.remove('lcov');
-//      expect(await runCoverage(projectWithVmTests, html: true), isFalse);
+//      expect((await runCoverage(projectWithVmTests, html: true)).successfulExit, isFalse);
 //      MockPlatformUtil.uninstall();
 //    });
 //    test('should not fail if "lcov" is not installed but --html is not set', () async {
 //      MockPlatformUtil.install();
 //      MockPlatformUtil.installedExecutables.remove('lcov');
-//      expect(await runCoverage(projectWithVmTests, html: false), isTrue);
+//      expect((await runCoverage(projectWithVmTests, html: false)).successfulExit, isTrue);
 //      MockPlatformUtil.uninstall();
 //    });
   });
