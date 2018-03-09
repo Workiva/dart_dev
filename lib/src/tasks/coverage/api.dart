@@ -295,6 +295,7 @@ class CoverageTask extends Task {
       await SeleniumHelper.killChildrenProcesses();
     }
     pubServeTask?.stop();
+
     // Merge all individual coverage collection files into one.
     _collection = _merge(collections);
   }
@@ -362,26 +363,28 @@ class CoverageTask extends Task {
   }
 
   File _merge(List<File> collections) {
-    if (collections.isEmpty)
-      throw new ArgumentError('Cannot merge an empty list of coverages.');
-
-    Map mergedJson = JSON.decode(collections.first.readAsStringSync());
-    for (int i = 1; i < collections.length; i++) {
-      if (!collections[i].existsSync()) continue;
-      String coverage = collections[i].readAsStringSync();
-      if (coverage.isNotEmpty) {
-        Map coverageJson = JSON.decode(coverage);
-        mergedJson['coverage'].addAll(coverageJson['coverage']);
-      }
-    }
-    _collections.deleteSync(recursive: true);
-
     File coverage = new File(path.join(_outputDirectory.path, 'coverage.json'));
     if (coverage.existsSync()) {
       coverage.deleteSync();
     }
-    coverage.createSync();
-    coverage.writeAsStringSync(JSON.encode(mergedJson));
+    coverage.createSync(recursive: true);
+
+    if (collections.isEmpty) {
+      coverage.writeAsStringSync('{}');
+    } else {
+      Map mergedJson = JSON.decode(collections.first.readAsStringSync());
+      for (int i = 1; i < collections.length; i++) {
+        if (!collections[i].existsSync()) continue;
+        String coverage = collections[i].readAsStringSync();
+        if (coverage.isNotEmpty) {
+          Map coverageJson = JSON.decode(coverage);
+          mergedJson['coverage'].addAll(coverageJson['coverage']);
+        }
+      }
+      _collections.deleteSync(recursive: true);
+
+      coverage.writeAsStringSync(JSON.encode(mergedJson));
+    }
     return coverage;
   }
 
@@ -520,7 +523,11 @@ class CoverageTask extends Task {
     _coverageOutput.add('Running VM test suite ${testPath}');
     _coverageOutput.add('$executable ${args.join(' ')}\n');
     TaskProcess process = _lastTestProcess = new TaskProcess(executable, args);
-    process.stderr.listen((l) => _coverageErrorOutput.add('    $l'));
+    process.stderr.listen((l) {
+      _coverageErrorOutput.add('    $l');
+      stderr.write(l);
+      print('covstderr>> $l');
+    });
 
     await for (String line in process.stdout) {
       _coverageOutput.add('    $line');
@@ -568,6 +575,8 @@ class CoverageTask extends Task {
       }
     });
     await for (String line in process.stderr) {
+      stderr.write(line);
+      print('covstderr>> $line');
       _coverageOutput.add('    $line');
       if (line.contains(_observatoryFailPattern)) {
         throw new CoverageTestSuiteException(testPath);

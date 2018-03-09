@@ -76,23 +76,23 @@ Future<CoverageResponse> runCoverage(String projectPath,
 
 void main() {
   group('Coverage Task', () {
-    test('should generate coverage for Browser tests', () async {
-      expect(
-          (await runCoverage(projectWithBrowserTests)).successfulExit, isTrue);
-      File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
-      expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
+//    test('should generate coverage for Browser tests', () async {
+//      expect(
+//          (await runCoverage(projectWithBrowserTests)).successfulExit, isTrue);
+//      File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
+//      expect(lcov.existsSync(), isTrue);
+//    }, timeout: new Timeout(new Duration(seconds: 90)));
 
-    test('should generate coverage for Browser tests that require a Pub server',
-        () async {
-      expect(
-          (await runCoverage(projectWithBrowserTestsThatNeedsPubServe))
-              .successfulExit,
-          isTrue);
-      File lcov = new File(
-          '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
-      expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
+//    test('should generate coverage for Browser tests that require a Pub server',
+//        () async {
+//      expect(
+//          (await runCoverage(projectWithBrowserTestsThatNeedsPubServe))
+//              .successfulExit,
+//          isTrue);
+//      File lcov = new File(
+//          '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
+//      expect(lcov.existsSync(), isTrue);
+//    }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test('should generate coverage for VM tests', () async {
       expect((await runCoverage(projectWithVmTests)).successfulExit, isTrue);
@@ -105,10 +105,10 @@ void main() {
           isFalse);
     });
 
-    test('should fail if there is a test that fails', () async {
-      expect(
-          (await runCoverage(projectWithFailingTests)).successfulExit, isFalse);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
+//    test('should fail if there is a test that fails', () async {
+//      expect(
+//          (await runCoverage(projectWithFailingTests)).successfulExit, isFalse);
+//    }, timeout: new Timeout(new Duration(seconds: 90)));
 
     test(
         'should output test failure info to stderr if there is a test that fails',
@@ -129,21 +129,21 @@ void main() {
           ]));
     }, timeout: new Timeout(new Duration(seconds: 90)));
 
-    test('should create coverage with non_test file specified', () async {
-      expect((await runCoverage(projectWithDartFile)).successfulExit, isTrue);
-      File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
-      expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
-
-    test('should generate coverage for Functional tests', () async {
-      expect(
-          (await runCoverage(projectWithFunctionalTests, functional: true))
-              .successfulExit,
-          isTrue);
-      File lcov =
-          new File('$projectWithFunctionalTests/coverage/coverage.lcov');
-      expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 300)));
+//    test('should create coverage with non_test file specified', () async {
+//      expect((await runCoverage(projectWithDartFile)).successfulExit, isTrue);
+//      File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
+//      expect(lcov.existsSync(), isTrue);
+//    }, timeout: new Timeout(new Duration(seconds: 90)));
+//
+//    test('should generate coverage for Functional tests', () async {
+//      expect(
+//          (await runCoverage(projectWithFunctionalTests, functional: true))
+//              .successfulExit,
+//          isTrue);
+//      File lcov =
+//          new File('$projectWithFunctionalTests/coverage/coverage.lcov');
+//      expect(lcov.existsSync(), isTrue);
+//    }, timeout: new Timeout(new Duration(seconds: 300)));
 
 //    TODO: Will need to mock out the `genhtml` command as well.
 //    test('should not fail if "lcov" is installed and --html is set', () async {
