@@ -17,15 +17,15 @@ import './test_test.dart' as test_test;
 import 'package:test/test.dart';
 
 void main() {
-  analyze_test.main();
-  copy_license_test.main();
+//  analyze_test.main();
+//  copy_license_test.main();
   coverage_test.main();
-  docs_test.main();
-  examples_test.main();
-  format_test.main();
-  gen_test_runner_test.main();
-  init_test.main();
-  local_test.main();
-  task_runner_test.main();
-  test_test.main();
+//  docs_test.main();
+//  examples_test.main();
+//  format_test.main();
+//  gen_test_runner_test.main();
+//  init_test.main();
+//  local_test.main();
+//  task_runner_test.main();
+//  test_test.main();
 }

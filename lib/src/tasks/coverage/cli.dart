@@ -105,8 +105,9 @@ class CoverageCli extends TaskCli {
     }
 
     CoverageResult result;
+    CoverageTask task;
     try {
-      CoverageTask task = CoverageTask.start(tests,
+      task = CoverageTask.start(tests,
           html: html,
           pubServe: pubServe,
           output: config.coverage.output,

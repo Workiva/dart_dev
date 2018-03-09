@@ -70,7 +70,7 @@ class Reporter {
         warning(_indent(line));
       });
       errorStream?.listen((line) {
-        warning(_indent(line));
+        warning(_indent(line), shout: true);
       })?.onError((line) {
         this.error(_indent(line));
       });
