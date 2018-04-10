@@ -3,4 +3,4 @@ version: 0.0.0
 dev_dependencies:
   dart_dev:
     path: ../../..
-  test: "^0.12.0"
+  test: ^0.12.33

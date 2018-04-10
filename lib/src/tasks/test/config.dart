@@ -29,6 +29,7 @@ const bool defaultUnit = true;
 const List<String> defaultUnitTests = const ['test/'];
 const List<String> defaultFunctionalTests = const [];
 const List<String> defaultPlatforms = const [];
+const String defaultPubServeWebCompiler = 'dart2js';
 
 class TestConfig extends TaskConfig {
   List afterFunctionalTests = defaultAfterFunctional;
@@ -39,5 +40,6 @@ class TestConfig extends TaskConfig {
   List<String> platforms = defaultPlatforms;
   bool pubServe = defaultPubServe;
   int pubServePort = defaultPubServePort;
+  String pubServeWebCompiler = defaultPubServeWebCompiler;
   List<String> unitTests = defaultUnitTests;
 }

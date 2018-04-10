@@ -12,10 +12,9 @@ homepage: https://github.com/Workiva/dart_dev
 
 dependencies:
   ansicolor: ^0.0.9
-  args: ^0.13.0
+  args: '>=0.13.7 <2.0.0'
   barback: ^0.15.0
   browser: '>=0.10.0 <0.11.0'
-  completion: ^0.1.5
   fluri: ^1.1.1
   html: ^0.13.0
   http: ^0.11.0
@@ -28,9 +27,9 @@ dependencies:
   yaml: ^2.1.0
   xml: ^2.4.2
 
-dev_dependencies:
-  coverage: ^0.8.0
-  dartdoc: ^0.13.0
+dev_dependencies:  
+  coverage: '>=0.9.3 <0.11.0'
+  dartdoc: '>=0.14.1 <0.19.0'
   dart_style: ^1.0.7
   test: ^0.12.24
 

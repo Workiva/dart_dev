@@ -182,12 +182,12 @@ void main() {
 
     test('should run tests that require a Pub server', () async {
       expect(await runTests(projectThatNeedsPubServe), equals(1));
-    });
+    }, tags: 'no-dart2');
 
     test('should run tests that provides a Pub server', () async {
       expect(await runTests(projectThatNeedsPubServe, runCustomPubServe: true),
           equals(1));
-    });
+    }, tags: 'no-dart2');
 
     test('should run tests with test name specified', () async {
       expect(await runTests(projectWithPassingTests, testName: 'passes'),
@@ -202,6 +202,6 @@ void main() {
     test('should allow you to specify a web-compiler', () async {
       expect(await runTests(projectThatNeedsPubServe, webCompiler: 'dartdevc'),
           equals(1));
-    });
+    }, tags: 'no-dart2');
   });
 }

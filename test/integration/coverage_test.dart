@@ -119,5 +119,5 @@ void main() {
 //      expect(await runCoverage(projectWithVmTests, html: false), isTrue);
 //      MockPlatformUtil.uninstall();
 //    });
-  });
+  }, tags: 'no-dart2');
 }
