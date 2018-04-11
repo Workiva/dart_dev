@@ -124,8 +124,7 @@ class TestCli extends TaskCli {
     // CLI user can filter tests by name.
     bool testNamed = parsedArgs['name'] != null;
 
-    var webCompiler = TaskCli.valueOf(
-        'web-compiler', parsedArgs, config.test.pubServeWebCompiler);
+    bool compilerSpecified = parsedArgs['web-compiler'] != null;
 
     if (!individualTestsSpecified && !unit && !integration && !functional) {
       return new CliResult.fail(
@@ -179,7 +178,9 @@ class TestCli extends TaskCli {
       if (!isPubServeRunning) {
         // Start `pub serve` on the `test` directory
         var additionalArgs = ['test'];
-        additionalArgs.add('--web-compiler=$webCompiler');
+        if (compilerSpecified) {
+          additionalArgs.add('--web-compiler=${parsedArgs['web-compiler']}');
+        }
 
         pubServeTask =
             startPubServe(port: pubServePort, additionalArgs: additionalArgs);
