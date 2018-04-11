@@ -186,7 +186,9 @@ void main() {
     });
 
     test('should run tests that provides a Pub server', () async {
-      expect(await runTests(projectThatNeedsPubServe, runCustomPubServe: true),
+      expect(
+          await runTests(projectThatNeedsPubServe,
+              runCustomPubServe: true, pubServePort: 58832),
           equals(1));
     });
 
