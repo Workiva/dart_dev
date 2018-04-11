@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:js';
 
+import 'package:dart2_constant/convert.dart' as convert;
 import 'package:platform_detect/platform_detect.dart';
 import 'package:fluri/fluri.dart';
 import 'package:rxdart/rxdart.dart';
@@ -94,7 +95,7 @@ main() async {
       };
 
       var message = lastStatus.otherLogs.join('\n');
-      if (!message.isEmpty) {
+      if (message.isNotEmpty) {
         test['message'] = message;
       }
 
@@ -185,7 +186,7 @@ String getTestPlatform({bool friendlyName: false}) {
 /// can be used to check results and perform truncation when necessary to keep Sauce Labs happy.
 bool isAboveMaxResultSize(Map globalTestResults) {
   const int maxResultsSize = 15000; // Actually somewhere >16100, <16500
-  final int testResultsSize = JSON.encode(globalTestResults).length;
+  final int testResultsSize = convert.json.encode(globalTestResults).length;
 
   return testResultsSize > maxResultsSize;
 }
@@ -394,7 +395,8 @@ String ansiHtml(String ansiText) {
       currentColor = ansiCodesToClasses[code];
     }
   }, onNonMatch: (String textMatch) {
-    var contents = const HtmlEscape(HtmlEscapeMode.ELEMENT).convert(textMatch);
+    var contents =
+        const HtmlEscape(convert.HtmlEscapeMode.element).convert(textMatch);
     if (currentColor != null) {
       pieces.add('<span class="$currentColor">$contents</span>');
     } else {

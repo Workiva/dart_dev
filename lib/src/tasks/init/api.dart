@@ -58,6 +58,7 @@ InitTask init() {
 }
 
 class InitTask extends Task {
-  final Future done = new Future.value();
+  @override
+  final Future<Null> done = new Future<Null>.value();
   InitTask();
 }

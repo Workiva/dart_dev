@@ -22,10 +22,13 @@ import 'package:dart_dev/src/tasks/init/api.dart';
 import 'package:dart_dev/src/tasks/cli.dart';
 
 class InitCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser();
 
+  @override
   final String command = 'init';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     InitTask task = init();
     await task.done;

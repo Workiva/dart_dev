@@ -22,14 +22,14 @@ String sauceResultsToXunitXml(Map results, {bool prettyXml: true}) {
         builder.element('testsuite', attributes: {
           'name': suite['name'],
           'id': suite['url'],
-          'failures': 1,
-          'skipped': 0,
-          'tests': 1,
-          'time': 0,
+          'failures': '1',
+          'skipped': '0',
+          'tests': '1',
+          'time': '0',
         }, nest: () {
           builder.element('testcase', attributes: {
             'name': '',
-            'time': 0,
+            'time': '0',
           }, nest: () {
             builder.element('failure', nest: () {
               builder.cdata('An error occurred while running this suite.\n\n'
@@ -47,7 +47,7 @@ String sauceResultsToXunitXml(Map results, {bool prettyXml: true}) {
         'id': suite['url'],
         'failures': suiteResults['failed'],
         // TODO can we even get a skipped count?
-        'skipped': 0,
+        'skipped': '0',
         'tests': suiteResults['total'],
         'time': suiteResults['duration'],
       }, nest: () {
@@ -78,7 +78,7 @@ String sauceResultsToXunitXml(Map results, {bool prettyXml: true}) {
         if (!reportedAtLeastOneTestCase) {
           builder.element('testcase', attributes: {
             'name': '(all tests in this suite)',
-            'time': 0,
+            'time': '0',
           }, nest: () {
             builder.text('All tests in this suite passed.\n\n'
                 '(Passing tests are ommitted, and this placeholder is here to '

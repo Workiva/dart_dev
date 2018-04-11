@@ -24,10 +24,13 @@ import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
 class CopyLicenseCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser();
 
+  @override
   final String command = 'copy-license';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     List<String> directories = config.copyLicense.directories;
     String licensePath = config.copyLicense.licensePath;

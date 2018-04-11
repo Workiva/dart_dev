@@ -29,6 +29,7 @@ import 'package:dart_dev/src/tasks/test/config.dart';
 import 'package:dart_dev/src/util.dart' show runAll;
 
 class TestCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser()
     ..addFlag('unit', defaultsTo: null, help: 'Includes the unit test suite.')
     ..addFlag('integration',
@@ -65,14 +66,17 @@ class TestCli extends TaskCli {
     ..addOption('web-compiler',
         abbr: 'w', help: ' The JavaScript compiler to use to serve the tests.');
 
+  @override
   final String command = 'test';
 
+  @override
   String get usage => '${super.usage} [files or directories...]';
 
   bool isExplicitlyFalse(bool value) {
     return value != null && value == false;
   }
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (!platform_util.hasImmediateDependency('test'))
       return new CliResult.fail(

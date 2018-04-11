@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:dart2_constant/convert.dart' as convert;
 import 'package:resource/resource.dart' as resource;
 
 import 'package:dart_dev/src/tasks/task.dart';
@@ -24,7 +24,7 @@ BashCompletionTask bashCompletion() {
   BashCompletionTask task = new BashCompletionTask(done.future);
 
   var script = new resource.Resource('package:dart_dev/bash-completion.sh');
-  script.readAsString(encoding: UTF8).then((content) {
+  script.readAsString(encoding: convert.utf8).then((content) {
     task
       ..completionScript = content
       ..successful = true;
@@ -37,7 +37,8 @@ BashCompletionTask bashCompletion() {
 }
 
 class BashCompletionTask extends Task {
-  final Future done;
+  @override
+  final Future<Null> done;
   String completionScript;
-  BashCompletionTask(Future this.done);
+  BashCompletionTask(Future<Null> this.done);
 }

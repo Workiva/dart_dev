@@ -50,9 +50,11 @@ class MockPlatformUtil implements PlatformUtil {
     projectDependencies = new Map.from(_defaultProjectDependencies);
   }
 
+  @override
   bool hasImmediateDependency(String packageName) =>
       projectDependencies.containsKey(packageName);
 
+  @override
   Future<bool> isExecutableInstalled(String executable) async =>
       installedExecutables.contains(executable);
 }

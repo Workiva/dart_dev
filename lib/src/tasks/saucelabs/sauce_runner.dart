@@ -3,15 +3,15 @@
 library dart_dev.src.tasks.saucelabs.sauce_runner;
 
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:dart2_constant/convert.dart' as convert;
 import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/util.dart';
 import 'package:http/http.dart';
 
-import 'sauce_unit_test_driver.dart';
 import 'platforms.dart';
 import 'sauce_api.dart';
+import 'sauce_unit_test_driver.dart';
 
 export 'platforms.dart';
 
@@ -162,7 +162,7 @@ Future<List<SauceTestHarness>> getTestHarnesses(
 
     var harnessPath = '$testPath.sauce_browser_test.html';
     var harnessAbsolutePath = '/$harnessPath';
-    var dartScripts = JSON.decode((await get(
+    var dartScripts = convert.json.decode((await get(
             '$pubServerBaseUrl$testPath.dart_file_list.json',
             headers: {'Accept': 'application/json'}))
         .body);

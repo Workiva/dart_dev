@@ -29,6 +29,7 @@ class CoverageTestSuiteException implements Exception {
   final String message;
   CoverageTestSuiteException(String testSuite)
       : this.message = 'Test suite has failing tests: $testSuite';
+  @override
   String toString() => 'CoverageTestSuiteException: $message';
 }
 
@@ -36,5 +37,6 @@ class CoverageTestSuiteException implements Exception {
 /// required "lcov" dependency being installed.
 class MissingLcovException implements Exception {
   final String message = missingLcovMessage;
+  @override
   String toString() => 'MissingLcovException: $message';
 }

@@ -25,12 +25,15 @@ import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/docs/api.dart';
 
 class DocsCli extends TaskCli {
+  @override
   ArgParser argParser = new ArgParser()
     ..addFlag('open',
         defaultsTo: true, help: 'Opens the docs site after being generated.');
 
+  @override
   final String command = 'docs';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (!hasImmediateDependency('dartdoc'))
       return new CliResult.fail(

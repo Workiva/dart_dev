@@ -15,9 +15,9 @@
 library dart_dev.src.tasks.coverage.api;
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart2_constant/convert.dart' as convert;
 import 'package:dart_dev/util.dart' show TaskProcess, getOpenPort;
 import 'package:path/path.dart' as path;
 
@@ -43,20 +43,20 @@ class CoverageResult extends TaskResult {
   CoverageResult.fail(
       Iterable<String> this.tests, File this.collection, File this.lcov,
       {Directory report})
-      : super.fail(),
-        this.report = report,
+      : this.report = report,
         reportIndex = report != null
             ? new File(path.join(report.path, 'index.html'))
-            : null;
+            : null,
+        super.fail();
 
   CoverageResult.success(
       Iterable<String> this.tests, File this.collection, File this.lcov,
       {Directory report})
-      : super.success(),
-        this.report = report,
+      : this.report = report,
         reportIndex = report != null
             ? new File(path.join(report.path, 'index.html'))
-            : null;
+            : null,
+        super.success();
 }
 
 class CoverageTask extends Task {
@@ -170,7 +170,6 @@ class CoverageTask extends Task {
         List<FileSystemEntity> children = dir.listSync(recursive: true);
         Iterable<FileSystemEntity> validTests =
             children.where((FileSystemEntity e) {
-          Uri uri = Uri.parse(e.absolute.path);
           return (
               // Is a file, not a directory.
               e is File &&
@@ -189,6 +188,7 @@ class CoverageTask extends Task {
 
   /// Completes when the coverage collection, formatting, and optional report
   /// generation has finished. Completes with a [CoverageResult] instance.
+  @override
   Future<CoverageResult> get done => _done.future;
 
   /// Combination of the underlying process stderrs, including individual test
@@ -223,7 +223,7 @@ class CoverageTask extends Task {
     PubServeInfo serveInfo;
 
     if (pubServe) {
-      pubServeTask = await _startServeForCoverage();
+      pubServeTask = _startServeForCoverage();
       serveInfo = await pubServeTask.serveInfos.first;
     }
 
@@ -365,12 +365,12 @@ class CoverageTask extends Task {
     if (collections.isEmpty)
       throw new ArgumentError('Cannot merge an empty list of coverages.');
 
-    Map mergedJson = JSON.decode(collections.first.readAsStringSync());
+    Map mergedJson = convert.json.decode(collections.first.readAsStringSync());
     for (int i = 1; i < collections.length; i++) {
       if (!collections[i].existsSync()) continue;
       String coverage = collections[i].readAsStringSync();
       if (coverage.isNotEmpty) {
-        Map coverageJson = JSON.decode(coverage);
+        Map coverageJson = convert.json.decode(coverage);
         mergedJson['coverage'].addAll(coverageJson['coverage']);
       }
     }
@@ -381,7 +381,7 @@ class CoverageTask extends Task {
       coverage.deleteSync();
     }
     coverage.createSync();
-    coverage.writeAsStringSync(JSON.encode(mergedJson));
+    coverage.writeAsStringSync(convert.json.encode(mergedJson));
     return coverage;
   }
 

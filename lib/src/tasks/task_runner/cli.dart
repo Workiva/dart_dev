@@ -9,13 +9,16 @@ import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
 class TaskRunnerCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser()
     ..addOption('config',
         help:
             'Configuration options should be performed in local dev.dart file');
 
+  @override
   final String command = 'task-runner';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     List<String> tasksToRun = config.taskRunner.tasksToRun;
 

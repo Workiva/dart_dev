@@ -20,10 +20,13 @@ import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/util.dart' show reporter;
 
 class ExportConfigCli extends TaskCli {
+  @override
   ArgParser argParser = new ArgParser();
 
+  @override
   final String command = 'export-config';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     reporter.log(new JsonEncoder.withIndent('  ', (obj) {
       // Attempt to convert the config into JSON.

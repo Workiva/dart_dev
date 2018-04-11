@@ -15,9 +15,9 @@
 @TestOn('vm')
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart2_constant/convert.dart' as convert;
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
@@ -48,7 +48,7 @@ void main() {
 
       var json;
       expect(() {
-        json = JSON.decode(output);
+        json = convert.json.decode(output);
       }, returnsNormally);
 
       expect(json, const isInstanceOf<Map>());
@@ -56,7 +56,8 @@ void main() {
 
     test('should emit JSON with default config for projects without a dev.dart',
         () async {
-      var json = JSON.decode(await exportConfigForProject(projectWithNoConfig));
+      var json = convert.json
+          .decode(await exportConfigForProject(projectWithNoConfig));
 
       // Just test the format task for now, since it's currently
       // the only config with serialization implemented.
@@ -71,7 +72,8 @@ void main() {
     });
 
     test('should emit JSON that includes custom config values', () async {
-      var json = JSON.decode(await exportConfigForProject(projectWithConfig));
+      var json =
+          convert.json.decode(await exportConfigForProject(projectWithConfig));
 
       // Just test the format task for now, since it's currently
       // the only config with serialization implemented.

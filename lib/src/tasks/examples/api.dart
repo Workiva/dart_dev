@@ -65,7 +65,8 @@ ExamplesTask serveExamples(
 }
 
 class ExamplesTask extends Task {
-  final Future done;
+  @override
+  final Future<Null> done;
   final String dartiumCommand;
   final String pubServeCommand;
 
@@ -73,8 +74,8 @@ class ExamplesTask extends Task {
   StreamController<String> _pubServeStdOut = new StreamController();
   StreamController<String> _pubServeStdErr = new StreamController();
 
-  ExamplesTask(String this.dartiumCommand, String this.pubServeCommand,
-      Future this.done) {
+  ExamplesTask(
+      String this.dartiumCommand, String this.pubServeCommand, this.done) {
     done.then((_) {
       _dartiumOutput.close();
       _pubServeStdOut.close();

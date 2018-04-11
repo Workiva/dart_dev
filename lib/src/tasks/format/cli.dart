@@ -27,6 +27,7 @@ import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
 class FormatCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser()
     ..addFlag('check',
         defaultsTo: defaultCheck,
@@ -36,10 +37,13 @@ class FormatCli extends TaskCli {
     ..addOption('line-length',
         abbr: 'l', defaultsTo: '80', help: 'Wrap lines longer than this.');
 
+  @override
   final String command = 'format';
 
+  @override
   String get usage => '${super.usage} [files or directories...]';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     try {
       if (!platform_util.hasImmediateDependency('dart_style'))

@@ -3,7 +3,6 @@ sudo: required
 
 dart:
   - stable
-  - dev
 
 addons:
   apt:

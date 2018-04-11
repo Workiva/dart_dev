@@ -15,9 +15,9 @@
 library dart_dev.src.tools.selenium;
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart2_constant/convert.dart' as convert;
 import 'package:uuid/uuid.dart';
 
 import 'package:dart_dev/src/task_process.dart';
@@ -105,12 +105,12 @@ class SeleniumHelper {
       WebSocket ws = await WebSocket.connect('ws://127.0.0.1:$port/ws');
       var uuid = _uuidGenerator.v1();
       ws.listen((message) {
-        var response = JSON.decode(message);
+        var response = convert.json.decode(message);
         c.complete(response['result'] != null &&
             response['result']['isolates'] is List &&
             response['result']['isolates'].isNotEmpty);
       });
-      ws.add(JSON.encode({
+      ws.add(convert.json.encode({
         'jsonrpc': '2.0',
         'method': 'getVM',
         'params': {},
@@ -145,7 +145,7 @@ class SeleniumHelper {
         _observatoryPorts.add(int.parse(m.group(2)));
       } else if (line.contains(_seleniumPortBoundPattern)) {
         var port = _seleniumPortBoundPattern.firstMatch(line).group(1);
-        await _seleniumProcess.kill();
+        _seleniumProcess.kill();
         throw new StateError(
             '$seleniumServerExecutable failed to start: port $port is already taken.');
       } else if (line.contains(_seleniumStartedPattern)) {

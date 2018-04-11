@@ -26,6 +26,7 @@ import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
 class AnalyzeCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser()
     ..addFlag('fatal-warnings',
         defaultsTo: defaultFatalWarnings,
@@ -46,8 +47,10 @@ class AnalyzeCli extends TaskCli {
         negatable: true,
         help: 'Treat lints as fatal.');
 
+  @override
   final String command = 'analyze';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     List<String> entryPoints = config.analyze.entryPoints;
     bool fatalWarnings = TaskCli.valueOf(

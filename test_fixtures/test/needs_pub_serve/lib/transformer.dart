@@ -7,6 +7,7 @@ import 'package:barback/barback.dart';
 class FalseToTrueTransformer extends Transformer {
   FalseToTrueTransformer.asPlugin();
 
+  @override
   String get allowedExtensions => '.dart';
 
   @override
