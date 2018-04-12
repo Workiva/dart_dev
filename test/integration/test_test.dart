@@ -19,6 +19,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart2_constant/convert.dart' as convert;
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
@@ -61,7 +62,7 @@ Future<int> runTests(String projectPath,
     Completer completer = new Completer();
 
     pubServeProcess.stdout
-        .transform(UTF8.decoder)
+        .transform(convert.utf8.decoder)
         .transform(new LineSplitter())
         .listen((var line) {
       if (line.contains('Build completed successfully')) {
@@ -185,7 +186,9 @@ void main() {
     });
 
     test('should run tests that provides a Pub server', () async {
-      expect(await runTests(projectThatNeedsPubServe, runCustomPubServe: true),
+      expect(
+          await runTests(projectThatNeedsPubServe,
+              runCustomPubServe: true, pubServePort: 58832),
           equals(1));
     });
 

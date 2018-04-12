@@ -28,6 +28,7 @@ import 'package:dart_dev/src/tasks/saucelabs/sauce_runner.dart' as sauceRunner;
 import 'package:dart_dev/src/tasks/saucelabs/xml_reporter.dart';
 
 class SauceRunnerCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser()
     ..addOption('build-name',
         abbr: 'b', defaultsTo: 'saucelabs', help: 'Build name for the run.')
@@ -38,11 +39,13 @@ class SauceRunnerCli extends TaskCli {
     ..addOption('sauce-tunnel-identifier',
         abbr: 'i', help: 'Identifier to use in sauce tunnel creation.');
 
+  @override
   final String command = 'saucelabs';
 
   final String sauceAccessKey = env['SAUCE_ACCESS_KEY'];
   final String sauceUserName = env['SAUCE_USERNAME'];
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (sauceUserName == null || sauceAccessKey == null) {
       return new CliResult.fail('Sauce Labs credentials must be available via '

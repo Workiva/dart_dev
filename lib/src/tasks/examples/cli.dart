@@ -26,6 +26,7 @@ import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/src/tasks/config.dart';
 
 class ExamplesCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser()
     ..addOption('hostname',
         defaultsTo: defaultHostname, help: 'The host name to listen on.')
@@ -33,8 +34,10 @@ class ExamplesCli extends TaskCli {
         defaultsTo: defaultPort.toString(),
         help: 'The base port to listen on.');
 
+  @override
   final String command = 'examples';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     String hostname =
         TaskCli.valueOf('hostname', parsedArgs, config.examples.hostname);

@@ -30,6 +30,7 @@ class GenResultGroup {
 }
 
 class GenTestRunnerCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser()
     ..addFlag('check',
         defaultsTo: defaultCheck,
@@ -39,8 +40,10 @@ class GenTestRunnerCli extends TaskCli {
         help:
             'Configuration options should be performed in local dev.dart file');
 
+  @override
   final String command = 'gen-test-runner';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     GenResultGroup results = new GenResultGroup();
 

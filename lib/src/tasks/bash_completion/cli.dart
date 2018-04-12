@@ -21,10 +21,13 @@ import 'package:dart_dev/src/tasks/cli.dart';
 import 'package:dart_dev/util.dart' show reporter;
 
 class BashCompletionCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser();
 
+  @override
   final String command = 'bash-completion';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     // This is kind of a hack to suppress output coloring, which messes us up since
     // we're outputting shell code (the control sequences are syntax errors).

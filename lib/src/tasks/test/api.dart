@@ -46,7 +46,7 @@ TestTask test(
   // TODO: Use this pattern to better parse the test summary even when the output is colorized
   // RegExp resultPattern = new RegExp(r'(\d+:\d+) \+(\d+) ?~?(\d+)? ?-?(\d+)?: (All|Some) tests (failed|passed)');
 
-  StreamController stdoutc = new StreamController();
+  StreamController<String> stdoutc = new StreamController<String>();
   process.stdout.listen((line) async {
     stdoutc.add(line);
     if ((line.contains('All tests passed!') ||
@@ -76,13 +76,14 @@ TestTask test(
 }
 
 class TestTask extends Task {
-  final Future done;
+  @override
+  final Future<Null> done;
   final String testCommand;
   String testSummary;
 
   StreamController<String> _testOutput = new StreamController();
 
-  TestTask(String this.testCommand, Future this.done);
+  TestTask(String this.testCommand, this.done);
 
   Stream<String> get testOutput => _testOutput.stream;
 }

@@ -22,6 +22,7 @@ import 'package:yaml/yaml.dart';
 import 'package:dart_dev/src/platform_util/platform_util.dart';
 
 class StandardPlatformUtil implements PlatformUtil {
+  @override
   bool hasImmediateDependency(String packageName) {
     File pubspec = new File('pubspec.yaml');
     Map pubspecYaml = loadYaml(pubspec.readAsStringSync());
@@ -35,6 +36,7 @@ class StandardPlatformUtil implements PlatformUtil {
     return deps.contains(packageName);
   }
 
+  @override
   Future<bool> isExecutableInstalled(String executable) async {
     ProcessResult result = await Process.run('which', [executable]);
     return result.exitCode == 0;

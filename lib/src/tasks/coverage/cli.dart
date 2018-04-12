@@ -31,6 +31,7 @@ import 'package:dart_dev/src/tasks/test/config.dart';
 import 'package:dart_dev/src/util.dart' show runAll;
 
 class CoverageCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser()
     ..addFlag('unit',
         defaultsTo: defaultUnit, help: 'Includes the unit test suite.')
@@ -53,8 +54,10 @@ class CoverageCli extends TaskCli {
         defaultsTo: true,
         help: 'Open the HTML report automatically.');
 
+  @override
   final String command = 'coverage';
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     if (!platform_util.hasImmediateDependency('coverage'))
       return new CliResult.fail(

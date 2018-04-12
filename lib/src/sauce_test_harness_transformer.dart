@@ -28,10 +28,10 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:barback/barback.dart';
+import 'package:dart2_constant/convert.dart' as convert;
 import 'package:fluri/fluri.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -64,6 +64,7 @@ import 'package:path/path.dart' as p;
 ///
 class SauceTestHarnessTransformer extends Transformer
     implements DeclaringTransformer {
+  @override
   final allowedExtensions = '.dart .html';
 
   static const String sauceDartExtension = '.sauce_browser_test.dart';
@@ -77,6 +78,7 @@ class SauceTestHarnessTransformer extends Transformer
 
   SauceTestHarnessTransformer.asPlugin();
 
+  @override
   void declareOutputs(DeclaringTransform transform) {
     var id = transform.primaryId;
 
@@ -90,6 +92,7 @@ class SauceTestHarnessTransformer extends Transformer
 
   var proxied = true;
 
+  @override
   Future apply(Transform transform) async {
     var id = transform.primaryInput.id;
 
@@ -98,7 +101,7 @@ class SauceTestHarnessTransformer extends Transformer
       await generateHtml(transform);
     } else if (id.extension == '.dart' &&
         !proxiedIframeRunnerFiles.contains(id.path)) {
-      await generateDart(transform);
+      generateDart(transform);
     }
 
     if (!proxiedIframeRunnerFiles.contains(id.path) && proxied) {
@@ -165,7 +168,8 @@ class SauceTestHarnessTransformer extends Transformer
         id.addExtension(sauceHtmlExtension), html.outerHtml));
 
     transform.addOutput(new Asset.fromString(
-        id.addExtension(sauceDartListExtension), JSON.encode(dartScripts)));
+        id.addExtension(sauceDartListExtension),
+        convert.json.encode(dartScripts)));
   }
 
   void generateDart(Transform transform) {

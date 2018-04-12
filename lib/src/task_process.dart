@@ -18,6 +18,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart2_constant/convert.dart' as convert;
+
 class TaskProcess {
   Completer _donec = new Completer();
   Completer _errc = new Completer();
@@ -35,11 +37,11 @@ class TaskProcess {
         .then((process) {
       _process = process;
       process.stdout
-          .transform(UTF8.decoder)
+          .transform(convert.utf8.decoder)
           .transform(new LineSplitter())
           .listen(_stdout.add, onDone: _outc.complete);
       process.stderr
-          .transform(UTF8.decoder)
+          .transform(convert.utf8.decoder)
           .transform(new LineSplitter())
           .listen(_stderr.add, onDone: _errc.complete);
       _outc.future.then((_) => _stdout.close());

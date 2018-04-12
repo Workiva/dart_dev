@@ -38,12 +38,13 @@ LocalTask local(String executable, Iterable<String> args) {
 }
 
 class LocalTask extends Task {
-  final Future done;
+  @override
+  final Future<Null> done;
   final String localCommand;
 
   StreamController<String> _commandOutput = new StreamController();
 
-  LocalTask(String this.localCommand, Future this.done);
+  LocalTask(String this.localCommand, this.done);
 
   Stream<String> get localOutput => _commandOutput.stream;
 }

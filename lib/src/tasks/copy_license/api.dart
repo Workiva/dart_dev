@@ -126,7 +126,8 @@ String trimLeadingAndTrailingEmptyLines(String input) {
 
 class CopyLicenseTask extends Task {
   List<String> affectedFiles = [];
-  final Future done = new Future.value();
+  @override
+  final Future<Null> done = new Future<Null>.value();
   CopyLicenseTask();
 }
 

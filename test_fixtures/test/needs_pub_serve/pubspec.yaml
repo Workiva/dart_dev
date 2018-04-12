@@ -3,8 +3,8 @@ version: 0.0.0
 dev_dependencies:
   dart_dev:
     path: ../../..
-  test: "^0.12.0"
-  barback: "^0.15.2"
+  test: ^0.12.33
+  barback: ^0.15.2
 transformers:
   # Add the necessary `test` package transformer
   # See https://github.com/dart-lang/test#testing-with-barback

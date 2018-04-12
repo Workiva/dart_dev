@@ -14,8 +14,8 @@
 
 library dart_dev.src.tasks.local.cli;
 
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:path/path.dart';
@@ -43,7 +43,9 @@ Function _commandPatternMatcher(String pattern) => (FileSystemEntity entity) =>
     new RegExp(pattern).hasMatch(basename(entity.path));
 
 class LocalCli extends TaskCli {
+  @override
   final ArgParser argParser = new ArgParser();
+  @override
   final String command;
   final Executable executable;
   final List<String> originalArgs;
@@ -58,8 +60,8 @@ class LocalCli extends TaskCli {
         .where(_commandPatternMatcher(config.local.commandFilePattern));
 
     return commandFiles
-        .map(_commandParser(config.local.commandFilePattern))
-        .fold({}, (Map m, Executable c) {
+        .map<Executable>(_commandParser(config.local.commandFilePattern))
+        .fold({}, (Map<String, Executable> m, Executable c) {
       m[c.name] = c;
       return m;
     });
@@ -67,6 +69,7 @@ class LocalCli extends TaskCli {
 
   LocalCli(this.command, this.executable, {List<String> this.originalArgs});
 
+  @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     var executableParams = config.local.executables[executable.extension];
 
