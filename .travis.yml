@@ -39,10 +39,12 @@ before_install:
   -  sh -e /etc/init.d/xvfb start
 
 script:
+  - pub run dependency_validator -i browser,coverage,dart_style,dartdoc,test
   - pub run dart_dev format --check
   - pub run dart_dev analyze
   - cd test_fixtures/coverage/functional_test/
   - pub get
+  - pub run dependency_validator -i browser,coverage
   - pub build
   - cd -
   - pub run dart_dev test --integration
