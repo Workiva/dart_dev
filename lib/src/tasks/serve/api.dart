@@ -28,7 +28,7 @@ final RegExp _servingRegExp =
 /// If [port] is 0, `pub serve` will pick its own port automatically.
 PubServeTask startPubServe({int port: 0, List<String> additionalArgs}) {
   var pubServeExecutable = 'pub';
-  var pubServeArgs = ['serve', '--port=$port'];
+  var pubServeArgs = ['run', 'dart_build', 'serve', '--port=$port'];
   if (additionalArgs != null) {
     pubServeArgs.addAll(additionalArgs);
   }

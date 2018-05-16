@@ -29,6 +29,11 @@ dependencies:
   xml: ^2.4.2
 
 dev_dependencies:
+  dart_build:
+    git:
+      url: git://github.com/Workiva/dart_build.git
+      ref: initial_dart1_functionality # uncomment this one for Dart 1
+      #ref: dart2 # uncomment this one for Dart 2
   coverage: '>=0.9.3 <0.11.0'
   dartdoc: '>=0.14.1 <0.19.0'
   dart_style: ^1.0.7
@@ -38,8 +43,8 @@ dev_dependencies:
 executables:
   dart_dev:
 
-environment:
-  sdk: '>=1.9.0 <2.0.0'
+# environment: # Commented out to allow installing under both Dart 1 and Dart 2
+  # sdk: '>=1.9.0 <2.0.0'
 
 transformers:
   - test/pub_serve:
