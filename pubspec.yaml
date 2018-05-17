@@ -39,8 +39,8 @@ dev_dependencies:
 executables:
   dart_dev:
 
-# environment: # Commented out to allow installing under both Dart 1 and Dart 2
-  # sdk: '>=1.9.0 <2.0.0'
+environment:
+  sdk: '>=1.9.0 <=2.0.0'
 
 transformers:
   - test/pub_serve:
