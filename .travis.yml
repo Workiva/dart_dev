@@ -44,7 +44,7 @@ script:
   - pub run dart_dev analyze
   - cd test_fixtures/coverage/functional_test/
   - pub get
-  - pub run dependency_validator -i browser,coverage
+  - pub run dependency_validator -i browser,coverage,dart_build
   - pub run dart_build build
   - cd -
   - pub run dart_dev test --integration
