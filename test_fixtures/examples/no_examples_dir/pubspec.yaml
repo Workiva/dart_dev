@@ -3,3 +3,4 @@ name: no_examples_dir
   dev_dependencies:
     dart_dev:
     path: ../../..
+  dart_build: ^0.1.0

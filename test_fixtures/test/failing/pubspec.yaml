@@ -4,3 +4,4 @@ dev_dependencies:
   dart_dev:
     path: ../../..
   test: ^0.12.33
+  dart_build: ^0.1.0
