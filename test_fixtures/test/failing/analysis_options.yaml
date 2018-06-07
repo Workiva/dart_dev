@@ -24,8 +24,8 @@ linter:
     # Declare method return types.
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false
-    # 0 issues
-    - always_declare_return_types
+    # FIXME: 1 lint(s)
+    # - always_declare_return_types
 
     # Separate the control structure expression from its statement.
     # recommendation: optional
@@ -44,8 +44,8 @@ linter:
 
     # Specify type annotations.
     # recommendation: recommended
-    # 0 issues
-    - always_specify_types
+    # FIXME: 2 lint(s)
+    # - always_specify_types
 
     # Annotate overridden members.
     # recommendation: required
@@ -293,7 +293,7 @@ linter:
     # recommendation: avoid
     # reason: Conflicts with always_specify_types. Recommend commenting this one out.
     # 0 issues
-    - omit_local_variable_types
+    # - omit_local_variable_types
 
     # Avoid defining a one-member abstract class when a simple function will do.
     # recommendation: optional
@@ -490,8 +490,8 @@ linter:
     # Type annotate public APIs.
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false. Use overrides.
-    # 0 issues
-    - type_annotate_public_apis
+    # FIXME: 1 lint(s)
+    # - type_annotate_public_apis
 
     # Don't type annotate initializing formals.
     # recommendation: optional
