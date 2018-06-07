@@ -1,0 +1,582 @@
+# analysis_options.yaml docs: https://www.dartlang.org/guides/language/analysis-options 
+analyzer:
+  # Strong mode is required. Applies to the current project.
+  strong-mode:
+    # When compiling to JS, both implicit options apply to the current 
+    # project and all dependencies. They are useful to find possible 
+    # Type fixes or areas for explicit typing.
+    implicit-casts: true
+    implicit-dynamic: true
+
+# ALL lint rules are included. Unused lints should be commented
+# out with a reason. An up to date list of all options is here
+# http://dart-lang.github.io/linter/lints/options/options.html
+# Descriptions of each rule is here http://dart-lang.github.io/linter/lints/
+#
+# To ignore a lint rule on a case by case basic in code just add a comment
+# above it or at the end of the line like: // ignore: <linter rule>
+# example: // ignore: invalid_assignment, const_initialized_with_non_constant_value
+#
+# More info about configuring analysis_options.yaml files
+# https://www.dartlang.org/guides/language/analysis-options#excluding-lines-within-a-file
+linter:
+  rules:
+    # Declare method return types.
+    # recommendation: recommended
+    # reason: React component render() method can return either ReactElement or false
+    # FIXME: 1 lint(s)
+    # - always_declare_return_types
+
+    # Separate the control structure expression from its statement.
+    # recommendation: optional
+    # 0 issues
+    - always_put_control_body_on_new_line
+
+    # Put @required named parameters first.
+    # recommendation: recommended
+    # 0 issues
+    - always_put_required_named_parameters_first
+
+    # Use @required.
+    # recommendation: recommended
+    # 0 issues
+    - always_require_non_null_named_parameters
+
+    # Specify type annotations.
+    # recommendation: recommended
+    # 0 issues
+    - always_specify_types
+
+    # Annotate overridden members.
+    # recommendation: required
+    # 0 issues
+    - annotate_overrides
+
+    # Avoid annotating with dynamic when not required.
+    # recommendation: optional
+    # 0 issues
+    - avoid_annotating_with_dynamic
+
+    # Avoid using `as`.
+    # recommendation: optional
+    # 0 issues
+    - avoid_as
+
+    # Avoid bool literals in conditional expressions.
+    # recommendation: optional
+    # 0 issues
+    - avoid_bool_literals_in_conditional_expressions
+
+    # Avoid catches without on clauses.
+    # recommendation: optional
+    # 0 issues
+    - avoid_catches_without_on_clauses
+
+    # Don't explicitly catch Error or types that implement it.
+    # recommendation: optional
+    # 0 issues
+    - avoid_catching_errors
+
+    # Avoid defining a class that contains only static members.
+    # recommendation: recommended
+    # 0 issues
+    - avoid_classes_with_only_static_members
+
+    # Avoid empty else statements.
+    # recommendation: required
+    # 0 issues
+    - avoid_empty_else
+
+    # Avoid using `forEach` with a function literal.
+    # recommendation: recommended
+    # reason: Use for (x in y) or forEach(someFunc) instead
+    # 0 issues
+    - avoid_function_literals_in_foreach_calls
+
+    # Don't explicitly initialize variables to null.
+    # recommendation: recommended
+    # 0 issues
+    - avoid_init_to_null
+
+    # Don't check for null in custom == operators.
+    # recommendation: recommended
+    # 0 issues
+    - avoid_null_checks_in_equality_operators
+
+    # Avoid positional boolean parameters.
+    # recommendation: recommended
+    # 0 issues
+    - avoid_positional_boolean_parameters
+
+    # Avoid private typedef functions.
+    # recommendation: optional
+    # 0 issues
+    - avoid_private_typedef_functions
+
+    # Avoid relative imports for files in `lib/`.
+    # recommendation: recommended
+    # reason: JS compilation will be faster without relative imports. Use package imports.
+    # 0 issues
+    - avoid_relative_lib_imports
+
+    # Don't rename parameters of overridden methods.
+    # recommendation: optional
+    # 0 issues
+    - avoid_renaming_method_parameters
+
+    # Avoid return types on setters.
+    # recommendation: required
+    # 0 issues
+    - avoid_return_types_on_setters
+
+    # Avoid returning null from members whose return type is bool, double, int, or num.
+    # recommendation: optional
+    # 0 issues
+    - avoid_returning_null
+
+    # Avoid returning this from methods just to enable a fluent interface.
+    # recommendation: recommended
+    # 0 issues
+    - avoid_returning_this
+
+    # Avoid setters without getters.
+    # recommendation: recommended
+    # 0 issues
+    - avoid_setters_without_getters
+
+    # Avoid single cascade in expression statements.
+    # recommendation: optional
+    # 0 issues
+    - avoid_single_cascade_in_expression_statements
+
+    # Avoid slow async `dart:io` methods.
+    # recommendation: recommended
+    # 0 issues
+    - avoid_slow_async_io
+
+    # Avoid types as parameter names.
+    # recommendation: optional
+    # 0 issues
+    - avoid_types_as_parameter_names
+
+    # Avoid annotating types for function expression parameters.
+    # recommendation: optional
+    # 0 issues
+    - avoid_types_on_closure_parameters
+
+    # Avoid defining unused paramters in constructors.
+    # recommendation: recommended
+    # 0 issues
+    - avoid_unused_constructor_parameters
+
+    # Await only futures.
+    # recommendation: required
+    # 0 issues
+    - await_only_futures
+
+    # Name types using UpperCamelCase.
+    # recommendation: optional
+    # 0 issues
+    - camel_case_types
+
+    # Cancel instances of dart.async.StreamSubscription.
+    # recommendation: required
+    # 0 issues
+    - cancel_subscriptions
+
+    # Cascade consecutive method invocations on the same reference.
+    # recommendation: optional
+    # 0 issues
+    - cascade_invocations
+
+    # Close instances of `dart.core.Sink`.
+    # recommendation: required
+    # 0 issues
+    - close_sinks
+
+    # Only reference in scope identifiers in doc comments.
+    # recommendation: optional
+    # 0 issues
+    - comment_references
+
+    # Prefer using lowerCamelCase for constant names.
+    # recommendation: optional
+    # 0 issues
+    - constant_identifier_names
+
+    # Avoid control flow in finally blocks.
+    # recommendation: required
+    # 0 issues
+    - control_flow_in_finally
+
+    # Adhere to Effective Dart Guide directives sorting conventions.
+    # recommendation: required
+    # FIXME: 1 lint(s)
+    - directives_ordering
+
+    # Avoid empty catch blocks.
+    # recommendation: recommended
+    # 0 issues
+    - empty_catches
+
+    # Use `;` instead of `{}` for empty constructor bodies.
+    # recommendation: recommended
+    # 0 issues
+    - empty_constructor_bodies
+
+    # Avoid empty statements.
+    # recommendation: required
+    # 0 issues
+    - empty_statements
+
+    # Always override `hashCode` if overriding `==`.
+    # recommendation: required
+    # 0 issues
+    - hash_and_equals
+
+    # Don't import implementation files from another package.
+    # recommendation: required
+    # 0 issues
+    - implementation_imports
+
+    # Conditions should not unconditionally evaluate to `true` or to `false`.
+    # recommendation: required
+    # 0 issues
+    - invariant_booleans
+
+    # Invocation of Iterable<E>.contains with references of unrelated types.
+    # recommendation: required
+    # 0 issues
+    - iterable_contains_unrelated_type
+
+    # Join return statement with assignment when possible.
+    # recommendation: optional
+    # 0 issues
+    - join_return_with_assignment
+
+    # Name libraries and source files using `lowercase_with_underscores`.
+    # recommendation: recommended
+    # 0 issues
+    - library_names
+
+    # Use `lowercase_with_underscores` when specifying a library prefix.
+    # recommendation: recommended
+    # 0 issues
+    - library_prefixes
+
+    # Invocation of `remove` with references of unrelated types.
+    # recommendation: required
+    # 0 issues
+    - list_remove_unrelated_type
+
+    # Boolean expression composed only with literals.
+    # recommendation: required
+    # 0 issues
+    - literal_only_boolean_expressions
+
+    # Don't use adjacent strings in list.
+    # recommendation: required
+    # 0 issues
+    - no_adjacent_strings_in_list
+
+    # Don't use more than one case with same value.
+    # recommendation: required
+    # 0 issues
+    - no_duplicate_case_values
+
+    # Name non-constant identifiers using lowerCamelCase.
+    # recommendation: recommended
+    # 0 issues
+    - non_constant_identifier_names
+
+    # Omit type annotations for local variables.
+    # recommendation: avoid
+    # reason: Conflicts with always_specify_types. Recommend commenting this one out.
+    # 0 issues
+    # - omit_local_variable_types
+
+    # Avoid defining a one-member abstract class when a simple function will do.
+    # recommendation: optional
+    # 0 issues
+    - one_member_abstracts
+
+    # Only throw instances of classes extending either Exception or Error.
+    # recommendation: required
+    # 0 issues
+    - only_throw_errors
+
+    # Don't override fields.
+    # recommendation: optional
+    # 0 issues
+    - overridden_fields
+
+    # Provide doc comments for all public APIs.
+    # recommendation: optional
+    # 0 issues
+    - package_api_docs
+
+    # Use `lowercase_with_underscores` for package names.
+    # recommendation: recommended
+    # 0 issues
+    - package_names
+
+    # Prefix library names with the package name and a dot-separated path.
+    # recommendation: recommended
+    # 0 issues
+    - package_prefixed_library_names
+
+    # Don't reassign references to parameters of functions or methods.
+    # recommendation: optional
+    # 0 issues
+    - parameter_assignments
+
+    # Use adjacent strings to concatenate string literals.
+    # recommendation: optional
+    # 0 issues
+    - prefer_adjacent_string_concatenation
+
+    # Prefer putting asserts in initializer list.
+    # recommendation: optional
+    # 0 issues
+    - prefer_asserts_in_initializer_lists
+
+    # Prefer using a boolean as the assert condition.
+    # recommendation: optional
+    # 0 issues
+    - prefer_bool_in_asserts
+
+    # Use collection literals when possible.
+    # recommendation: optional
+    # 0 issues
+    - prefer_collection_literals
+
+    # Prefer using `??=` over testing for null.
+    # recommendation: optional
+    # 0 issues
+    - prefer_conditional_assignment
+
+    # Prefer const with constant constructors.
+    # recommendation: optional
+    # 0 issues
+    - prefer_const_constructors
+
+    # Prefer declare const constructors on `@immutable` classes.
+    # recommendation: optional
+    # 0 issues
+    - prefer_const_constructors_in_immutables
+
+    # Prefer const over final for declarations.
+    # recommendation: recommended
+    # 0 issues
+    - prefer_const_declarations
+
+    # Prefer const literals as parameters of constructors on @immutable classes.
+    # recommendation: optional
+    # 0 issues
+    - prefer_const_literals_to_create_immutables
+
+    # Prefer defining constructors instead of static methods to create instances.
+    # recommendation: optional
+    # 0 issues
+    - prefer_constructors_over_static_methods
+
+    # Use contains for `List` and `String` instances.
+    # recommendation: optional
+    # 0 issues
+    - prefer_contains
+
+    # Prefer equal for default values.
+    # recommendation: optional
+    # 0 issues
+    - prefer_equal_for_default_values
+
+    # Use => for short members whose body is a single return statement.
+    # recommendation: optional
+    # 0 issues
+    - prefer_expression_function_bodies
+
+    # Private field could be final.
+    # recommendation: optional
+    # 0 issues
+    - prefer_final_fields
+
+    # Prefer final for variable declaration if reference is not reassigned.
+    # recommendation: optional
+    # reason: Generates a lot of lint since people use var a lot for local variables.
+    # 0 issues
+    - prefer_final_locals
+
+    # Use `forEach` to only apply a function to all the elements.
+    # recommendation: optional
+    # 0 issues
+    - prefer_foreach
+
+    # Use a function declaration to bind a function to a name.
+    # recommendation: optional
+    # 0 issues
+    - prefer_function_declarations_over_variables
+
+    # Use initializing formals when possible.
+    # recommendation: recommended
+    # 0 issues
+    - prefer_initializing_formals
+
+    # Use interpolation to compose strings and values.
+    # recommendation: optional
+    # 0 issues
+    - prefer_interpolation_to_compose_strings
+
+    # Use `isEmpty` for Iterables and Maps.
+    # recommendation: optional
+    # 0 issues
+    - prefer_is_empty
+
+    # Use `isNotEmpty` for Iterables and Maps.
+    # recommendation: optional
+    # 0 issues
+    - prefer_is_not_empty
+
+    # Prefer single quotes where they won't require escape sequences.
+    # recommendation: optional
+    # 0 issues
+    - prefer_single_quotes
+
+    # Prefer typing uninitialized variables and fields.
+    # recommendation: optional
+    # 0 issues
+    - prefer_typing_uninitialized_variables
+
+    # Document all public members.
+    # recommendation: optional
+    # reason: Can get annoying for React component lifecycle methods, constructors.
+    # 0 issues
+    - public_member_api_docs
+
+    # Property getter recursively returns itself.
+    # recommendation: optional
+    # 0 issues
+    - recursive_getters
+
+    # Prefer using /// for doc comments.
+    # recommendation: recommended
+    # 0 issues
+    - slash_for_doc_comments
+
+    # Sort constructor declarations before method declarations.
+    # recommendation: optional
+    # 0 issues
+    - sort_constructors_first
+
+    # Sort unnamed constructor declarations first.
+    # recommendation: optional
+    # 0 issues
+    - sort_unnamed_constructors_first
+
+    # Place the `super` call last in a constructor initialization list.
+    # recommendation: optional
+    # 0 issues
+    - super_goes_last
+
+    # Test type arguments in operator ==(Object other).
+    # recommendation: required
+    # 0 issues
+    - test_types_in_equals
+
+    # Avoid `throw` in finally block.
+    # recommendation: required
+    # 0 issues
+    - throw_in_finally
+
+    # Type annotate public APIs.
+    # recommendation: recommended
+    # reason: React component render() method can return either ReactElement or false. Use overrides.
+    # FIXME: 1 lint(s)
+    # - type_annotate_public_apis
+
+    # Don't type annotate initializing formals.
+    # recommendation: optional
+    # 0 issues
+    - type_init_formals
+
+    # Await future-returning functions inside async function bodies.
+    # recommendation: recommended
+    # 0 issues
+    - unawaited_futures
+
+    # Avoid using braces in interpolation when not needed.
+    # recommendation: optional
+    # 0 issues
+    - unnecessary_brace_in_string_interps
+
+    # Avoid wrapping fields in getters and setters just to be "safe".
+    # recommendation: optional
+    # 0 issues
+    - unnecessary_getters_setters
+
+    # Don't create a lambda when a tear-off will do.
+    # recommendation: optional
+    # 0 issues
+    - unnecessary_lambdas
+
+    # Avoid null in null-aware assignment.
+    # recommendation: optional
+    # 0 issues
+    - unnecessary_null_aware_assignments
+
+    # Avoid using `null` in `if null` operators.
+    # recommendation: optional
+    # 0 issues
+    - unnecessary_null_in_if_null_operators
+
+    # Don't override a method to do a super method invocation with the same parameters.
+    # recommendation: optional
+    # 0 issues
+    - unnecessary_overrides
+
+    # Unnecessary parenthesis can be removed.
+    # recommendation: optional
+    # 0 issues
+    - unnecessary_parenthesis
+
+    # Avoid using unnecessary statements.
+    # recommendation: required
+    # 0 issues
+    - unnecessary_statements
+
+    # Don't access members with `this` unless avoiding shadowing.
+    # recommendation: recommended
+    # 0 issues
+    - unnecessary_this
+
+    # Equality operator `==` invocation with references of unrelated types.
+    # recommendation: required
+    # reason: Comparing references of a type where neither is a subtype of the other most likely will return false and might not reflect programmer's intent.
+    # 0 issues
+    - unrelated_type_equality_checks
+
+    # Use rethrow to rethrow a caught exception.
+    # recommendation: optional
+    # 0 issues
+    - use_rethrow_when_possible
+
+    # Use a setter for operations that conceptually change a property.
+    # recommendation: optional
+    # 0 issues
+    - use_setters_to_change_properties
+
+    # Use string buffer to compose strings.
+    # recommendation: optional
+    # 0 issues
+    - use_string_buffers
+
+    # Start the name of the method with to/_to or as/_as if applicable.
+    # recommendation: optional
+    # 0 issues
+    - use_to_and_as_if_applicable
+
+    # Use valid regular expression syntax.
+    # recommendation: required
+    # 0 issues
+    - valid_regexps
+
+
