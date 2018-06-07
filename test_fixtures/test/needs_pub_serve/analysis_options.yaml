@@ -7,8 +7,6 @@ analyzer:
     # Type fixes or areas for explicit typing.
     implicit-casts: true
     implicit-dynamic: true
-  exclude:
-    - "test_fixtures"
 
 # ALL lint rules are included. Unused lints should be commented
 # out with a reason. An up to date list of all options is here
@@ -26,13 +24,13 @@ linter:
     # Declare method return types.
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false
-    # FIXME: 2 lint(s)
+    # FIXME: 1 lint(s)
     # - always_declare_return_types
 
     # Separate the control structure expression from its statement.
     # recommendation: optional
     # 0 issues
-    # - always_put_control_body_on_new_line
+    - always_put_control_body_on_new_line
 
     # Put @required named parameters first.
     # recommendation: recommended
@@ -46,7 +44,7 @@ linter:
 
     # Specify type annotations.
     # recommendation: recommended
-    # FIXME: 11 lint(s)
+    # FIXME: 5 lint(s)
     # - always_specify_types
 
     # Annotate overridden members.
@@ -57,12 +55,12 @@ linter:
     # Avoid annotating with dynamic when not required.
     # recommendation: optional
     # 0 issues
-    # - avoid_annotating_with_dynamic
+    - avoid_annotating_with_dynamic
 
     # Avoid using `as`.
     # recommendation: optional
     # 0 issues
-    # - avoid_as
+    - avoid_as
 
     # Avoid bool literals in conditional expressions.
     # recommendation: optional
@@ -72,12 +70,12 @@ linter:
     # Avoid catches without on clauses.
     # recommendation: optional
     # 0 issues
-    # - avoid_catches_without_on_clauses
+    - avoid_catches_without_on_clauses
 
     # Don't explicitly catch Error or types that implement it.
     # recommendation: optional
     # 0 issues
-    # - avoid_catching_errors
+    - avoid_catching_errors
 
     # Avoid defining a class that contains only static members.
     # recommendation: recommended
@@ -93,12 +91,12 @@ linter:
     # recommendation: recommended
     # reason: Use for (x in y) or forEach(someFunc) instead
     # 0 issues
-    # - avoid_function_literals_in_foreach_calls
+    - avoid_function_literals_in_foreach_calls
 
     # Don't explicitly initialize variables to null.
     # recommendation: recommended
     # 0 issues
-    # - avoid_init_to_null
+    - avoid_init_to_null
 
     # Don't check for null in custom == operators.
     # recommendation: recommended
@@ -108,7 +106,7 @@ linter:
     # Avoid positional boolean parameters.
     # recommendation: recommended
     # 0 issues
-    # - avoid_positional_boolean_parameters
+    - avoid_positional_boolean_parameters
 
     # Avoid private typedef functions.
     # recommendation: optional
@@ -164,7 +162,7 @@ linter:
     # Avoid annotating types for function expression parameters.
     # recommendation: optional
     # 0 issues
-    # - avoid_types_on_closure_parameters
+    - avoid_types_on_closure_parameters
 
     # Avoid defining unused paramters in constructors.
     # recommendation: recommended
@@ -189,7 +187,7 @@ linter:
     # Cascade consecutive method invocations on the same reference.
     # recommendation: optional
     # 0 issues
-    # - cascade_invocations
+    - cascade_invocations
 
     # Close instances of `dart.core.Sink`.
     # recommendation: required
@@ -199,7 +197,7 @@ linter:
     # Only reference in scope identifiers in doc comments.
     # recommendation: optional
     # 0 issues
-    # - comment_references
+    - comment_references
 
     # Prefer using lowerCamelCase for constant names.
     # recommendation: optional
@@ -264,7 +262,7 @@ linter:
     # Use `lowercase_with_underscores` when specifying a library prefix.
     # recommendation: recommended
     # 0 issues
-    # - library_prefixes
+    - library_prefixes
 
     # Invocation of `remove` with references of unrelated types.
     # recommendation: required
@@ -294,7 +292,7 @@ linter:
     # Omit type annotations for local variables.
     # recommendation: avoid
     # reason: Conflicts with always_specify_types. Recommend commenting this one out.
-    # 2 lint(s)
+    # 0 issues
     # - omit_local_variable_types
 
     # Avoid defining a one-member abstract class when a simple function will do.
@@ -310,7 +308,7 @@ linter:
     # Don't override fields.
     # recommendation: optional
     # 0 issues
-    # - overridden_fields
+    - overridden_fields
 
     # Provide doc comments for all public APIs.
     # recommendation: optional
@@ -330,7 +328,7 @@ linter:
     # Don't reassign references to parameters of functions or methods.
     # recommendation: optional
     # 0 issues
-    # - parameter_assignments
+    - parameter_assignments
 
     # Use adjacent strings to concatenate string literals.
     # recommendation: optional
@@ -355,12 +353,12 @@ linter:
     # Prefer using `??=` over testing for null.
     # recommendation: optional
     # 0 issues
-    # - prefer_conditional_assignment
+    - prefer_conditional_assignment
 
     # Prefer const with constant constructors.
     # recommendation: optional
     # 0 issues
-    # - prefer_const_constructors
+    - prefer_const_constructors
 
     # Prefer declare const constructors on `@immutable` classes.
     # recommendation: optional
@@ -370,7 +368,7 @@ linter:
     # Prefer const over final for declarations.
     # recommendation: recommended
     # 0 issues
-    # - prefer_const_declarations
+    - prefer_const_declarations
 
     # Prefer const literals as parameters of constructors on @immutable classes.
     # recommendation: optional
@@ -380,7 +378,7 @@ linter:
     # Prefer defining constructors instead of static methods to create instances.
     # recommendation: optional
     # 0 issues
-    # - prefer_constructors_over_static_methods
+    - prefer_constructors_over_static_methods
 
     # Use contains for `List` and `String` instances.
     # recommendation: optional
@@ -390,28 +388,28 @@ linter:
     # Prefer equal for default values.
     # recommendation: optional
     # 0 issues
-    # - prefer_equal_for_default_values
+    - prefer_equal_for_default_values
 
     # Use => for short members whose body is a single return statement.
     # recommendation: optional
     # 0 issues
-    # - prefer_expression_function_bodies
+    - prefer_expression_function_bodies
 
     # Private field could be final.
     # recommendation: optional
     # 0 issues
-    # - prefer_final_fields
+    - prefer_final_fields
 
     # Prefer final for variable declaration if reference is not reassigned.
     # recommendation: optional
     # reason: Generates a lot of lint since people use var a lot for local variables.
-    # FIXME: 4 lint(s)
+    # FIXME: 2 lint(s)
     # - prefer_final_locals
 
     # Use `forEach` to only apply a function to all the elements.
     # recommendation: optional
     # 0 issues
-    # - prefer_foreach
+    - prefer_foreach
 
     # Use a function declaration to bind a function to a name.
     # recommendation: optional
@@ -421,12 +419,12 @@ linter:
     # Use initializing formals when possible.
     # recommendation: recommended
     # 0 issues
-    # - prefer_initializing_formals
+    - prefer_initializing_formals
 
     # Use interpolation to compose strings and values.
     # recommendation: optional
     # 0 issues
-    # - prefer_interpolation_to_compose_strings
+    - prefer_interpolation_to_compose_strings
 
     # Use `isEmpty` for Iterables and Maps.
     # recommendation: optional
@@ -441,17 +439,17 @@ linter:
     # Prefer single quotes where they won't require escape sequences.
     # recommendation: optional
     # 0 issues
-    # - prefer_single_quotes
+    - prefer_single_quotes
 
     # Prefer typing uninitialized variables and fields.
     # recommendation: optional
     # 0 issues
-    # - prefer_typing_uninitialized_variables
+    - prefer_typing_uninitialized_variables
 
     # Document all public members.
     # recommendation: optional
     # reason: Can get annoying for React component lifecycle methods, constructors.
-    # 0 issues
+    # FIXME: 3 lint(s)
     # - public_member_api_docs
 
     # Property getter recursively returns itself.
@@ -467,7 +465,7 @@ linter:
     # Sort constructor declarations before method declarations.
     # recommendation: optional
     # 0 issues
-    # - sort_constructors_first
+    - sort_constructors_first
 
     # Sort unnamed constructor declarations first.
     # recommendation: optional
@@ -477,7 +475,7 @@ linter:
     # Place the `super` call last in a constructor initialization list.
     # recommendation: optional
     # 0 issues
-    # - super_goes_last
+    - super_goes_last
 
     # Test type arguments in operator ==(Object other).
     # recommendation: required
@@ -492,23 +490,23 @@ linter:
     # Type annotate public APIs.
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false. Use overrides.
-    # FIXME: 2 lint(s)
+    # FIXME: 1 lint(s)
     # - type_annotate_public_apis
 
     # Don't type annotate initializing formals.
     # recommendation: optional
     # 0 issues
-    # - type_init_formals
+    - type_init_formals
 
     # Await future-returning functions inside async function bodies.
     # recommendation: recommended
     # 0 issues
-    # - unawaited_futures
+    - unawaited_futures
 
     # Avoid using braces in interpolation when not needed.
     # recommendation: optional
     # 0 issues
-    # - unnecessary_brace_in_string_interps
+    - unnecessary_brace_in_string_interps
 
     # Avoid wrapping fields in getters and setters just to be "safe".
     # recommendation: optional
@@ -518,7 +516,7 @@ linter:
     # Don't create a lambda when a tear-off will do.
     # recommendation: optional
     # 0 issues
-    # - unnecessary_lambdas
+    - unnecessary_lambdas
 
     # Avoid null in null-aware assignment.
     # recommendation: optional
@@ -538,7 +536,7 @@ linter:
     # Unnecessary parenthesis can be removed.
     # recommendation: optional
     # 0 issues
-    # - unnecessary_parenthesis
+    - unnecessary_parenthesis
 
     # Avoid using unnecessary statements.
     # recommendation: required
@@ -548,7 +546,7 @@ linter:
     # Don't access members with `this` unless avoiding shadowing.
     # recommendation: recommended
     # 0 issues
-    # - unnecessary_this
+    - unnecessary_this
 
     # Equality operator `==` invocation with references of unrelated types.
     # recommendation: required
@@ -569,7 +567,7 @@ linter:
     # Use string buffer to compose strings.
     # recommendation: optional
     # 0 issues
-    # - use_string_buffers
+    - use_string_buffers
 
     # Start the name of the method with to/_to or as/_as if applicable.
     # recommendation: optional
