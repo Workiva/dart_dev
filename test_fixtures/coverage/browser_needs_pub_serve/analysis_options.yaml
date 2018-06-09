@@ -25,8 +25,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/always_declare_return_types.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false
-    # 0 issues
-    - always_declare_return_types
+    # FIXME: 3 lint(s)
+    # - always_declare_return_types
 
     # Separate the control structure expression from its statement.
     # http://dart-lang.github.io/linter/lints/always_put_control_body_on_new_line.html
@@ -49,13 +49,13 @@ linter:
     # Specify type annotations.
     # http://dart-lang.github.io/linter/lints/always_specify_types.html
     # recommendation: optional
-    # 0 issues
-    - always_specify_types
+    # FIXME: 3 lint(s)
+    # - always_specify_types
 
     # Annotate overridden members.
     # http://dart-lang.github.io/linter/lints/annotate_overrides.html
     # recommendation: required
-    # 0 issues
+    # FIXME: 1 lint(s)
     - annotate_overrides
 
     # Avoid annotating with dynamic when not required.
@@ -497,8 +497,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/prefer_final_locals.html
     # recommendation: optional
     # reason: Generates a lot of lint since people use var a lot for local variables.
-    # 0 issues
-    - prefer_final_locals
+    # FIXME: 2 lint(s)
+    # - prefer_final_locals
 
     # Use `forEach` to only apply a function to all the elements.
     # http://dart-lang.github.io/linter/lints/prefer_foreach.html
@@ -565,8 +565,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/public_member_api_docs.html
     # recommendation: optional
     # reason: Can get annoying for React component lifecycle methods, constructors.
-    # 0 issues
-    - public_member_api_docs
+    # FIXME: 5 lint(s)
+    # - public_member_api_docs
 
     # Property getter recursively returns itself.
     # http://dart-lang.github.io/linter/lints/recursive_getters.html
@@ -614,8 +614,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/type_annotate_public_apis.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false. Use overrides.
-    # 0 issues
-    - type_annotate_public_apis
+    # FIXME: 3 lint(s)
+    # - type_annotate_public_apis
 
     # Don't type annotate initializing formals.
     # http://dart-lang.github.io/linter/lints/type_init_formals.html
