@@ -25,8 +25,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/always_declare_return_types.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false
-    # FIXME: 1 lint(s)
-    # - always_declare_return_types
+    # 0 issues
+    - always_declare_return_types
 
     # Separate the control structure expression from its statement.
     # http://dart-lang.github.io/linter/lints/always_put_control_body_on_new_line.html
@@ -49,8 +49,8 @@ linter:
     # Specify type annotations.
     # http://dart-lang.github.io/linter/lints/always_specify_types.html
     # recommendation: optional
-    # FIXME: 2 lint(s)
-    # - always_specify_types
+    # 0 issues
+    - always_specify_types
 
     # Annotate overridden members.
     # http://dart-lang.github.io/linter/lints/annotate_overrides.html
@@ -565,8 +565,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/public_member_api_docs.html
     # recommendation: optional
     # reason: Can get annoying for React component lifecycle methods, constructors.
-    # FIXME: 1 lint(s)
-    # - public_member_api_docs
+    # 0 issues
+    - public_member_api_docs
 
     # Property getter recursively returns itself.
     # http://dart-lang.github.io/linter/lints/recursive_getters.html
@@ -614,8 +614,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/type_annotate_public_apis.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false. Use overrides.
-    # FIXME: 2 lint(s)
-    # - type_annotate_public_apis
+    # 0 issues
+    - type_annotate_public_apis
 
     # Don't type annotate initializing formals.
     # http://dart-lang.github.io/linter/lints/type_init_formals.html

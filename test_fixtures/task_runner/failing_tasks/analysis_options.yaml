@@ -49,7 +49,7 @@ linter:
     # Specify type annotations.
     # http://dart-lang.github.io/linter/lints/always_specify_types.html
     # recommendation: optional
-    # FIXME: 2 lint(s)
+    # FIXME: 4 lint(s)
     # - always_specify_types
 
     # Annotate overridden members.
@@ -442,8 +442,8 @@ linter:
     # Prefer const with constant constructors.
     # http://dart-lang.github.io/linter/lints/prefer_const_constructors.html
     # recommendation: optional
-    # 0 issues
-    - prefer_const_constructors
+    # FIXME: 1 lint(s)
+    # - prefer_const_constructors
 
     # Prefer declare const constructors on `@immutable` classes.
     # http://dart-lang.github.io/linter/lints/prefer_const_constructors_in_immutables.html
@@ -565,7 +565,7 @@ linter:
     # http://dart-lang.github.io/linter/lints/public_member_api_docs.html
     # recommendation: optional
     # reason: Can get annoying for React component lifecycle methods, constructors.
-    # FIXME: 1 lint(s)
+    # FIXME: 2 lint(s)
     # - public_member_api_docs
 
     # Property getter recursively returns itself.

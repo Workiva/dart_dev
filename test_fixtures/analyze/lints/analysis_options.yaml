@@ -25,8 +25,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/always_declare_return_types.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false
-    # FIXME: 1 lint(s)
-    # - always_declare_return_types
+    # 0 issues
+    - always_declare_return_types
 
     # Separate the control structure expression from its statement.
     # http://dart-lang.github.io/linter/lints/always_put_control_body_on_new_line.html
@@ -49,13 +49,13 @@ linter:
     # Specify type annotations.
     # http://dart-lang.github.io/linter/lints/always_specify_types.html
     # recommendation: optional
-    # FIXME: 2 lint(s)
-    # - always_specify_types
+    # 0 issues
+    - always_specify_types
 
     # Annotate overridden members.
     # http://dart-lang.github.io/linter/lints/annotate_overrides.html
     # recommendation: required
-    # 0 issues
+    # FIXME: 1 lint(s)
     - annotate_overrides
 
     # Avoid annotating with dynamic when not required.
@@ -140,8 +140,8 @@ linter:
     # Avoid positional boolean parameters.
     # http://dart-lang.github.io/linter/lints/avoid_positional_boolean_parameters.html
     # recommendation: recommended
-    # 0 issues
-    - avoid_positional_boolean_parameters
+    # FIXME: 1 lint(s)
+    # - avoid_positional_boolean_parameters
 
     # Avoid private typedef functions.
     # http://dart-lang.github.io/linter/lints/avoid_private_typedef_functions.html
@@ -565,7 +565,7 @@ linter:
     # http://dart-lang.github.io/linter/lints/public_member_api_docs.html
     # recommendation: optional
     # reason: Can get annoying for React component lifecycle methods, constructors.
-    # FIXME: 1 lint(s)
+    # FIXME: 4 lint(s)
     # - public_member_api_docs
 
     # Property getter recursively returns itself.
@@ -614,8 +614,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/type_annotate_public_apis.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false. Use overrides.
-    # FIXME: 2 lint(s)
-    # - type_annotate_public_apis
+    # 0 issues
+    - type_annotate_public_apis
 
     # Don't type annotate initializing formals.
     # http://dart-lang.github.io/linter/lints/type_init_formals.html

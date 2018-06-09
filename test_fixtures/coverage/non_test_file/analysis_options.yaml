@@ -25,7 +25,7 @@ linter:
     # http://dart-lang.github.io/linter/lints/always_declare_return_types.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false
-    # FIXME: 1 lint(s)
+    # FIXME: 2 lint(s)
     # - always_declare_return_types
 
     # Separate the control structure expression from its statement.
@@ -49,7 +49,7 @@ linter:
     # Specify type annotations.
     # http://dart-lang.github.io/linter/lints/always_specify_types.html
     # recommendation: optional
-    # FIXME: 2 lint(s)
+    # FIXME: 1 lint(s)
     # - always_specify_types
 
     # Annotate overridden members.
@@ -565,7 +565,7 @@ linter:
     # http://dart-lang.github.io/linter/lints/public_member_api_docs.html
     # recommendation: optional
     # reason: Can get annoying for React component lifecycle methods, constructors.
-    # FIXME: 1 lint(s)
+    # FIXME: 2 lint(s)
     # - public_member_api_docs
 
     # Property getter recursively returns itself.

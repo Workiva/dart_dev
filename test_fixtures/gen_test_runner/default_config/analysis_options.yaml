@@ -49,8 +49,8 @@ linter:
     # Specify type annotations.
     # http://dart-lang.github.io/linter/lints/always_specify_types.html
     # recommendation: optional
-    # FIXME: 2 lint(s)
-    # - always_specify_types
+    # 0 issues
+    - always_specify_types
 
     # Annotate overridden members.
     # http://dart-lang.github.io/linter/lints/annotate_overrides.html
@@ -565,8 +565,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/public_member_api_docs.html
     # recommendation: optional
     # reason: Can get annoying for React component lifecycle methods, constructors.
-    # FIXME: 1 lint(s)
-    # - public_member_api_docs
+    # 0 issues
+    - public_member_api_docs
 
     # Property getter recursively returns itself.
     # http://dart-lang.github.io/linter/lints/recursive_getters.html
@@ -614,7 +614,7 @@ linter:
     # http://dart-lang.github.io/linter/lints/type_annotate_public_apis.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false. Use overrides.
-    # FIXME: 2 lint(s)
+    # FIXME: 1 lint(s)
     # - type_annotate_public_apis
 
     # Don't type annotate initializing formals.

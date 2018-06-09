@@ -49,7 +49,7 @@ linter:
     # Specify type annotations.
     # http://dart-lang.github.io/linter/lints/always_specify_types.html
     # recommendation: optional
-    # FIXME: 2 lint(s)
+    # FIXME: 5 lint(s)
     # - always_specify_types
 
     # Annotate overridden members.
@@ -497,8 +497,8 @@ linter:
     # http://dart-lang.github.io/linter/lints/prefer_final_locals.html
     # recommendation: optional
     # reason: Generates a lot of lint since people use var a lot for local variables.
-    # 0 issues
-    - prefer_final_locals
+    # FIXME: 2 lint(s)
+    # - prefer_final_locals
 
     # Use `forEach` to only apply a function to all the elements.
     # http://dart-lang.github.io/linter/lints/prefer_foreach.html
@@ -565,7 +565,7 @@ linter:
     # http://dart-lang.github.io/linter/lints/public_member_api_docs.html
     # recommendation: optional
     # reason: Can get annoying for React component lifecycle methods, constructors.
-    # FIXME: 1 lint(s)
+    # FIXME: 3 lint(s)
     # - public_member_api_docs
 
     # Property getter recursively returns itself.
@@ -614,7 +614,7 @@ linter:
     # http://dart-lang.github.io/linter/lints/type_annotate_public_apis.html
     # recommendation: recommended
     # reason: React component render() method can return either ReactElement or false. Use overrides.
-    # FIXME: 2 lint(s)
+    # FIXME: 1 lint(s)
     # - type_annotate_public_apis
 
     # Don't type annotate initializing formals.
