@@ -6,7 +6,7 @@ main(List<String> args) async {
   config.test
     ..pubServe = true
     ..unitTests = ['test/unit_test.dart']
-    ..platforms = ['dartium'];
+    ..platforms = ['content-shell'];
 
   await dev(args);
 }
