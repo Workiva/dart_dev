@@ -4,6 +4,9 @@ sudo: required
 dart:
   - stable
 
+env:
+  - DARTIUM_EXPIRATION_TIME="1577836800"
+
 addons:
   apt:
     packages:
