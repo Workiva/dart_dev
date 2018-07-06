@@ -17,21 +17,31 @@ library dart_dev.dev;
 import 'package:dart_dev/dart_dev.dart';
 
 main(args) async {
-  var directories = ['bin/', 'lib/', 'test/integration/', 'tool/'];
+  var directories = ['bin/', 'lib/', 'test/', 'tool/'];
   config.analyze.entryPoints = directories;
   config.copyLicense.directories = directories;
   config.coverage.reportOn = ['bin/', 'lib/'];
   config.format
     ..paths = directories
-    ..exclude = ['test/integration/generated_runner.dart'];
+    ..exclude = [
+      'test/integration/generated_runner.dart',
+      'test/unit/browser/generated_runner.dart',
+      'test/unit/vm/generated_runner.dart',
+    ];
   config.genTestRunner.configs = [
-    new TestRunnerConfig(directory: 'test/integration', env: Environment.vm)
+    new TestRunnerConfig(
+        directory: 'test/unit/browser', env: Environment.browser),
+    new TestRunnerConfig(directory: 'test/unit/vm', env: Environment.vm),
+    new TestRunnerConfig(directory: 'test/integration', env: Environment.vm),
   ];
   config.test
     ..concurrency = 1
-    ..platforms = ['vm']
+    ..platforms = ['content-shell', 'vm']
     ..integrationTests = ['test/integration/generated_runner.dart']
-    ..unitTests = [];
+    ..unitTests = [
+      'test/unit/browser/generated_runner.dart',
+      'test/unit/vm/generated_runner.dart',
+    ];
 
   await dev(args);
 }
