@@ -17,6 +17,7 @@ library dart_dev.src.tasks.coverage.config;
 import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
 
+const bool defaultCheckedMode = false;
 const List defaultAfterFunctional = const [];
 const List defaultBeforeFunctional = const [];
 const bool defaultHtml = true;
@@ -26,6 +27,11 @@ const List<String> defaultReportOn = const ['lib/'];
 class CoverageConfig extends TaskConfig {
   List afterFunctionalTests = defaultAfterFunctional;
   List beforeFunctionalTests = defaultBeforeFunctional;
+
+  /// Enable or disable Dart's checked mode.
+  /// Defaults to false to avoid a breaking behavioral change, but it is
+  /// **strongly** recommended that this be enabled.
+  bool checkedMode = defaultCheckedMode;
 
   /// Enable or disable HTML generation.
   /// Defaults to true.
