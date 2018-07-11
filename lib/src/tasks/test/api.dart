@@ -20,6 +20,7 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
 import 'package:dart_dev/src/tools/selenium.dart' show SeleniumHelper;
+import 'package:dart_dev/src/util.dart';
 
 TestTask test(
     {int concurrency,
@@ -38,7 +39,8 @@ TestTask test(
   args.addAll(additionalArgs);
   args.addAll(tests);
 
-  TaskProcess process = new TaskProcess(executable, args);
+  TaskProcess process = new TaskProcess(executable, args,
+      environment: dartiumExpirationOverrideEnv);
   Completer outputProcessed = new Completer();
   TestTask task = new TestTask('$executable ${args.join(' ')}',
       Future.wait([process.done, outputProcessed.future]));

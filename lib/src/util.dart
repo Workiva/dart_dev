@@ -110,3 +110,13 @@ Future runAll(List tasks) async {
     }
   }
 }
+
+final _newExpirationDate = new DateTime.now().add(const Duration(days: 1000));
+
+/// A map of environment variables that will set the Dartium expiration
+/// to 1000 days after the current date.
+final Map<String, String> dartiumExpirationOverrideEnv = new Map.unmodifiable({
+  // This is given in seconds since epoch
+  'DARTIUM_EXPIRATION_TIME':
+      (_newExpirationDate.millisecondsSinceEpoch / 1000).toStringAsFixed(0),
+});

@@ -18,6 +18,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart2_constant/convert.dart' as convert;
+import 'package:dart_dev/src/util.dart';
 import 'package:dart_dev/util.dart' show TaskProcess, getOpenPort;
 import 'package:path/path.dart' as path;
 
@@ -552,8 +553,9 @@ class CoverageTask extends Task {
     _coverageOutput.add('');
     _coverageOutput.add('Running test suite ${testPath}');
     _coverageOutput.add('$executable ${args.join(' ')}\n');
-    TaskProcess process =
-        _lastTestProcess = new TaskProcess('content_shell', args);
+    TaskProcess process = _lastTestProcess = new TaskProcess(
+        'content_shell', args,
+        environment: dartiumExpirationOverrideEnv);
 
     // Content-shell dumps render tree to stderr, which is where the test
     // results will be. The observatory port should be output to stderr as

@@ -31,9 +31,10 @@ class TaskProcess {
   StreamController<String> _stderr = new StreamController();
 
   TaskProcess(String executable, List<String> arguments,
-      {String workingDirectory}) {
+      {String workingDirectory, Map<String, String> environment}) {
     Process
-        .start(executable, arguments, workingDirectory: workingDirectory)
+        .start(executable, arguments,
+            workingDirectory: workingDirectory, environment: environment)
         .then((process) {
       _process = process;
       process.stdout
