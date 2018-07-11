@@ -101,15 +101,22 @@ class CoverageTask extends Task {
   /// If [html] is true, `genhtml` will be used to generate an HTML report of
   /// the collected coverage and the report will be opened.
   static CoverageTask start(List<String> tests,
-      {bool html: defaultHtml,
+      {bool checkedMode: defaultCheckedMode,
+      bool html: defaultHtml,
       bool pubServe: defaultPubServe,
       String output: defaultOutput,
       List<String> reportOn: defaultReportOn}) {
     CoverageTask coverage = new CoverageTask._(tests, reportOn,
-        html: html, output: output, pubServe: pubServe);
+        checkedMode: checkedMode,
+        html: html,
+        output: output,
+        pubServe: pubServe);
     coverage._run();
     return coverage;
   }
+
+  /// Whether or not the coverage collection runs should be run in checked mode.
+  final bool _checkedMode;
 
   /// JSON formatted coverage. Output from the coverage package.
   File _collection;
@@ -155,10 +162,12 @@ class CoverageTask extends Task {
   List<String> _reportOn;
 
   CoverageTask._(List<String> tests, List<String> reportOn,
-      {bool html: defaultHtml,
+      {bool checkedMode: false,
+      bool html: defaultHtml,
       String output: defaultOutput,
       bool this.pubServe: defaultPubServe})
-      : _html = html,
+      : _checkedMode = checkedMode,
+        _html = html,
         _outputDirectory = new Directory(output),
         _reportOn = reportOn {
     // Build the list of test files.
@@ -517,6 +526,9 @@ class CoverageTask extends Task {
     // Run the test on the Dart VM.
     String executable = 'dart';
     List args = ['--observe=$port', testPath];
+    if (_checkedMode) {
+      args.insert(0, '--checked');
+    }
     _coverageOutput.add('');
     _coverageOutput.add('Running VM test suite ${testPath}');
     _coverageOutput.add('$executable ${args.join(' ')}\n');
@@ -550,12 +562,15 @@ class CoverageTask extends Task {
     // The window size is specified to correspond to the size of the window in the
     // dart test package, https://github.com/dart-lang/test/blob/ec1b57647df74293d7a71316020e39702735b3f7/CHANGELOG.md#012201
     List args = ['--content-shell-host-window-size=1024x768', testPath];
+    Map<String, String> env = {}..addAll(dartiumExpirationOverrideEnv);
+    if (_checkedMode) {
+      env.addAll(dartFlagsCheckedModeEnv);
+    }
     _coverageOutput.add('');
     _coverageOutput.add('Running test suite ${testPath}');
     _coverageOutput.add('$executable ${args.join(' ')}\n');
-    TaskProcess process = _lastTestProcess = new TaskProcess(
-        'content_shell', args,
-        environment: dartiumExpirationOverrideEnv);
+    TaskProcess process = _lastTestProcess =
+        new TaskProcess('content_shell', args, environment: env);
 
     // Content-shell dumps render tree to stderr, which is where the test
     // results will be. The observatory port should be output to stderr as

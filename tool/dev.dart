@@ -20,7 +20,9 @@ main(args) async {
   var directories = ['bin/', 'lib/', 'test/', 'tool/'];
   config.analyze.entryPoints = directories;
   config.copyLicense.directories = directories;
-  config.coverage.reportOn = ['bin/', 'lib/'];
+  config.coverage
+    ..checkedMode = true
+    ..reportOn = ['bin/', 'lib/'];
   config.format
     ..paths = directories
     ..exclude = [
