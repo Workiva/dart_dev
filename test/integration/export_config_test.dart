@@ -66,7 +66,7 @@ void main() {
       var formatConfig = json['format'];
       // default values
       expect(formatConfig, containsPair('check', false));
-      expect(formatConfig, containsPair('directories', ['lib/']));
+      expect(formatConfig, containsPair('paths', ['lib/']));
       expect(formatConfig, containsPair('exclude', []));
       expect(formatConfig, containsPair('lineLength', 80));
     });
@@ -82,7 +82,7 @@ void main() {
       var formatConfig = json['format'];
       // default values
       expect(formatConfig, containsPair('check', false));
-      expect(formatConfig, containsPair('directories', ['lib/']));
+      expect(formatConfig, containsPair('paths', ['lib/']));
       // custom values
       expect(formatConfig, containsPair('exclude', ['foo', 'bar']));
       expect(formatConfig, containsPair('lineLength', 1234));
