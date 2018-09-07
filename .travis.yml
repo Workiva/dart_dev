@@ -2,7 +2,7 @@ language: dart
 sudo: required
 
 dart:
-  - stable
+  - 1.24.3
 
 addons:
   apt:
