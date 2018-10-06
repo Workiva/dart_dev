@@ -27,6 +27,7 @@ import 'package:dart_dev/src/tasks/analyze/cli.dart';
 import 'package:dart_dev/src/tasks/bash_completion/cli.dart';
 import 'package:dart_dev/src/tasks/copy_license/cli.dart';
 import 'package:dart_dev/src/tasks/coverage/cli.dart';
+import 'package:dart_dev/src/tasks/dart_x_only/cli.dart';
 import 'package:dart_dev/src/tasks/docs/cli.dart';
 import 'package:dart_dev/src/tasks/examples/cli.dart';
 import 'package:dart_dev/src/tasks/export_config/cli.dart';
@@ -82,6 +83,12 @@ dev(List<String> args) async {
         shout: true);
     exit(exitCode);
   }
+
+  // Register these tasks after the rest of the tasks have been registered
+  // because they depend on the list of other available dart_dev tasks.
+  final availableTasks = _cliTasks.keys.toSet();
+  registerTask(new Dart1OnlyCli(availableTasks), config.dart1Only);
+  registerTask(new Dart2OnlyCli(availableTasks), config.dart2Only);
 
   await _run(args);
   exit(exitCode);

@@ -18,6 +18,7 @@ import 'package:dart_dev/src/tasks/analyze/config.dart';
 import 'package:dart_dev/src/tasks/bash_completion/config.dart';
 import 'package:dart_dev/src/tasks/copy_license/config.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
+import 'package:dart_dev/src/tasks/dart_x_only/config.dart';
 import 'package:dart_dev/src/tasks/docs/config.dart';
 import 'package:dart_dev/src/tasks/examples/config.dart';
 import 'package:dart_dev/src/tasks/format/config.dart';
@@ -35,6 +36,8 @@ class Config {
   BashCompletionConfig bashCompletion = new BashCompletionConfig();
   CopyLicenseConfig copyLicense = new CopyLicenseConfig();
   CoverageConfig coverage = new CoverageConfig();
+  Dart1OnlyConfig dart1Only = new Dart1OnlyConfig();
+  Dart2OnlyConfig dart2Only = new Dart2OnlyConfig();
 
   /// Deprecated: 1.10.0
   /// To be removed: 2.0.0

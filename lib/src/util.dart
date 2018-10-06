@@ -20,6 +20,8 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:dart_dev/util.dart' show TaskProcess, reporter;
 
+final int dartMajorVersion = int.parse(Platform.version.split('.').first);
+
 void copyDirectory(Directory source, Directory dest) {
   if (!dest.existsSync()) {
     dest.createSync(recursive: true);
