@@ -94,5 +94,5 @@ void main() {
           isTrue);
       expect(tasks.failedTasks.contains(failedFormatting), isTrue);
     });
-  }, timeout: const Timeout(const Duration(minutes: 1)));
+  });
 }

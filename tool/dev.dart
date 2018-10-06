@@ -30,20 +30,7 @@ main(args) async {
       'test/unit/browser/generated_runner.dart',
       'test/unit/vm/generated_runner.dart',
     ];
-  config.genTestRunner.configs = [
-    new TestRunnerConfig(
-        directory: 'test/unit/browser', env: Environment.browser),
-    new TestRunnerConfig(directory: 'test/unit/vm', env: Environment.vm),
-    new TestRunnerConfig(directory: 'test/integration', env: Environment.vm),
-  ];
-  config.test
-    ..concurrency = 1
-    ..platforms = ['content-shell', 'vm']
-    ..integrationTests = ['test/integration/generated_runner.dart']
-    ..unitTests = [
-      'test/unit/browser/generated_runner.dart',
-      'test/unit/vm/generated_runner.dart',
-    ];
+  config.test.concurrency = 1;
 
   await dev(args);
 }

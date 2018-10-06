@@ -7,8 +7,6 @@ import './analyze_test.dart' as analyze_test;
 import './copy_license_test.dart' as copy_license_test;
 import './coverage_test.dart' as coverage_test;
 import './dart_x_only_test.dart' as dart_x_only_test;
-import './docs_test.dart' as docs_test;
-import './examples_test.dart' as examples_test;
 import './export_config_test.dart' as export_config_test;
 import './format_test.dart' as format_test;
 import './gen_test_runner_test.dart' as gen_test_runner_test;
@@ -23,8 +21,6 @@ void main() {
   copy_license_test.main();
   coverage_test.main();
   dart_x_only_test.main();
-  docs_test.main();
-  examples_test.main();
   export_config_test.main();
   format_test.main();
   gen_test_runner_test.main();

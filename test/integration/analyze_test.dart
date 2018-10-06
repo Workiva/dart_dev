@@ -161,9 +161,10 @@ void main() {
     test('should not report warnings as fatal if not configured to do so',
         () async {
       Analysis analysis =
-          await analyzeProject(projectWithErrors, fatalWarnings: false);
-      expect(analysis.numErrors, equals(1));
+          await analyzeProject(projectWithWarnings, fatalWarnings: false);
+      expect(analysis.numErrors, equals(0));
       expect(analysis.numWarnings, equals(1));
+      expect(analysis.exitCode, equals(0));
     });
 
     test(
@@ -172,7 +173,7 @@ void main() {
       Analysis analysis =
           await analyzeProject(projectWithStaticTypingIssues, strong: false);
       expect(analysis.exitCode, equals(0));
-    });
+    }, tags: 'dart1-only');
 
     test(
         'should report issues on project with static typing issues if strong mode is on',
@@ -180,6 +181,6 @@ void main() {
       Analysis analysis =
           await analyzeProject(projectWithStaticTypingIssues, strong: true);
       expect(analysis.numErrors, greaterThan(0));
-    });
+    }, tags: 'dart1-only');
   });
 }

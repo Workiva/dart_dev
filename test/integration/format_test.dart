@@ -41,7 +41,7 @@ const String projectWithoutDartStyle = 'test_fixtures/format/no_dart_style';
 /// formatting was successful, false otherwise.
 Future<bool> formatProject(
   String projectPath, {
-  Iterable additionalArgs: const [],
+  Iterable<String> additionalArgs: const <String>[],
   bool check: false,
 }) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);

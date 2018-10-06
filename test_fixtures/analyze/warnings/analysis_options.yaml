@@ -1,0 +1,3 @@
+analyzer:
+  errors:
+    extra_positional_arguments: warning

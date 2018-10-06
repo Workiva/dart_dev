@@ -55,7 +55,8 @@ FormatTask format({
     args.addAll(filesToFormat.files);
 
     TaskProcess process = new TaskProcess(executable, args);
-    task = new FormatTask('$executable ${args.join(' ')}', process.done);
+    task = new FormatTask(
+        '$executable ${args.join(' ')}', process.done.then((_) => null));
 
     RegExp cwdPattern = new RegExp('Formatting directory (.+):');
     RegExp formattedPattern = new RegExp('Formatted (.+\.dart)');

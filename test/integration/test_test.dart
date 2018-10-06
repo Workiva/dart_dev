@@ -23,6 +23,8 @@ import 'package:dart2_constant/convert.dart' as convert;
 import 'package:dart_dev/util.dart' show TaskProcess;
 import 'package:test/test.dart';
 
+final String buildRunnerTestPattern = 'pub run build_runner test';
+final String pubRunTestPattern = 'pub run test';
 RegExp numTestsPassedPattern = new RegExp(r'\+(\d+)(:| )');
 const String projectToVerifyUnitTestsRunByDefault =
     'test_fixtures/test/default_unit';
@@ -31,19 +33,22 @@ const String projectWithFailingTests = 'test_fixtures/test/failing';
 const String projectWithPassingTests = 'test_fixtures/test/passing';
 const String projectWithPassingIntegrationTests =
     'test_fixtures/test/passingIntegration';
+const String projectThatNeedsBuildRunner =
+    'test_fixtures/test/needs_build_runner';
 const String projectThatNeedsPubServe = 'test_fixtures/test/needs_pub_serve';
 
 Future<int> runTests(String projectPath,
     {bool unit: true,
     bool integration: false,
     List<String> files,
+    bool expectBuildRunner,
     String testName: '',
     bool runCustomPubServe: false,
     int pubServePort: 56090,
     String webCompiler}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
-  List args = ['run', 'dart_dev', 'test', '--no-color'];
+  final args = <String>['run', 'dart_dev', 'test', '--no-color'];
   if (unit != null) args.add(unit ? '--unit' : '--no-unit');
   if (integration != null)
     args.add(integration ? '--integration' : '--no-integration');
@@ -59,13 +64,14 @@ Future<int> runTests(String projectPath,
         'pub', ['serve', '--port=$pubServePort', 'test'],
         workingDirectory: '$projectPath');
 
-    Completer completer = new Completer();
+    final completer = new Completer<Null>();
 
     pubServeProcess.stdout
         .transform(convert.utf8.decoder)
         .transform(new LineSplitter())
         .listen((var line) {
-      if (line.contains('Build completed successfully')) {
+      if (!completer.isCompleted &&
+          line.contains('Build completed successfully')) {
         completer.complete();
       }
     });
@@ -91,9 +97,17 @@ Future<int> runTests(String projectPath,
       new TaskProcess('pub', args, workingDirectory: projectPath);
 
   var numTestsRun = -1;
+  var buildRunnerTest = false;
+  var pubRunTest = false;
   var webCompilerSpecified = false;
 
   process.stdout.listen((output) {
+    if (!buildRunnerTest && output.contains(buildRunnerTestPattern)) {
+      buildRunnerTest = true;
+    }
+    if (!pubRunTest && output.contains(pubRunTestPattern)) {
+      pubRunTest = true;
+    }
     if (numTestsPassedPattern.hasMatch(output)) {
       numTestsRun =
           int.parse(numTestsPassedPattern.firstMatch(output).group(1));
@@ -109,6 +123,15 @@ Future<int> runTests(String projectPath,
 
   if (pubServeProcess != null) {
     pubServeProcess.kill();
+  }
+
+  if (expectBuildRunner == true) {
+    expect(buildRunnerTest, isTrue);
+    expect(pubRunTest, isFalse);
+  }
+  if (expectBuildRunner == false) {
+    expect(buildRunnerTest, isFalse);
+    expect(pubRunTest, isTrue);
   }
 
   if (webCompiler != null) {
@@ -183,14 +206,14 @@ void main() {
 
     test('should run tests that require a Pub server', () async {
       expect(await runTests(projectThatNeedsPubServe), equals(1));
-    });
+    }, tags: 'dart1-only');
 
     test('should run tests that provides a Pub server', () async {
       expect(
           await runTests(projectThatNeedsPubServe,
               runCustomPubServe: true, pubServePort: 58832),
           equals(1));
-    });
+    }, tags: 'dart1-only');
 
     test('should run tests with test name specified', () async {
       expect(await runTests(projectWithPassingTests, testName: 'passes'),
@@ -205,6 +228,22 @@ void main() {
     test('should allow you to specify a web-compiler', () async {
       expect(await runTests(projectThatNeedsPubServe, webCompiler: 'dartdevc'),
           equals(1));
-    });
+    }, tags: 'dart1-only');
+
+    test(
+        'should use pub run test if on Dart1 even if build_test found in pubspec',
+        () async {
+      expect(
+          await runTests(projectThatNeedsBuildRunner, expectBuildRunner: false),
+          equals(1));
+    }, tags: 'dart1-only');
+
+    test(
+        'should use build_runner test if on Dart2 and build_test found in pubspec',
+        () async {
+      expect(
+          await runTests(projectThatNeedsBuildRunner, expectBuildRunner: true),
+          equals(1));
+    }, tags: 'dart2-only');
   });
 }

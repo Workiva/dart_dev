@@ -97,16 +97,50 @@ void main() {
     });
   }, tags: 'dart1-only');
 
-// TODO
-//  group('(SDK=Dart2)', () {
-//
-//    group('dart1-only Task', () {
-//
-//    });
-//
-//    group('dart2-only Task', () {
-//
-//    });
-//
-//  }, tags: 'dart2-only');
+  group('(SDK=Dart2)', () {
+    group('dart1-only Task', () {
+      test('requires a target', () async {
+        final result = await runDart1Only(<String>[]);
+        expect(result.exitCode, 1);
+      });
+
+      test('is skipped', () async {
+        final result = await runDart1Only(['coverage']);
+        expect(result.skipped, isTrue);
+        expect(result.exitCode, 0);
+      });
+    });
+
+    group('dart2-only Task', () {
+      test('requires a target', () async {
+        final result = await runDart2Only([]);
+        expect(result.exitCode, 1);
+      });
+
+      test('runs a ddev task', () async {
+        final result = await runDart2Only(['analyze']);
+        expect(result.skipped, isFalse);
+        expect(result.exitCode, 0);
+      });
+
+      test('runs a ddev task with args', () async {
+        final result =
+            await runDart2Only(['--', 'analyze', '--no-fatal-warnings']);
+        expect(result.skipped, isFalse);
+        expect(result.exitCode, 0);
+      });
+
+      test('runs an executable', () async {
+        final result = await runDart2Only(['dartdoc']);
+        expect(result.skipped, isFalse);
+        expect(result.exitCode, 0);
+      });
+
+      test('runs an executable with args', () async {
+        final result = await runDart2Only(['--', 'pub', 'get', '--offline']);
+        expect(result.skipped, isFalse);
+        expect(result.exitCode, 0);
+      });
+    });
+  }, tags: 'dart2-only');
 }

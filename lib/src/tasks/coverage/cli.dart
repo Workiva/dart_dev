@@ -28,7 +28,7 @@ import 'package:dart_dev/src/tasks/coverage/api.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
 import 'package:dart_dev/src/tasks/coverage/exceptions.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
-import 'package:dart_dev/src/util.dart' show runAll;
+import 'package:dart_dev/src/util.dart' show dartMajorVersion, runAll;
 
 class CoverageCli extends TaskCli {
   @override
@@ -59,6 +59,10 @@ class CoverageCli extends TaskCli {
 
   @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
+    if (dartMajorVersion == 2) {
+      return new CliResult.fail('Coverage is not supported on Dart 2.');
+    }
+
     if (!platform_util.hasImmediateDependency('coverage'))
       return new CliResult.fail(
           'Package "coverage" must be an immediate dependency in order to run its executables.');

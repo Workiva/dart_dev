@@ -1,0 +1,17 @@
+platforms:
+- chrome
+- vm
+
+concurrency: 1
+timeout: 3m
+
+presets:
+  dart1:
+    exclude_tags: "dart2-only"
+
+  dart2:
+    exclude_tags: "dart1-only"
+
+  travis:
+    reporter: expanded
+    retry: 2

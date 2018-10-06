@@ -59,8 +59,7 @@ class SubTask {
     taskProcess.stderr.listen((line) {
       this.taskError += '\n$line';
     }, onDone: () => stderrc.complete());
-    Future
-        .wait([taskProcess.done, stdoutc.future, stderrc.future])
+    Future.wait([taskProcess.done, stdoutc.future, stderrc.future])
         .then((_) => _done.complete())
         .catchError((e) => _done.completeError(e));
   }

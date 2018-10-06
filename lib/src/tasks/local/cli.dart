@@ -34,13 +34,16 @@ class Executable {
   Executable(this.path, this.name, this.extension);
 }
 
-Function _commandParser(String pattern) => (File f) {
-      var matches = new RegExp(pattern).firstMatch(basename(f.path));
-      return new Executable(f.path, matches.group(1), matches.group(2));
+typedef Executable CommandParser(FileSystemEntity entity);
+typedef bool CommandPatternMatcher(FileSystemEntity entity);
+
+CommandParser _commandParser(String pattern) => (entity) {
+      var matches = new RegExp(pattern).firstMatch(basename(entity.path));
+      return new Executable(entity.path, matches.group(1), matches.group(2));
     };
 
-Function _commandPatternMatcher(String pattern) => (FileSystemEntity entity) =>
-    new RegExp(pattern).hasMatch(basename(entity.path));
+CommandPatternMatcher _commandPatternMatcher(String pattern) =>
+    (entity) => new RegExp(pattern).hasMatch(basename(entity.path));
 
 class LocalCli extends TaskCli {
   @override
@@ -51,17 +54,16 @@ class LocalCli extends TaskCli {
   final List<String> originalArgs;
 
   static Map<String, Executable> discover(List<String> paths) {
-    List<File> commandFiles = paths
-        .map((String path) => new Directory(path))
-        .where((Directory directory) => directory.existsSync())
-        .expand((Directory directory) => directory
-            .listSync(recursive: true, followLinks: config.local.followSymlinks)
-            .toList())
+    final commandFiles = paths
+        .map((path) => new Directory(path))
+        .where((directory) => directory.existsSync())
+        .expand((directory) => directory.listSync(
+            recursive: true, followLinks: config.local.followSymlinks))
         .where(_commandPatternMatcher(config.local.commandFilePattern));
 
     return commandFiles
-        .map<Executable>(_commandParser(config.local.commandFilePattern))
-        .fold({}, (Map<String, Executable> m, Executable c) {
+        .map(_commandParser(config.local.commandFilePattern))
+        .fold({}, (m, c) {
       m[c.name] = c;
       return m;
     });

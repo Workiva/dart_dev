@@ -20,30 +20,42 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
 import 'package:dart_dev/src/tools/selenium.dart' show SeleniumHelper;
-import 'package:dart_dev/src/util.dart';
+import 'package:dart_dev/src/util.dart'
+    show dartMajorVersion, dartiumExpirationOverrideEnv;
+import 'package:dart_dev/util.dart' show hasImmediateDependency;
 
 TestTask test(
     {int concurrency,
-    List<String> additionalArgs: const [],
     List<String> platforms: const [],
+    List<String> presets: const [],
+    List<String> testArgs: const [],
     List<String> tests: const []}) {
-  var executable = 'pub';
-  var args = ['run', 'test'];
+  final executable = 'pub';
+  final args = <String>[];
+  if (dartMajorVersion == 2 && hasImmediateDependency('build_test')) {
+    args.addAll(['run', 'build_runner', 'test', '--']);
+  } else {
+    args.addAll(['run', 'test']);
+  }
+
   if (concurrency != null) {
     args.add('--concurrency=$concurrency');
   }
   platforms.forEach((p) {
     args.addAll(['-p', p]);
   });
+  presets.forEach((p) {
+    args.addAll(['-P', p]);
+  });
   args.addAll(['--reporter=expanded']);
-  args.addAll(additionalArgs);
+  args.addAll(testArgs);
   args.addAll(tests);
 
   TaskProcess process = new TaskProcess(executable, args,
       environment: dartiumExpirationOverrideEnv);
   Completer outputProcessed = new Completer();
   TestTask task = new TestTask('$executable ${args.join(' ')}',
-      Future.wait([process.done, outputProcessed.future]));
+      Future.wait([process.done, outputProcessed.future]).then((_) => null));
 
   // TODO: Use this pattern to better parse the test summary even when the output is colorized
   // RegExp resultPattern = new RegExp(r'(\d+:\d+) \+(\d+) ?~?(\d+)? ?-?(\d+)?: (All|Some) tests (failed|passed)');

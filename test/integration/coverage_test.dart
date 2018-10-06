@@ -40,7 +40,7 @@ Future<bool> runCoverage(String projectPath,
     oldCoverage.deleteSync(recursive: true);
   }
 
-  List args = ['run', 'dart_dev', 'coverage'];
+  List args = <String>['run', 'dart_dev', 'coverage'];
   if (functional) {
     args.add('--functional');
     args.add('--no-unit');
@@ -54,12 +54,18 @@ Future<bool> runCoverage(String projectPath,
 }
 
 void main() {
-  group('Coverage Task', () {
+  group('Coverage Task (dart2)', () {
+    test('should fail', () async {
+      expect(await runCoverage(projectWithBrowserTests), isFalse);
+    });
+  }, tags: 'dart2-only');
+
+  group('Coverage Task (dart1)', () {
     test('should generate coverage for Browser tests', () async {
       expect(await runCoverage(projectWithBrowserTests), isTrue);
       File lcov = new File('$projectWithBrowserTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
+    });
 
     test('should generate coverage for Browser tests that require a Pub server',
         () async {
@@ -68,13 +74,13 @@ void main() {
       File lcov = new File(
           '$projectWithBrowserTestsThatNeedsPubServe/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
+    });
 
     test('should generate coverage for VM tests', () async {
       expect(await runCoverage(projectWithVmTests), isTrue);
       File lcov = new File('$projectWithVmTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
+    });
 
     test('should fail if "coverage" package is missing', () async {
       expect(await runCoverage(projectWithoutCoveragePackage), isFalse);
@@ -82,13 +88,13 @@ void main() {
 
     test('should fail if there is a test that fails', () async {
       expect(await runCoverage(projectWithFailingTests), isFalse);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
+    });
 
     test('should create coverage with non_test file specified', () async {
       expect(await runCoverage(projectWithDartFile), isTrue);
       File lcov = new File('$projectWithDartFile/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 90)));
+    });
 
     test('should generate coverage for Functional tests', () async {
       expect(await runCoverage(projectWithFunctionalTests, functional: true),
@@ -96,7 +102,7 @@ void main() {
       File lcov =
           new File('$projectWithFunctionalTests/coverage/coverage.lcov');
       expect(lcov.existsSync(), isTrue);
-    }, timeout: new Timeout(new Duration(seconds: 300)));
+    });
 
 //    TODO: Will need to mock out the `genhtml` command as well.
 //    test('should not fail if "lcov" is installed and --html is set', () async {
@@ -119,5 +125,5 @@ void main() {
 //      expect(await runCoverage(projectWithVmTests, html: false), isTrue);
 //      MockPlatformUtil.uninstall();
 //    });
-  });
+  }, tags: 'dart1-only');
 }
