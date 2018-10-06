@@ -35,6 +35,12 @@ class DocsCli extends TaskCli {
 
   @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
+    reporter.warning('''
+---- DEPRECATION NOTICE ----
+The docs task is deprecated and will be removed in dart_dev v2.0.0.
+Use `dartdoc` instead.
+----------------------------''');
+
     if (!hasImmediateDependency('dartdoc'))
       return new CliResult.fail(
           'Package "dartdoc" must be an immediate dependency in order to run its executables.');

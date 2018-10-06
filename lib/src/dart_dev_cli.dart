@@ -59,12 +59,15 @@ dev(List<String> args) async {
   registerTask(new BashCompletionCli(), config.bashCompletion);
   registerTask(new CopyLicenseCli(), config.copyLicense);
   registerTask(new CoverageCli(), config.coverage);
+  // ignore: deprecated_member_use
   registerTask(new DocsCli(), config.docs);
+  // ignore: deprecated_member_use
   registerTask(new ExamplesCli(), config.examples);
   registerTask(new ExportConfigCli(), new TaskConfig());
   registerTask(new FormatCli(), config.format);
   registerTask(new GenTestRunnerCli(), config.genTestRunner);
   registerTask(new InitCli(), config.init);
+  // ignore: deprecated_member_use
   registerTask(new SauceRunnerCli(), config.saucelabs);
   registerTask(new TaskRunnerCli(), config.taskRunner);
   registerTask(new TestCli(), config.test);
