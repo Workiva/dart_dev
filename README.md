@@ -9,12 +9,6 @@
 
 ---
 
-#### Looking for the 2.0.0 Alpha?
-
-https://github.com/Workiva/dart_dev/blob/2.0.0-alpha/README.md
-
----
-
 - [**Motivation**](#motivation)
 - [**Supported Tasks**](#supported-tasks)
 - [**Getting Started**](#getting-started)
@@ -91,8 +85,8 @@ local tasks.
 - **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
 - **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
 - **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
-- **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs.
-- **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
+- (DEPRECATED) **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs.
+- (DEPRECATED) **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Generate a test runner file:** that allows for faster test execution.
 - **Running dart unit tests on Sauce Labs:** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
@@ -247,11 +241,11 @@ running any of the following tasks:
 ddev analyze
 ddev copy-license
 ddev coverage
-ddev docs
-ddev examples
+ddev docs  # (DEPRECATED)
+ddev examples  # (DEPRECATED)
 ddev format
 ddev gen-test-runner
-ddev saucelabs
+ddev saucelabs  # (DEPRECATED)
 ddev task-runner
 ddev test
 
@@ -259,17 +253,44 @@ ddev test
 pub run dart_dev analyze
 pub run dart_dev copy-license
 pub run dart_dev coverage
-pub run dart_dev docs
-pub run dart_dev examples
+pub run dart_dev docs  # (DEPRECATED)
+pub run dart_dev examples   # (DEPRECATED)
 pub run dart_dev format
 pub run dart_dev gen-test-runner
-pub run dart_dev saucelabs
+pub run dart_dev saucelabs  # (DEPRECATED)
 pub run dart_dev task-runner
 pub run dart_dev test
 ```
 
 Add the `-h` flag to any of the above commands to receive additional help
 information specific to that task.
+
+
+#### Convenience Tasks for Targeting Dart1 and/or Dart2
+
+To help with the transition from Dart1 to Dart2, you can leverage the `dart1-only`
+and `dart2-only` tasks to conditionally run another dart_dev task or any executable.
+
+```bash
+# Run a dart_dev task only on Dart1:
+$ ddev dart1-only test
+
+# Run a dart_dev task with additional args only on Dart1:
+$ ddev dart1-only -- format --check
+
+# Run an shell script only on Dart1:
+$ ddev dart1-only ./example.sh
+
+# Run an executable with additional args only on Dart1:
+$ ddev dart1-only -- pub serve web --port 8080
+
+# The `dart2-only` task works exactly the same, but only runs on Dart2:
+$ ddev dart2-only test
+$ ddev dart2-only -- format --check
+$ ddev dart2-only ./example.sh
+$ ddev dart2-only -- pub run build_runner serve web:8080
+```
+
 
 
 ## Project Configuration

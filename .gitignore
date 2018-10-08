@@ -23,5 +23,6 @@ test_reports/
 /test_fixtures/coverage/functional_test/test/functional/simple_test.dart.temp.html
 /test_fixtures/coverage/non_test_file/coverage/
 /test_fixtures/coverage/vm/coverage/
+/test_fixtures/dart_x_only/doc/api/
 /test_fixtures/docs/docs/doc/api/
 /test_fixtures/format/changes_needed_temp/

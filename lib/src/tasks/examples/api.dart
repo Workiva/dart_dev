@@ -27,6 +27,11 @@ bool hasExamples() {
   return exampleDir.existsSync();
 }
 
+/// Deprecated 1.10.0
+/// To be removed: 2.0.0
+/// Use `pub serve example` or `pub run build_runner serve example:8080`
+/// instead.
+@deprecated
 ExamplesTask serveExamples(
     {String hostname: defaultHostname, int port: defaultPort}) {
   if (!hasExamples())
@@ -64,6 +69,10 @@ ExamplesTask serveExamples(
   return task;
 }
 
+/// Deprecated: 1.10.0
+/// To be removed: 2.0.0
+/// Use the `dartdoc` executable instead.
+@deprecated
 class ExamplesTask extends Task {
   @override
   final Future<Null> done;

@@ -27,6 +27,7 @@ import 'package:dart_dev/src/tasks/analyze/cli.dart';
 import 'package:dart_dev/src/tasks/bash_completion/cli.dart';
 import 'package:dart_dev/src/tasks/copy_license/cli.dart';
 import 'package:dart_dev/src/tasks/coverage/cli.dart';
+import 'package:dart_dev/src/tasks/dart_x_only/cli.dart';
 import 'package:dart_dev/src/tasks/docs/cli.dart';
 import 'package:dart_dev/src/tasks/examples/cli.dart';
 import 'package:dart_dev/src/tasks/export_config/cli.dart';
@@ -59,12 +60,15 @@ dev(List<String> args) async {
   registerTask(new BashCompletionCli(), config.bashCompletion);
   registerTask(new CopyLicenseCli(), config.copyLicense);
   registerTask(new CoverageCli(), config.coverage);
+  // ignore: deprecated_member_use
   registerTask(new DocsCli(), config.docs);
+  // ignore: deprecated_member_use
   registerTask(new ExamplesCli(), config.examples);
   registerTask(new ExportConfigCli(), new TaskConfig());
   registerTask(new FormatCli(), config.format);
   registerTask(new GenTestRunnerCli(), config.genTestRunner);
   registerTask(new InitCli(), config.init);
+  // ignore: deprecated_member_use
   registerTask(new SauceRunnerCli(), config.saucelabs);
   registerTask(new TaskRunnerCli(), config.taskRunner);
   registerTask(new TestCli(), config.test);
@@ -79,6 +83,12 @@ dev(List<String> args) async {
         shout: true);
     exit(exitCode);
   }
+
+  // Register these tasks after the rest of the tasks have been registered
+  // because they depend on the list of other available dart_dev tasks.
+  final availableTasks = _cliTasks.keys.toSet();
+  registerTask(new Dart1OnlyCli(availableTasks), config.dart1Only);
+  registerTask(new Dart2OnlyCli(availableTasks), config.dart2Only);
 
   await _run(args);
   exit(exitCode);

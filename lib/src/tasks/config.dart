@@ -18,6 +18,7 @@ import 'package:dart_dev/src/tasks/analyze/config.dart';
 import 'package:dart_dev/src/tasks/bash_completion/config.dart';
 import 'package:dart_dev/src/tasks/copy_license/config.dart';
 import 'package:dart_dev/src/tasks/coverage/config.dart';
+import 'package:dart_dev/src/tasks/dart_x_only/config.dart';
 import 'package:dart_dev/src/tasks/docs/config.dart';
 import 'package:dart_dev/src/tasks/examples/config.dart';
 import 'package:dart_dev/src/tasks/format/config.dart';
@@ -35,13 +36,32 @@ class Config {
   BashCompletionConfig bashCompletion = new BashCompletionConfig();
   CopyLicenseConfig copyLicense = new CopyLicenseConfig();
   CoverageConfig coverage = new CoverageConfig();
+  Dart1OnlyConfig dart1Only = new Dart1OnlyConfig();
+  Dart2OnlyConfig dart2Only = new Dart2OnlyConfig();
+
+  /// Deprecated: 1.10.0
+  /// To be removed: 2.0.0
+  /// Use the `dartdoc` executable instead.
+  @deprecated
   DocsConfig docs = new DocsConfig();
+
+  /// Deprecated 1.10.0
+  /// To be removed: 2.0.0
+  /// Use `pub serve example` or `pub run build_runner serve example:8080`
+  /// instead.
+  @deprecated
   ExamplesConfig examples = new ExamplesConfig();
+
   LocalConfig local = new LocalConfig();
   FormatConfig format = new FormatConfig();
   GenTestRunnerConfig genTestRunner = new GenTestRunnerConfig();
   InitConfig init = new InitConfig();
+
+  /// Deprecated 1.10.0
+  /// To be removed: 2.0.0
+  @deprecated
   SaucelabsConfig saucelabs = new SaucelabsConfig();
+
   TaskRunnerConfig taskRunner = new TaskRunnerConfig();
   TestConfig test = new TestConfig();
 
@@ -50,12 +70,15 @@ class Config {
         'bashCompletion': bashCompletion,
         'copyLicense': copyLicense,
         'coverage': coverage,
+        // ignore: deprecated_member_use
         'docs': docs,
+        // ignore: deprecated_member_use
         'examples': examples,
         'local': local,
         'format': format,
         'genTestRunner': genTestRunner,
         'init': init,
+        // ignore: deprecated_member_use
         'saucelabs': saucelabs,
         'taskRunner': taskRunner,
         'test': test,

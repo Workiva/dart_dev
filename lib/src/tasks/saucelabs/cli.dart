@@ -47,17 +47,24 @@ class SauceRunnerCli extends TaskCli {
 
   @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
+    reporter.warning('''
+---- DEPRECATION NOTICE ----
+The saucelabs task is deprecated and will be removed in dart_dev v2.0.0.
+----------------------------''');
+
     if (sauceUserName == null || sauceAccessKey == null) {
       return new CliResult.fail('Sauce Labs credentials must be available via '
           'the `SAUCE_ACCESS_KEY` and `SAUCE_USERNAME` environment variables.');
     }
 
+    // ignore: deprecated_member_use
     if (config.saucelabs.filesToTest.isEmpty) {
       return new CliResult.fail('You must specify files to test.');
     }
 
     List<sauceRunner.SauceTest> sauceTests = [];
 
+    // ignore: deprecated_member_use
     for (String file in config.saucelabs.filesToTest) {
       sauceTests.add(new sauceRunner.SauceTest(file, file));
     }
@@ -65,10 +72,15 @@ class SauceRunnerCli extends TaskCli {
     var autoSauceConnect =
         TaskCli.valueOf('new-sauce-tunnel', parsedArgs, true);
     var buildName =
+        // ignore: deprecated_member_use
         TaskCli.valueOf('build-name', parsedArgs, config.saucelabs.buildName);
-    var tunnelIdentifier = TaskCli.valueOf('sauce-tunnel-identifier',
-        parsedArgs, config.saucelabs.sauceConnectTunnelIdentifier);
+    var tunnelIdentifier = TaskCli.valueOf(
+        'sauce-tunnel-identifier',
+        parsedArgs,
+        // ignore: deprecated_member_use
+        config.saucelabs.sauceConnectTunnelIdentifier);
 
+    // ignore: deprecated_member_use
     final int pubServePort = config.saucelabs.pubServePort ?? 0;
 
     if (tunnelIdentifier == null) {
@@ -76,7 +88,11 @@ class SauceRunnerCli extends TaskCli {
     }
 
     var results = await sauceRunner.run(
-        sauceTests, config.saucelabs.platforms, sauceUserName, sauceAccessKey,
+        sauceTests,
+        // ignore: deprecated_member_use
+        config.saucelabs.platforms,
+        sauceUserName,
+        sauceAccessKey,
         autoSauceConnect: autoSauceConnect,
         tunnelIdentifier: tunnelIdentifier,
         options: getSauceBuildOptions(buildName),
@@ -96,8 +112,10 @@ class SauceRunnerCli extends TaskCli {
 
     reporter.log('');
     reporter.log(
+        // ignore: deprecated_member_use
         'Writing xUnit test report to ${config.saucelabs.testReportPath}.');
     var reportXml = sauceResultsToXunitXml(results);
+    // ignore: deprecated_member_use
     var reportOutput = new File(config.saucelabs.testReportPath);
     await reportOutput.create(recursive: true);
     await reportOutput.writeAsString(reportXml);
@@ -105,6 +123,7 @@ class SauceRunnerCli extends TaskCli {
     if (failed) {
       return new CliResult.fail('Fail, there was an error in running your tests'
           ' please review the output above and the test report located at'
+          // ignore: deprecated_member_use
           ' ${config.saucelabs.testReportPath}.');
     } else {
       return new CliResult.success('Success, your tests completed successfully'

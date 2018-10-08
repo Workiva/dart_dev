@@ -39,8 +39,16 @@ class ExamplesCli extends TaskCli {
 
   @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
+    reporter.warning('''
+---- DEPRECATION NOTICE ----
+The examples task is deprecated and will be removed in dart_dev v2.0.0.
+Run `pub serve example` or `pub run build_runner serve example:8080` instead.
+----------------------------''');
+
     String hostname =
+        // ignore: deprecated_member_use
         TaskCli.valueOf('hostname', parsedArgs, config.examples.hostname);
+    // ignore: deprecated_member_use
     var port = TaskCli.valueOf('port', parsedArgs, config.examples.port);
     if (port is String) {
       port = int.parse(port);
@@ -49,6 +57,7 @@ class ExamplesCli extends TaskCli {
     if (!hasExamples())
       return new CliResult.fail('This project does not have any examples.');
 
+    // ignore: deprecated_member_use
     ExamplesTask task = serveExamples(hostname: hostname, port: port);
     reporter.logGroup(task.pubServeCommand,
         outputStream: task.pubServeStdOut, errorStream: task.pubServeStdErr);

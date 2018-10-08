@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library dart_dev.api;
+library dart_dev.src.tasks.dart_x_only.config;
 
-export 'package:dart_dev/src/tasks/analyze/api.dart' show AnalyzeTask, analyze;
-export 'package:dart_dev/src/tasks/examples/api.dart'
-    show
-        // ignore: deprecated_member_use
-        ExamplesTask,
-        // ignore: deprecated_member_use
-        serveExamples;
-export 'package:dart_dev/src/tasks/format/api.dart'
-    show FilesToFormat, FormatTask, format, getFilesToFormat;
-export 'package:dart_dev/src/tasks/init/api.dart' show InitTask, init;
-export 'package:dart_dev/src/tasks/test/api.dart' show TestTask, test;
+import 'package:dart_dev/src/tasks/config.dart';
+
+class Dart1OnlyConfig extends TaskConfig {}
+
+class Dart2OnlyConfig extends TaskConfig {}
