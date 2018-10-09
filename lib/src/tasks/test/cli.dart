@@ -26,7 +26,7 @@ import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/src/tasks/test/api.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
-import 'package:dart_dev/src/util.dart' show runAll;
+import 'package:dart_dev/src/util.dart' show dartMajorVersion, runAll;
 
 class TestCli extends TaskCli {
   @override
@@ -58,7 +58,11 @@ class TestCli extends TaskCli {
         abbr: 'p',
         allowMultiple: true,
         help:
-            'The platform(s) on which to run the tests.\n[vm (default), dartium, content-shell, chrome, phantomjs, firefox, safari]')
+            'The platform(s) on which to run the tests.\n[vm (default), chrome, firefox, safari]')
+    ..addOption('preset',
+        abbr: 'P',
+        allowMultiple: true,
+        help: 'The configuration preset(s) to use.')
     ..addOption('name',
         abbr: 'n',
         help:
@@ -78,15 +82,16 @@ class TestCli extends TaskCli {
 
   @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
-    if (!platform_util.hasImmediateDependency('test'))
+    if (!platform_util.hasImmediateDependency('test')) {
       return new CliResult.fail(
           'Package "test" must be an immediate dependency in order to run its executables.');
+    }
 
-    List<String> additionalArgs = [];
+    final testArgs = <String>[];
     List<String> tests = [];
 
     if (!color) {
-      additionalArgs.add('--no-color');
+      testArgs.add('--no-color');
     }
 
     bool pauseAfterLoad =
@@ -108,6 +113,8 @@ class TestCli extends TaskCli {
     }
     List<String> platforms =
         TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
+    List<String> presets =
+        TaskCli.valueOf('preset', parsedArgs, const <String>[]);
 
     // CLI user can specify individual test files to run.
     bool individualTestsSpecified = parsedArgs.rest.isNotEmpty;
@@ -167,54 +174,59 @@ class TestCli extends TaskCli {
     }
 
     if (pauseAfterLoad) {
-      additionalArgs.add('--pause-after-load');
+      testArgs.add('--pause-after-load');
     }
 
     PubServeTask pubServeTask;
 
     if (pubServe) {
-      bool isPubServeRunning = await isPortBound(pubServePort);
+      if (dartMajorVersion == 2) {
+        reporter.warning('''Pub serve was removed in Dart 2.
+A pub serve instance will not be started.''');
+      } else {
+        bool isPubServeRunning = await isPortBound(pubServePort);
 
-      if (!isPubServeRunning) {
-        // Start `pub serve` on the `test` directory
-        var additionalArgs = ['test'];
-        if (compilerSpecified) {
-          additionalArgs.add('--web-compiler=${parsedArgs['web-compiler']}');
+        if (!isPubServeRunning) {
+          // Start `pub serve` on the `test` directory
+          var pubServeArgs = ['test'];
+          if (compilerSpecified) {
+            pubServeArgs.add('--web-compiler=${parsedArgs['web-compiler']}');
+          }
+
+          pubServeTask =
+              startPubServe(port: pubServePort, additionalArgs: pubServeArgs);
+
+          var startupLogFinished = new Completer();
+          reporter.logGroup(pubServeTask.command,
+              outputStream: pubServeTask.stdOut
+                  .transform(until(startupLogFinished.future)),
+              errorStream: pubServeTask.stdErr
+                  .transform(until(startupLogFinished.future)));
+
+          var serveInfo = await pubServeTask.serveInfos.first;
+          pubServePort = serveInfo.port;
+
+          startupLogFinished.complete();
+          pubServeTask.stdOut.join('\n').then((stdOut) {
+            if (stdOut.isNotEmpty) {
+              reporter.logGroup('`${pubServeTask.command}` (buffered stdout)',
+                  output: stdOut);
+            }
+          });
+          pubServeTask.stdErr.join('\n').then((stdErr) {
+            if (stdErr.isNotEmpty) {
+              reporter.logGroup('`${pubServeTask.command}` (buffered stderr)',
+                  error: stdErr);
+            }
+          });
         }
 
-        pubServeTask =
-            startPubServe(port: pubServePort, additionalArgs: additionalArgs);
-
-        var startupLogFinished = new Completer();
-        reporter.logGroup(pubServeTask.command,
-            outputStream:
-                pubServeTask.stdOut.transform(until(startupLogFinished.future)),
-            errorStream: pubServeTask.stdErr
-                .transform(until(startupLogFinished.future)));
-
-        var serveInfo = await pubServeTask.serveInfos.first;
-        pubServePort = serveInfo.port;
-
-        startupLogFinished.complete();
-        pubServeTask.stdOut.join('\n').then((stdOut) {
-          if (stdOut.isNotEmpty) {
-            reporter.logGroup('`${pubServeTask.command}` (buffered stdout)',
-                output: stdOut);
-          }
-        });
-        pubServeTask.stdErr.join('\n').then((stdErr) {
-          if (stdErr.isNotEmpty) {
-            reporter.logGroup('`${pubServeTask.command}` (buffered stderr)',
-                error: stdErr);
-          }
-        });
+        testArgs.add('--pub-serve=$pubServePort');
       }
-
-      additionalArgs.add('--pub-serve=$pubServePort');
     }
 
     if (testNamed) {
-      additionalArgs.addAll(['-n', '${parsedArgs['name']}']);
+      testArgs.addAll(['-n', '${parsedArgs['name']}']);
     }
 
     if (functional && config.test.beforeFunctionalTests.isNotEmpty) {
@@ -225,7 +237,8 @@ class TestCli extends TaskCli {
         tests: tests,
         concurrency: concurrency,
         platforms: platforms,
-        additionalArgs: additionalArgs);
+        presets: presets,
+        testArgs: testArgs);
     reporter.logGroup(task.testCommand, outputStream: task.testOutput);
 
     await task.done;

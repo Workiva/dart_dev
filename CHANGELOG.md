@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.0.0](https://github.com/Workiva/dart_dev/compare/1.10.1...2.0.0)
+_October 9, 2018_
+
+- **BREAKING CHANGE:** `docs`, `examples`, and `saucelabs` tasks have been removed.
+
+- **BREAKING CHANGE:** `ExamplesTask` and `serveExamples` have been removed from
+  the `package:dart_dev/api.dart` entry point.
+
+- **BREAKING CHANGE:** `SaucePlatform` and the constant platform instances have
+  been removed from the `package:dart_dev/dart_dev.dart` entry point.
+
+- **Improvement:** Dart 2 compatible!
+
+  _Notable change to the `test` task:_ Pub serve functionality is now ignored when
+  running the `test` task, as that functionality was removed from the pub executable
+  as a part of the Dart 2.0.0 SDK release. To accommodate this change, the `test`
+  task will now run tests via `build_runner test` when on Dart 2 and when `build_test`
+  is found in your package's `pubspec.yaml`.
+
+  _Caveat:_ The `coverage` task exits with a non-zero exit code immediately when
+  run on Dart2, as there is not yet any support for collecting coverage from browser
+  tests.
+
 ## [1.10.1](https://github.com/Workiva/dart_dev/compare/1.10.0...1.10.1)
 _October 9, 2018_
 

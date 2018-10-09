@@ -15,12 +15,6 @@
 library dart_dev.api;
 
 export 'package:dart_dev/src/tasks/analyze/api.dart' show AnalyzeTask, analyze;
-export 'package:dart_dev/src/tasks/examples/api.dart'
-    show
-        // ignore: deprecated_member_use
-        ExamplesTask,
-        // ignore: deprecated_member_use
-        serveExamples;
 export 'package:dart_dev/src/tasks/format/api.dart'
     show FilesToFormat, FormatTask, format, getFilesToFormat;
 export 'package:dart_dev/src/tasks/init/api.dart' show InitTask, init;

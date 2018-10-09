@@ -6,7 +6,7 @@ main(List<String> args) async {
   config.test
     ..pubServe = true
     ..unitTests = ['test/unit_test.dart']
-    ..platforms = ['content-shell'];
+    ..platforms = ['chrome'];
 
   await dev(args);
 }

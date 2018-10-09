@@ -85,8 +85,6 @@ local tasks.
 - **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
 - **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
 - **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
-- (DEPRECATED) **Documentation Generation:** runs the tool from [the `dartdoc` package](https://github.com/dart-lang/dartdoc) to generate docs.
-- (DEPRECATED) **Serving Examples:** uses [`pub serve`](https://www.dartlang.org/tools/pub/cmd/pub-serve.html) to serve the project examples.
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Generate a test runner file:** that allows for faster test execution.
 - **Running dart unit tests on Sauce Labs:** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
@@ -204,9 +202,6 @@ main(args) async {
   // Configure whether or not the HTML coverage report should be generated.
   config.coverage.html = false;
 
-  // Configure the port on which examples should be served.
-  config.examples.port = 9000;
-
   // Define the paths to include when running the
   // Dart formatter.
   config.format.paths = ['lib/', 'test/', 'tool/'];
@@ -241,11 +236,8 @@ running any of the following tasks:
 ddev analyze
 ddev copy-license
 ddev coverage
-ddev docs  # (DEPRECATED)
-ddev examples  # (DEPRECATED)
 ddev format
 ddev gen-test-runner
-ddev saucelabs  # (DEPRECATED)
 ddev task-runner
 ddev test
 
@@ -253,11 +245,8 @@ ddev test
 pub run dart_dev analyze
 pub run dart_dev copy-license
 pub run dart_dev coverage
-pub run dart_dev docs  # (DEPRECATED)
-pub run dart_dev examples   # (DEPRECATED)
 pub run dart_dev format
 pub run dart_dev gen-test-runner
-pub run dart_dev saucelabs  # (DEPRECATED)
 pub run dart_dev task-runner
 pub run dart_dev test
 ```
@@ -306,12 +295,9 @@ main(args) async {
   config.analyze
   config.copyLicense
   config.coverage
-  config.docs
-  config.examples
   config.format
   config.genTestRunner
   config.init
-  config.saucelabs
   config.taskRunner
   config.test
 
@@ -455,38 +441,6 @@ configuration from the `config.test` object.
 >    `brew update && brew install lcov`
 >
 > Otherwise, visit http://ltp.sourceforge.net/coverage/lcov.php
-
-#### `docs` config
-There are currently no project-configuration settings for the `docs` task.
-
-#### `examples` Config
-All configuration options for the `examples` task are found on the
-`config.examples` object.
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>hostname</code></td>
-            <td><code>String</code></td>
-            <td><code>'localhost'</code></td>
-            <td>The host name to listen on.</td>
-        </tr>
-        <tr>
-            <td><code>port</code></td>
-            <td><code>int</code></td>
-            <td><code>8080</code></td>
-            <td>The base port to listen on.</td>
-        </tr>
-    </tbody>
-</table>
 
 #### `format` Config
 All configuration options for the `format` task are found on the `config.format`
@@ -651,67 +605,6 @@ All configuration options for the local task discovery are found on the
     </tbody>
 </table>
 
-#### `saucelabs` Config
-All configuration options for the `saucelabs` task are found on the `config.saucelabs`
-object.
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>filesToTest</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>[]</code></td>
-            <td>Html files related to browser tests to be executed on saucelabs (the path will be relative to the test directory)</td>
-        </tr>
-        <tr>
-            <td><code>platforms</code></td>
-            <td><code>List&lt;SaucePlatform&gt;</code></td>
-            <td><code>[chromeWindows, firefoxWindows, chromeOsx, firefoxOsx, ie10, ie11]</code></td>
-            <td>Platforms to be executed on saucelabs</td>
-        </tr>
-        <tr>
-            <td><code>pubServePort</code></td>
-            <td><code>int</code></td>
-            <td><code>0</code></td>
-            <td>Specify the port to run the tests on, otherwise specifying 0 will use a random port</td>
-        </tr>
-        <tr>
-            <td><code>sauceConnectTunnelIdentifier</code></td>
-            <td><code>String</code></td>
-            <td><code>null</code></td>
-            <td>The sauce connect tunnel to use, if null then a tunnel will be automatically started</td>
-        </tr>
-        <tr>
-            <td><code>testReportPath</code></td>
-            <td><code>String</code></td>
-            <td><code>test_reports/sauce_labs_unit_tests.xml</code></td>
-            <td>Path for test_report</td>
-        </tr>        
-    </tbody>
-</table>
-
-* In order to use this the following transformer needs to be added to your pubspec.yaml, it must also be applied after the test transformer
-
-```
-- dart_dev/src/sauce_test_harness_transformer:
-    $include: [
-       "test/**_test{.*,}.dart",
-       "test/**_test{.*,}.html",
-      ]
-```
-
-* The html files to be transformed should have the `packages/test/dart.js` script tag listed last.
-
-* During this process the test directory will be served which means that the `filesToTest` must be within the test directory and their path will be relative to the test directory.
-
 #### `task-runner` Config
 All configuration options for the `task-runner` task are found on the `config.taskRunnerConfig`
 object.
@@ -836,20 +729,15 @@ Supported tasks:
     analyze
     copy-license
     coverage
-    docs
-    examples
     format
     gen-test-runner
     init
-    saucelabs
     test
 ```
 
 - Static analysis: `ddev analyze`
 - Applying license to source files: `ddev copy-license`
 - Code coverage: `ddev coverage`
-- Documentation generation: `ddev docs`
-- Serving examples: `ddev examples`
 - Dart formatter: `ddev format`
 - Generate test runner: `ddev gen-test-runner`
 - Initialization: `ddev init`
@@ -871,7 +759,6 @@ import 'package:dart_dev/api.dart' as api;
 
 main() async {
   await api.analyze();
-  await api.serveExamples();
   await api.format();
   await api.init();
   await api.test();

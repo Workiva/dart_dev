@@ -35,8 +35,7 @@ CopyLicenseTask copyLicense(
   directories.forEach((path) {
     Directory dir = new Directory(path);
     if (!dir.existsSync()) return;
-    Iterable<File> files =
-        dir.listSync(recursive: true).where((e) => e is File);
+    final files = dir.listSync(recursive: true).where((e) => e is File);
     files.forEach((file) {
       // Skip files in packages/ directory
       if (file.path.contains('/packages/')) return;

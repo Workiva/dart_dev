@@ -1,8 +1,7 @@
 language: dart
-sudo: required
 
-dart:
-  - 1.24.3
+# Workaround for issue with sandboxed Chrome in containerized Travis builds.
+sudo: required
 
 addons:
   apt:
@@ -12,6 +11,11 @@ addons:
     - ttf-dejavu
     - ttf-indic-fonts
     - fonts-tlwg-garuda
+  chrome: stable
+
+dart:
+  - 1.24.3
+  - stable
 
 before_install:
   # Workaround for https://github.com/travis-ci/travis-ci/issues/8607
@@ -39,14 +43,12 @@ before_install:
   -  sh -e /etc/init.d/xvfb start
 
 script:
-  - pub run dependency_validator -i browser,coverage,dart_style,dartdoc,test
-  - pub run dart_dev format --check
+  - pub run dependency_validator -i browser,coverage,dart_style,test
+  - pub run dart_dev dart2-only -- format --check
   - pub run dart_dev analyze
-  - cd test_fixtures/coverage/functional_test/
-  - pub get
-  - pub run dependency_validator -i browser,coverage
-  - pub build
-  - cd -
-  - pub run dart_dev test --integration
-  - pub run dart_dev coverage --integration --no-html
-  - bash <(curl -s https://codecov.io/bash) -f coverage/coverage.lcov
+  - pub run dart_dev dart1-only ./tool/build_functional_coverage_fixture.sh
+  - pub run dart_dev dart1-only -- test -P dart1
+  - pub run dart_dev dart2-only -- test -P dart2
+# TODO: no way to use a preset with coverage
+#  - pub run dart_dev dart1-only coverage --integration --no-html
+#  - bash <(curl -s https://codecov.io/bash) -f coverage/coverage.lcov

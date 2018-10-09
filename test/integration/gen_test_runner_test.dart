@@ -33,8 +33,8 @@ Future<Runner> generateTestRunner(String projectPath,
     {List<String> additionalArgs: const []}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
-  var files = [];
-  var errors = [];
+  var files = <String>[];
+  var errors = <String>[];
   var stderr = '';
   var stdout = '';
   var args = ['run', 'dart_dev', 'gen-test-runner'];

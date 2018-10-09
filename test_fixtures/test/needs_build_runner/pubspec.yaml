@@ -1,6 +1,8 @@
-name: test_generator_check_pass
+name: test_needs_build_runner
 version: 0.0.0
 dev_dependencies:
   dart_dev:
     path: ../../..
+  build_runner: any
+  build_test: any
   test: any
