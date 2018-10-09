@@ -6,6 +6,10 @@ import 'package:webdriver/io.dart' show Browser, BrowserPlatform, Capabilities;
 
 /// A platform on which Sauce Labs tests will run, consisting of a browser,
 /// an optional browser version, and an optional operating system.
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 class SaucePlatform {
   final String browser;
   final String browserVersion;
@@ -95,30 +99,62 @@ const _osOsx = 'mac';
 const _osWindows = 'Windows';
 
 /// Chrome (OS and version agnostic).
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 const SaucePlatform chrome = const SaucePlatform(Browser.chrome);
 
 /// Chrome on Windows (version agnostic).
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 const SaucePlatform chromeWindows =
     const SaucePlatform(Browser.chrome, os: _osWindows);
 
 /// Chrome on OS X (version agnostic).
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 const SaucePlatform chromeOsx = const SaucePlatform(Browser.chrome, os: _osOsx);
 
 /// Firefox on Windows (version agnostic).
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 const SaucePlatform firefoxWindows =
     const SaucePlatform(Browser.firefox, os: _osWindows);
 
 /// Firefox on OS X (version agnostic).
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 const SaucePlatform firefoxOsx =
     const SaucePlatform(Browser.firefox, os: _osOsx);
 
 /// Safari (OS and version agnostic).
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 const SaucePlatform safari = const SaucePlatform(Browser.safari, os: _osOsx);
 
 /// Internet Explorer 10 (OS agnostic).
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 const SaucePlatform ie10 =
     const SaucePlatform(Browser.ie, browserVersion: '10');
 
 /// Internet Explorer 11 (OS agnostic).
+///
+/// Deprecated: 1.10.1
+/// To be removed: 2.0.0
+@deprecated
 const SaucePlatform ie11 =
     const SaucePlatform(Browser.ie, browserVersion: '11');
