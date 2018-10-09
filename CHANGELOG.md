@@ -1,5 +1,53 @@
 # Changelog
 
+## [1.10.1](https://github.com/Workiva/dart_dev/compare/1.10.0...1.10.1)
+_October 9, 2018_
+
+- **Deprecations:** The following members of the `package:dart_dev/dart_dev.dart`
+  entry point have been deprecated and will be removed in 2.0.0:
+
+    * `SaucePlatform`
+    * `const SaucePlatform chrome`
+    * `const SaucePlatform chromeWindows`
+    * `const SaucePlatform chromeOsx`
+    * `const SaucePlatform firefoxWindows`
+    * `const SaucePlatform firefoxOsx`
+    * `const SaucePlatform safari`
+    * `const SaucePlatform ie10`
+    * `const SaucePlatform ie11`
+
+## [1.10.0](https://github.com/Workiva/dart_dev/compare/1.9.6...1.10.0)
+_October 8, 2018_
+
+- **New Tasks:** `dart1-only` and `dart2-only`
+
+    Use these tasks to conditionally run another dart_dev task or an arbitrary
+    shell command _only_ when running on Dart1 or Dart2.
+
+    ```bash
+    # Run a dart_dev task only on Dart1:
+    $ ddev dart1-only test
+
+    # Run a dart_dev task with additional args only on Dart1:
+    $ ddev dart1-only -- format --check
+
+    # Run an shell script only on Dart1:
+    $ ddev dart1-only ./example.sh
+
+    # Run an executable with additional args only on Dart1:
+    $ ddev dart1-only -- pub serve web --port 8080
+
+    # The `dart2-only` task works exactly the same, but only runs on Dart2:
+    $ ddev dart2-only test
+    $ ddev dart2-only -- format --check
+    $ ddev dart2-only ./example.sh
+    $ ddev dart2-only -- pub run build_runner serve web:8080
+    ```
+
+- **Deprecated Tasks:** `docs`, `examples`, and `saucelabs`.
+
+    These three tasks have been deprecated and will be removed in 2.0.0.
+
 ## [1.1.2](https://github.com/Workiva/dart_dev/compare/1.1.1...1.1.2)
 _March 22, 2016_
 
