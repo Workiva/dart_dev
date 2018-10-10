@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0](https://github.com/Workiva/dart_dev/compare/1.10.1...2.0.0)
+## [2.0.0-beta](https://github.com/Workiva/dart_dev/compare/1.10.1...2.0.0-beta)
 _October 9, 2018_
 
 - **BREAKING CHANGE:** `docs`, `examples`, and `saucelabs` tasks have been removed.
