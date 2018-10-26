@@ -30,6 +30,7 @@ const List<String> defaultUnitTests = const ['test/'];
 const List<String> defaultFunctionalTests = const [];
 const List<String> defaultPlatforms = const [];
 const String defaultOutput = "expanded";
+const String defaultOutputFilename = null;
 
 class TestConfig extends TaskConfig {
   List afterFunctionalTests = defaultAfterFunctional;
@@ -42,4 +43,5 @@ class TestConfig extends TaskConfig {
   int pubServePort = defaultPubServePort;
   List<String> unitTests = defaultUnitTests;
   String output = defaultOutput;
+  String outputFilename = defaultOutputFilename;
 }

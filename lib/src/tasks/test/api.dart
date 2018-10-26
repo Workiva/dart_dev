@@ -15,6 +15,7 @@
 library dart_dev.src.tasks.test.api;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dart_dev/util.dart' show TaskProcess;
 
@@ -27,12 +28,15 @@ import 'package:dart_dev/util.dart' show hasImmediateDependency;
 TestTask test(
     {int concurrency,
     String output,
+    String outputFilename,
     List<String> platforms: const [],
     List<String> presets: const [],
     List<String> testArgs: const [],
     List<String> tests: const []}) {
   final executable = 'pub';
   final args = <String>[];
+  File outputFile = null;
+  IOSink sink = null;
   if (dartMajorVersion == 2 && hasImmediateDependency('build_test')) {
     args.addAll(['run', 'build_runner', 'test', '--']);
   } else {
@@ -51,6 +55,10 @@ TestTask test(
   if (output != null){
     args.addAll(['--reporter=$output']);
   }
+  if (outputFilename != null){
+    outputFile = new File(outputFilename);
+    sink = outputFile.openWrite();
+  }
   args.addAll(testArgs);
   args.addAll(tests);
 
@@ -66,6 +74,9 @@ TestTask test(
   StreamController<String> stdoutc = new StreamController<String>();
   process.stdout.listen((line) async {
     stdoutc.add(line);
+    if(sink != null){
+      sink.write(line);
+    }
     if ((line.contains('All tests passed!') ||
             line.contains('Some tests failed.')) &&
         !outputProcessed.isCompleted) {
@@ -84,6 +95,9 @@ TestTask test(
     }
   });
   process.exitCode.then((code) {
+    if (sink != null){
+      sink.close();
+    }
     if (task.successful == null) {
       task.successful = code <= 0;
     }

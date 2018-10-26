@@ -39,9 +39,13 @@ class TestCli extends TaskCli {
         defaultsTo: defaultFunctional,
         help: 'Includes the functional test suite.')
     ..addOption('output',
-        abbr: 'r',
+        abbr: 'o',
         defaultsTo: '$defaultOutput',
         help: 'The output style of the test suites run.')
+    ..addOption('outputFilename',
+        abbr: 'f',
+        defaultsTo: '$defaultOutputFilename',
+        help: 'File to route test output to.')
     ..addOption('concurrency',
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
@@ -111,6 +115,7 @@ class TestCli extends TaskCli {
     }
     
     var output = TaskCli.valueOf('output', parsedArgs, config.test.output);
+    var outputFilename = TaskCli.valueOf('outputFilename', parsedArgs, config.test.outputFilename);
 
     var concurrency =
         TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
@@ -242,6 +247,7 @@ A pub serve instance will not be started.''');
     TestTask task = test(
         tests: tests,
         output: output,
+        outputFilename: outputFilename,
         concurrency: concurrency,
         platforms: platforms,
         presets: presets,
