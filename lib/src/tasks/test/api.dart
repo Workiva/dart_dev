@@ -26,6 +26,7 @@ import 'package:dart_dev/util.dart' show hasImmediateDependency;
 
 TestTask test(
     {int concurrency,
+    String output,
     List<String> platforms: const [],
     List<String> presets: const [],
     List<String> testArgs: const [],
@@ -47,7 +48,9 @@ TestTask test(
   presets.forEach((p) {
     args.addAll(['-P', p]);
   });
-  args.addAll(['--reporter=expanded']);
+  if (output != null){
+    args.addAll(['--reporter=$output']);
+  }
   args.addAll(testArgs);
   args.addAll(tests);
 

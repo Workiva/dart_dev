@@ -38,6 +38,10 @@ class TestCli extends TaskCli {
     ..addFlag('functional',
         defaultsTo: defaultFunctional,
         help: 'Includes the functional test suite.')
+    ..addOption('output',
+        abbr: 'r',
+        defaultsTo: '$defaultOutput',
+        help: 'The output style of the test suites run.')
     ..addOption('concurrency',
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
@@ -105,6 +109,8 @@ class TestCli extends TaskCli {
     if (pubServePort is String) {
       pubServePort = int.parse(pubServePort);
     }
+    
+    var output = TaskCli.valueOf('output', parsedArgs, config.test.output);
 
     var concurrency =
         TaskCli.valueOf('concurrency', parsedArgs, config.test.concurrency);
@@ -235,6 +241,7 @@ A pub serve instance will not be started.''');
 
     TestTask task = test(
         tests: tests,
+        output: output,
         concurrency: concurrency,
         platforms: platforms,
         presets: presets,
