@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:dart_dev/dart_dev.dart';
+import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/util.dart' show reporter;
 
 class ExportConfigCli extends TaskCli {
@@ -28,17 +28,7 @@ class ExportConfigCli extends TaskCli {
 
   @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
-    reporter.log(new JsonEncoder.withIndent('  ', (obj) {
-      // Attempt to convert the config into JSON.
-      try {
-        return obj.toJson();
-      } catch (_) {}
-
-      // If the given object doesn't support JSON serialization, skip it.
-      // This allows us to not implement serialization in all configs up-front,
-      // as well as not break for parts of the config that can't be serialized.
-      return null;
-    }).convert(config));
+    reporter.log(serializeConfig());
 
     return new CliResult.success();
   }

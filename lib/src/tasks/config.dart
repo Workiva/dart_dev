@@ -14,6 +14,8 @@
 
 library dart_dev.src.tasks.config;
 
+import 'dart:convert';
+
 import 'package:dart_dev/src/tasks/analyze/config.dart';
 import 'package:dart_dev/src/tasks/bash_completion/config.dart';
 import 'package:dart_dev/src/tasks/copy_license/config.dart';
@@ -59,4 +61,18 @@ class Config {
 class TaskConfig {
   List after = [];
   List before = [];
+}
+
+String serializeConfig({bool pretty: false}) {
+  return new JsonEncoder.withIndent(pretty ? '  ' : null, (obj) {
+    // Attempt to convert the config into JSON.
+    try {
+      return obj.toJson();
+    } catch (_) {}
+
+    // If the given object doesn't support JSON serialization, skip it.
+    // This allows us to not implement serialization in all configs up-front,
+    // as well as not break for parts of the config that can't be serialized.
+    return null;
+  }).convert(config);
 }

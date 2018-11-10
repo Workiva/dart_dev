@@ -18,10 +18,14 @@ import 'dart:async';
 
 import 'package:dart_dev/util.dart' show TaskProcess;
 
+import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/task.dart';
 
 LocalTask local(String executable, Iterable<String> args) {
-  TaskProcess process = new TaskProcess(executable, args);
+  TaskProcess process = new TaskProcess(executable, args, environment: {
+    // Make a serialized version of the config available to this task.
+    'dart_dev_config': serializeConfig(),
+  });
 
   LocalTask task = new LocalTask('$executable ${args.join(' ')}',
       Future.wait([process.done]).then((_) => null));
