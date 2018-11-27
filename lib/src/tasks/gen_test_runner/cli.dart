@@ -36,6 +36,10 @@ class GenTestRunnerCli extends TaskCli {
         defaultsTo: defaultCheck,
         negatable: false,
         help: 'Check whether the generated runner is up-to-date')
+    ..addOption('activeTestsRegex',
+        abbr: 't',
+        defaultsTo: defaultRegex,
+        help: 'Comments out tests that do not match given regex')
     ..addOption('config',
         help:
             'Configuration options should be performed in local dev.dart file');
@@ -48,6 +52,7 @@ class GenTestRunnerCli extends TaskCli {
     GenResultGroup results = new GenResultGroup();
 
     bool check = parsedArgs['check'];
+    String activeTestsRegex = parsedArgs['activeTestsRegex'];
 
     for (var currentConfig in config.genTestRunner.configs) {
       if (!new Directory(currentConfig.directory).existsSync()) {
@@ -56,6 +61,7 @@ class GenTestRunnerCli extends TaskCli {
       }
 
       currentConfig.check = check;
+      currentConfig.activeTestsRegex = activeTestsRegex;
 
       GenTestRunnerTask task = await genTestRunner(currentConfig);
       await task.done;

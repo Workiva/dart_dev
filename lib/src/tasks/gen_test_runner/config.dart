@@ -22,6 +22,7 @@ const List<String> defaultPreTestCommands = const [];
 const String defaultDirectory = 'test/';
 const Environment defaultEnv = Environment.browser;
 const String defaultFilename = 'generated_runner';
+const String defaultRegex = '';
 const bool defaultGenHtml = false;
 const bool defaultReact = true;
 const List<String> defaultHtmlHeaders = const [];
@@ -35,6 +36,7 @@ class TestRunnerConfig {
   String directory = defaultDirectory;
   Environment env = defaultEnv;
   String filename = defaultFilename;
+  String activeTestsRegex = defaultRegex;
   bool genHtml = defaultGenHtml;
   List<String> htmlHeaders = defaultHtmlHeaders;
 
@@ -44,6 +46,7 @@ class TestRunnerConfig {
       String this.directory: defaultDirectory,
       Environment this.env: defaultEnv,
       String this.filename: defaultFilename,
+      String this.activeTestsRegex: defaultRegex,
       bool this.genHtml: defaultGenHtml,
       List<String> this.htmlHeaders: defaultHtmlHeaders});
 }

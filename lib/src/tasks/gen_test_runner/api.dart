@@ -24,6 +24,8 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
   var taskTitle = 'gen-test-runner';
   var args = ['-d ${currentConfig.directory}', '-e ${currentConfig.env}'];
   currentConfig.genHtml ? args.add('--genHtml') : args.add('--no-genHtml');
+  args.addAll(['-t', '${currentConfig.activeTestsRegex}']);
+  final regexp = new RegExp(currentConfig.activeTestsRegex);
 
   GenTestRunnerTask task =
       new GenTestRunnerTask('$taskTitle ${args.join(' ')}');
@@ -87,8 +89,12 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   testFiles.forEach((File file) {
     var testPath = file.path.replaceFirst(currentDirectory, '');
-    runnerLines.add(
-        'import \'${'./' + testPath}\' as ${testPath.replaceAll('/', '_').substring(0, testPath.length - 5)};');
+    var line =
+        'import \'${'./' + testPath}\' as ${testPath.replaceAll('/', '_').substring(0, testPath.length - 5)};';
+    if (!regexp.hasMatch(testPath)) {
+      line = '//' + line;
+    }
+    runnerLines.add(line);
   });
 
   runnerLines.add('import \'package:test/test.dart\';');
@@ -110,8 +116,12 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig) async {
 
   testFiles.forEach((File file) {
     var testPath = file.path.replaceFirst(currentDirectory, '');
-    runnerLines.add(
-        '  ${testPath.replaceAll('/', '_').substring(0, testPath.length - 5)}.main();');
+    var line =
+        '${testPath.replaceAll('/', '_').substring(0, testPath.length - 5)}.main();';
+    if (!regexp.hasMatch(testPath)) {
+      line = '//' + line;
+    }
+    runnerLines.add('  $line');
   });
 
   runnerLines.add('}');
