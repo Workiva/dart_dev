@@ -1,0 +1,6 @@
+name: test_generator_browser_and_vm_runner
+version: 0.0.0
+dev_dependencies:
+  dart_dev:
+    path: ../../..
+  test: any

@@ -27,6 +27,7 @@ const String browserAndVmRunner =
     'test_fixtures/gen_test_runner/browser_and_vm_runner';
 const String checkFail = 'test_fixtures/gen_test_runner/check_fail';
 const String checkPass = 'test_fixtures/gen_test_runner/check_pass';
+const String activeTestsRegex = 'test_fixtures/gen_test_runner/active_tests_regex';
 const String defaultConfig = 'test_fixtures/gen_test_runner/default_config';
 
 Future<Runner> generateTestRunner(String projectPath,
@@ -65,6 +66,22 @@ verifyExistenceAndCleanup(String file,
   if (shouldFileExist) {
     new File(file).deleteSync();
   }
+}
+
+verifyExistenceCommentedLinesAndCleanup(
+    String filename, String offendingRegex) {
+  expect(FileSystemEntity.isFileSync(filename), isTrue);
+  var file = new File(filename);
+  var lines = file.readAsLinesSync();
+  for (var line in lines) {
+    if (line.trim().startsWith('//')) {
+      expect(line.contains(offendingRegex), isTrue);
+    } else {
+      expect(line.contains(offendingRegex), isFalse);
+    }
+  }
+
+  return null;
 }
 
 verifyContent(String filePath, String expectedContent) {
@@ -140,6 +157,52 @@ void main() {
             runner.stderr.contains('Generated test runner is not up-to-date.'),
             isTrue);
         expect(runner.stdout, equals(''));
+      });
+    });
+
+    group('--activeTestRegex option', () {
+      test('generates normally', () async {
+        Runner runner = await generateTestRunner(activeTestsRegex);
+        expect(runner.exitCode, isZero);
+        var actGeneratedFilename =
+            path.join(activeTestsRegex, 'test/generated_runner.dart');
+        verifyExistenceCommentedLinesAndCleanup(actGeneratedFilename, '');
+        verifyExistenceAndCleanup(actGeneratedFilename, shouldFileExist: true);
+        verifyExistenceAndCleanup(
+            path.join(activeTestsRegex, 'test/generated_runner.html'),
+            shouldFileExist: false);
+      });
+
+      group('comments out tests matching a given regex', () {
+        test('long form', () async {
+          Runner runner = await generateTestRunner(activeTestsRegex,
+              additionalArgs: ['--activeTestsRegex', 'totally_active']);
+          expect(runner.exitCode, isZero);
+          var actGeneratedFilename =
+              path.join(activeTestsRegex, 'test/generated_runner.dart');
+          verifyExistenceCommentedLinesAndCleanup(
+              actGeneratedFilename, 'totally_active');
+          verifyExistenceAndCleanup(actGeneratedFilename,
+              shouldFileExist: true);
+          verifyExistenceAndCleanup(
+              path.join(activeTestsRegex, 'test/generated_runner.html'),
+              shouldFileExist: false);
+        });
+
+        test('short form', () async {
+          Runner runner = await generateTestRunner(activeTestsRegex,
+              additionalArgs: ['-t', 'totally_active']);
+          expect(runner.exitCode, isZero);
+          var actGeneratedFilename =
+              path.join(activeTestsRegex, 'test/generated_runner.dart');
+          verifyExistenceCommentedLinesAndCleanup(
+              actGeneratedFilename, 'totally_active');
+          verifyExistenceAndCleanup(actGeneratedFilename,
+              shouldFileExist: true);
+          verifyExistenceAndCleanup(
+              path.join(activeTestsRegex, 'test/generated_runner.html'),
+              shouldFileExist: false);
+        });
       });
     });
   });
