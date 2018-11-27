@@ -494,8 +494,14 @@ object.
             <td>The list of runner configurations used to create individual test runners</td>
         </tr>
         <tr>
+            <td><code>activeTestsRegex</code></td>
+            <td><code>String</code></td>
+            <td><code>''</code></td>
+            <td>You can use this to speed up local dev by specifying which files you want to include. This should reduce the build time of <code>ddev test</code>, allowing you to target your specific tests and iterate quickly.</td>
+        </tr>
+        <tr>
             <td><code>check</code></td>
-            <td><code>bool/code></td>
+            <td><code>bool</code></td>
             <td><code>false</code></td>
             <td>If true, will only check to ensure the runner is up-to-date</td>
         </tr>
@@ -505,6 +511,9 @@ object.
 **Note:** if you plan to use the `--check` option, be sure to exclude
 the `generated_runner_test.dart` file from formatting. This can be done
 by adding it to the `config.format.exclude` list.
+**Note:** the `--activeTestsRegex` (or `-t`) option is meant to be used
+for local dev and iterating quickly on tests. It should be easily undone
+with a `git checkout -- <path_to/generated_runner.dart>`.
 
 #### Local Config
 All configuration options for the local task discovery are found on the
