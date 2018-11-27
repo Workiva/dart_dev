@@ -27,7 +27,8 @@ const String browserAndVmRunner =
     'test_fixtures/gen_test_runner/browser_and_vm_runner';
 const String checkFail = 'test_fixtures/gen_test_runner/check_fail';
 const String checkPass = 'test_fixtures/gen_test_runner/check_pass';
-const String activeTestsRegex = 'test_fixtures/gen_test_runner/active_tests_regex';
+const String activeTestsRegex =
+    'test_fixtures/gen_test_runner/active_tests_regex';
 const String defaultConfig = 'test_fixtures/gen_test_runner/default_config';
 
 Future<Runner> generateTestRunner(String projectPath,

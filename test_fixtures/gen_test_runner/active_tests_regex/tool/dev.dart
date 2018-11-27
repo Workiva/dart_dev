@@ -1,4 +1,4 @@
-library test_generator_browser_and_vm_runner.tool.dev;
+library test_active_tests_regex.tool.dev;
 
 import 'package:dart_dev/dart_dev.dart';
 
