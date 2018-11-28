@@ -511,6 +511,7 @@ object.
 **Note:** if you plan to use the `--check` option, be sure to exclude
 the `generated_runner_test.dart` file from formatting. This can be done
 by adding it to the `config.format.exclude` list.
+
 **Note:** the `--activeTestsRegex` (or `-t`) option is meant to be used
 for local dev and iterating quickly on tests. It should be easily undone
 with a `git checkout -- <path_to/generated_runner.dart>`.
