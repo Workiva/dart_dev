@@ -24,12 +24,14 @@ import 'package:dart_dev/src/util.dart'
     show dartMajorVersion, dartiumExpirationOverrideEnv;
 import 'package:dart_dev/util.dart' show hasImmediateDependency;
 
-TestTask test(
-    {int concurrency,
-    List<String> platforms: const [],
-    List<String> presets: const [],
-    List<String> testArgs: const [],
-    List<String> tests: const []}) {
+TestTask test({
+  int concurrency,
+  String reporter: 'expanded',
+  List<String> platforms: const [],
+  List<String> presets: const [],
+  List<String> testArgs: const [],
+  List<String> tests: const [],
+}) {
   final executable = 'pub';
   final args = <String>[];
   if (dartMajorVersion == 2 && hasImmediateDependency('build_test')) {
@@ -47,15 +49,19 @@ TestTask test(
   presets.forEach((p) {
     args.addAll(['-P', p]);
   });
-  args.addAll(['--reporter=expanded']);
+  args.addAll(['--reporter=$reporter']);
   args.addAll(testArgs);
   args.addAll(tests);
 
   TaskProcess process = new TaskProcess(executable, args,
       environment: dartiumExpirationOverrideEnv);
   Completer outputProcessed = new Completer();
-  TestTask task = new TestTask('$executable ${args.join(' ')}',
-      Future.wait([process.done, outputProcessed.future]).then((_) => null));
+  TestTask task = new TestTask(
+    '$executable ${args.join(' ')}',
+    Future.wait([process.done, outputProcessed.future]).then((_) => null),
+    process.stdoutRaw,
+    process.stderrRaw,
+  );
 
   // TODO: Use this pattern to better parse the test summary even when the output is colorized
   // RegExp resultPattern = new RegExp(r'(\d+:\d+) \+(\d+) ?~?(\d+)? ?-?(\d+)?: (All|Some) tests (failed|passed)');
@@ -94,10 +100,12 @@ class TestTask extends Task {
   final Future<Null> done;
   final String testCommand;
   String testSummary;
+  final Stream<List<int>> stdoutRaw;
+  final Stream<List<int>> stderrRaw;
 
   StreamController<String> _testOutput = new StreamController();
 
-  TestTask(String this.testCommand, this.done);
+  TestTask(String this.testCommand, this.done, this.stdoutRaw, this.stderrRaw);
 
   Stream<String> get testOutput => _testOutput.stream;
 }

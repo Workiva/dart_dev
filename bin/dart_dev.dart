@@ -26,8 +26,8 @@ main(List<String> args) async {
     // If dev.dart exists, run that to allow configuration.
     var newArgs = [devFile.path]..addAll(args);
     TaskProcess process = new TaskProcess('dart', newArgs);
-    process.stdout.listen(stdout.writeln);
-    process.stderr.listen(stderr.writeln);
+    stdout.addStream(process.stdoutRaw);
+    stderr.addStream(process.stderrRaw);
     await process.done;
     exitCode = await process.exitCode;
   } else {

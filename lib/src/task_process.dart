@@ -27,6 +27,8 @@ class TaskProcess {
   Completer<int> _procExitCode = new Completer();
   Process _process;
 
+  StreamController<List<int>> _stdoutRaw = new StreamController();
+  StreamController<List<int>> _stderrRaw = new StreamController();
   StreamController<String> _stdout = new StreamController();
   StreamController<String> _stderr = new StreamController();
 
@@ -36,16 +38,26 @@ class TaskProcess {
             workingDirectory: workingDirectory, environment: environment)
         .then((process) {
       _process = process;
-      process.stdout
+      final processStdout = process.stdout.asBroadcastStream();
+      final processStderr = process.stderr.asBroadcastStream();
+      _stdoutRaw.addStream(processStdout);
+      _stderrRaw.addStream(processStderr);
+      processStdout
           .transform(convert.utf8.decoder)
           .transform(new LineSplitter())
           .listen(_stdout.add, onDone: _outc.complete);
-      process.stderr
+      processStderr
           .transform(convert.utf8.decoder)
           .transform(new LineSplitter())
           .listen(_stderr.add, onDone: _errc.complete);
-      _outc.future.then((_) => _stdout.close());
-      _errc.future.then((_) => _stderr.close());
+      _outc.future.then((_) {
+        _stdoutRaw.close();
+        _stdout.close();
+      });
+      _errc.future.then((_) {
+        _stderrRaw.close();
+        _stderr.close();
+      });
       process.exitCode.then(_procExitCode.complete);
       Future.wait([_outc.future, _errc.future, process.exitCode])
           .then((_) => _donec.complete());
@@ -58,6 +70,9 @@ class TaskProcess {
 
   Stream<String> get stderr => _stderr.stream;
   Stream<String> get stdout => _stdout.stream;
+
+  Stream<List<int>> get stdoutRaw => _stdoutRaw.stream;
+  Stream<List<int>> get stderrRaw => _stderrRaw.stream;
 
   bool kill([ProcessSignal signal = ProcessSignal.SIGTERM]) =>
       _process.kill(signal);

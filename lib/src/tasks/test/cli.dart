@@ -16,6 +16,7 @@ library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
 
+import 'dart:io';
 import 'package:args/args.dart';
 
 import 'package:dart_dev/util.dart' show reporter, isPortBound;
@@ -42,6 +43,17 @@ class TestCli extends TaskCli {
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
         help: 'The number of concurrent test suites run.')
+    ..addOption(
+      'reporter',
+      abbr: 'r',
+      defaultsTo: defaultReporter,
+      help: 'The runner used to print test results.',
+      allowedHelp: {
+        'compact': 'A single line, updated continuously.',
+        'expanded': 'A separate line for each update.',
+        'json': 'A machine-readable format (see https://goo.gl/gBsV1a).',
+      },
+    )
     ..addFlag('pub-serve',
         negatable: true,
         defaultsTo: defaultPubServe,
@@ -111,6 +123,8 @@ class TestCli extends TaskCli {
     if (concurrency is String) {
       concurrency = int.parse(concurrency);
     }
+    String testReporter =
+        TaskCli.valueOf('reporter', parsedArgs, config.test.reporter);
     List<String> platforms =
         TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
     List<String> presets =
@@ -235,11 +249,21 @@ A pub serve instance will not be started.''');
 
     TestTask task = test(
         tests: tests,
+        reporter: testReporter,
         concurrency: concurrency,
         platforms: platforms,
         presets: presets,
         testArgs: testArgs);
-    reporter.logGroup(task.testCommand, outputStream: task.testOutput);
+
+    if (testReporter == 'compact') {
+      reporter.logGroup(task.testCommand);
+      // Print the raw output so that carriage returns
+      // (which are used to rewrite lines) are printed properly.
+      stdout.addStream(task.stdoutRaw);
+      stderr.addStream(task.stderrRaw);
+    } else {
+      reporter.logGroup(task.testCommand, outputStream: task.testOutput);
+    }
 
     await task.done;
 
