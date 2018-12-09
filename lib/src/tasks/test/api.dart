@@ -66,9 +66,8 @@ TestTask test({
   // TODO: Use this pattern to better parse the test summary even when the output is colorized
   // RegExp resultPattern = new RegExp(r'(\d+:\d+) \+(\d+) ?~?(\d+)? ?-?(\d+)?: (All|Some) tests (failed|passed)');
 
-  StreamController<String> stdoutc = new StreamController<String>();
   process.stdout.listen((line) async {
-    stdoutc.add(line);
+    task._testOutput.add(line);
     if ((line.contains('All tests passed!') ||
             line.contains('Some tests failed.')) &&
         !outputProcessed.isCompleted) {
@@ -76,9 +75,13 @@ TestTask test({
       await SeleniumHelper.killChildrenProcesses();
       outputProcessed.complete();
     }
+  }, onDone: () {
+    if (!outputProcessed.isCompleted) {
+      outputProcessed.complete();
+    }
+    task._testOutput.close();
   });
 
-  stdoutc.stream.listen(task._testOutput.add);
   process.stderr.listen((line) async {
     task._testOutput.addError(line);
     if (line.contains('No tests match regular expression')) {
