@@ -18,12 +18,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:async/async.dart';
 import 'package:dart2_constant/convert.dart' as convert;
 
 class TaskProcess {
   Completer _donec = new Completer();
-  Completer _errc = new Completer();
-  Completer _outc = new Completer();
   Completer<int> _procExitCode = new Completer();
   Process _process;
 
@@ -38,28 +37,31 @@ class TaskProcess {
             workingDirectory: workingDirectory, environment: environment)
         .then((process) {
       _process = process;
-      final processStdout = process.stdout.asBroadcastStream();
-      final processStderr = process.stderr.asBroadcastStream();
-      _stdoutRaw.addStream(processStdout);
-      _stderrRaw.addStream(processStderr);
-      processStdout
+
+      final stdoutSplitter = new StreamSplitter(process.stdout);
+      final stderrSplitter = new StreamSplitter(process.stderr);
+
+      stdoutSplitter.split().pipe(_stdoutRaw);
+      stderrSplitter.split().pipe(_stderrRaw);
+
+      stdoutSplitter
+          .split()
           .transform(convert.utf8.decoder)
           .transform(new LineSplitter())
-          .listen(_stdout.add, onDone: _outc.complete);
-      processStderr
+          .pipe(_stdout);
+      stderrSplitter
+          .split()
           .transform(convert.utf8.decoder)
           .transform(new LineSplitter())
-          .listen(_stderr.add, onDone: _errc.complete);
-      _outc.future.then((_) {
-        _stdoutRaw.close();
-        _stdout.close();
-      });
-      _errc.future.then((_) {
-        _stderrRaw.close();
-        _stderr.close();
-      });
-      process.exitCode.then(_procExitCode.complete);
-      Future.wait([_outc.future, _errc.future, process.exitCode])
+          .pipe(_stderr);
+
+      stdoutSplitter.close();
+      stderrSplitter.close();
+
+      process.exitCode
+          .then(_procExitCode.complete)
+          // Some consumers depend on this being one tick later than the exitCode future.
+          // For example, changing this timing breaks the `analyze` task.
           .then((_) => _donec.complete());
     });
   }
