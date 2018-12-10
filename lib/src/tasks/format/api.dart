@@ -136,6 +136,8 @@ FilesToFormat getFilesToFormat({
         if (pathParts.contains('packages')) continue;
         // Skip contents of .pub directories.
         if (pathParts.contains('.pub')) continue;
+        // Skip contents of .dart_tool directories.
+        if (pathParts.contains('.dart_tool')) continue;
 
         // Skip excluded files.
         bool isExcluded = exclude.any((excluded) =>
