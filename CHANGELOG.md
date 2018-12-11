@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/Workiva/dart_dev/compare/2.0.0...2.0.1)
+
+_December 11, 2018_
+
+- **Bug Fix:** The format task now ignores the `.dart_tool/` directory. Prior to
+  this, it would try to format `.dart` files in `.dart_tool/`, often resulting
+  in `ProcessException: Argument list too long` errors.
+
 ## [2.0.0](https://github.com/Workiva/dart_dev/compare/1.10.1...2.0.0)
 _October 11, 2018_
 
