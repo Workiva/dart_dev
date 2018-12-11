@@ -288,5 +288,13 @@ void main() {
       String contentsAfter = file.readAsStringSync();
       expect(contentsBefore, equals(contentsAfter));
     });
+
+    test('should skip files in ".dart_tool" when excludes specified', () async {
+      File file = new File('$projectWithExclusions/lib/.dart_tool/main.dart');
+      String contentsBefore = file.readAsStringSync();
+      expect(await formatProject(projectWithExclusions), isTrue);
+      String contentsAfter = file.readAsStringSync();
+      expect(contentsBefore, equals(contentsAfter));
+    });
   });
 }
