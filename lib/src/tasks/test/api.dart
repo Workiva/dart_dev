@@ -32,10 +32,21 @@ TestTask test(
     List<String> tests: const []}) {
   final executable = 'pub';
   final args = <String>[];
-  if (dartMajorVersion == 2 && hasImmediateDependency('build_test')) {
-    args.addAll(['run', 'build_runner', 'test', '--']);
-  } else {
-    args.addAll(['run', 'test']);
+
+  if (dartMajorVersion == 2) {
+    var invalidPlatforms = new Set.from(['dartium', 'content-shell']);
+    var foundInvalidPlatforms =
+        invalidPlatforms.intersection(platforms.toSet());
+    if (foundInvalidPlatforms.isNotEmpty) {
+      throw new ArgumentError(
+          'Test platforms that are incompatible with Dart 2 detected: $foundInvalidPlatforms');
+    }
+
+    if (hasImmediateDependency('build_test')) {
+      args.addAll(['run', 'build_runner', 'test', '--']);
+    } else {
+      args.addAll(['run', 'test']);
+    }
   }
 
   if (concurrency != null) {
