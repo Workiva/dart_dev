@@ -47,6 +47,8 @@ TestTask test(
     } else {
       args.addAll(['run', 'test']);
     }
+  } else {
+    args.addAll(['run', 'test']);
   }
 
   if (concurrency != null) {

@@ -259,16 +259,14 @@ void main() {
     test('should fail if using content-shell on Dart2', () async {
       expect(runTests(projectWithPassingTests, platform: 'content-shell'),
           throwsA(new isInstanceOf<TestFailure>()));
-    }, tags: 'dart1-only');
+    }, tags: 'dart2-only');
 
     test('should not fail if using dartium on Dart1', () async {
-      expect(runTests(projectWithPassingTests, platform: 'dartium'),
-          throwsA(new isInstanceOf<TestFailure>()));
+      expect(await runTests(projectWithPassingTests, platform: 'dartium'), equals(1));
     }, tags: 'dart1-only');
 
     test('should not fail if using content-shell on Dart1', () async {
-      expect(runTests(projectWithPassingTests, platform: 'content-shell'),
-          throwsA(new isInstanceOf<TestFailure>()));
+      expect(await runTests(projectWithPassingTests, platform: 'content-shell'), equals(1));
     }, tags: 'dart1-only');
   });
 }
