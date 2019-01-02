@@ -262,11 +262,13 @@ void main() {
     }, tags: 'dart2-only');
 
     test('should not fail if using dartium on Dart1', () async {
-      expect(await runTests(projectWithPassingTests, platform: 'dartium'), equals(1));
+      expect(await runTests(projectWithPassingTests, platform: 'dartium'),
+          equals(1));
     }, tags: 'dart1-only');
 
     test('should not fail if using content-shell on Dart1', () async {
-      expect(await runTests(projectWithPassingTests, platform: 'content-shell'), equals(1));
+      expect(await runTests(projectWithPassingTests, platform: 'content-shell'),
+          equals(1));
     }, tags: 'dart1-only');
   });
 }
