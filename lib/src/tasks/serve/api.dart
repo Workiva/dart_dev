@@ -41,6 +41,8 @@ PubServeTask startPubServe({int port: 0, List<String> additionalArgs}) {
   var task = new PubServeTask('$pubServeExecutable ${pubServeArgs.join(' ')}',
       pubServeInfos.stream, pubServeProcess.done, pubServeProcess.kill);
 
+  task.done.whenComplete(pubServeInfos.close);
+
   pubServeProcess.stdout.listen((String line) {
     task._pubServeStdOut.add(line);
 
