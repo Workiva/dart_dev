@@ -127,9 +127,16 @@ final Map<String, String> dartiumExpirationOverrideEnv = new Map.unmodifiable({
       (_newExpirationDate.millisecondsSinceEpoch / 1000).toStringAsFixed(0),
 });
 
+/// Returns whether the current environment is most likely that of an automated
+/// (continuous integration) build.
+///
+/// Environment variables are used instead of checking the stdout type, since
+/// the way that `pub run dart_dev` invokes `tool/dart_dev.dart` (without
+/// inherited stdio) prevents us of determining whether we're in an interactive
+/// terminal.
 bool inCi() {
   final env = Platform.environment;
-  if (env['CI'] == 'true') return true; // Travis
+  if (env['CI'] == 'true') return true; // Travis, etc.
   if (env['BUILD_ID'] == 'true') return true; // Workiva Build
   return false;
 }
