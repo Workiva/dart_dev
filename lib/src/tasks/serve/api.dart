@@ -21,6 +21,7 @@ import 'package:dart_dev/util.dart' show TaskProcess;
 /// A regular expression that matches the output of "pub serve".
 final RegExp _servingRegExp =
     new RegExp(r'^Serving [^ ]+ +([^ ]+) +on http://localhost:(\d+)$');
+const _buildReadyPattern = 'Build completed successfully';
 
 /// Starts a Pub server on the specified [port] and returns the associated
 /// [PubServeTask].
@@ -36,10 +37,16 @@ PubServeTask startPubServe({int port: 0, List<String> additionalArgs}) {
   TaskProcess pubServeProcess =
       new TaskProcess(pubServeExecutable, pubServeArgs);
 
+  var readyCompleter = new Completer<Null>();
   var pubServeInfos = new StreamController<PubServeInfo>();
 
-  var task = new PubServeTask('$pubServeExecutable ${pubServeArgs.join(' ')}',
-      pubServeInfos.stream, pubServeProcess.done, pubServeProcess.kill);
+  var task = new PubServeTask(
+    '$pubServeExecutable ${pubServeArgs.join(' ')}',
+    pubServeInfos.stream,
+    pubServeProcess.done,
+    pubServeProcess.kill,
+    readyCompleter.future,
+  );
 
   task.done.whenComplete(pubServeInfos.close);
 
@@ -51,6 +58,10 @@ PubServeTask startPubServe({int port: 0, List<String> additionalArgs}) {
       var directory = match[1];
       var port = int.parse(match[2]);
       pubServeInfos.add(new PubServeInfo(directory, port));
+    }
+
+    if (!readyCompleter.isCompleted && line.contains(_buildReadyPattern)) {
+      readyCompleter.complete();
     }
   });
 
@@ -72,11 +83,18 @@ class PubServeTask {
   final Future done;
   final Function _stop;
 
+  /// A future that completes when the Pub server outputs
+  /// "Build completed successfully", and thus is ready to
+  /// start handling requests.
+  ///
+  /// This may never complete.
+  final Future<Null> ready;
+
   StreamController<String> _pubServeStdOut = new StreamController.broadcast();
   StreamController<String> _pubServeStdErr = new StreamController.broadcast();
 
   PubServeTask(String this.command, Stream<PubServeInfo> this.serveInfos,
-      Future this.done, void this._stop()) {
+      Future this.done, void this._stop(), this.ready) {
     done.then((_) {
       _pubServeStdOut.close();
       _pubServeStdErr.close();

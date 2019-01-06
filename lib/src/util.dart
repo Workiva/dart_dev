@@ -126,3 +126,10 @@ final Map<String, String> dartiumExpirationOverrideEnv = new Map.unmodifiable({
   'DARTIUM_EXPIRATION_TIME':
       (_newExpirationDate.millisecondsSinceEpoch / 1000).toStringAsFixed(0),
 });
+
+bool inCi() {
+  final env = Platform.environment;
+  if (env['CI'] == 'true') return true; // Travis
+  if (env['BUILD_ID'] == 'true') return true; // Workiva Build
+  return false;
+}

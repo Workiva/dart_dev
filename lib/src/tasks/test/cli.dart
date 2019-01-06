@@ -16,6 +16,7 @@ library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
 
+import 'package:ansicolor/ansicolor.dart';
 import 'package:args/args.dart';
 
 import 'package:dart_dev/util.dart' show reporter, isPortBound;
@@ -26,7 +27,7 @@ import 'package:dart_dev/src/tasks/config.dart';
 import 'package:dart_dev/src/tasks/serve/api.dart';
 import 'package:dart_dev/src/tasks/test/api.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
-import 'package:dart_dev/src/util.dart' show dartMajorVersion, runAll;
+import 'package:dart_dev/src/util.dart' show dartMajorVersion, inCi, runAll;
 
 class TestCli extends TaskCli {
   @override
@@ -177,6 +178,7 @@ class TestCli extends TaskCli {
       testArgs.add('--pause-after-load');
     }
 
+    Duration pubServeStartupTime;
     PubServeTask pubServeTask;
 
     if (pubServe) {
@@ -193,8 +195,13 @@ A pub serve instance will not be started.''');
             pubServeArgs.add('--web-compiler=${parsedArgs['web-compiler']}');
           }
 
+          final stopwatch = new Stopwatch()..start();
           pubServeTask =
               startPubServe(port: pubServePort, additionalArgs: pubServeArgs);
+          pubServeTask.ready.then((_) {
+            stopwatch.stop();
+            pubServeStartupTime = stopwatch.elapsed;
+          }, onError: (_) {});
 
           var startupLogFinished = new Completer();
           reporter.logGroup(pubServeTask.command,
@@ -253,8 +260,44 @@ A pub serve instance will not be started.''');
       await runAll(config.test.after = config.test.afterFunctionalTests);
     }
 
+    // This will be null if we didn't start a Pub server or it never finished.
+    if (pubServeStartupTime != null) {
+      printPubServeSpeedMessage(pubServeStartupTime);
+    }
+
     return task.successful
         ? new CliResult.success(task.testSummary)
         : new CliResult.fail(task.testSummary);
   }
+}
+
+void printPubServeSpeedMessage(Duration startupTime) {
+  const longStartupThreshold = const Duration(seconds: 5);
+  if (startupTime < longStartupThreshold || inCi()) {
+    return;
+  }
+
+  final boldWhite = new AnsiPen()..white(bold: true);
+  final boldYellow = new AnsiPen()..yellow(bold: true);
+  final seconds =
+      (startupTime.inMilliseconds / Duration.MILLISECONDS_PER_SECOND)
+          .toStringAsFixed(1);
+  reporter.log('''
+
+********************************************************************
+* ${boldWhite('Did you know?')} 
+* You don't have to wait to start new Pub server for each test run!                                                               
+*                                                                 
+* Reusing a Pub server would have made this test run                                                                 
+* at least ${boldYellow('$seconds seconds faster')}.                                                                
+*                                                                
+* To do this, start a Pub server on any open port: 
+*     pub serve test --port 8083
+* 
+* And then in a different terminal, run your tests and 
+* provide that same port via `--pub-serve-port`.
+*     ddev test --pub-serve-port=8083
+*
+* Happy testing!                                                                
+********************************************************************''');
 }
