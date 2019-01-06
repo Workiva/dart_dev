@@ -15,9 +15,11 @@
 library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:ansicolor/ansicolor.dart';
 import 'package:args/args.dart';
+import 'package:path/path.dart' as p;
 
 import 'package:dart_dev/util.dart' show reporter, isPortBound;
 
@@ -57,6 +59,12 @@ class TestCli extends TaskCli {
             'If unspecified, an arbitrary open port will be selected.\n'
             'Any already running server bound to this port will be used,\n'
             'and if there is none, a new one will be started automatically.')
+    ..addOption('pub-serve-output-file',
+        help: 'The file to write Pub serve output to.\n'
+            'If unspecified, output will be written to stdout \n'
+            'if a CI environment is detected, or to a temporary file otherwise\n'
+            '(to reduce output noise when running tests locally).\n'
+            'To get output in stdout outside of CI, specify an empty string.')
     ..addOption('platform',
         abbr: 'p',
         allowMultiple: true,
@@ -216,16 +224,49 @@ A pub serve instance will not be started.''');
           pubServePort = serveInfo.port;
 
           startupLogFinished.complete();
-          pubServeTask.stdOut.join('\n').then((stdOut) {
-            if (stdOut.isNotEmpty) {
-              reporter.logGroup('`${pubServeTask.command}` (buffered stdout)',
-                  output: stdOut);
-            }
-          });
-          pubServeTask.stdErr.join('\n').then((stdErr) {
-            if (stdErr.isNotEmpty) {
-              reporter.logGroup('`${pubServeTask.command}` (buffered stderr)',
-                  error: stdErr);
+
+          String pubServeOutputFile;
+          final String outputFileArg =
+              TaskCli.valueOf('pub-serve-output-file', parsedArgs, null);
+          if (outputFileArg == '') {
+            // Output should always go to stdout.
+            pubServeOutputFile = null;
+          } else if (outputFileArg == null && !inCi()) {
+            // Output file was not specified; default to a temporary file when not in CI.
+            pubServeOutputFile = p.join(
+                Directory.systemTemp.createTempSync().path,
+                'pub-serve-output.txt');
+          } else {
+            // Output file was specified.
+            pubServeOutputFile = outputFileArg;
+          }
+
+          if (pubServeOutputFile != null) {
+            reporter.log(
+                '\nPub server output will be written to $pubServeOutputFile');
+          }
+
+          Future.wait([
+            pubServeTask.stdOut.join('\n'),
+            pubServeTask.stdErr.join('\n'),
+          ]).then((outputs) {
+            final pubServeStdout = outputs[0];
+            final pubServeStderr = outputs[1];
+            final command = pubServeTask.command;
+
+            if (pubServeOutputFile != null) {
+              new File(pubServeOutputFile).writeAsStringSync(
+                  '`$command` (buffered stdout)\n$pubServeStdout\n\n'
+                  '`$command` (buffered stderr)\n$pubServeStderr');
+            } else {
+              if (pubServeStdout.isNotEmpty) {
+                reporter.logGroup('`$command` (buffered stdout)',
+                    output: pubServeStdout);
+              }
+              if (pubServeStderr.isNotEmpty) {
+                reporter.logGroup('`$command` (buffered stderr)',
+                    error: pubServeStderr);
+              }
             }
           });
         }
