@@ -43,18 +43,20 @@ class TestCli extends TaskCli {
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
         help: 'The number of concurrent test suites run.')
-    ..addFlag('pub-serve',
-        negatable: true,
-        defaultsTo: defaultPubServe,
-        help: 'Serves browser tests using a Pub server.')
     ..addFlag('pause-after-load',
         help: 'Pauses for debugging before any tests execute.\n'
             'Implies --concurrency=1 and --timeout=none.\n'
             'Currently only supported for browser tests.',
         negatable: false)
+    ..addFlag('pub-serve',
+        negatable: true,
+        defaultsTo: defaultPubServe,
+        help: 'Serves browser tests using a Pub server.')
     ..addOption('pub-serve-port',
-        help:
-            'Port used by the Pub server for browser tests. The default value will randomly select an open port to use.')
+        help: 'The port of the Pub server used for browser tests.\n'
+            'If unspecified, an arbitrary open port will be selected.\n'
+            'Any already running server bound to this port will be used,\n'
+            'and if there is none, a new one will be started automatically.')
     ..addOption('platform',
         abbr: 'p',
         allowMultiple: true,
