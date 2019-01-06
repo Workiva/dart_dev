@@ -19,6 +19,7 @@ import 'dart:io';
 
 import 'package:ansicolor/ansicolor.dart';
 import 'package:args/args.dart';
+import 'package:dart2_constant/core.dart' as core;
 import 'package:path/path.dart' as p;
 
 import 'package:dart_dev/util.dart' show reporter, isPortBound;
@@ -323,7 +324,7 @@ void printPubServeSpeedMessage(Duration startupTime) {
   final boldWhite = new AnsiPen()..white(bold: true);
   final boldYellow = new AnsiPen()..yellow(bold: true);
   final seconds =
-      (startupTime.inMilliseconds / Duration.MILLISECONDS_PER_SECOND)
+      (startupTime.inMilliseconds / core.Duration.millisecondsPerSecond)
           .toStringAsFixed(1);
   reporter.log('''
 
