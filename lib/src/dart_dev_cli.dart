@@ -170,9 +170,15 @@ Future _run(List<String> args) async {
 
   TaskConfig config = _cliConfigs[task];
   await runAll(config.before);
-  CliResult result =
-      await _cliTasks[task].run(env.command, color: env['color']);
-  await runAll(config.after);
+  CliResult result;
+  try {
+    result = await _cliTasks[task].run(env.command, color: env['color']);
+    await runAll(config.after);
+  } on ArgumentError catch (e) {
+    reporter.error(e.message, shout: true);
+    exitCode = 1;
+    return;
+  }
 
   reporter.log('');
   if (result.successful) {

@@ -45,7 +45,8 @@ Future<int> runTests(String projectPath,
     String testName: '',
     bool runCustomPubServe: false,
     int pubServePort: 56090,
-    String webCompiler}) async {
+    String webCompiler,
+    String platform}) async {
   await Process.run('pub', ['get'], workingDirectory: projectPath);
 
   final args = <String>['run', 'dart_dev', 'test', '--no-color'];
@@ -91,6 +92,10 @@ Future<int> runTests(String projectPath,
   if (webCompiler != null) {
     webCompilerArg = '--web-compiler=${webCompiler}';
     args.add(webCompilerArg);
+  }
+
+  if (platform != null) {
+    args.addAll(['-p', platform]);
   }
 
   TaskProcess process =
@@ -245,5 +250,25 @@ void main() {
           await runTests(projectThatNeedsBuildRunner, expectBuildRunner: true),
           equals(1));
     }, tags: 'dart2-only');
+
+    test('should fail if using dartium on Dart2', () async {
+      expect(runTests(projectWithPassingTests, platform: 'dartium'),
+          throwsA(new isInstanceOf<TestFailure>()));
+    }, tags: 'dart2-only');
+
+    test('should fail if using content-shell on Dart2', () async {
+      expect(runTests(projectWithPassingTests, platform: 'content-shell'),
+          throwsA(new isInstanceOf<TestFailure>()));
+    }, tags: 'dart2-only');
+
+    test('should not fail if using dartium on Dart1', () async {
+      expect(await runTests(projectWithPassingTests, platform: 'dartium'),
+          equals(1));
+    }, tags: 'dart1-only');
+
+    test('should not fail if using content-shell on Dart1', () async {
+      expect(await runTests(projectWithPassingTests, platform: 'content-shell'),
+          equals(1));
+    }, tags: 'dart1-only');
   });
 }
