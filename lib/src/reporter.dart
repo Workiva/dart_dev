@@ -93,7 +93,10 @@ class Reporter {
       color && message.isNotEmpty ? pen(message) : message;
 
   void _log(IOSink sink, String message, {bool shout: false}) {
-    if (quiet && !shout) return;
+    // This may look like a strange conditional, but please leave it.
+    // Somehow when using the tearoff `reporter.log` the `quiet` variable
+    // is null, which causes a runtime error when running tests in Dart 2.1.0
+    if (quiet == true && shout != true) return;
     sink.writeln(message);
   }
 }
