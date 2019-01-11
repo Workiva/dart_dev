@@ -27,22 +27,27 @@ final AnsiPen _red = new AnsiPen()..red();
 final AnsiPen _yellow = new AnsiPen()..yellow();
 
 class Reporter {
-  bool color = true;
-  bool quiet = false;
+  bool _color;
+  bool _quiet;
 
-  Reporter({this.color: true, this.quiet: false}) {
-    // Do an additional check here to make sure nulls were not passed
-    color ??= true;
-    quiet ??= false;
+  Reporter({color: true, quiet: false}) {
+    this.color = color;
+    this.quiet = quiet;
   }
 
-  String colorBlue(String message) => _color(_blue, message);
+  bool get color => _color;
+  bool get quiet => _quiet;
 
-  String colorGreen(String message) => _color(_green, message);
+  set color(bool b) => _color = b ?? true;
+  set quiet(bool b) => _quiet = b ?? false;
 
-  String colorRed(String message) => _color(_red, message);
+  String colorBlue(String message) => _colorMessage(_blue, message);
 
-  String colorYellow(String message) => _color(_yellow, message);
+  String colorGreen(String message) => _colorMessage(_green, message);
+
+  String colorRed(String message) => _colorMessage(_red, message);
+
+  String colorYellow(String message) => _colorMessage(_yellow, message);
 
   void log(String message, {bool shout: false}) {
     _log(stdout, message, shout: shout);
@@ -93,15 +98,11 @@ class Reporter {
     _log(stderr, colorYellow(message), shout: shout);
   }
 
-  String _color(AnsiPen pen, String message) =>
+  String _colorMessage(AnsiPen pen, String message) =>
       color && message.isNotEmpty ? pen(message) : message;
 
   void _log(IOSink sink, String message, {bool shout: false}) {
-    // Ensure that even if quiet or shout are null, the conditional
-    // will result in a boolean
-    if (quiet == true && shout != true) {
-      return;
-    }
+    if (quiet && !shout) return;
     sink.writeln(message);
   }
 }
