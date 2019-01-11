@@ -30,7 +30,11 @@ class Reporter {
   bool color = true;
   bool quiet = false;
 
-  Reporter({bool this.color, bool this.quiet});
+  Reporter({this.color: true, this.quiet: false}) {
+    // Do an additional check here to make sure nulls were not passed
+    color ??= true;
+    quiet ??= false;
+  }
 
   String colorBlue(String message) => _color(_blue, message);
 
@@ -93,10 +97,11 @@ class Reporter {
       color && message.isNotEmpty ? pen(message) : message;
 
   void _log(IOSink sink, String message, {bool shout: false}) {
-    // This may look like a strange conditional, but please leave it.
-    // Somehow when using the tearoff `reporter.log` the `quiet` variable
-    // is null, which causes a runtime error when running tests in Dart 2.1.0
-    if (quiet == true && shout != true) return;
+    // Ensure that even if quiet or shout are null, the conditional
+    // will result in a boolean
+    if (quiet == true && shout != true) {
+      return;
+    }
     sink.writeln(message);
   }
 }
