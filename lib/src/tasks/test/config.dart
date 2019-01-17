@@ -21,6 +21,7 @@ const List defaultBeforeFunctional = const [];
 const int defaultConcurrency = 4;
 const bool defaultPauseAfterLoad = false;
 const bool defaultPubServe = false;
+const bool defaultDisableServeStdOut = false;
 const int defaultPubServePort = 0;
 const bool defaultIntegration = false;
 const bool defaultFunctional = false;

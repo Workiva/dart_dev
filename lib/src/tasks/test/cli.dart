@@ -38,6 +38,9 @@ class TestCli extends TaskCli {
     ..addFlag('functional',
         defaultsTo: defaultFunctional,
         help: 'Includes the functional test suite.')
+    ..addFlag('disable-serve-std-out',
+        defaultsTo: defaultDisableServeStdOut,
+        help: 'Disables standard output for pub serve task.')
     ..addOption('concurrency',
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
@@ -99,6 +102,9 @@ class TestCli extends TaskCli {
 
     bool pubServe =
         TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
+
+    bool disablePubStdOut = TaskCli.valueOf(
+        'disable-serve-std-out', parsedArgs, defaultDisableServeStdOut);
 
     var pubServePort =
         TaskCli.valueOf('pub-serve-port', parsedArgs, config.test.pubServePort);
@@ -193,8 +199,10 @@ A pub serve instance will not be started.''');
             pubServeArgs.add('--web-compiler=${parsedArgs['web-compiler']}');
           }
 
-          pubServeTask =
-              startPubServe(port: pubServePort, additionalArgs: pubServeArgs);
+          pubServeTask = startPubServe(
+              port: pubServePort,
+              additionalArgs: pubServeArgs,
+              printToStdOut: !disablePubStdOut);
 
           var startupLogFinished = new Completer();
           reporter.logGroup(pubServeTask.command,
