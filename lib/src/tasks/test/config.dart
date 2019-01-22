@@ -40,5 +40,6 @@ class TestConfig extends TaskConfig {
   List<String> platforms = defaultPlatforms;
   bool pubServe = defaultPubServe;
   int pubServePort = defaultPubServePort;
+  bool disableServeStdOut = defaultDisableServeStdOut;
   List<String> unitTests = defaultUnitTests;
 }

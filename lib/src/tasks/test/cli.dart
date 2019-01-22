@@ -104,7 +104,7 @@ class TestCli extends TaskCli {
         TaskCli.valueOf('pub-serve', parsedArgs, config.test.pubServe);
 
     bool disablePubStdOut = TaskCli.valueOf(
-        'disable-serve-std-out', parsedArgs, defaultDisableServeStdOut);
+        'disable-serve-std-out', parsedArgs, config.test.disableServeStdOut);
 
     var pubServePort =
         TaskCli.valueOf('pub-serve-port', parsedArgs, config.test.pubServePort);
