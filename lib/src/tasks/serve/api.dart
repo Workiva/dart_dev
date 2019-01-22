@@ -26,7 +26,8 @@ final RegExp _servingRegExp =
 /// [PubServeTask].
 ///
 /// If [port] is 0, `pub serve` will pick its own port automatically.
-PubServeTask startPubServe({int port: 0, List<String> additionalArgs}) {
+PubServeTask startPubServe(
+    {int port: 0, List<String> additionalArgs, bool printToStdOut: true}) {
   var pubServeExecutable = 'pub';
   var pubServeArgs = ['serve', '--port=$port'];
   if (additionalArgs != null) {
@@ -42,7 +43,9 @@ PubServeTask startPubServe({int port: 0, List<String> additionalArgs}) {
       pubServeInfos.stream, pubServeProcess.done, pubServeProcess.kill);
 
   pubServeProcess.stdout.listen((String line) {
-    task._pubServeStdOut.add(line);
+    if (printToStdOut) {
+      task._pubServeStdOut.add(line);
+    }
 
     var match = _servingRegExp.firstMatch(line);
     if (match != null) {
