@@ -131,7 +131,7 @@ void main() {
       });
 
       test('runs an executable', () async {
-        final result = await runDart2Only(['dartdoc']);
+        final result = await runDart2Only(['pub']);
         expect(result.skipped, isFalse);
         expect(result.exitCode, 0);
       });
