@@ -18,7 +18,8 @@ import 'dart:async';
 
 import 'package:args/args.dart';
 
-import 'package:dart_dev/util.dart' show reporter, isPortBound;
+import 'package:dart_dev/util.dart'
+    show hasImmediateDependency, isPortBound, reporter, TaskProcess;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -181,6 +182,17 @@ class TestCli extends TaskCli {
 
     if (pauseAfterLoad) {
       testArgs.add('--pause-after-load');
+    }
+
+    if (dartMajorVersion == 2 && hasImmediateDependency('build_test')) {
+      final buildProcess =
+          new TaskProcess('pub', ['run', 'build_runner', 'build']);
+      reporter.logGroup('pub run build_runner build',
+          outputStream: buildProcess.stdout, errorStream: buildProcess.stderr);
+      final buildExitCode = await buildProcess.exitCode;
+      if (buildExitCode != 0) {
+        return new CliResult.fail('Build failed - cannot run tests.');
+      }
     }
 
     PubServeTask pubServeTask;
