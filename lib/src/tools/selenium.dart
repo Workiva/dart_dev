@@ -92,7 +92,7 @@ class SeleniumHelper {
 
   static Future<bool> killChildrenProcesses() async {
     if (_seleniumProcess == null) return true;
-    return _seleniumProcess.killAllChildren();
+    return _seleniumProcess.killAllDescendants();
   }
 
   /// Sends a `getVM` RPC to the observatory instance located at the given
