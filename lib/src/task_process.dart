@@ -18,7 +18,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:async/async.dart';
 import 'package:dart2_constant/convert.dart' as convert;
+import 'package:dart_dev/util.dart';
 
 class TaskProcess {
   Completer _donec = new Completer();
@@ -49,6 +51,7 @@ class TaskProcess {
       process.exitCode.then(_procExitCode.complete);
       Future.wait([_outc.future, _errc.future, process.exitCode])
           .then((_) => _donec.complete());
+      _setUpSignalKillListeners(process, '$executable $arguments.join(' ')');
     });
   }
 
@@ -62,38 +65,60 @@ class TaskProcess {
   bool kill([ProcessSignal signal = ProcessSignal.SIGTERM]) =>
       _process.kill(signal);
 
+  /// __Deprecated__ Use [killAllDescendants] instead
+  @Deprecated('3.0.0')
   Future<bool> killAllChildren(
-      [ProcessSignal signal = ProcessSignal.SIGTERM]) async {
-    List<int> cpids = await _getChildPids();
-    cpids.remove(_process.pid);
-    bool killed = true;
-    for (int i = 0; i < cpids.length; i++) {
-      killed = killed && Process.killPid(cpids[i], signal);
-    }
-    return killed;
+          [ProcessSignal signal = ProcessSignal.SIGTERM]) async =>
+      killAllDescendants(signal);
+
+  bool killProcessAndAllDescendants(
+      [ProcessSignal signal = ProcessSignal.SIGTERM]) {
+    // Take care to not short circuit via boolean operators or iteration here.
+    // For example, `killA() && killB()` will not run `killB()`
+    // if `killA()` returns false.
+    final allDescendantsKilled = killAllDescendants();
+    final killed = kill();
+    return allDescendantsKilled && killed;
   }
 
-  Future<List<int>> _getChildPids({List<int> pids}) async {
-    pids = pids ?? [_process.pid];
-    String executable = 'pgrep';
-    List<TaskProcess> pgreps = [];
-    var args = [];
-    List<int> cpids = [];
-    for (int pid in pids) {
-      args = [];
-      args.add('-P');
-      args.add(pid.toString());
-      var pgrep = new TaskProcess(executable, args);
-      pgrep.stdout.listen((l) {
-        cpids.add(int.parse(l));
-      });
-      pgreps.add(pgrep);
+  bool killAllDescendants([ProcessSignal signal = ProcessSignal.SIGTERM]) {
+    var allKilled = true;
+    for (var pid in _getAllDescendantPids()) {
+      // Take care to not short circuit via boolean operators or iteration here.
+      // For example, `killA() && killB()` will not run `killB()`
+      // if `killA()` returns false.
+      final killed = Process.killPid(pid, signal);
+      if (!killed) {
+        allKilled = false;
+      }
     }
-    await Future.wait(pgreps.map((pgrep) => pgrep.done));
+    return allKilled;
+  }
 
-    if (cpids.isNotEmpty) {
-      cpids.addAll(await _getChildPids(pids: cpids));
+  List<int> _getAllDescendantPids({List<int> pids}) {
+    pids ??= [_process.pid];
+    final descendantPids = <int>[];
+    for (var pid in pids) {
+      final result = Process.runSync('pgrep', ['-P', pid.toString()]);
+      final outputLines = const LineSplitter().convert(result.stdout as String);
+      descendantPids.addAll(outputLines.map(int.parse));
     }
-    return cpids;
+
+    if (descendantPids.isNotEmpty) {
+      descendantPids.addAll(_getAllDescendantPids(pids: descendantPids));
+    }
+    return descendantPids;
+  }
+
+  void _setUpSignalKillListeners(Process process, String description) {
+    final listener = StreamGroup.merge([
+      ProcessSignal.SIGINT.watch(),
+      ProcessSignal.SIGTERM.watch(),
+    ]).listen((signal) {
+      reporter?.warning('Signal $signal received. '
+          'Killing process `$description` and its children.');
+      killProcessAndAllDescendants();
+    });
+    process.exitCode.then((_) => listener.cancel());
   }
 }
