@@ -77,7 +77,7 @@ class TaskProcess {
     pids = pids ?? [_process.pid];
     String executable = 'pgrep';
     List<TaskProcess> pgreps = [];
-    var args = [];
+    List<String> args = [];
     List<int> cpids = [];
     for (int pid in pids) {
       args = [];
