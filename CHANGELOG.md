@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.5](https://github.com/Workiva/dart_dev/compare/2.0.4...2.0.5)
+
+- **Improvement:** Added `config.test.deleteConflictingOutputs` that when
+  enabled will include the `--delete-conflicting-outputs` flag when running
+  tests via `build_runner`.
+
+- **Bug Fix:** Fix a type-related RTE in the `TaskProcess` class.
+
 ## [2.0.4](https://github.com/Workiva/dart_dev/compare/2.0.3...2.0.4)
 
 - **Bug Fix:** When on Dart 2 and the package has a dependency on `build_test`,
