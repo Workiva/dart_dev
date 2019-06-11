@@ -24,12 +24,13 @@ import 'package:dart_dev/src/util.dart'
     show dartMajorVersion, dartiumExpirationOverrideEnv;
 import 'package:dart_dev/util.dart' show hasImmediateDependency;
 
-TestTask test(
-    {int concurrency,
-    List<String> platforms: const [],
-    List<String> presets: const [],
-    List<String> testArgs: const [],
-    List<String> tests: const []}) {
+TestTask test({
+  int concurrency,
+  List<String> platforms: const [],
+  List<String> presets: const [],
+  List<String> testArgs: const [],
+  List<String> tests: const [],
+}) {
   final executable = 'pub';
   final args = <String>[];
 
@@ -43,7 +44,12 @@ TestTask test(
     }
 
     if (hasImmediateDependency('build_test')) {
-      args.addAll(['run', 'build_runner', 'test', '--']);
+      args.addAll([
+        'run',
+        'build_runner',
+        'test',
+        '--',
+      ]);
     } else {
       args.addAll(['run', 'test']);
     }

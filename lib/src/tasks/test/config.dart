@@ -19,6 +19,7 @@ import 'package:dart_dev/src/tasks/config.dart';
 const List defaultAfterFunctional = const [];
 const List defaultBeforeFunctional = const [];
 const int defaultConcurrency = 4;
+const bool defaultDeleteConflictingOutputs = false;
 const bool defaultPauseAfterLoad = false;
 const bool defaultPubServe = false;
 const bool defaultDisableServeStdOut = false;
@@ -35,6 +36,7 @@ class TestConfig extends TaskConfig {
   List afterFunctionalTests = defaultAfterFunctional;
   List beforeFunctionalTests = defaultBeforeFunctional;
   int concurrency = defaultConcurrency;
+  bool deleteConflictingOutputs = defaultDeleteConflictingOutputs;
   List<String> functionalTests = defaultFunctionalTests;
   List<String> integrationTests = defaultIntegrationTests;
   List<String> platforms = defaultPlatforms;

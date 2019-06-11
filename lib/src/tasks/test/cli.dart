@@ -55,6 +55,8 @@ class TestCli extends TaskCli {
             'Implies --concurrency=1 and --timeout=none.\n'
             'Currently only supported for browser tests.',
         negatable: false)
+    ..addFlag('delete-conflicting-outputs',
+        help: 'Deletes conflicting outputs during the build', negatable: false)
     ..addOption('pub-serve-port',
         help:
             'Port used by the Pub server for browser tests. The default value will randomly select an open port to use.')
@@ -93,6 +95,7 @@ class TestCli extends TaskCli {
 
     final testArgs = <String>[];
     List<String> tests = [];
+    List<String> buildArgs = [];
 
     if (!color) {
       testArgs.add('--no-color');
@@ -122,6 +125,11 @@ class TestCli extends TaskCli {
         TaskCli.valueOf('platform', parsedArgs, config.test.platforms);
     List<String> presets =
         TaskCli.valueOf('preset', parsedArgs, const <String>[]);
+
+    bool deleteConflictingOutputs = TaskCli.valueOf(
+        'delete-conflicting-outputs',
+        parsedArgs,
+        config.test.deleteConflictingOutputs);
 
     // CLI user can specify individual test files to run.
     bool individualTestsSpecified = parsedArgs.rest.isNotEmpty;
@@ -184,9 +192,13 @@ class TestCli extends TaskCli {
       testArgs.add('--pause-after-load');
     }
 
+    if (deleteConflictingOutputs) {
+      buildArgs.add('--delete-conflicting-outputs');
+    }
+
     if (dartMajorVersion == 2 && hasImmediateDependency('build_test')) {
-      final buildProcess =
-          new TaskProcess('pub', ['run', 'build_runner', 'build']);
+      var args = ['run', 'build_runner', 'build']..addAll(buildArgs);
+      final buildProcess = new TaskProcess('pub', args);
       reporter.logGroup('pub run build_runner build',
           outputStream: buildProcess.stdout, errorStream: buildProcess.stderr);
       final buildExitCode = await buildProcess.exitCode;

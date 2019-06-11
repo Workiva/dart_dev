@@ -1,3 +1,4 @@
+.dart_tool
 .packages
 .pub
 .dart_tool
@@ -27,3 +28,4 @@ test_reports/
 /test_fixtures/dart_x_only/doc/api/
 /test_fixtures/docs/docs/doc/api/
 /test_fixtures/format/changes_needed_temp/
+/test_fixtures/needs_build_runner/.dart_tool
