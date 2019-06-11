@@ -26,7 +26,6 @@ import 'package:dart_dev/util.dart' show hasImmediateDependency;
 
 TestTask test({
   int concurrency,
-  List<String> buildArgs: const [],
   List<String> platforms: const [],
   List<String> presets: const [],
   List<String> testArgs: const [],
@@ -49,11 +48,8 @@ TestTask test({
         'run',
         'build_runner',
         'test',
+        '--',
       ]);
-      if (buildArgs.isNotEmpty) {
-        args.addAll(buildArgs);
-      }
-      args.add('--');
     } else {
       args.addAll(['run', 'test']);
     }

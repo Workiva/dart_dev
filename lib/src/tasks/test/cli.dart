@@ -196,6 +196,17 @@ class TestCli extends TaskCli {
       buildArgs.add('--delete-conflicting-outputs');
     }
 
+    if (dartMajorVersion == 2 && hasImmediateDependency('build_test')) {
+      var args = ['run', 'build_runner', 'build']..addAll(buildArgs);
+      final buildProcess = new TaskProcess('pub', args);
+      reporter.logGroup('pub run build_runner build',
+          outputStream: buildProcess.stdout, errorStream: buildProcess.stderr);
+      final buildExitCode = await buildProcess.exitCode;
+      if (buildExitCode != 0) {
+        return new CliResult.fail('Build failed - cannot run tests.');
+      }
+    }
+
     PubServeTask pubServeTask;
 
     if (pubServe) {
@@ -259,8 +270,7 @@ A pub serve instance will not be started.''');
         concurrency: concurrency,
         platforms: platforms,
         presets: presets,
-        testArgs: testArgs,
-        buildArgs: buildArgs);
+        testArgs: testArgs);
     reporter.logGroup(task.testCommand, outputStream: task.testOutput);
 
     await task.done;
