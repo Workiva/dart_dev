@@ -43,7 +43,7 @@ TestTask test(
     }
 
     if (hasImmediateDependency('build_test')) {
-      args.addAll(['run', 'build_runner', 'test', '--']);
+      args.addAll(['run', 'build_runner', 'test', '--delete-conflicting-outputs', '--']);
     } else {
       args.addAll(['run', 'test']);
     }
