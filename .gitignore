@@ -1,7 +1,7 @@
 .packages
 .pub
 packages
-pubspec.lock
+/pubspec.lock
 build/
 .idea/
 
