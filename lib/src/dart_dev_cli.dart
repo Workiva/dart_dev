@@ -182,9 +182,9 @@ Future _run(List<String> args) async {
 
   reporter.log('');
   if (result.successful) {
-    reporter.success(result.message, shout: true);
+    reporter.success(result.message ?? '', shout: true);
   } else {
-    reporter.error(result.message, shout: true);
+    reporter.error(result.message ?? 'The task did not succeed.', shout: true);
     exitCode = 1;
   }
 }
