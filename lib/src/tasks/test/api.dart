@@ -106,10 +106,12 @@ TestTask test({
       task.successful = code <= 0;
 
       if (!task.successful) {
-        task.testSummary = 'An error was encountered when running tests.';
+//        task.testSummary = 'An error was encountered when running tests.';
       }
 
-      outputProcessed.complete();
+      if (!outputProcessed.isCompleted) {
+        outputProcessed.complete();
+      }
     }
   });
 
