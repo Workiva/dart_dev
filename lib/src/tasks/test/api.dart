@@ -49,7 +49,7 @@ TestTask test({
         'run',
         'build_runner',
         'test',
-        ]);
+      ]);
       args.addAll(buildArgs);
       args.add('--');
     } else {
@@ -106,7 +106,7 @@ TestTask test({
       task.successful = code <= 0;
 
       if (!task.successful) {
-//        task.testSummary = 'An error was encountered when running tests.';
+        task.testSummary = 'An error was encountered when running tests.';
       }
 
       if (!outputProcessed.isCompleted) {
