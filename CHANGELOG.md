@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.6](https://github.com/Workiva/dart_dev/compare/2.0.5...2.0.6)
+
+- **Improvement:** On dart 2, the `test` task now properly sets a non-zero
+  exit code if the build fails. As a result, it also no longer runs a separate
+  `pub run build_runner build` prior to running tests.
+
 ## [2.0.5](https://github.com/Workiva/dart_dev/compare/2.0.4...2.0.5)
 
 - **Improvement:** Added `config.test.deleteConflictingOutputs` that when
