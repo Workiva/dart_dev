@@ -87,19 +87,26 @@ class Reporter {
   }
 
   void error(String message, {bool shout: false}) {
+    message = message ?? 'An error was encountered running the task.';
     _log(stderr, colorRed(message), shout: shout);
   }
 
   void success(String message, {bool shout: false}) {
+    if (message == null) {
+      return;
+    }
     log(colorGreen(message), shout: shout);
   }
 
   void warning(String message, {bool shout: false}) {
+    if (message == null) {
+      return;
+    }
     _log(stderr, colorYellow(message), shout: shout);
   }
 
   String _colorMessage(AnsiPen pen, String message) =>
-      color && message.isNotEmpty ? pen(message) : message;
+      color && message != null && message.isNotEmpty ? pen(message) : message;
 
   void _log(IOSink sink, String message, {bool shout: false}) {
     if (quiet && !shout) return;

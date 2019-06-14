@@ -30,6 +30,7 @@ TestTask test({
   List<String> presets: const [],
   List<String> testArgs: const [],
   List<String> tests: const [],
+  List<String> buildArgs: const [],
 }) {
   final executable = 'pub';
   final args = <String>[];
@@ -48,8 +49,9 @@ TestTask test({
         'run',
         'build_runner',
         'test',
-        '--',
       ]);
+      args.addAll(buildArgs);
+      args.add('--');
     } else {
       args.addAll(['run', 'test']);
     }
@@ -102,6 +104,14 @@ TestTask test({
   process.exitCode.then((code) {
     if (task.successful == null) {
       task.successful = code <= 0;
+
+      if (!task.successful) {
+        task.testSummary = 'An error was encountered when running tests.';
+      }
+
+      if (!outputProcessed.isCompleted) {
+        outputProcessed.complete();
+      }
     }
   });
 
