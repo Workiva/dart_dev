@@ -22,6 +22,7 @@ import 'package:dart_dev/src/tasks/dart_x_only/config.dart';
 import 'package:dart_dev/src/tasks/format/config.dart';
 import 'package:dart_dev/src/tasks/gen_test_runner/config.dart';
 import 'package:dart_dev/src/tasks/init/config.dart';
+import 'package:dart_dev/src/tasks/sass/config.dart';
 import 'package:dart_dev/src/tasks/task_runner/config.dart';
 import 'package:dart_dev/src/tasks/test/config.dart';
 import 'package:dart_dev/src/tasks/local/config.dart';
@@ -41,6 +42,7 @@ class Config {
   InitConfig init = new InitConfig();
   TaskRunnerConfig taskRunner = new TaskRunnerConfig();
   TestConfig test = new TestConfig();
+  SassConfig sass = new SassConfig();
 
   Map<String, dynamic> toJson() => {
         'analyze': analyze,
@@ -53,6 +55,7 @@ class Config {
         'init': init,
         'taskRunner': taskRunner,
         'test': test,
+        'sass': sass,
       };
 }
 
