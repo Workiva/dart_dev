@@ -1,11 +1,6 @@
-import 'package:args/command_runner.dart';
+abstract class DartDevCommandConfig {
+  final String commandName;
+  final bool hidden;
 
-abstract class DartDevTool {
-  Command<int> get command;
-}
-
-abstract class DartDevToolConfig {
-  String commandName;
-
-  DartDevToolConfig(this.commandName);
+  DartDevCommandConfig(this.commandName, {this.hidden});
 }

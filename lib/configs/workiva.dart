@@ -1,22 +1,23 @@
-import 'package:dart_dev/tool_api.dart';
-import 'package:dart_dev/tools/analyze_tool.dart';
-import 'package:dart_dev/tools/format_tool.dart';
-import 'package:dart_dev/tools/test_tool.dart';
+import 'package:args/command_runner.dart';
+import 'package:dart_dev/commands/analyze_command.dart';
+import 'package:dart_dev/commands/format_command.dart';
+import 'package:dart_dev/commands/test_command.dart';
 
-Iterable<DartDevTool> build({
+Iterable<Command<int>> build({
   AnalyzeConfig analyzeConfig,
   FormatConfig formatConfig,
+  TestConfig testConfig,
 }) =>
     [
       // command: analyze
-      AnalyzeTool(
+      AnalyzeCommand(
         AnalyzeConfig(
           commandName: 'analyze',
         ),
       ),
 
       // command: format
-      FormatTool(
+      FormatCommand(
         FormatConfig(
           commandName: 'format',
 
@@ -27,7 +28,7 @@ Iterable<DartDevTool> build({
       ),
 
       // command: test
-      TestTool(
-        TestConfig(),
+      TestCommand(
+        TestConfig().merge(testConfig),
       ),
     ];

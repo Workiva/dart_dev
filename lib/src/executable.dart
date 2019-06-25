@@ -2,17 +2,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:dart_dev/src/logging.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:dart_dev/src/dart_dev_runner.dart';
-import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/utils/assert_dir_is_dart_package.dart';
-import 'package:dart_dev/src/utils/custom_entrypoint.dart';
+import 'dart_dev_runner.dart';
+import 'utils/assert_dir_is_dart_package.dart';
+import 'utils/custom_entrypoint.dart';
+import 'utils/logging.dart';
 
-typedef _ConfigGetter = List<DartDevTool> Function();
+typedef _ConfigGetter = List<Command<int>> Function();
 
 const _customDevDartPath = 'tool/dev.dart';
 
@@ -41,7 +40,7 @@ Future<int> runWithConfig(List<String> args, _ConfigGetter configGetter) async {
     return ExitCode.usage.code;
   }
 
-  Iterable<DartDevTool> config;
+  Iterable<Command<int>> config;
   try {
     config = configGetter();
   } catch (error) {
@@ -55,6 +54,12 @@ Future<int> runWithConfig(List<String> args, _ConfigGetter configGetter) async {
       ..writeln('For more info: http://github.com/Workiva/dart_dev#TODO');
     return ExitCode.config.code;
   }
+
+  // StreamSubscription exitSignalsSub;
+  // exitSignalsSub = exitProcessSignals.listen((signal) async {
+  //   await killAllChildProcesses();
+  //   await exitSignalsSub?.cancel();
+  // });
 
   try {
     exit(await DartDevRunner(config).run(args));

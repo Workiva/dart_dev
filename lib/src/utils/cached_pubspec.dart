@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:pubspec_parse/pubspec_parse.dart';
-import 'package:yaml/yaml.dart';
 
 Pubspec cachedPubspec({String path}) {
-  _pubspec ??= Pubspec.parse(loadYaml(
-      File(p.join(path ?? p.current, 'pubspec.yaml')).readAsStringSync()));
+  final sourceUrl = p.join(path ?? p.current, 'pubspec.yaml');
+  _pubspec ??=
+      Pubspec.parse(File(sourceUrl).readAsStringSync(), sourceUrl: sourceUrl);
   return _pubspec;
 }
 

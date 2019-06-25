@@ -5,18 +5,11 @@ import 'package:args/command_runner.dart';
 import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 
-import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/utils/has_any_positional_args_before_separator.dart';
-import 'package:dart_dev/src/utils/verbose_enabled.dart';
+import '../utils/ensure_process_exit.dart';
+import '../utils/has_any_positional_args_before_separator.dart';
+import '../utils/verbose_enabled.dart';
 
 final _log = Logger('AnalyzeTool');
-
-class AnalyzeTool implements DartDevTool {
-  @override
-  final AnalyzeCommand command;
-
-  AnalyzeTool(AnalyzeConfig config) : command = AnalyzeCommand(config);
-}
 
 class AnalyzeCommand extends Command<int> {
   final AnalyzeConfig config;
@@ -29,6 +22,9 @@ class AnalyzeCommand extends Command<int> {
   @override
   String get description =>
       'Run static analysis on dart files in this package.';
+
+  @override
+  bool get hidden => config.hidden ?? false;
 
   @override
   String get invocation =>
@@ -50,6 +46,7 @@ class AnalyzeCommand extends Command<int> {
     final process = await Process.start(
         'dartanalyzer', [...args, ...entrypoints],
         mode: ProcessStartMode.inheritStdio);
+    ensureProcessExit(process);
     return process.exitCode;
   }
 
@@ -105,20 +102,26 @@ class AnalyzeCommand extends Command<int> {
   }
 }
 
-class AnalyzeConfig extends DartDevToolConfig {
+class AnalyzeConfig {
   AnalyzeConfig({
     this.dartanalyzerArgs,
-    String commandName,
+    this.commandName,
     this.include,
-  }) : super(commandName);
+    this.hidden,
+  });
+
+  final String commandName;
 
   final List<String> dartanalyzerArgs;
+
+  final bool hidden;
 
   final List<Glob> include;
 
   AnalyzeConfig merge(AnalyzeConfig other) => AnalyzeConfig(
-        dartanalyzerArgs: other?.dartanalyzerArgs ?? dartanalyzerArgs,
         commandName: other?.commandName ?? commandName,
+        dartanalyzerArgs: other?.dartanalyzerArgs ?? dartanalyzerArgs,
+        hidden: other?.hidden ?? hidden,
         include: other?.include ?? include,
       );
 

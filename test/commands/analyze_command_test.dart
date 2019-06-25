@@ -6,7 +6,7 @@ import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-import 'package:dart_dev/src/tools/analyze_tool.dart';
+import 'package:dart_dev/src/tools/analyze_command.dart';
 
 void main() {
   group('assertNoPositionalArgsBeforeSeparator', () {
@@ -112,5 +112,10 @@ void main() {
           ['-t'], ['a', 'b', 'c', 'd', 'e', 'f'],
           verbose: true);
     });
+  });
+
+  test('slow', () async {
+    expect(
+        await Future.delayed(Duration(seconds: 5)).then((_) => true), isTrue);
   });
 }

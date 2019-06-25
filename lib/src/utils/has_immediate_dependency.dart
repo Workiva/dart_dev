@@ -1,4 +1,4 @@
-import 'package:dart_dev/src/utils/cached_pubspec.dart';
+import 'cached_pubspec.dart';
 
 /// Returns `true` if [packageName] is an immediate dependency, and `false`
 /// otherwise.

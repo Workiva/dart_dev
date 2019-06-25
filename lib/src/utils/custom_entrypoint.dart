@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-import 'package:dart_dev/src/utils/dart_tool_cache.dart';
+import 'dart_tool_cache.dart';
+import 'ensure_process_exit.dart';
 
 const _devDartPath = 'tool/dev.dart';
 final _customEntrypointPath = p.join(cacheDirPath, 'custom_executable.dart');
@@ -43,5 +44,6 @@ Future<int> runViaCustomEntrypoint(List<String> args) async {
         ...args,
       ],
       mode: ProcessStartMode.inheritStdio);
+  ensureProcessExit(process);
   return process.exitCode;
 }

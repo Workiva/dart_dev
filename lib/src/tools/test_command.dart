@@ -1,21 +1,15 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
-import 'package:dart_dev/tool_utils.dart';
+import 'package:dart_dev/command_utils.dart';
 import 'package:logging/logging.dart';
 
-import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/utils/has_any_positional_args_before_separator.dart';
+import '../utils/ensure_process_exit.dart';
+import '../utils/has_any_positional_args_before_separator.dart';
 
 final _log = Logger('TestTool');
-
-class TestTool implements DartDevTool {
-  @override
-  final TestCommand command;
-
-  TestTool(TestConfig config) : command = TestCommand(config);
-}
 
 class TestCommand extends Command<int> {
   final TestConfig config;
@@ -23,10 +17,13 @@ class TestCommand extends Command<int> {
   TestCommand([TestConfig config]) : config = config ?? TestConfig();
 
   @override
-  String get name => config.commandName ?? 'test';
+  String get name => config.commandName ?? TestConfig.defaultCommandName;
 
   @override
-  String get description => 'Run Dart tests in this package.';
+  String get description => config.description ?? TestConfig.defaultDescription;
+
+  @override
+  bool get hidden => config.hidden ?? false;
 
   @override
   String get invocation {
@@ -69,11 +66,11 @@ class TestCommand extends Command<int> {
   @override
   Future<int> run() async {
     assertNoPositionalArgsBeforeSeparator(name, argResults, usageException);
-
-    final args = [];
-    _log.info('Running: pub ${args.join(' ')}');
-    final process = await Process.start('pub', [...args],
-        mode: ProcessStartMode.inheritStdio);
+    final args = buildTestArgs(config, argResults);
+    _log.info('Running: pub ${args.join(' ')}\n');
+    final process =
+        await Process.start('pub', args, mode: ProcessStartMode.inheritStdio);
+    ensureProcessExit(process);
     return process.exitCode;
   }
 
@@ -89,21 +86,78 @@ class TestCommand extends Command<int> {
           'a "--" separator.');
     }
   }
+
+  static Iterable<String> buildTestArgs(
+      TestConfig config, ArgResults argResults) {
+    final hasBuildTest = hasImmediateDependency('build_test');
+
+    final args = <String>[
+      // `pub run test` or `pub run build_runner test`
+      'run',
+      if (hasBuildTest)
+        'build_runner',
+      'test',
+
+      // Add the args targeting the build_runner command.
+      if (hasBuildTest)
+        ...config.buildRunnerArgs ?? [],
+      if (hasBuildTest)
+        ...takeArgsBetweenSeparators(argResults.rest),
+
+      // Add the args targeting the test command.
+      '--',
+      ...config.testArgs ?? [],
+      if (hasBuildTest)
+        ...takeArgsBetweenSeparators(argResults.rest, skip: 1)
+      else
+        ...takeArgsBetweenSeparators(argResults.rest)
+    ];
+    if (args.last == '--') {
+      args.removeLast();
+    }
+    return args;
+  }
+
+  static Iterable<String> takeArgsBetweenSeparators(List<String> args,
+      {int skip}) {
+    List<String> result;
+    skip ??= 0;
+    for (var i = 0; i < args.length; i++) {
+      if (args[i] == '--') {
+        if (skip-- == 0) {
+          result = args.skip(i + 1).toList();
+          break;
+        }
+      }
+    }
+    result ??= [];
+    return result.contains('--') ? result.take(result.indexOf('--')) : result;
+  }
 }
 
-class TestConfig extends DartDevToolConfig {
+class TestConfig {
   TestConfig({
     this.buildRunnerArgs,
-    String commandName,
+    this.commandName,
+    this.description,
+    this.hidden,
     this.testArgs,
-  }) : super(commandName);
+  });
 
   final List<String> buildRunnerArgs;
+  final String commandName;
+  final String description;
+  final bool hidden;
   final List<String> testArgs;
+
+  static const String defaultCommandName = 'test';
+  static const String defaultDescription = 'Run Dart tests in this package.';
 
   TestConfig merge(TestConfig other) => TestConfig(
         buildRunnerArgs: other?.buildRunnerArgs ?? buildRunnerArgs,
         commandName: other?.commandName ?? commandName,
+        description: other?.description ?? description,
+        hidden: other?.hidden ?? hidden,
         testArgs: other?.testArgs ?? testArgs,
       );
 }

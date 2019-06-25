@@ -2,6 +2,9 @@ name: dart_dev
 version: 0.0.0
 private: true
 
+environment:
+ sdk: ">=2.3.0 <3.0.0"
+
 dependencies:
   args: ^1.5.2
   glob: ^1.1.7

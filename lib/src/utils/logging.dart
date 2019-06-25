@@ -23,7 +23,7 @@ import 'package:io/ansi.dart';
 import 'package:logging/logging.dart';
 import 'package:stack_trace/stack_trace.dart';
 
-import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
+import 'parse_flag_from_args.dart';
 
 // Ensures this message does not get overwritten by later logs.
 const _logSuffix = '\n';

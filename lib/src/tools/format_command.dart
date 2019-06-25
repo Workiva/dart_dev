@@ -1,24 +1,17 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:dart_dev/src/utils/verbose_enabled.dart';
 import 'package:glob/glob.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 
-import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/utils/has_immediate_dependency.dart';
-import 'package:dart_dev/src/utils/has_any_positional_args_before_separator.dart';
-import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
+import '../utils/ensure_process_exit.dart';
+import '../utils/has_immediate_dependency.dart';
+import '../utils/has_any_positional_args_before_separator.dart';
+import '../utils/parse_flag_from_args.dart';
+import '../utils/verbose_enabled.dart';
 
 final _log = Logger('Format');
-
-class FormatTool implements DartDevTool {
-  @override
-  final FormatCommand command;
-
-  FormatTool(FormatConfig config) : command = FormatCommand(config);
-}
 
 class FormatCommand extends Command<int> {
   final FormatConfig config;
@@ -30,6 +23,9 @@ class FormatCommand extends Command<int> {
 
   @override
   String get description => 'Format dart files in this package.';
+
+  @override
+  bool get hidden => config.hidden ?? false;
 
   @override
   String get invocation =>
@@ -137,26 +133,31 @@ class FormatCommand extends Command<int> {
       [...args, ...inputs],
       mode: ProcessStartMode.inheritStdio,
     );
-
+    ensureProcessExit(process);
     return process.exitCode;
   }
 }
 
-class FormatConfig extends DartDevToolConfig {
+class FormatConfig {
   FormatConfig({
-    String commandName,
+    this.commandName,
     this.defaultMode,
     this.exclude,
     this.formatter,
+    this.hidden,
     this.include,
     this.lineLength,
-  }) : super(commandName);
+  });
+
+  final String commandName;
 
   final FormatMode defaultMode;
 
   final List<Glob> exclude;
 
   final Formatter formatter;
+
+  final bool hidden;
 
   final List<Glob> include;
 
@@ -167,6 +168,7 @@ class FormatConfig extends DartDevToolConfig {
         defaultMode: other?.defaultMode ?? defaultMode,
         exclude: other?.exclude ?? exclude,
         formatter: other?.formatter ?? formatter,
+        hidden: other?.hidden ?? hidden,
         include: other?.include ?? include,
         lineLength: other?.lineLength ?? lineLength,
       );
