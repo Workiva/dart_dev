@@ -1,7 +1,7 @@
 name: non_test_file
 version: 0.0.0
 dev_dependencies:
-  coverage: "^0.7.2"
+  coverage: '>=0.7.3 <0.13.0'
   dart_dev:
     path: ../../..
   test: "^0.12.0"

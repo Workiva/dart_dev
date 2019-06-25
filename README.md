@@ -27,6 +27,7 @@ development requirements:
 - Consistent code formatting
 - Static analysis to detect issues
 - Documentation generation
+- CSS generation using the Dart Sass compiler
 - Examples for manual testing/exploration
 - Applying a LICENSE file to all source files
 - Running dart unit tests on Sauce Labs
@@ -85,6 +86,7 @@ local tasks.
 - **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
 - **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
 - **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
+- **Compiling Sass:** runs the [`compile_sass` tool from the `w_common` package](https://github.com/workiva/w_common).
 - **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
 - **Generate a test runner file:** that allows for faster test execution.
 - **Running dart unit tests on Sauce Labs:** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
@@ -240,6 +242,7 @@ ddev format
 ddev gen-test-runner
 ddev task-runner
 ddev test
+ddev sass
 
 # without the alias
 pub run dart_dev analyze
@@ -249,6 +252,7 @@ pub run dart_dev format
 pub run dart_dev gen-test-runner
 pub run dart_dev task-runner
 pub run dart_dev test
+pub run dart_dev sass
 ```
 
 Add the `-h` flag to any of the above commands to receive additional help

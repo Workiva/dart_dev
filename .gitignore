@@ -29,3 +29,5 @@ test_reports/
 /test_fixtures/docs/docs/doc/api/
 /test_fixtures/format/changes_needed_temp/
 /test_fixtures/needs_build_runner/.dart_tool
+/test_fixtures/sass/fake_consumer_package
+/test_fixtures/coverage/functional_test/pubspec.lock
