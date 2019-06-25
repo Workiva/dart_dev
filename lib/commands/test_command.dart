@@ -1,1 +1,1 @@
-export '../src/tools/test_command.dart' show TestCommand, TestConfig;
+export '../src/commands/test_command.dart' show TestCommand, TestConfig;

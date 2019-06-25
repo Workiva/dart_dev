@@ -6,7 +6,7 @@ import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-import 'package:dart_dev/src/tools/analyze_command.dart';
+import 'package:dart_dev/src/commands/analyze_command.dart';
 
 void main() {
   group('assertNoPositionalArgsBeforeSeparator', () {
