@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
@@ -55,12 +56,6 @@ Future<int> runWithConfig(List<String> args, _ConfigGetter configGetter) async {
     return ExitCode.config.code;
   }
 
-  // StreamSubscription exitSignalsSub;
-  // exitSignalsSub = exitProcessSignals.listen((signal) async {
-  //   await killAllChildProcesses();
-  //   await exitSignalsSub?.cancel();
-  // });
-
   try {
     exit(await DartDevRunner(config).run(args));
   } on UsageException catch (error) {
@@ -68,6 +63,10 @@ Future<int> runWithConfig(List<String> args, _ConfigGetter configGetter) async {
     return ExitCode.usage.code;
   } catch (error, stack) {
     _log.severe('Uncaught Exception:', error, stack);
+    if (!parseFlagFromArgs(args, 'verbose', abbr: 'v')) {
+      // Always print the stack trace for an uncaught exception.
+      stderr.writeln(stack);
+    }
     return ExitCode.unavailable.code;
   }
 

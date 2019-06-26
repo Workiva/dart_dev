@@ -26,6 +26,15 @@ class SequenceCommand extends Command<int> {
   bool get hidden => config.hidden ?? false;
 
   @override
+  void printUsage() {
+    if (config?.helpCommand != null && config.helpCommand.isNotEmpty) {
+      runner.run(config.helpCommand);
+    } else {
+      super.printUsage();
+    }
+  }
+
+  @override
   Future<int> run() async {
     int code;
     for (final args in config.beforeCommands ?? []) {
@@ -59,6 +68,7 @@ class SequenceConfig {
     this.beforeCommands,
     this.commandName,
     this.description,
+    this.helpCommand,
     this.hidden,
     this.primaryCommands,
   });
@@ -67,6 +77,7 @@ class SequenceConfig {
   final List<List<String>> beforeCommands;
   final String commandName;
   final String description;
+  final List<String> helpCommand;
   final bool hidden;
   final List<List<String>> primaryCommands;
 }

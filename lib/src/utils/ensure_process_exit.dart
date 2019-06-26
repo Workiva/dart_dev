@@ -1,5 +1,6 @@
-import 'dart:async';
 import 'dart:io';
+
+import 'package:logging/logging.dart';
 
 import 'exit_process_signals.dart';
 
@@ -14,19 +15,16 @@ import 'exit_process_signals.dart';
 /// process will be forwarded via [process.kill]. This is only needed if the
 /// given [process] was started in either the [ProcessStartMode.detached] or
 /// [ProcessStartMode.detachedWithStdio] modes.
-void ensureProcessExit(Process process, {bool forwardExitSignals}) {
+void ensureProcessExit(Process process, {bool forwardExitSignals, Logger log}) {
   forwardExitSignals ??= false;
-  StreamSubscription sub;
-  sub = exitProcessSignals.listen((signal) async {
+  var signalsSub = exitProcessSignals.listen((signal) async {
+    log?.info('Waiting for subprocess to exit...');
     if (forwardExitSignals) {
       process.kill(signal);
     }
-    await process.exitCode;
-    await sub?.cancel();
-    sub = null;
   });
   process.exitCode.then((_) {
-    sub?.cancel();
-    sub = null;
+    signalsSub?.cancel();
+    signalsSub = null;
   });
 }

@@ -46,7 +46,7 @@ class AnalyzeCommand extends Command<int> {
     final process = await Process.start(
         'dartanalyzer', [...args, ...entrypoints],
         mode: ProcessStartMode.inheritStdio);
-    ensureProcessExit(process);
+    ensureProcessExit(process, log: _log);
     return process.exitCode;
   }
 

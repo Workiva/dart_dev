@@ -2,12 +2,13 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:glob/glob.dart';
+import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 
 import '../utils/ensure_process_exit.dart';
-import '../utils/has_immediate_dependency.dart';
 import '../utils/has_any_positional_args_before_separator.dart';
+import '../utils/package_is_immediate_dependency.dart';
 import '../utils/parse_flag_from_args.dart';
 import '../utils/verbose_enabled.dart';
 
@@ -60,11 +61,13 @@ class FormatCommand extends Command<int> {
     List<String> executableArgs;
     switch (config.formatter) {
       case Formatter.dartStyle:
-        if (!hasImmediateDependency('dart_style')) {
-          _log.severe('Cannot run the "dart_style:format" executable because '
-              'the "dart_style" package is not an immediate dependency.\n'
-              'Either add "dart_style" to your pubspec.yaml or configure the '
-              'format tool to use "dartfmt" instead.');
+        if (!packageIsImmediateDependency('dart_style')) {
+          _log.severe(red.wrap('Cannot run `dart_style:format`.\n') +
+              yellow.wrap('You must either have a dependency on `dart_style` '
+                  'in `pubspec.yaml` or configure the format tool to use `dartfmt`'
+                  'instead.\n'
+                  'Either add "dart_style" to your pubspec.yaml or configure the '
+                  'format tool to use "dartfmt" instead.'));
           return ExitCode.config.code;
         }
         executable = 'pub';
@@ -133,7 +136,7 @@ class FormatCommand extends Command<int> {
       [...args, ...inputs],
       mode: ProcessStartMode.inheritStdio,
     );
-    ensureProcessExit(process);
+    ensureProcessExit(process, log: _log);
     return process.exitCode;
   }
 }

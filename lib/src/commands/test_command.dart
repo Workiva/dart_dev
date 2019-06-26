@@ -4,10 +4,13 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/command_utils.dart';
+import 'package:io/ansi.dart';
+import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 
 import '../utils/ensure_process_exit.dart';
 import '../utils/has_any_positional_args_before_separator.dart';
+import '../utils/take_args_between_separators.dart';
 
 final _log = Logger('TestTool');
 
@@ -30,7 +33,7 @@ class TestCommand extends Command<int> {
     final buffer = StringBuffer()
       ..write(
           '${super.invocation.replaceFirst('[arguments]', '[dart_dev arguments]')} ');
-    if (hasImmediateDependency('build_test')) {
+    if (packageIsImmediateDependency('build_test')) {
       buffer.write('[-- [build_runner arguments]]');
     }
     buffer.write('[-- [test arguments]]');
@@ -39,7 +42,7 @@ class TestCommand extends Command<int> {
 
   @override
   String get usageFooter {
-    final hasBuildTest = hasImmediateDependency('build_test');
+    final hasBuildTest = packageIsImmediateDependency('build_test');
     final buffer = StringBuffer();
     if (hasBuildTest) {
       buffer
@@ -65,12 +68,18 @@ class TestCommand extends Command<int> {
 
   @override
   Future<int> run() async {
+    if (!packageIsImmediateDependency('test')) {
+      _log.severe(red.wrap('Could not run tests.\n') +
+          yellow
+              .wrap('You must have a dependency on `test` in `pubspec.yaml`.'));
+      return ExitCode.config.code;
+    }
     assertNoPositionalArgsBeforeSeparator(name, argResults, usageException);
     final args = buildTestArgs(config, argResults);
     _log.info('Running: pub ${args.join(' ')}\n');
     final process =
         await Process.start('pub', args, mode: ProcessStartMode.inheritStdio);
-    ensureProcessExit(process);
+    ensureProcessExit(process, log: _log);
     return process.exitCode;
   }
 
@@ -89,7 +98,7 @@ class TestCommand extends Command<int> {
 
   static Iterable<String> buildTestArgs(
       TestConfig config, ArgResults argResults) {
-    final hasBuildTest = hasImmediateDependency('build_test');
+    final hasBuildTest = packageIsImmediateDependency('build_test');
 
     final args = <String>[
       // `pub run test` or `pub run build_runner test`
@@ -116,22 +125,6 @@ class TestCommand extends Command<int> {
       args.removeLast();
     }
     return args;
-  }
-
-  static Iterable<String> takeArgsBetweenSeparators(List<String> args,
-      {int skip}) {
-    List<String> result;
-    skip ??= 0;
-    for (var i = 0; i < args.length; i++) {
-      if (args[i] == '--') {
-        if (skip-- == 0) {
-          result = args.skip(i + 1).toList();
-          break;
-        }
-      }
-    }
-    result ??= [];
-    return result.contains('--') ? result.take(result.indexOf('--')) : result;
   }
 }
 
