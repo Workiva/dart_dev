@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:args/command_runner.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('SequenceCommand');
 
 class SequenceCommand extends Command<int> {
   final SequenceConfig config;
@@ -44,7 +47,9 @@ class SequenceCommand extends Command<int> {
       }
     }
     for (final args in config.primaryCommands ?? []) {
-      code = await runner.run([...args, ...argResults.rest]);
+      final combinedArgs = <String>[...args, ...argResults.rest];
+      _log.info('Running: dart_dev ${combinedArgs.join(' ')}\n');
+      code = await runner.run(combinedArgs);
       if (code != 0) {
         return code;
       }

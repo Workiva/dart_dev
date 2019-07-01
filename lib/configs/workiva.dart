@@ -15,7 +15,7 @@ Iterable<Command<int>> build({
       AnalyzeCommand(
         AnalyzeConfig(
           commandName: 'analyze',
-        ),
+        ).merge(analyzeConfig),
       ),
 
       // command: format

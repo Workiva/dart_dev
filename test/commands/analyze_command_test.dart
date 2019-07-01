@@ -59,7 +59,7 @@ void main() {
   });
 
   group('buildEntrypoints', () {
-    final root = 'test/tools/fixtures/analyze_tool';
+    final root = 'test/commands/fixtures/analyze_tool';
     test('defaults to `.`', () {
       final config = AnalyzeConfig();
       expect(AnalyzeCommand.buildEntrypoints(config, root: root), ['.']);
