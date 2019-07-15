@@ -3,38 +3,79 @@ import 'dart:async';
 import 'package:args/command_runner.dart';
 import 'package:logging/logging.dart';
 
+import '../command_builder.dart';
+
 final _log = Logger('SequenceCommand');
 
-class SequenceCommand extends Command<int> {
-  final SequenceConfig config;
+class WrappedCommand implements CommandBuilder {
+  WrappedCommand(this.innerCommand, {
+    this.afterCommands,
+    this.beforeCommands,
+  });
 
-  SequenceCommand([SequenceConfig config])
-      : config = config ?? SequenceConfig() {
-    if (config.commandName == null) {
-      throw ArgumentError('config.commandName must not be null.');
-    }
-    if (config.primaryCommands == null || config.primaryCommands.isEmpty) {
-      throw ArgumentError(
-          'config.primaryCommands must be non-null and non-empty.');
-    }
-  }
+  final List<CommandBuilder> afterCommands;
+
+  final List<CommandBuilder> beforeCommands;
 
   @override
-  String get name => config.commandName;
+  String description;
 
   @override
-  String get description => config.description ?? '';
+  bool hidden;
+
+  final CommandBuilder innerCommand;
 
   @override
-  bool get hidden => config.hidden ?? false;
+  Command<int> build(String commandName) => _SequenceCommand(
+    afterCommands ?? <CommandBuilder>[],
+    beforeCommands ?? <CommandBuilder>[],
+    commandName,
+    description,
+    hidden,
+    innerCommand,
+  );
+}
+
+class _SequenceCommand extends Command<int> {
+  final List<CommandBuilder> _afterCommands;
+  final List<CommandBuilder> _beforeCommands;
+  final String _commandName;
+  final String _description;
+  final bool _hidden;
+  final CommandBuilder _innerCommand;
+
+  _SequenceCommand(
+    this._afterCommands,
+    this._beforeCommands,
+    this._commandName,
+    this._description,
+    this._hidden,
+    this._innerCommand,
+  );
+  //     : config = config ?? SequenceConfig() {
+  //   if (config.commandName == null) {
+  //     throw ArgumentError('config.commandName must not be null.');
+  //   }
+  //   if (config.primaryCommands == null || config.primaryCommands.isEmpty) {
+  //     throw ArgumentError(
+  //         'config.primaryCommands must be non-null and non-empty.');
+  //   }
+  // }
+
+  @override
+  String get name => _commandName;
+
+  @override
+  String get description => _description ?? '';
+
+  @override
+  bool get hidden => _hidden ?? false;
+
+  String get _innerCommandName => '_$name';
 
   @override
   void printUsage() {
-    if (config?.helpCommand != null && config.helpCommand.isNotEmpty) {
-      runner.run(config.helpCommand);
-    } else {
-      super.printUsage();
-    }
+    runner.run([_innerCommandName, '-h']);
   }
 
   @override
@@ -64,6 +105,20 @@ class SequenceCommand extends Command<int> {
       }
     }
     return code;
+  }
+
+  void _addWrappedCommands() {
+    if (runner.commands.containsKey(_innerCommandName)) {
+      return;
+    }
+
+    final innerCommand = 
+
+    for (var i = 0; i < _beforeCommands.length; i++) {
+      final command = _beforeCommands[i].build('${_innerCommand}_before$i');
+      runner.addCommand(command);
+    }
+    
   }
 }
 

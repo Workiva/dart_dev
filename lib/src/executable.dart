@@ -7,12 +7,13 @@ import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
+import 'command_builder.dart';
 import 'dart_dev_runner.dart';
 import 'utils/assert_dir_is_dart_package.dart';
 import 'utils/custom_entrypoint.dart';
 import 'utils/logging.dart';
 
-typedef _ConfigGetter = List<Command<int>> Function();
+typedef _ConfigGetter = Map<String, CommandBuilder> Function();
 
 const _customDevDartPath = 'tool/dev.dart';
 
@@ -41,7 +42,7 @@ Future<int> runWithConfig(List<String> args, _ConfigGetter configGetter) async {
     return ExitCode.usage.code;
   }
 
-  Iterable<Command<int>> config;
+  Map<String, CommandBuilder> config;
   try {
     config = configGetter();
   } catch (error) {
