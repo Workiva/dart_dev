@@ -20,28 +20,30 @@ const List defaultAfterFunctional = const [];
 const List defaultBeforeFunctional = const [];
 const int defaultConcurrency = 4;
 const bool defaultDeleteConflictingOutputs = false;
-const bool defaultPauseAfterLoad = false;
-const bool defaultPubServe = false;
 const bool defaultDisableServeStdOut = false;
-const int defaultPubServePort = 0;
-const bool defaultIntegration = false;
 const bool defaultFunctional = false;
+const List<String> defaultFunctionalTests = const [];
+const bool defaultIntegration = false;
 const List<String> defaultIntegrationTests = const [];
+const bool defaultPauseAfterLoad = false;
+const List<String> defaultPlatforms = const [];
+const bool defaultPubServe = false;
+const int defaultPubServePort = 0;
+const bool defaultRelease = false;
 const bool defaultUnit = true;
 const List<String> defaultUnitTests = const ['test/'];
-const List<String> defaultFunctionalTests = const [];
-const List<String> defaultPlatforms = const [];
 
 class TestConfig extends TaskConfig {
   List afterFunctionalTests = defaultAfterFunctional;
   List beforeFunctionalTests = defaultBeforeFunctional;
   int concurrency = defaultConcurrency;
   bool deleteConflictingOutputs = defaultDeleteConflictingOutputs;
+  bool disableServeStdOut = defaultDisableServeStdOut;
   List<String> functionalTests = defaultFunctionalTests;
   List<String> integrationTests = defaultIntegrationTests;
   List<String> platforms = defaultPlatforms;
   bool pubServe = defaultPubServe;
   int pubServePort = defaultPubServePort;
-  bool disableServeStdOut = defaultDisableServeStdOut;
+  bool release = defaultRelease;
   List<String> unitTests = defaultUnitTests;
 }
