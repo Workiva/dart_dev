@@ -57,7 +57,7 @@ class TestCli extends TaskCli {
         negatable: false)
     ..addFlag('delete-conflicting-outputs',
         help: 'Deletes conflicting outputs during the build', negatable: false)
-    ..addFlag('release', abbr: '-r', negatable: true, help: 'Runs tests in release mode (i.e. compiled via dart2js).')
+    ..addFlag('release', abbr: 'r', negatable: true, help: 'Runs tests in release mode (i.e. compiled via dart2js).')
     ..addOption('pub-serve-port',
         help:
             'Port used by the Pub server for browser tests. The default value will randomly select an open port to use.')
