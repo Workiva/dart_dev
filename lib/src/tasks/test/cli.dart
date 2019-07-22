@@ -57,7 +57,10 @@ class TestCli extends TaskCli {
         negatable: false)
     ..addFlag('delete-conflicting-outputs',
         help: 'Deletes conflicting outputs during the build', negatable: false)
-    ..addFlag('release', abbr: 'r', negatable: true, help: 'Runs tests in release mode (i.e. compiled via dart2js).')
+    ..addFlag('release',
+        abbr: 'r',
+        negatable: true,
+        help: 'Runs tests in release mode (i.e. compiled via dart2js).')
     ..addOption('pub-serve-port',
         help:
             'Port used by the Pub server for browser tests. The default value will randomly select an open port to use.')
@@ -132,10 +135,7 @@ class TestCli extends TaskCli {
         parsedArgs,
         config.test.deleteConflictingOutputs);
 
-    bool release = TaskCli.valueOf(
-        'release',
-        parsedArgs,
-        config.test.release);
+    bool release = TaskCli.valueOf('release', parsedArgs, config.test.release);
 
     // CLI user can specify individual test files to run.
     bool individualTestsSpecified = parsedArgs.rest.isNotEmpty;
@@ -201,6 +201,7 @@ class TestCli extends TaskCli {
     if (deleteConflictingOutputs) {
       buildArgs.add('--delete-conflicting-outputs');
     }
+
     if (release) {
       buildArgs.add('--release');
     }
