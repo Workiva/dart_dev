@@ -56,7 +56,7 @@ StringBuffer colorLog(LogRecord record, {bool verbose}) {
   }
 
   if (record.stackTrace != null && verbose) {
-    final trace = new Trace.from(record.stackTrace).terse;
+    final trace = Trace.from(record.stackTrace).terse;
     lines.add(trace);
   }
 
@@ -100,6 +100,17 @@ String humanReadable(Duration duration) {
   return '${hours}h ${remaining.inMinutes}m';
 }
 
+void logSubprocessHeader(Logger logger, String command, {Level level}) {
+  level ??= Level.INFO;
+  logger.log(
+      level,
+      'Running subprocess:\n' +
+          magenta.wrap(command) +
+          '\n' +
+          '-' * (io.stdout.hasTerminal ? io.stdout.terminalColumns : 79) +
+          '\n');
+}
+
 /// Logs an asynchronous [action] with [description] before and after.
 ///
 /// Returns a future that completes after the action and logging finishes.
@@ -107,8 +118,9 @@ Future<T> logTimedAsync<T>(
   Logger logger,
   String description,
   Future<T> action(), {
-  Level level = Level.INFO,
+  Level level,
 }) async {
+  level ??= Level.INFO;
   final watch = Stopwatch()..start();
   logger.log(level, '$description...');
   final result = await action();

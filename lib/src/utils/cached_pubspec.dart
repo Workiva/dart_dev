@@ -5,9 +5,11 @@ import 'package:pubspec_parse/pubspec_parse.dart';
 
 Pubspec cachedPubspec({String path}) {
   final sourceUrl = p.join(path ?? p.current, 'pubspec.yaml');
-  _pubspec ??=
-      Pubspec.parse(File(sourceUrl).readAsStringSync(), sourceUrl: sourceUrl);
-  return _pubspec;
+  _cachedPubspecs.putIfAbsent(
+      sourceUrl,
+      () => Pubspec.parse(File(sourceUrl).readAsStringSync(),
+          sourceUrl: sourceUrl));
+  return _cachedPubspecs[sourceUrl];
 }
 
-Pubspec _pubspec;
+final _cachedPubspecs = <String, Pubspec>{};

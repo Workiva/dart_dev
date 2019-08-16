@@ -2,18 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
-import 'command_builder.dart';
 import 'dart_dev_runner.dart';
 import 'utils/assert_dir_is_dart_package.dart';
 import 'utils/custom_entrypoint.dart';
 import 'utils/logging.dart';
 
-typedef _ConfigGetter = Map<String, CommandBuilder> Function();
+typedef _ConfigGetter = Map<String, DevTool> Function();
 
 const _customDevDartPath = 'tool/dev.dart';
 
@@ -42,14 +42,14 @@ Future<int> runWithConfig(List<String> args, _ConfigGetter configGetter) async {
     return ExitCode.usage.code;
   }
 
-  Map<String, CommandBuilder> config;
+  Map<String, DevTool> config;
   try {
     config = configGetter();
   } catch (error) {
     stderr
       ..writeln('Invalid "tool/dev.dart" in ${p.absolute(p.current)}')
       ..writeln()
-      ..writeln('It should provide a `Map<String, DartDevTool> config;` getter,'
+      ..writeln('It should provide a `Map<String, DevTool> config;` getter,'
           ' but it either does not exist or threw unexpectedly:')
       ..writeln('  $error')
       ..writeln()

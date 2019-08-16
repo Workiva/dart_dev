@@ -1,5 +1,5 @@
 name: dart_dev
-version: 0.0.0
+version: 3.0.0-alpha.1
 private: true
 
 environment:
@@ -7,6 +7,7 @@ environment:
 
 dependencies:
   args: ^1.5.2
+  completion: ^0.2.1+1
   glob: ^1.1.7
   io: ^0.3.3
   logging: ^0.11.3+2

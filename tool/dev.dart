@@ -1,8 +1,9 @@
-import 'package:dart_dev/command_builder.dart';
-import 'package:dart_dev/commands/analyze_command.dart';
-import 'package:dart_dev/commands/format_command.dart';
+import 'package:dart_dev/configs/workiva.dart';
+import 'package:dart_dev/dart_dev.dart';
+import 'package:glob/glob.dart';
 
-Map<String, CommandBuilder> get config => {
-      'analyze': AnalyzeCommand(),
-      'format': FormatCommand(),
-    };
+final config = {
+  ...workivaConfig,
+  'format': FormatTool()..exclude = [Glob('test/tools/fixtures/**.dart')],
+  'serve': WebdevServeTool()..webdevArgs = ['test'],
+};
