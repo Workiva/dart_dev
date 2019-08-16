@@ -38,24 +38,6 @@ void main() {
     });
   });
 
-  // group('assertDartStyleAvailable', () {
-  //   test('detects if dart_style is a direct dependency', () async {
-  //     final path = 'test/tools/fixtures/format/has_dart_style';
-  //     expect(assertDartStyleAvailable(path: path), isTrue);
-  //     await flushMicrotasks();
-  //     expect(logs, isEmpty);
-  //   });
-
-  //   test('detects if dart_style is not available', () async {
-  //     final path = 'test/tools/fixtures/format/missing_dart_style';
-  //     expect(assertDartStyleAvailable(path: path), isFalse);
-  //     await flushMicrotasks();
-  //     expect(logs, hasLength(1));
-  //     expect(logs.first.level, Level.SEVERE);
-  //     expect(logs.first.message, contains('dart_style:format'));
-  //   });
-  // });
-
   group('buildArgs', () {
     test('no mode', () {
       expect(buildArgs(['a', 'b'], null), orderedEquals(['a', 'b']));
