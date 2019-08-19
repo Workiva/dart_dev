@@ -166,7 +166,7 @@ void main() {
     test('with <=5 entrypoints', () {
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains('dartanalyzer -t a b c d e') &&
               record.level == Level.INFO)));
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e']);
@@ -175,7 +175,7 @@ void main() {
     test('with >5 entrypoints', () {
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains('dartanalyzer -t <6 paths>') &&
               record.level == Level.INFO)));
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f']);
@@ -184,7 +184,7 @@ void main() {
     test('with >5 entrypoints in verbose mode', () {
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains('dartanalyzer -t a b c d e f') &&
               record.level == Level.INFO)));
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'], verbose: true);

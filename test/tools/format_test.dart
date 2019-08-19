@@ -113,14 +113,24 @@ void main() {
   group('buildExecution', () {
     test('throws UsageException if positional args are given', () {
       final argResults = ArgParser().parse(['a']);
-      final context = DevToolExecutionContext(argResults: argResults);
-      expect(() => buildExecution(context), throwsA(isA<UsageException>()));
+      final context = DevToolExecutionContext(
+          argResults: argResults, commandName: 'test_format');
+      expect(
+          () => buildExecution(context),
+          throwsA(isA<UsageException>()
+            ..having((e) => e.message, 'command name', contains('test_format'))
+            ..having((e) => e.message, 'usage', contains('--formatter-args'))));
     });
 
     test('throws UsageException if args are given after a separator', () {
       final argResults = ArgParser().parse(['--', 'a']);
-      final context = DevToolExecutionContext(argResults: argResults);
-      expect(() => buildExecution(context), throwsA(isA<UsageException>()));
+      final context = DevToolExecutionContext(
+          argResults: argResults, commandName: 'test_format');
+      expect(
+          () => buildExecution(context),
+          throwsA(isA<UsageException>()
+            ..having((e) => e.message, 'command name', contains('test_format'))
+            ..having((e) => e.message, 'usage', contains('--formatter-args'))));
     });
 
     test(
@@ -129,7 +139,7 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains('Cannot run "dart_style:format"') &&
               record.message
                   .contains('add "dart_style" to your pubspec.yaml') &&
@@ -147,7 +157,7 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains(
                   'formatter cannot run because no inputs could be found') &&
               record.message.contains('tool/dev.dart') &&
@@ -234,6 +244,17 @@ void main() {
                 ['-w', '--fix', '--follow-links', '--indent', '2', '-v', '.']));
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
       });
+
+      test('and logs the test subprocess', () {
+        Logger.root.level = Level.ALL;
+        expect(
+            Logger.root.onRecord,
+            emitsThrough(predicate<LogRecord>((record) =>
+                record.message.contains('dartfmt .') &&
+                record.level == Level.INFO)));
+
+        buildExecution(DevToolExecutionContext());
+      });
     });
   });
 
@@ -284,7 +305,7 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains(
                   'formatter cannot run because no inputs could be found') &&
               record.message.contains('tool/dev.dart') &&
@@ -297,7 +318,7 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains(
                   'formatter cannot run because no inputs could be found') &&
               record.message.contains('tool/dev.dart') &&
@@ -314,7 +335,7 @@ void main() {
       expect(
           Logger.root.onRecord,
           emitsThrough(
-            predicate((record) =>
+            predicate<LogRecord>((record) =>
                 record.message.contains('Could not list include') &&
                 record.message.contains('$includeGlob') &&
                 record.level == Level.FINE),
@@ -322,7 +343,7 @@ void main() {
       expect(
           Logger.root.onRecord,
           emitsThrough(
-            predicate((record) =>
+            predicate<LogRecord>((record) =>
                 record.message.contains('Could not list exclude') &&
                 record.message.contains('$excludeGlob') &&
                 record.level == Level.FINE),
@@ -338,7 +359,7 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains('Excluding these paths') &&
               record.message.contains('$root/should_exclude.dart') &&
               record.level == Level.FINE)));
@@ -371,7 +392,7 @@ void main() {
     test('<=5 inputs and verbose=false', () async {
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains('dartfmt -x -y a b') &&
               record.level == Level.INFO)));
 
@@ -381,7 +402,7 @@ void main() {
     test('>5 inputs and verbose=true', () async {
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains('dartfmt -x -y <6 paths>') &&
               record.level == Level.INFO)));
 
@@ -391,7 +412,7 @@ void main() {
     test('>5 inputs and verbose=false', () async {
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate((record) =>
+          emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains('dartfmt -x -y a b c d e f') &&
               record.level == Level.INFO)));
 

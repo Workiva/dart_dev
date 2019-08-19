@@ -16,6 +16,35 @@ import '../utils/run_process_and_ensure_exit.dart';
 
 final _log = Logger('Test');
 
+/// A dart_dev tool that runs dart tests for the current project.
+///
+/// Tests will be run via `pub run test` unless the current project depends on
+/// `build_test`, in which case it will run tests via
+/// `pub run build_runner test`.
+///
+/// To use this tool in your project, include it in the dart_dev config in
+/// `tool/dev.dart`:
+///     import 'package:dart_dev/dart_dev.dart';
+///
+///     final config = {
+///       'test': TestTool(),
+///     };
+///
+/// This will make it available via the `dart_dev` command-line app like so:
+///     pub run dart_dev test
+///
+/// This tool can be configured by modifying any of its fields:
+///     // tool/dev.dart
+///     import 'package:dart_dev/dart_dev.dart';
+///
+///     final config = {
+///       'test': TestTool()
+///         ..buildArgs = ['--delete-conflicting-outputs']
+///         ..testArgs = ['-P', 'unit'],
+///     };
+///
+/// It is also possible to run this tool directly in a dart script:
+///     TestTool().run();
 class TestTool extends DevTool {
   /// The args to pass to the `pub run build_runner test` process that will be
   /// run by this command when the current project depends on `build_test`.
@@ -41,7 +70,7 @@ class TestTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
     context ??= DevToolExecutionContext();
-    final execution = createTestExecution(context,
+    final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredTestArgs: testArgs);
     if (execution.exitCode != null) {
       return execution.exitCode;
@@ -52,6 +81,22 @@ class TestTool extends DevTool {
   @override
   Command<int> toCommand(String name) => DevToolCommand(name, this,
       argParser: ArgParser()
+        ..addSeparator('======== Selecting Tests')
+        ..addMultiOption('name',
+            abbr: 'n',
+            help: 'A substring of the name of the test to run.\n'
+                'Regular expression syntax is supported.\n'
+                'If passed multiple times, tests must match all substrings.',
+            splitCommas: false)
+        ..addMultiOption('plain-name',
+            abbr: 'N',
+            help: 'A plain-text substring of the name of the test to run.\n'
+                'If passed multiple times, tests must match all substrings.',
+            splitCommas: false)
+        ..addSeparator('======== Running Tests')
+        ..addMultiOption('preset',
+            abbr: 'P', help: 'The configuration preset(s) to use.')
+        ..addSeparator('======== Other Options')
         ..addOption('test-args',
             help: 'Args to pass to the test runner process.\n'
                 'Run "pub run test -h -v" to see all available options.')
@@ -87,132 +132,30 @@ class TestExecution {
   final ProcessDeclaration process;
 }
 
-TestExecution createTestExecution(
-  DevToolExecutionContext context, {
-  List<String> configuredBuildArgs,
-  List<String> configuredTestArgs,
-}) {
-  if (context.argResults != null) {
-    assertNoArgsAfterSeparator(context.argResults, context.usageException,
-        commandName: context.commandName,
-        usageFooter:
-            'Arguments can be passed to the test runner process via the '
-            '--test-args option.\n'
-            'If this project runs tests via build_runner, arguments can be '
-            'passed to that process via the --build-args option.');
-  }
-
-  final hasBuildTest = packageIsImmediateDependency('build_test');
-  if (!hasBuildTest &&
-      context.argResults != null &&
-      context.argResults['build-args'] != null) {
-    context.usageException('Can only use --build-args in a project that has a '
-        'direct dependency on "build_test" in the pubspec.yaml.');
-  }
-  if (!assertTestRunnerAvailable()) {
-    return TestExecution.exitEarly(ExitCode.config.code);
-  }
-  if (!hasBuildTest &&
-      configuredBuildArgs != null &&
-      configuredBuildArgs.isNotEmpty) {
-    _log.severe('This project is configured to run tests with buildArgs, but '
-        '"build_test" is not a direct dependency in this project.\n'
-        'Either remove these buildArgs in tool/dev.dart or add "build_test" to '
-        'the pubspec.yaml.');
-    return TestExecution.exitEarly(ExitCode.config.code);
-  }
-  final args = buildTestArgs(
-      argResults: context.argResults,
-      configuredBuildArgs: configuredBuildArgs,
-      configuredTestArgs: configuredTestArgs,
-      useBuildTest: hasBuildTest,
-      verbose: context.verbose);
-  logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
-  return TestExecution.process(
-      ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
-}
-
-/// A dart_dev command that runs tests for the current project.
-///
-/// This command will run tests via `pub run test` unless the current project
-/// depends on `build_test`, in which case it will run tests via
-/// `pub run build_runner test`.
-///
-/// The default target for this command is `test` (e.g. `ddev test`), but
-/// this is configurable in each project's `tool/dev.dart`.
-///
-/// This test command can be configured by modifying any of the available fields
-/// on an instance of this class, e.g.:
-///     // tool/dev.dart
-///     import 'package:dart_dev/tools/test_tool.dart';
-///
-///     final config = {
-///       'test': TestCommand()
-///         ..buildRunnerArgs = ['--delete-conflicting-outputs']
-///         ..testArgs = ['--verbose-trace']
-///     }
-// class TestCommand extends CommandBuilder {
-//   /// The args to pass to the `pub run build_runner test` process that will be
-//   /// run by this command when the current project depends on `build_test`.
-//   ///
-//   /// Run `pub run build_runner test -h` to see all available args.
-//   List<String> buildRunnerArgs;
-
-//   /// The default description for this test command can be overridden by setting
-//   /// this field to a non-null value.
-//   ///
-//   /// This description is used when printing the help text for this command as
-//   /// well as the help text for the top-level `ddev` command runner.
-//   @override
-//   String description;
-
-//   /// This command is not hidden from the `ddev` command runner by default, but
-//   /// can be by setting this to `true`.
-//   @override
-//   bool hidden;
-
-//   /// The args to pass to the `pub run test` process (either directly or
-//   /// through the `pub run build_runner test` process if applicable).
-//   ///
-//   /// Run `pub run test -h` to see all available args.
-//   ///
-//   /// Note that most of the command-line options for the `pub run test` process
-//   /// also have `dart_test.yaml` configuration counterparts. Rather than
-//   /// configuring this field, it is preferred that the project be configured via
-//   /// `dart_test.yaml` so that the configuration is used even when running tests
-//   /// through some means other than `ddev`.
-//   List<String> testArgs;
-
-//   @override
-//   Command<int> build(String commandName) => _TestCommand(
-//         commandName,
-//         buildRunnerArgs ?? <String>[],
-//         description,
-//         hidden,
-//         testArgs ?? <String>[],
-//       );
-// }
-
-/// Returns `true` if executables from `test` can be run in the current project
-/// (i.e. it is a direct dependency), and `false` otherwise.
-///
-/// Also logs a SEVERE log if `test` is not available explaining why its
-/// executable cannot be run and how to fix the issue.
-bool assertTestRunnerAvailable({String path}) {
-  if (!packageIsImmediateDependency('test', path: path)) {
-    _log.severe(red.wrap('Cannot run tests.\n') +
-        yellow.wrap('You must have a dependency on "test" in pubspec.yaml.\n'));
-    return false;
-  }
-  return true;
-}
-
-/// Builds and returns the args needed to run the test process.
+/// Builds and returns the full list of args for the test process that
+/// [TestTool] will start.
 ///
 /// If [useBuildTest] is true, the returned args will run tests via
-/// `pub run build_runner test`. Otherwise, the returned args will run tests via
-/// `pub run test`.
-List<String> buildTestArgs({
+/// `pub run build_runner test`. Additional args targeting the build process
+/// will immediately follow and args targeting the test process will follow an
+/// arg separator (`--`).
+///
+/// If [useBuildTest] is false, the returned args will run tests via
+/// `pub run test` and additional args targeting the test process will follow
+/// immediately. Build args will be ignored.
+///
+/// When building the build args portion of the list, the [configuredBuildArgs]
+/// will be included first (if non-null) followed by the value of the
+/// `--build-args` option if it and [argResults] are non-null.
+///
+/// When building the test args portion of the list, the [configuredTestArgs]
+/// will be included first (if non-null), followed by the value of the
+/// `--test-args` option if it and [argResults] are non-null, followed by any
+/// remaining positional args passed directly to the [TestTool] command.
+///
+/// If [verbose] is true, both the build args and the test args portions of the
+/// returned list will include the `-v` verbose flag.
+List<String> buildArgs({
   ArgResults argResults,
   List<String> configuredBuildArgs,
   List<String> configuredTestArgs,
@@ -270,4 +213,75 @@ List<String> buildTestArgs({
     // Add the args targeting the test command.
     ...testArgs,
   ];
+}
+
+/// Returns a declarative representation of a test process to run based on the
+/// given parameters.
+///
+/// These parameters will be populated from [TestTool] when it is executed
+/// (either directly or via a command-line app).
+///
+/// [context] is the execution context that would be provided by [TestTool] when
+/// converted to a [DevToolCommand]. For tests, this can be manually creatd to
+/// to imitate the various CLI inputs.
+///
+/// [configuredBuildArgs] will be populated from [TestTool.buildArgs].
+///
+/// [configuredTestArgs] will be populated from [TestTool.testArgs].
+///
+/// If non-null, [path] will override the current working directory for any
+/// operations that require it. This is intended for use by tests.
+///
+/// The [TestTool] can be tested almost completely via this function by
+/// enumerating all of the possible parameter variations and making assertions
+/// on the declarative output.
+TestExecution buildExecution(
+  DevToolExecutionContext context, {
+  List<String> configuredBuildArgs,
+  List<String> configuredTestArgs,
+  String path,
+}) {
+  if (context.argResults != null) {
+    assertNoArgsAfterSeparator(context.argResults, context.usageException,
+        commandName: context.commandName,
+        usageFooter:
+            'Arguments can be passed to the test runner process via the '
+            '--test-args option.\n'
+            'If this project runs tests via build_runner, arguments can be '
+            'passed to that process via the --build-args option.');
+  }
+
+  final hasBuildTest = packageIsImmediateDependency('build_test', path: path);
+  if (!hasBuildTest &&
+      context.argResults != null &&
+      context.argResults['build-args'] != null) {
+    context.usageException('Can only use --build-args in a project that has a '
+        'direct dependency on "build_test" in the pubspec.yaml.');
+  }
+
+  if (!packageIsImmediateDependency('test', path: path)) {
+    _log.severe(red.wrap('Cannot run tests.\n') +
+        yellow.wrap('You must have a dependency on "test" in pubspec.yaml.\n'));
+    return TestExecution.exitEarly(ExitCode.config.code);
+  }
+
+  if (!hasBuildTest &&
+      configuredBuildArgs != null &&
+      configuredBuildArgs.isNotEmpty) {
+    _log.severe('This project is configured to run tests with buildArgs, but '
+        '"build_test" is not a direct dependency in this project.\n'
+        'Either remove these buildArgs in tool/dev.dart or add "build_test" to '
+        'the pubspec.yaml.');
+    return TestExecution.exitEarly(ExitCode.config.code);
+  }
+
+  final args = buildArgs(
+      argResults: context.argResults,
+      configuredBuildArgs: configuredBuildArgs,
+      configuredTestArgs: configuredTestArgs,
+      useBuildTest: hasBuildTest,
+      verbose: context.verbose);
+  logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
+  return TestExecution.process(
+      ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
 }

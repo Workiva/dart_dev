@@ -36,7 +36,7 @@ final _log = Logger('Format');
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
-///       'analyze': FormatTool()
+///       'format': FormatTool()
 ///         ..defaultMode = FormatMode.assertNoChanges
 ///         ..exclude = [Glob('lib/src/generated/**.dart')]
 ///         ..formatter = Formatter.dartStyle,
@@ -92,7 +92,7 @@ class FormatTool extends DevTool {
   @override
   Command<int> toCommand(String name) => DevToolCommand(name, this,
       argParser: ArgParser()
-        ..addSeparator('Formatter Mode:')
+        ..addSeparator('======== Formatter Mode')
         ..addFlag('overwrite',
             abbr: 'w',
             negatable: false,
@@ -107,7 +107,7 @@ class FormatTool extends DevTool {
             help:
                 'Assert that no changes need to be made by setting the exit code '
                 'accordingly.\nImplies "--dry-run" and "--set-exit-if-changed".')
-        ..addSeparator('Other options:')
+        ..addSeparator('======== Other Options')
         ..addOption('formatter-args',
             help: 'Args to pass to the "dartfmt" process.\n'
                 'Run "dartfmt -h -v" to see all available options.'));
