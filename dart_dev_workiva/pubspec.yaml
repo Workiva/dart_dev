@@ -1,0 +1,13 @@
+name: dart_dev_workiva
+version: 1.0.0
+private: true
+
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+
+dependencies:
+  dart_dev_config:
+    path: ../dart_dev_config
+
+dev_dependencies:
+  test: any
