@@ -1,0 +1,6 @@
+name: missing_test_runner
+version: 0.0.0
+private: true
+
+dev_dependencies:
+  test: any
