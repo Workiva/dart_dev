@@ -8,10 +8,10 @@ import 'package:dart_dev/dart_dev.dart';
 final sassTool = SassTool()..sourceDir = 'lib/';
 
 Map<String, DevTool> get workivaConfig => {
-  'analyze': AnalyzeTool(),
-  'format': FormatTool(),
-  'sass': sassTool,
-  'sass-release': sassTool.toReleaseSassTool(),
-  'serve': WebdevServeTool(),
-  'test': TestTool(),
-};
+      'analyze': AnalyzeTool(),
+      'format': FormatTool(),
+      'sass': sassTool,
+      'sass-release': sassTool.toReleaseSassTool(),
+      'serve': WebdevServeTool(),
+      'test': TestTool(),
+    };

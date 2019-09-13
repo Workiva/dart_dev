@@ -90,13 +90,6 @@ class SassTool extends DevTool {
                 '`sass.compile()` \nproduces results that differ from those '
                 'found in the committed \n`.css` files. \nIntended only for '
                 'use as a CI safeguard.')
-        // ..addFlag('release',
-        //     negatable: false,
-        //     abbr: 'r',
-        //     help:
-        //         'Whether to compile minified CSS for bundling with a pub '
-        //         'package. \nTypically only set during a CI run. \n'
-        //         'A check of the unminified output will be performed first.')
         ..addFlag('watch',
             negatable: false,
             help: 'Watch stylesheets and recompile when they change.')
@@ -159,11 +152,6 @@ class CompileSassExecution {
   ///
   /// This process' result should become the final result of the [SassTool].
   final ProcessDeclaration process;
-
-  // /// A declarative representation of the `pub run w_common:compile_sass`
-  // /// process that is identical to [process] except that it will run in
-  // /// `--check` mode and i
-  // final ProcessDeclaration releaseCheckProcess;
 }
 
 /// Returns a combined list of args for the `pub run w_common:compile_sass`
