@@ -1,6 +1,0 @@
-name: format_no_changes_needed
-version: 0.0.0
-dev_dependencies:
-  dart_dev:
-    path: ../../..
-  dart_style: any

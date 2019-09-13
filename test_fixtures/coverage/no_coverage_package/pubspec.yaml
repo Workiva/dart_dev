@@ -1,5 +1,0 @@
-name: coverage_no_coverage_package
-version: 0.0.0
-dev_dependencies:
-  dart_dev:
-    path: ../../..

@@ -1,6 +1,0 @@
-name: test_generator_check_pass
-version: 0.0.0
-dev_dependencies:
-  dart_dev:
-    path: ../../..
-  test: any
