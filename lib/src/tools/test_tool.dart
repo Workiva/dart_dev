@@ -6,6 +6,7 @@ import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
+import 'package:path/path.dart' as p;
 
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
@@ -168,9 +169,14 @@ List<String> buildArgs({
     // process in this order:
     // 1. Statically configured args from [WebdevServeTool.buildArgs]
     ...configuredBuildArgs ?? <String>[],
-    // 2. Args passed to --build-args
+    // 2. Build filters to narrow the build to only the target tests.
+    //    (If no test dirs/files are passed in as args, then no build filters
+    //     will be created.)
+    ...buildFiltersForTestArgs(argResults.rest),
+    // 3. Args passed to --build-args
     ...splitSingleOptionValue(argResults, 'build-args'),
   ];
+
   final testArgs = <String>[
     // Combine all args that should be passed through to the webdev serve
     // process in this order:
@@ -282,4 +288,20 @@ TestExecution buildExecution(
   logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
   return TestExecution.process(
       ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
+}
+
+// NOTE: This currently depends on https://github.com/dart-lang/build/pull/2445
+// Additionally, consumers need to depend on build_web_compilers AND build_vm_compilers
+// We should add some guard-rails (don't use filters if either of those deps are
+// missing, and ensure adequate version of build_runner).
+Iterable<String> buildFiltersForTestArgs(List<String> testInputs) {
+  final filters = <String>[];
+  for (final input in testInputs) {
+    if (input.endsWith('.dart')) {
+      filters.add('$input.*_test.dart.js');
+    } else {
+      filters.add('$input**');
+    }
+  }
+  return [for (final filter in filters) '--build-filter=$filter'];
 }
