@@ -15,8 +15,12 @@
 library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:dart_dev/dart_dev.dart';
+import 'package:dart_dev/src/tasks/gen_test_runner/api.dart';
+import 'package:dart_dev/src/tasks/gen_test_runner/cli.dart';
 
 import 'package:dart_dev/util.dart'
     show hasImmediateDependency, isPortBound, reporter, TaskProcess;
@@ -98,8 +102,8 @@ class TestCli extends TaskCli {
     }
 
     final testArgs = <String>[];
-    List<String> tests = [];
-    List<String> buildArgs = [];
+    final tests = <String>[];
+    final buildArgs = <String>[];
 
     if (!color) {
       testArgs.add('--no-color');
@@ -163,8 +167,33 @@ class TestCli extends TaskCli {
 
     // Build the list of tests to run.
     if (individualTestsSpecified) {
+      print('individual tests were specified');
       // Individual tests explicitly passed in should override the test suites.
-      tests.addAll(parsedArgs.rest);
+      // Gen test runner
+      if (dartMajorVersion == 2) {
+        final mapConfigToTestFiles = <TestRunnerConfig, List<String> /* tests to include in runner */>{};
+        // Construct mapping from config to tests which should be ran in that config
+        for (final _config in config.genTestRunner.configs) {
+          for (final testFilePath in parsedArgs.rest) {
+            if (testFilePath.contains(_config.directory)) {
+              mapConfigToTestFiles.containsKey(_config) ? mapConfigToTestFiles[_config].add(testFilePath) : mapConfigToTestFiles[_config] = [testFilePath];
+            }
+          }
+        }
+
+        for (final _config in mapConfigToTestFiles.keys) {
+          config.genTestRunner.configs.remove(_config);
+          await genTestRunner(_config, filesToInclude: mapConfigToTestFiles[_config]);
+          tests.add(_config.path);
+        }
+
+        // Empty all other unused generated runners
+        for (final _config in config.genTestRunner.configs) {
+          await genTestRunner(_config, filesToInclude: []);
+        }
+      } else {
+        tests.addAll(parsedArgs.rest);
+      }
     } else {
       // Unit and/or integration suites should only run if individual tests
       // were not specified.
@@ -283,6 +312,13 @@ A pub serve instance will not be started.''');
 
     if (functional && config.test.afterFunctionalTests.isNotEmpty) {
       await runAll(config.test.after = config.test.afterFunctionalTests);
+    }
+
+
+    // Regenerate all runners:
+    for (final _config in config.genTestRunner.configs) {
+      print('regenerating runners');
+      await genTestRunner(_config);
     }
 
     return task.successful

@@ -38,14 +38,18 @@ class TestRunnerConfig {
   bool genHtml = defaultGenHtml;
   List<String> htmlHeaders = defaultHtmlHeaders;
 
+  String get path => '${directory + (!directory.endsWith('/') ? '/' : '')}$filename.dart';
+
   TestRunnerConfig(
       {List<String> this.dartHeaders: defaultDartHeaders,
       List<String> this.preTestCommands: defaultPreTestCommands,
-      String this.directory: defaultDirectory,
+      String directory: defaultDirectory,
       Environment this.env: defaultEnv,
       String this.filename: defaultFilename,
       bool this.genHtml: defaultGenHtml,
-      List<String> this.htmlHeaders: defaultHtmlHeaders});
+      List<String> this.htmlHeaders: defaultHtmlHeaders}) {
+    this.directory = directory.endsWith('/') ? directory : directory + '/';
+  }
 }
 
 class GenTestRunnerConfig extends TaskConfig {
