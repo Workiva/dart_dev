@@ -167,7 +167,6 @@ class TestCli extends TaskCli {
 
     // Build the list of tests to run.
     if (individualTestsSpecified) {
-      print('individual tests were specified');
       // Individual tests explicitly passed in should override the test suites.
       // Gen test runner
       if (dartMajorVersion == 2) {
@@ -317,7 +316,6 @@ A pub serve instance will not be started.''');
 
     // Regenerate all runners:
     for (final _config in config.genTestRunner.configs) {
-      print('regenerating runners');
       await genTestRunner(_config);
     }
 

@@ -44,7 +44,6 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig, {List<St
 
   if (filesToInclude != null) {
     for (final filePath in filesToInclude) {
-      print('adding $filePath');
       testFiles.add(new File(filePath));
     }
   } else {
@@ -66,7 +65,6 @@ Future<GenTestRunnerTask> genTestRunner(TestRunnerConfig currentConfig, {List<St
       }
     });
   }
-  print('testFiles: $testFiles');
 
   if (currentConfig.genHtml && !currentConfig.check) {
     await testHtmlFileGenerator(
