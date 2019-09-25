@@ -175,38 +175,35 @@ class TestCli extends TaskCli {
     // Build the list of tests to run.
     if (individualTestsSpecified) {
       // Individual tests explicitly passed in should override the test suites.
-      // Gen test runner
-      if (dartMajorVersion == 2) {
-        if (parsedArgs[_hackFastBuilds]) {
-          reporter.warning(
-              'You\'re using `${_hackFastBuilds}`. This will re-write the generated test runners in your repo.\n'
-              'The test task will attempt to restore your generated runners after completion, but you may '
-              'have to re-run `pub run dart_dev gen-test-runner` if your runners have changed.');
-          final mapConfigToTestFiles = <TestRunnerConfig,
-              List<String> /* tests to include in runner */ >{};
-          // Construct mapping from config to tests which should be ran in that config
-          for (final _config in config.genTestRunner.configs) {
-            for (final testFilePath in parsedArgs.rest) {
-              if (testFilePath.contains(_config.directory)) {
-                mapConfigToTestFiles.containsKey(_config)
-                    ? mapConfigToTestFiles[_config].add(testFilePath)
-                    : mapConfigToTestFiles[_config] = [testFilePath];
-              }
+      if (dartMajorVersion == 2 && parsedArgs[_hackFastBuilds]) {
+        reporter.warning(
+            'You\'re using `${_hackFastBuilds}`. This will re-write the generated test runners in your repo.\n'
+                'The test task will attempt to restore your generated runners after completion, but you may '
+                'have to re-run `pub run dart_dev gen-test-runner` if your runners have changed.');
+        final mapConfigToTestFiles = <TestRunnerConfig,
+            List<String> /* tests to include in runner */>{};
+        // Construct mapping from config to tests which should be ran in that config
+        for (final _config in config.genTestRunner.configs) {
+          for (final testFilePath in parsedArgs.rest) {
+            if (testFilePath.contains(_config.directory)) {
+              mapConfigToTestFiles.containsKey(_config)
+                  ? mapConfigToTestFiles[_config].add(testFilePath)
+                  : mapConfigToTestFiles[_config] = [testFilePath];
             }
           }
-
-          for (final _config in mapConfigToTestFiles.keys) {
-            config.genTestRunner.configs.remove(_config);
-            await genTestRunner(_config,
-                filesToInclude: mapConfigToTestFiles[_config]);
-            tests.add(_config.path);
-          }
-
-          // Empty all other unused generated runners
-          for (final _config in config.genTestRunner.configs) {
-            await genTestRunner(_config, filesToInclude: []);
-          }
         }
+
+        for (final _config in mapConfigToTestFiles.keys) {
+          config.genTestRunner.configs.remove(_config);
+          await genTestRunner(_config,
+              filesToInclude: mapConfigToTestFiles[_config]);
+          tests.add(_config.path);
+        }
+
+        // Empty all other unused generated runners
+        for (final _config in config.genTestRunner.configs) {
+          await genTestRunner(_config, filesToInclude: []);
+          }
       } else {
         tests.addAll(parsedArgs.rest);
       }
