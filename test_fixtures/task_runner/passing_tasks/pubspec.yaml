@@ -5,4 +5,3 @@ dev_dependencies:
     path: ../../..
   dart_style: any
   test: any
-

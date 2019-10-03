@@ -18,6 +18,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:dart_dev/src/tasks/sass/cli.dart';
 import 'package:dart_dev/util.dart' show reporter;
 
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -63,6 +64,7 @@ dev(List<String> args) async {
   registerTask(new InitCli(), config.init);
   registerTask(new TaskRunnerCli(), config.taskRunner);
   registerTask(new TestCli(), config.test);
+  registerTask(new SassCli(), config.sass);
 
   try {
     LocalCli.discover(config.local.taskPaths).forEach((task, exec) {

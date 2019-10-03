@@ -1,5 +1,39 @@
 # Changelog
 
+## [2.0.6](https://github.com/Workiva/dart_dev/compare/2.0.5...2.0.6)
+
+- **Improvement:** On dart 2, the `test` task now properly sets a non-zero
+  exit code if the build fails. As a result, it also no longer runs a separate
+  `pub run build_runner build` prior to running tests.
+
+## [2.0.5](https://github.com/Workiva/dart_dev/compare/2.0.4...2.0.5)
+
+- **Improvement:** Added `config.test.deleteConflictingOutputs` that when
+  enabled will include the `--delete-conflicting-outputs` flag when running
+  tests via `build_runner`.
+
+- **Bug Fix:** Fix a type-related RTE in the `TaskProcess` class.
+
+## [2.0.4](https://github.com/Workiva/dart_dev/compare/2.0.3...2.0.4)
+
+- **Bug Fix:** When on Dart 2 and the package has a dependency on `build_test`,
+  the `test` task will now properly exit with a non-zero exit code if the build
+  fails.
+
+## [2.0.3](https://github.com/Workiva/dart_dev/compare/2.0.2...2.0.3)
+
+- **Feature:** Use `--disable-serve-std-out` or set
+  `config.test.disableServeStdOut = true` with the `test` task to silence the
+  pub serve output.
+
+## [2.0.2](https://github.com/Workiva/dart_dev/compare/2.0.1...2.0.2)
+
+- **Improvement:** The test task now fails early if running on Dart 2 with
+  either the `dartium` or `content-shell` platforms are selected.
+
+- **Bug Fix:** Prevent a null exception in the reporter when running on Dart
+  >=2.1.0.
+
 ## [2.0.1](https://github.com/Workiva/dart_dev/compare/2.0.0...2.0.1)
 
 _December 11, 2018_

@@ -33,10 +33,14 @@ class TestRunnerConfig {
   List<String> dartHeaders = defaultDartHeaders;
   List<String> preTestCommands = defaultPreTestCommands;
   String directory = defaultDirectory;
+  String get normalizedDirectory =>
+      directory + (!directory.endsWith('/') ? '/' : '');
   Environment env = defaultEnv;
   String filename = defaultFilename;
   bool genHtml = defaultGenHtml;
   List<String> htmlHeaders = defaultHtmlHeaders;
+
+  String get path => '$normalizedDirectory$filename.dart';
 
   TestRunnerConfig(
       {List<String> this.dartHeaders: defaultDartHeaders,

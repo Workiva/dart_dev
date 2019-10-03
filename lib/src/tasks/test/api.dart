@@ -24,12 +24,14 @@ import 'package:dart_dev/src/util.dart'
     show dartMajorVersion, dartiumExpirationOverrideEnv;
 import 'package:dart_dev/util.dart' show hasImmediateDependency;
 
-TestTask test(
-    {int concurrency,
-    List<String> platforms: const [],
-    List<String> presets: const [],
-    List<String> testArgs: const [],
-    List<String> tests: const []}) {
+TestTask test({
+  int concurrency,
+  List<String> platforms: const [],
+  List<String> presets: const [],
+  List<String> testArgs: const [],
+  List<String> tests: const [],
+  List<String> buildArgs: const [],
+}) {
   final executable = 'pub';
   final args = <String>[];
 
@@ -43,7 +45,13 @@ TestTask test(
     }
 
     if (hasImmediateDependency('build_test')) {
-      args.addAll(['run', 'build_runner', 'test', '--']);
+      args.addAll([
+        'run',
+        'build_runner',
+        'test',
+      ]);
+      args.addAll(buildArgs);
+      args.add('--');
     } else {
       args.addAll(['run', 'test']);
     }
@@ -96,6 +104,14 @@ TestTask test(
   process.exitCode.then((code) {
     if (task.successful == null) {
       task.successful = code <= 0;
+
+      if (!task.successful) {
+        task.testSummary = 'An error was encountered when running tests.';
+      }
+
+      if (!outputProcessed.isCompleted) {
+        outputProcessed.complete();
+      }
     }
   });
 

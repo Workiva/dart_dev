@@ -15,10 +15,16 @@
 library dart_dev.src.tasks.test.cli;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:dart_dev/dart_dev.dart';
+import 'package:dart_dev/src/tasks/gen_test_runner/api.dart';
+import 'package:dart_dev/src/tasks/gen_test_runner/cli.dart';
+import 'package:dart_dev/src/tasks/gen_test_runner/config.dart';
 
-import 'package:dart_dev/util.dart' show reporter, isPortBound;
+import 'package:dart_dev/util.dart'
+    show hasImmediateDependency, isPortBound, reporter, TaskProcess;
 
 import 'package:dart_dev/src/platform_util/api.dart' as platform_util;
 import 'package:dart_dev/src/tasks/cli.dart';
@@ -38,6 +44,8 @@ class TestCli extends TaskCli {
     ..addFlag('functional',
         defaultsTo: defaultFunctional,
         help: 'Includes the functional test suite.')
+    ..addFlag('delete-conflicting-outputs',
+        help: 'Deletes conflicting outputs during the build', negatable: false)
     ..addFlag('disable-serve-std-out',
         defaultsTo: defaultDisableServeStdOut,
         help: 'Disables standard output for pub serve task.')
@@ -45,6 +53,12 @@ class TestCli extends TaskCli {
         abbr: 'j',
         defaultsTo: '$defaultConcurrency',
         help: 'The number of concurrent test suites run.')
+    ..addFlag(_hackFastBuilds,
+        help:
+            'Improves iterative build times by re-writing the generated test runners at runtime.\n'
+            'Use this flag and specify the test file you want to run.\nThis flag '
+            'is a no-op if no test files are specified.',
+        defaultsTo: false)
     ..addFlag('pub-serve',
         negatable: true,
         defaultsTo: defaultPubServe,
@@ -54,6 +68,10 @@ class TestCli extends TaskCli {
             'Implies --concurrency=1 and --timeout=none.\n'
             'Currently only supported for browser tests.',
         negatable: false)
+    ..addFlag('release',
+        abbr: 'r',
+        negatable: true,
+        help: 'Runs tests in release mode (i.e. compiled via dart2js).')
     ..addOption('pub-serve-port',
         help:
             'Port used by the Pub server for browser tests. The default value will randomly select an open port to use.')
@@ -91,7 +109,8 @@ class TestCli extends TaskCli {
     }
 
     final testArgs = <String>[];
-    List<String> tests = [];
+    final tests = <String>[];
+    final buildArgs = <String>[];
 
     if (!color) {
       testArgs.add('--no-color');
@@ -122,6 +141,13 @@ class TestCli extends TaskCli {
     List<String> presets =
         TaskCli.valueOf('preset', parsedArgs, const <String>[]);
 
+    bool deleteConflictingOutputs = TaskCli.valueOf(
+        'delete-conflicting-outputs',
+        parsedArgs,
+        config.test.deleteConflictingOutputs);
+
+    bool release = TaskCli.valueOf('release', parsedArgs, config.test.release);
+
     // CLI user can specify individual test files to run.
     bool individualTestsSpecified = parsedArgs.rest.isNotEmpty;
 
@@ -146,10 +172,44 @@ class TestCli extends TaskCli {
           'files/directories');
     }
 
+    final mapRunnerToContents = <File /*generated runner file*/, String /* contents */>{};
     // Build the list of tests to run.
     if (individualTestsSpecified) {
       // Individual tests explicitly passed in should override the test suites.
-      tests.addAll(parsedArgs.rest);
+      if (dartMajorVersion == 2 && parsedArgs[_hackFastBuilds]) {
+        reporter.warning(
+            'WARNING: You\'re using `${_hackFastBuilds}`. This will re-write the generated test runners in your repo.\n'
+                'The test task will attempt to restore your generated runners after completion, but you may '
+                'have to re-run `pub run dart_dev gen-test-runner` and `pub run dart_dev format` if your runners have changed.\n\n');
+        final mapConfigToTestFiles = <TestRunnerConfig,
+            Set<String> /* tests to include in runner */>{};
+        // Construct mapping from config to tests which should be ran in that config
+        final copyOfConfigs = new List.from(config.genTestRunner.configs);
+        for (final _config in copyOfConfigs) {
+          for (final testFilePath in parsedArgs.rest) {
+            if (testFilePath.contains(_config.directory)) {
+              mapConfigToTestFiles.putIfAbsent(_config, () => new Set.from([testFilePath]));
+              mapConfigToTestFiles[_config].add(testFilePath);
+            }
+          }
+        }
+
+        for (final _config in mapConfigToTestFiles.keys) {
+          copyOfConfigs.remove(_config);
+          final runnerFile = new File(_config.path);
+          mapRunnerToContents.putIfAbsent(runnerFile, () => runnerFile.readAsStringSync());
+          await genTestRunner(_config,
+              filesToInclude: mapConfigToTestFiles[_config].toList());
+          tests.add(_config.path);
+        }
+
+        // Empty all other unused generated runners
+        for (final _config in copyOfConfigs) {
+          await genTestRunner(_config, filesToInclude: []);
+        }
+      } else {
+        tests.addAll(parsedArgs.rest);
+      }
     } else {
       // Unit and/or integration suites should only run if individual tests
       // were not specified.
@@ -181,6 +241,14 @@ class TestCli extends TaskCli {
 
     if (pauseAfterLoad) {
       testArgs.add('--pause-after-load');
+    }
+
+    if (deleteConflictingOutputs) {
+      buildArgs.add('--delete-conflicting-outputs');
+    }
+
+    if (release) {
+      buildArgs.add('--release');
     }
 
     PubServeTask pubServeTask;
@@ -246,7 +314,8 @@ A pub serve instance will not be started.''');
         concurrency: concurrency,
         platforms: platforms,
         presets: presets,
-        testArgs: testArgs);
+        testArgs: testArgs,
+        buildArgs: buildArgs);
     reporter.logGroup(task.testCommand, outputStream: task.testOutput);
 
     await task.done;
@@ -261,8 +330,17 @@ A pub serve instance will not be started.''');
       await runAll(config.test.after = config.test.afterFunctionalTests);
     }
 
+    if (parsedArgs[_hackFastBuilds]) {
+      // Regenerate all runners:
+      mapRunnerToContents.forEach((file, originalContents) {
+        file.writeAsStringSync(originalContents);
+      });
+    }
+
     return task.successful
         ? new CliResult.success(task.testSummary)
         : new CliResult.fail(task.testSummary);
   }
+
+  static String _hackFastBuilds = 'hack-fast-builds';
 }
