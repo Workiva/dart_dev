@@ -7,11 +7,11 @@ import 'package:glob/glob.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
-import 'package:path/path.dart' as p;
 
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/build_inputs.dart';
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
@@ -258,7 +258,8 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
-  final inputs = buildInputs(exclude: exclude, include: include);
+  final allInputs = buildInputs(exclude: exclude, include: include);
+  final inputs = allInputs['files'];
   if (inputs.isEmpty) {
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
@@ -271,72 +272,6 @@ FormatExecution buildExecution(
   return FormatExecution.process(ProcessDeclaration(
       dartfmt.executable, [...args, ...inputs],
       mode: ProcessStartMode.inheritStdio));
-}
-
-/// Builds and returns the list of inputs on which the formatter should be run.
-///
-/// These inputs are determined by expanding the [include] globs and filtering
-/// out any paths that match the expanded [exclude] globs.
-///
-/// Logs may be output in certain scenarios for debugging purposes.
-///
-/// By default these globs are assumed to be relative to the current working
-/// directory, but that can be overridden via [root] for testing purposes.
-Iterable<String> buildInputs(
-    {List<Glob> exclude, List<Glob> include, String root}) {
-  exclude ??= <Glob>[];
-  include ??= [
-    if (exclude.isNotEmpty) ...[
-      Glob('*.dart'),
-      Glob('benchmark/**.dart'),
-      Glob('bin/**.dart'),
-      Glob('example/**.dart'),
-      Glob('lib/**.dart'),
-      Glob('test/**.dart'),
-      Glob('tool/**.dart'),
-      Glob('web/**.dart'),
-    ],
-  ];
-  final includePaths = {
-    if (include.isEmpty) p.normalize(root ?? '.'),
-  };
-  for (final glob in include) {
-    try {
-      includePaths.addAll(glob
-          .listSync(root: root)
-          .where((entity) => entity is File || entity is Directory)
-          .map((file) => file.path));
-    } on FileSystemException catch (error, stack) {
-      _log.fine('Could not list include glob: $glob', error, stack);
-    }
-  }
-  _log.fine('Include paths:\n  ${includePaths.join('\n  ')}');
-
-  final excludePaths = <String>{};
-  for (final glob in exclude) {
-    try {
-      excludePaths.addAll(glob
-          .listSync(root: root)
-          .where((entity) => entity is File || entity is Directory)
-          .map((file) => file.path));
-    } on FileSystemException catch (error, stack) {
-      _log.fine('Could not list exclude glob: $glob', error, stack);
-    }
-  }
-  _log.fine('Exclude paths:\n  ${excludePaths.join('\n  ')}');
-
-  final excluded = includePaths.intersection(excludePaths);
-  if (excluded.isNotEmpty) {
-    _log.fine('Excluding these paths from formatting:\n  '
-        '${includePaths.intersection(excludePaths).join('\n  ')}');
-  }
-  final inputs = includePaths.difference(excludePaths);
-  if (inputs.isEmpty) {
-    _log.severe('The formatter cannot run because no inputs could be found '
-        'with the configured includes and excludes.\n'
-        'Please modify the excludes and/or includes in "tool/dev.dart".');
-  }
-  return inputs;
 }
 
 /// Returns a representation of the process that will be run by [FormatTool]
