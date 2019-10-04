@@ -75,39 +75,6 @@ void main() {
             '2',
           ]));
     });
-
-    test('inserts a verbose flag if not already present', () {
-      final argParser = FormatTool().toCommand('t').argParser;
-      final argResults = argParser.parse(['--formatter-args', '--indent 2']);
-      expect(
-          buildArgs(['a', 'b'], FormatMode.overwrite,
-              argResults: argResults,
-              configuredFormatterArgs: ['--fix', '--follow-links'],
-              verbose: true),
-          orderedEquals([
-            'a',
-            'b',
-            '-w',
-            '--fix',
-            '--follow-links',
-            '--indent',
-            '2',
-            '-v',
-          ]));
-    });
-
-    test('does not insert a duplicate verbose flag (-v)', () {
-      expect(
-          buildArgs([], null, configuredFormatterArgs: ['-v'], verbose: true),
-          orderedEquals(['-v']));
-    });
-
-    test('does not insert a duplicate verbose flag (--verbose)', () {
-      expect(
-          buildArgs([], null,
-              configuredFormatterArgs: ['--verbose'], verbose: true),
-          orderedEquals(['--verbose']));
-    });
   });
 
   group('buildExecution', () {
@@ -224,24 +191,6 @@ void main() {
             execution.process.args,
             orderedEquals(
                 ['-w', '--fix', '--follow-links', '--indent', '2', '.']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
-      });
-
-      test('with verbose=true', () {
-        final argParser = FormatTool().toCommand('t').argParser;
-        final argResults =
-            argParser.parse(['-w', '--formatter-args', '--indent 2']);
-        final context =
-            DevToolExecutionContext(argResults: argResults, verbose: true);
-        final execution = buildExecution(context,
-            configuredFormatterArgs: ['--fix', '--follow-links'],
-            formatter: Formatter.dartfmt);
-        expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dartfmt');
-        expect(
-            execution.process.args,
-            orderedEquals(
-                ['-w', '--fix', '--follow-links', '--indent', '2', '-v', '.']));
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
       });
 

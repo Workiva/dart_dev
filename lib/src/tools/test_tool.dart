@@ -172,7 +172,7 @@ List<String> buildArgs({
     // 2. Build filters to narrow the build to only the target tests.
     //    (If no test dirs/files are passed in as args, then no build filters
     //     will be created.)
-    ...buildFiltersForTestArgs(argResults.rest),
+    ...buildFiltersForTestArgs(argResults?.rest),
     // 3. Args passed to --build-args
     ...splitSingleOptionValue(argResults, 'build-args'),
   ];
@@ -180,7 +180,7 @@ List<String> buildArgs({
   final testArgs = <String>[
     // Combine all args that should be passed through to the webdev serve
     // process in this order:
-    // 1. Statically configured args from [WebdevServeTool.webdevArgs]
+    // 1. Statically configured args from [TestTool.testArgs]
     ...configuredTestArgs ?? <String>[],
     // 2. The -n|--name, -N|--plain-name, and -P|--preset options
     ...getMultiOptionValues(argResults, 'name'),
@@ -296,12 +296,15 @@ TestExecution buildExecution(
 // missing, and ensure adequate version of build_runner).
 Iterable<String> buildFiltersForTestArgs(List<String> testInputs) {
   final filters = <String>[];
-  for (final input in testInputs) {
+  for (final input in testInputs ?? []) {
     if (input.endsWith('.dart')) {
-      filters.add('$input.*_test.dart.js');
+      filters..add('$input.*_test.dart.js')..add(dartExtToHtml(input));
     } else {
       filters.add('$input**');
     }
   }
   return [for (final filter in filters) '--build-filter=$filter'];
 }
+
+String dartExtToHtml(String input) =>
+    '${input.substring(0, input.length - 'dart'.length)}html';

@@ -177,9 +177,7 @@ Iterable<String> buildArgs(
   FormatMode mode, {
   ArgResults argResults,
   List<String> configuredFormatterArgs,
-  bool verbose,
 }) {
-  verbose ??= false;
   final args = <String>[
     ...executableArgs,
 
@@ -200,9 +198,6 @@ Iterable<String> buildArgs(
     // 3. Args passed to --formatter-args
     ...splitSingleOptionValue(argResults, 'formatter-args'),
   ];
-  if (verbose && !args.contains('-v') && !args.contains('--verbose')) {
-    args.add('-v');
-  }
   return args;
 }
 
@@ -271,8 +266,7 @@ FormatExecution buildExecution(
   final dartfmt = buildProcess(formatter);
   final args = buildArgs(dartfmt.args, mode,
       argResults: context.argResults,
-      configuredFormatterArgs: configuredFormatterArgs,
-      verbose: context.verbose);
+      configuredFormatterArgs: configuredFormatterArgs);
   logCommand(dartfmt.executable, inputs, args, verbose: context.verbose);
   return FormatExecution.process(ProcessDeclaration(
       dartfmt.executable, [...args, ...inputs],

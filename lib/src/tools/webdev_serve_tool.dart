@@ -6,12 +6,13 @@ import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
+import 'package:pub_semver/pub_semver.dart';
 
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
-import '../utils/package_is_globally_activated.dart';
+import '../utils/global_package_is_active_and_compatible.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
 
@@ -208,9 +209,12 @@ WebdevServeExecution buildExecution(
             'Arguments can be passed to the build process via the --build-args '
             'option.');
   }
-  if (!packageIsGloballyActivated('webdev', environment: environment)) {
-    _log.severe(red.wrap('Cannot run "webdev serve".\n') +
-        yellow.wrap('You must have "webdev" globally activated:\n'
+  if (!globalPackageIsActiveAndCompatible(
+      'webdev', VersionConstraint.parse('^2.0.0'),
+      environment: environment)) {
+    _log.severe(red.wrap(styleBold.wrap('webdev serve') +
+            ' could not run for this project.\n') +
+        yellow.wrap('You must have `webdev` globally activated:\n'
             '  pub global activate webdev ^2.0.0'));
     return WebdevServeExecution.exitEarly(ExitCode.config.code);
   }

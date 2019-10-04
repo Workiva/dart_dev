@@ -5,4 +5,3 @@
 build/
 /doc/api/
 /pubspec.lock
-test_pub_cache*

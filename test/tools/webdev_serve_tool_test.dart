@@ -2,6 +2,7 @@
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
+import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
@@ -130,7 +131,7 @@ void main() {
 
     setUpAll(() {
       pubCacheWithWebdev = TempPubCache();
-      globalActivate('webdev ^2.0.0',
+      globalActivate('webdev', '^2.0.0',
           environment: pubCacheWithWebdev.envOverride);
 
       pubCacheWithoutWebdev = TempPubCache();
@@ -166,20 +167,23 @@ void main() {
     });
 
     test('returns config exit code and logs if webdev is not globally activate',
-        () async {
-      Logger.root.level = Level.ALL;
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('Cannot run "webdev serve"') &&
-              record.message.contains('pub global activate webdev ^2.0.0') &&
-              record.level == Level.SEVERE)));
+        () {
+      overrideAnsiOutput(false, () {
+        Logger.root.level = Level.ALL;
 
-      expect(
-          buildExecution(DevToolExecutionContext(),
-                  environment: pubCacheWithoutWebdev.envOverride)
-              .exitCode,
-          ExitCode.config.code);
+        expect(
+            Logger.root.onRecord,
+            emitsThrough(predicate<LogRecord>((record) =>
+                record.message.contains('webdev serve could not run') &&
+                record.message.contains('pub global activate webdev ^2.0.0') &&
+                record.level == Level.SEVERE)));
+
+        expect(
+            buildExecution(DevToolExecutionContext(),
+                    environment: pubCacheWithoutWebdev.envOverride)
+                .exitCode,
+            ExitCode.config.code);
+      });
     });
 
     group('returns a WebdevServeExecution', () {
@@ -256,26 +260,28 @@ void main() {
       });
 
       test('and logs the test subprocess', () {
-        Logger.root.level = Level.ALL;
-        expect(
-            Logger.root.onRecord,
-            emitsThrough(predicate<LogRecord>((record) =>
-                record.message.contains(
-                    'pub global run webdev serve web --auto restart -- --delete-conflicting-outputs -o test:build') &&
-                record.level == Level.INFO)));
+        overrideAnsiOutput(false, () {
+          Logger.root.level = Level.ALL;
+          expect(
+              Logger.root.onRecord,
+              emitsThrough(predicate<LogRecord>((record) =>
+                  record.message.contains(
+                      'pub global run webdev serve web --auto restart -- --delete-conflicting-outputs -o test:build') &&
+                  record.level == Level.INFO)));
 
-        final argParser = WebdevServeTool().toCommand('t').argParser;
-        final argResults = argParser.parse([
-          '--webdev-args',
-          '--auto restart',
-          '--build-args',
-          '-o test:build'
-        ]);
-        final context = DevToolExecutionContext(argResults: argResults);
-        buildExecution(context,
-            configuredBuildArgs: ['--delete-conflicting-outputs'],
-            configuredWebdevArgs: ['web'],
-            environment: pubCacheWithWebdev.envOverride);
+          final argParser = WebdevServeTool().toCommand('t').argParser;
+          final argResults = argParser.parse([
+            '--webdev-args',
+            '--auto restart',
+            '--build-args',
+            '-o test:build'
+          ]);
+          final context = DevToolExecutionContext(argResults: argResults);
+          buildExecution(context,
+              configuredBuildArgs: ['--delete-conflicting-outputs'],
+              configuredWebdevArgs: ['web'],
+              environment: pubCacheWithWebdev.envOverride);
+        });
       });
     });
   });
