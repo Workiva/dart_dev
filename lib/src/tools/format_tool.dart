@@ -49,8 +49,8 @@ class FormatTool extends DevTool {
   /// The default mode in which to run the formatter.
   ///
   /// This is still overridable via the command line:
-  ///     ddev format -- -n  # dry-run
-  ///     ddev format -- -w  # ovewrite
+  ///     ddev format -n  # dry-run
+  ///     ddev format -w  # ovewrite
   FormatMode defaultMode = FormatMode.overwrite;
 
   @override

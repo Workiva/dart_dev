@@ -16,12 +16,12 @@ import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 /// which the tool is being run, which can be used in the function. Currently,
 /// it only contains one piece if info: whether or not "verbose" mode is
 /// enabled.
-///
 ///     import 'package:dart_dev/dart_dev.dart';
+///     import 'package:io/io.dart';
 ///
 ///     int helloWorld(DartFunctionToolContext context) {
 ///       print('Hello world!');
-///       return 0;
+///       return ExitCode.success.code; // 0
 ///     }
 ///
 ///     final config = {

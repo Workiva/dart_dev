@@ -34,7 +34,7 @@ final _log = Logger('Analyze');
 ///
 ///     final config = {
 ///       'analyze': AnalyzeTool()
-///         ..dartanalyzerArgs = ['--fatal-infos']
+///         ..analyzerArgs = ['--fatal-infos']
 ///         ..include = [Glob('.'), Glob('other/**.dart')],
 ///     };
 ///
