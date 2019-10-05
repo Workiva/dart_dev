@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
-/// Builds and returns the list of inputs on which the formatter should be run.
+/// Builds and returns the object that contains:
+/// - The file paths
+/// - The paths that were excluded by an exclude glob
+/// - The paths that were skipped because they are links
+/// - The hidden directories(start with a '.') that were skipped
 ///
-/// These inputs are determined by expanding the [include] globs and filtering
-/// out any paths that match the expanded [exclude] globs.
-///
-/// Logs may be output in certain scenarios for debugging purposes.
+/// The file paths will include all .dart files in [path] (and its subdirectories), and
+/// filtered out any paths that match the expanded [exclude] globs.
 ///
 /// By default these globs are assumed to be relative to the current working
 /// directory, but that can be overridden via [root] for testing purposes.
