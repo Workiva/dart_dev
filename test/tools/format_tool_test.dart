@@ -210,13 +210,18 @@ void main() {
     });
 
     test('custom excludes', () {
+      final formatInputs =
+          getFormatterInputs(exclude: [Glob('*_exclude.dart')], root: root);
+
       expect(
-          getFormatterInputs(exclude: [Glob('*_exclude.dart')], root: root)
-              .filesToFormat,
+          formatInputs.filesToFormat,
           unorderedEquals({
             '$root/file.dart',
             for (final dir in dirs) '$root/$dir/sub/file.dart',
           }));
+
+      expect(formatInputs.excludedFiles,
+          unorderedEquals({'$root/should_exclude.dart'}));
     });
 
     test('empty inputs due to excludes config', () async {
@@ -224,12 +229,20 @@ void main() {
           getFormatterInputs(exclude: [Glob('**')], root: root).filesToFormat,
           isEmpty);
     });
-
-    test('correct excluded paths', () async {
+    test('ignores all hidden directories', () {
       expect(
-          getFormatterInputs(exclude: [Glob('*_exclude.dart')], root: root)
-              .excludedFiles,
-          unorderedEquals(['$root/should_exclude.dart']));
+          getFormatterInputs(root: root).hiddenDirectories,
+          unorderedEquals(
+              {'${root}/.dart_tool_test', '${root}/example/.pub_test'}));
+    });
+
+    test('ignores directory and file links', () {
+      expect(
+          getFormatterInputs(root: root).links,
+          unorderedEquals({
+            '${root}/sub',
+            '${root}/example/file.dart',
+          }));
     });
   });
 
