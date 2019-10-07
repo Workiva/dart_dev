@@ -216,12 +216,12 @@ void main() {
       expect(
           formatInputs.filesToFormat,
           unorderedEquals({
-            '$root/file.dart',
-            for (final dir in dirs) '$root/$dir/sub/file.dart',
+            'file.dart',
+            for (final dir in dirs) '$dir/sub/file.dart',
           }));
 
-      expect(formatInputs.excludedFiles,
-          unorderedEquals({'$root/should_exclude.dart'}));
+      expect(
+          formatInputs.excludedFiles, unorderedEquals({'should_exclude.dart'}));
     });
 
     test('empty inputs due to excludes config', () async {
@@ -230,19 +230,13 @@ void main() {
           isEmpty);
     });
     test('ignores all hidden directories', () {
-      expect(
-          getFormatterInputs(root: root).hiddenDirectories,
-          unorderedEquals(
-              {'${root}/.dart_tool_test', '${root}/example/.pub_test'}));
+      expect(getFormatterInputs(root: root).hiddenDirectories,
+          unorderedEquals({'.dart_tool_test', 'example/.pub_test'}));
     });
 
     test('ignores directory and file links', () {
-      expect(
-          getFormatterInputs(root: root).links,
-          unorderedEquals({
-            '${root}/sub',
-            '${root}/example/file.dart',
-          }));
+      expect(getFormatterInputs(root: root).links,
+          unorderedEquals({'sub', 'example/file.dart'}));
     });
   });
 

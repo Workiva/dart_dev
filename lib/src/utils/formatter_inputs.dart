@@ -25,11 +25,10 @@ FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
 
   for (final entry in dir.listSync(recursive: true, followLinks: false)) {
     String relative = p.relative(entry.path, from: dir.path);
-    String fullPath = p.relative(entry.path, from: '.');
     bool isExcluded = false;
 
     if (entry is Link) {
-      returnInputs.links.add(fullPath);
+      returnInputs.links.add(relative);
       continue;
     }
 
@@ -54,14 +53,14 @@ FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
     if (exclude.isNotEmpty) {
       for (final glob in exclude) {
         if (glob.matches(relative)) {
-          returnInputs.excludedFiles.add(fullPath);
+          returnInputs.excludedFiles.add(relative);
           isExcluded = true;
           continue;
         }
       }
       if (isExcluded) continue;
 
-      if (entry is File) returnInputs.filesToFormat.add(fullPath);
+      if (entry is File) returnInputs.filesToFormat.add(relative);
     }
   }
 
