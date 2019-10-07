@@ -130,10 +130,46 @@ void main() {
                   'formatter cannot run because no inputs could be found') &&
               record.message.contains('tool/dev.dart') &&
               record.level == Level.SEVERE)));
+
       final context = DevToolExecutionContext();
       final execution = buildExecution(context,
           exclude: [Glob('**')], path: 'test/tools/fixtures/format/globs');
       expect(execution.exitCode, ExitCode.config.code);
+    });
+
+    test('logs the excluded paths', () async {
+      Logger.root.level = Level.ALL;
+      expect(
+          Logger.root.onRecord,
+          emitsThrough(predicate<LogRecord>((record) =>
+              record.message.contains('Excluding these paths') &&
+              record.message.contains('should_exclude.dart') &&
+              record.level == Level.FINE)));
+
+      buildExecution(DevToolExecutionContext(),
+          exclude: [Glob('*_exclude.dart')],
+          path: 'test/tools/fixtures/format/globs');
+    });
+
+    test('logs links and hidden directories', () async {
+      Logger.root.level = Level.ALL;
+      expect(
+          Logger.root.onRecord,
+          emitsInOrder([
+            predicate<LogRecord>((record) =>
+                record.message.contains('Excluding these links') &&
+                record.message.contains('sub') &&
+                record.message.contains('example/file.dart') &&
+                record.level == Level.FINE),
+            predicate<LogRecord>((record) =>
+                record.message.contains('Excluding these hidden directories') &&
+                record.message.contains('.dart_tool_test') &&
+                record.message.contains('example/.pub_test') &&
+                record.level == Level.FINE)
+          ]));
+
+      buildExecution(DevToolExecutionContext(),
+          path: 'test/tools/fixtures/format/globs');
     });
 
     group('returns a FormatExecution', () {
@@ -172,8 +208,13 @@ void main() {
             path: 'test/tools/fixtures/format/has_dart_style');
         expect(execution.exitCode, isNull);
         expect(execution.process.executable, 'pub');
-        expect(execution.process.args,
-            orderedEquals(['run', 'dart_style:format', '.']));
+        expect(
+            execution.process.args,
+            orderedEquals([
+              'run',
+              'dart_style:format',
+              'test/tools/fixtures/format/has_dart_style'
+            ]));
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
       });
 

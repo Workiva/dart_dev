@@ -255,22 +255,38 @@ FormatExecution buildExecution(
             'format tool to use "dartfmt" instead.'));
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
+  final inputs = getFormatterInputs(exclude: exclude, root: path);
 
-  final inputs = getFormatterInputs(exclude: exclude).includedFiles;
-  if (inputs.isEmpty) {
+  if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '
         'with the configured includes and excludes.\n'
         'Please modify the excludes and/or includes in "tool/dev.dart".');
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
+  if (inputs.excludedFiles.isNotEmpty) {
+    _log.fine('Excluding these paths from formatting:\n  '
+        '${inputs.excludedFiles.join('\n')}');
+  }
+
+  if (inputs.links.isNotEmpty) {
+    _log.fine('Excluding these links from formatting:\n  '
+        '${inputs.links.join('\n')}');
+  }
+
+  if (inputs.hiddenDirectories.isNotEmpty) {
+    _log.fine('Excluding these hidden directories from formatting:\n  '
+        '${inputs.hiddenDirectories.join('\n')}');
+  }
+
   final dartfmt = buildProcess(formatter);
   final args = buildArgs(dartfmt.args, mode,
       argResults: context.argResults,
       configuredFormatterArgs: configuredFormatterArgs);
-  logCommand(dartfmt.executable, inputs, args, verbose: context.verbose);
+  logCommand(dartfmt.executable, inputs.includedFiles, args,
+      verbose: context.verbose);
   return FormatExecution.process(ProcessDeclaration(
-      dartfmt.executable, [...args, ...inputs],
+      dartfmt.executable, [...args, ...inputs.includedFiles],
       mode: ProcessStartMode.inheritStdio));
 }
 
