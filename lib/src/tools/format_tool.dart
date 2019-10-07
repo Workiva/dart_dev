@@ -258,6 +258,9 @@ FormatExecution buildExecution(
 
   final inputs = getFormatterInputs(exclude: exclude).includedFiles;
   if (inputs.isEmpty) {
+    _log.severe('The formatter cannot run because no inputs could be found '
+        'with the configured includes and excludes.\n'
+        'Please modify the excludes and/or includes in "tool/dev.dart".');
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
