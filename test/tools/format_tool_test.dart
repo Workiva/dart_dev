@@ -121,6 +121,13 @@ void main() {
       expect(execution.exitCode, ExitCode.config.code);
     });
 
+    test('returns a config exit code if inputs list is empty', () {
+      final context = DevToolExecutionContext();
+      final execution = buildExecution(context,
+          exclude: [Glob('**')], path: 'test/tools/fixtures/format/globs');
+      expect(execution.exitCode, ExitCode.config.code);
+    });
+
     group('returns a FormatExecution', () {
       test('', () {
         final context = DevToolExecutionContext();
