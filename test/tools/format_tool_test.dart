@@ -121,22 +121,6 @@ void main() {
       expect(execution.exitCode, ExitCode.config.code);
     });
 
-    test('returns a config exit code if inputs list is empty', () {
-      Logger.root.level = Level.ALL;
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains(
-                  'formatter cannot run because no inputs could be found') &&
-              record.message.contains('tool/dev.dart') &&
-              record.level == Level.SEVERE)));
-
-      final context = DevToolExecutionContext();
-      final execution = buildExecution(context,
-          exclude: [Glob('**')], path: 'test/tools/fixtures/format/globs');
-      expect(execution.exitCode, ExitCode.config.code);
-    });
-
     group('returns a FormatExecution', () {
       test('', () {
         final context = DevToolExecutionContext();
