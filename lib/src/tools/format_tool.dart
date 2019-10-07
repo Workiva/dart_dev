@@ -8,10 +8,10 @@ import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 
+import '../../utils.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
-import '../utils/build_inputs.dart';
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
@@ -85,8 +85,7 @@ class FormatTool extends DevTool {
         configuredFormatterArgs: formatterArgs,
         defaultMode: defaultMode,
         exclude: exclude,
-        formatter: formatter,
-        include: include);
+        formatter: formatter);
     return execution.exitCode ?? runProcessAndEnsureExit(execution.process);
   }
 
@@ -233,7 +232,6 @@ FormatExecution buildExecution(
   FormatMode defaultMode,
   List<Glob> exclude,
   Formatter formatter,
-  List<Glob> include,
   String path,
 }) {
   FormatMode mode;
@@ -258,8 +256,7 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
-  final allInputs = buildInputs(exclude: exclude, include: include);
-  final inputs = allInputs['files'];
+  final inputs = getFormatterInputs(exclude: exclude).filesToFormat;
   if (inputs.isEmpty) {
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
