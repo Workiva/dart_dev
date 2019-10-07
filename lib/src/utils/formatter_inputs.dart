@@ -25,12 +25,15 @@ FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
 
   for (final entry in dir.listSync(recursive: true, followLinks: false)) {
     String relative = p.relative(entry.path, from: dir.path);
+    String fullPath = p.relative(entry.path, from: '.');
     bool isExcluded = false;
 
     if (entry is Link) {
-      returnInputs.links.add(relative);
+      returnInputs.links.add(fullPath);
       continue;
     }
+
+    if (entry is File && !entry.path.endsWith('.dart')) continue;
 
     // If the path is in a subdirectory starting with ".", ignore it.
     List<String> parts = p.split(relative);
@@ -42,8 +45,6 @@ FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
       }
     }
 
-    if (entry is File && !entry.path.endsWith('.dart')) continue;
-
     if (hiddenIndex != null) {
       final hidden_directory = p.joinAll(parts.take(hiddenIndex + 1));
       returnInputs.hiddenDirectories.add(hidden_directory);
@@ -53,13 +54,14 @@ FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
     if (exclude.isNotEmpty) {
       for (final glob in exclude) {
         if (glob.matches(relative)) {
-          returnInputs.excludedFiles.add(relative);
+          returnInputs.excludedFiles.add(fullPath);
           isExcluded = true;
           continue;
         }
       }
       if (isExcluded) continue;
-      returnInputs.filesToFormat.add(relative);
+
+      if (entry is File) returnInputs.filesToFormat.add(fullPath);
     }
   }
 
