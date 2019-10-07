@@ -212,7 +212,7 @@ void main() {
     ];
 
     test('no excludes', () {
-      expect(getFormatterInputs(root: root).filesToFormat,
+      expect(getFormatterInputs(root: root).includedFiles,
           unorderedEquals({'$root'}));
     });
 
@@ -221,7 +221,7 @@ void main() {
           getFormatterInputs(exclude: [Glob('*_exclude.dart')], root: root);
 
       expect(
-          formatInputs.filesToFormat,
+          formatInputs.includedFiles,
           unorderedEquals({
             'file.dart',
             for (final dir in dirs) '$dir/sub/file.dart',
@@ -233,7 +233,7 @@ void main() {
 
     test('empty inputs due to excludes config', () async {
       expect(
-          getFormatterInputs(exclude: [Glob('**')], root: root).filesToFormat,
+          getFormatterInputs(exclude: [Glob('**')], root: root).includedFiles,
           isEmpty);
     });
     test('ignores all hidden directories', () {

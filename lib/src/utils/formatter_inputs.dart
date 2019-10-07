@@ -15,20 +15,19 @@ import 'package:path/path.dart' as p;
 /// By default these globs are assumed to be relative to the current working
 /// directory, but that can be overridden via [root] for testing purposes.
 FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
-  FormatterInputs returnInputs = FormatterInputs(Set(), Set(), Set(), Set());
+  FormatterInputs inputs = FormatterInputs(Set(), Set(), Set(), Set());
 
   exclude ??= <Glob>[];
 
-  if (exclude.isEmpty) returnInputs.filesToFormat.add(root ?? '.');
+  if (exclude.isEmpty) inputs.includedFiles.add(root ?? '.');
 
   Directory dir = Directory(root ?? '.');
 
   for (final entry in dir.listSync(recursive: true, followLinks: false)) {
     String relative = p.relative(entry.path, from: dir.path);
-    bool isExcluded = false;
 
     if (entry is Link) {
-      returnInputs.links.add(relative);
+      inputs.links.add(relative);
       continue;
     }
 
@@ -45,37 +44,32 @@ FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
     }
 
     if (hiddenIndex != null) {
-      final hidden_directory = p.joinAll(parts.take(hiddenIndex + 1));
-      returnInputs.hiddenDirectories.add(hidden_directory);
+      final hiddenDirectory = p.joinAll(parts.take(hiddenIndex + 1));
+      inputs.hiddenDirectories.add(hiddenDirectory);
       continue;
     }
 
     if (exclude.isNotEmpty) {
-      for (final glob in exclude) {
-        if (glob.matches(relative)) {
-          returnInputs.excludedFiles.add(relative);
-          isExcluded = true;
-          continue;
-        }
+      if (exclude.any((glob) => glob.matches(relative))) {
+        inputs.excludedFiles.add(relative);
+      } else {
+        if (entry is File) inputs.includedFiles.add(relative);
       }
-      if (isExcluded) continue;
-
-      if (entry is File) returnInputs.filesToFormat.add(relative);
     }
   }
 
-  return returnInputs;
+  return inputs;
 }
 
 class FormatterInputs {
-  FormatterInputs(this.filesToFormat, this.links, this.excludedFiles,
+  FormatterInputs(this.includedFiles, this.links, this.excludedFiles,
       this.hiddenDirectories);
 
-  Set<String> filesToFormat;
+  final Set<String> includedFiles;
 
-  Set<String> links;
+  final Set<String> links;
 
-  Set<String> excludedFiles;
+  final Set<String> excludedFiles;
 
-  Set<String> hiddenDirectories;
+  final Set<String> hiddenDirectories;
 }

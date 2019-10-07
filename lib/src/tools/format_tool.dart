@@ -256,7 +256,7 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
-  final inputs = getFormatterInputs(exclude: exclude).filesToFormat;
+  final inputs = getFormatterInputs(exclude: exclude).includedFiles;
   if (inputs.isEmpty) {
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
