@@ -9,8 +9,8 @@ import 'package:path/path.dart' as p;
 /// - The paths that were skipped because they are links
 /// - The hidden directories(start with a '.') that were skipped
 ///
-/// The file paths will include all .dart files in [path] (and its subdirectories), and
-/// filtered out any paths that match the expanded [exclude] globs.
+/// The file paths will include all .dart files in [path] (and its subdirectories),
+/// except any paths that match the expanded [exclude] globs.
 ///
 /// By default these globs are assumed to be relative to the current working
 /// directory, but that can be overridden via [root] for testing purposes.
