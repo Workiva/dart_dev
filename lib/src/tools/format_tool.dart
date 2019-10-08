@@ -264,19 +264,21 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
-  if (inputs.excludedFiles.isNotEmpty) {
-    _log.fine('Excluding these paths from formatting:\n  '
-        '${inputs.excludedFiles.join('\n')}');
-  }
+  if (exclude != null) {
+    if (inputs.excludedFiles.isNotEmpty) {
+      _log.fine('Excluding these paths from formatting:\n  '
+          '${inputs.excludedFiles.join('\n')}');
+    }
 
-  if (inputs.skippedLinks.isNotEmpty) {
-    _log.fine('Excluding these links from formatting:\n  '
-        '${inputs.skippedLinks.join('\n')}');
-  }
+    if (inputs.skippedLinks.isNotEmpty) {
+      _log.fine('Excluding these links from formatting:\n  '
+          '${inputs.skippedLinks.join('\n')}');
+    }
 
-  if (inputs.hiddenDirectories.isNotEmpty) {
-    _log.fine('Excluding these hidden directories from formatting:\n  '
-        '${inputs.hiddenDirectories.join('\n')}');
+    if (inputs.hiddenDirectories.isNotEmpty) {
+      _log.fine('Excluding these hidden directories from formatting:\n  '
+          '${inputs.hiddenDirectories.join('\n')}');
+    }
   }
 
   final dartfmt = buildProcess(formatter);

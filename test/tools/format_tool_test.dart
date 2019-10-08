@@ -137,25 +137,16 @@ void main() {
       expect(execution.exitCode, ExitCode.config.code);
     });
 
-    test('logs the excluded paths', () async {
-      Logger.root.level = Level.ALL;
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('Excluding these paths') &&
-              record.message.contains('should_exclude.dart') &&
-              record.level == Level.FINE)));
-
-      buildExecution(DevToolExecutionContext(),
-          exclude: [Glob('*_exclude.dart')],
-          path: 'test/tools/fixtures/format/globs');
-    });
-
-    test('logs links and hidden directories', () async {
+    test('logs the excluded paths, skipped links and hidden directories',
+        () async {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
           emitsInOrder([
+            predicate<LogRecord>((record) =>
+                record.message.contains('Excluding these paths') &&
+                record.message.contains('should_exclude.dart') &&
+                record.level == Level.FINE),
             predicate<LogRecord>((record) =>
                 record.message.contains('Excluding these links') &&
                 record.message.contains('sub') &&
@@ -169,6 +160,7 @@ void main() {
           ]));
 
       buildExecution(DevToolExecutionContext(),
+          exclude: [Glob('*_exclude.dart')],
           path: 'test/tools/fixtures/format/globs');
     });
 
@@ -208,13 +200,8 @@ void main() {
             path: 'test/tools/fixtures/format/has_dart_style');
         expect(execution.exitCode, isNull);
         expect(execution.process.executable, 'pub');
-        expect(
-            execution.process.args,
-            orderedEquals([
-              'run',
-              'dart_style:format',
-              'test/tools/fixtures/format/has_dart_style'
-            ]));
+        expect(execution.process.args,
+            orderedEquals(['run', 'dart_style:format', '.']));
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
       });
 
@@ -261,38 +248,36 @@ void main() {
     ];
 
     test('no excludes', () {
-      expect(getFormatterInputs(root: root).includedFiles,
-          unorderedEquals({'$root'}));
+      FormatterInputs formatterInputs = getFormatterInputs(root: root);
+      expect(formatterInputs.includedFiles, unorderedEquals({'.'}));
+      expect(formatterInputs.excludedFiles, null);
+      expect(formatterInputs.hiddenDirectories, null);
+      expect(formatterInputs.skippedLinks, null);
     });
 
     test('custom excludes', () {
-      final formatInputs =
+      FormatterInputs formatterInputs =
           getFormatterInputs(exclude: [Glob('*_exclude.dart')], root: root);
 
       expect(
-          formatInputs.includedFiles,
+          formatterInputs.includedFiles,
           unorderedEquals({
             'file.dart',
             for (final dir in dirs) '$dir/sub/file.dart',
           }));
 
-      expect(
-          formatInputs.excludedFiles, unorderedEquals({'should_exclude.dart'}));
+      expect(formatterInputs.excludedFiles,
+          unorderedEquals({'should_exclude.dart'}));
+      expect(formatterInputs.hiddenDirectories,
+          unorderedEquals({'.dart_tool_test', 'example/.pub_test'}));
+      expect(formatterInputs.skippedLinks,
+          unorderedEquals({'sub', 'example/file.dart'}));
     });
 
     test('empty inputs due to excludes config', () async {
       expect(
           getFormatterInputs(exclude: [Glob('**')], root: root).includedFiles,
           isEmpty);
-    });
-    test('ignores all hidden directories', () {
-      expect(getFormatterInputs(root: root).hiddenDirectories,
-          unorderedEquals({'.dart_tool_test', 'example/.pub_test'}));
-    });
-
-    test('ignores directory and file links', () {
-      expect(getFormatterInputs(root: root).links,
-          unorderedEquals({'sub', 'example/file.dart'}));
     });
   });
 
