@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
-import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/utils/version.dart';
+import 'dart_dev_tool.dart';
+import 'events.dart' as events;
+import 'utils/version.dart';
 
 // import 'package:completion/completion.dart' as completion;
 
@@ -41,7 +44,12 @@ class DartDevRunner extends CommandRunner<int> {
       print(dartDevVersion);
       return 0;
     }
-    return (await super.run(args)) ?? 0;
+    final stopwatch = Stopwatch()..start();
+    final exitCode = (await super.run(args)) ?? 0;
+    stopwatch.stop();
+    events.onCommandCompleteController
+        .add(events.CommandResult(args, exitCode, stopwatch.elapsed));
+    return exitCode;
   }
 }
 
