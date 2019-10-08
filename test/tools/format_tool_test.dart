@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
+import 'package:dart_dev/src/utils/formatter_inputs.dart';
 import 'package:glob/glob.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
@@ -136,6 +137,33 @@ void main() {
       expect(execution.exitCode, ExitCode.config.code);
     });
 
+    test('logs the excluded paths, skipped links and hidden directories',
+        () async {
+      Logger.root.level = Level.ALL;
+      expect(
+          Logger.root.onRecord,
+          emitsInOrder([
+            predicate<LogRecord>((record) =>
+                record.message.contains('Excluding these paths') &&
+                record.message.contains('should_exclude.dart') &&
+                record.level == Level.FINE),
+            predicate<LogRecord>((record) =>
+                record.message.contains('Excluding these links') &&
+                record.message.contains('sub') &&
+                record.message.contains('example/file.dart') &&
+                record.level == Level.FINE),
+            predicate<LogRecord>((record) =>
+                record.message.contains('Excluding these hidden directories') &&
+                record.message.contains('.dart_tool_test') &&
+                record.message.contains('example/.pub_test') &&
+                record.level == Level.FINE)
+          ]));
+
+      buildExecution(DevToolExecutionContext(),
+          exclude: [Glob('*_exclude.dart')],
+          path: 'test/tools/fixtures/format/globs');
+    });
+
     group('returns a FormatExecution', () {
       test('', () {
         final context = DevToolExecutionContext();
@@ -207,7 +235,7 @@ void main() {
     });
   });
 
-  group('buildInputs', () {
+  group('getFormatterInputs', () {
     final root = 'test/tools/fixtures/format/globs';
     final dirs = [
       'benchmark',
@@ -219,101 +247,37 @@ void main() {
       'web',
     ];
 
-    test('no excludes and default includes', () {
-      expect(buildInputs(root: root), unorderedEquals({'$root'}));
+    test('no excludes', () {
+      FormatterInputs formatterInputs = getFormatterInputs(root: root);
+      expect(formatterInputs.includedFiles, unorderedEquals({'.'}));
+      expect(formatterInputs.excludedFiles, null);
+      expect(formatterInputs.hiddenDirectories, null);
+      expect(formatterInputs.skippedLinks, null);
     });
 
-    test('custom includes', () {
-      expect(buildInputs(include: [Glob('**.txt')], root: root),
-          unorderedEquals({'$root/file.txt'}));
-    });
+    test('custom excludes', () {
+      FormatterInputs formatterInputs =
+          getFormatterInputs(exclude: [Glob('*_exclude.dart')], root: root);
 
-    test('custom excludes and default includes', () {
       expect(
-          buildInputs(exclude: [Glob('*_exclude.dart')], root: root),
+          formatterInputs.includedFiles,
           unorderedEquals({
-            '$root/file.dart',
-            for (final dir in dirs) '$root/$dir/sub/file.dart',
+            'file.dart',
+            for (final dir in dirs) '$dir/sub/file.dart',
           }));
-    });
 
-    test('custom excludes and custom includes', () {
-      expect(
-          buildInputs(
-              exclude: [Glob('*_exclude.dart')],
-              include: [Glob('**.dart'), Glob('**.txt')],
-              root: root),
-          unorderedEquals({
-            '$root/file.dart',
-            '$root/file.txt',
-            for (final dir in dirs) '$root/$dir/sub/file.dart',
-          }));
-    });
-
-    test('empty inputs due to includes config', () async {
-      Logger.root.level = Level.ALL;
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains(
-                  'formatter cannot run because no inputs could be found') &&
-              record.message.contains('tool/dev.dart') &&
-              record.level == Level.SEVERE)));
-
-      expect(buildInputs(include: [Glob('**.nope')], root: root), isEmpty);
+      expect(formatterInputs.excludedFiles,
+          unorderedEquals({'should_exclude.dart'}));
+      expect(formatterInputs.hiddenDirectories,
+          unorderedEquals({'.dart_tool_test', 'example/.pub_test'}));
+      expect(formatterInputs.skippedLinks,
+          unorderedEquals({'sub', 'example/file.dart'}));
     });
 
     test('empty inputs due to excludes config', () async {
-      Logger.root.level = Level.ALL;
       expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains(
-                  'formatter cannot run because no inputs could be found') &&
-              record.message.contains('tool/dev.dart') &&
-              record.level == Level.SEVERE)));
-
-      expect(buildInputs(exclude: [Glob('**')], root: root), isEmpty);
-    });
-
-    test('logs globs that throw when listing', () {
-      final includeGlob = Glob('nonexistent/include/**');
-      final excludeGlob = Glob('nonexistent/exclude/**');
-
-      Logger.root.level = Level.ALL;
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(
-            predicate<LogRecord>((record) =>
-                record.message.contains('Could not list include') &&
-                record.message.contains('$includeGlob') &&
-                record.level == Level.FINE),
-          ));
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(
-            predicate<LogRecord>((record) =>
-                record.message.contains('Could not list exclude') &&
-                record.message.contains('$excludeGlob') &&
-                record.level == Level.FINE),
-          ));
-
-      expect(
-          buildInputs(
-              exclude: [excludeGlob], include: [includeGlob], root: root),
+          getFormatterInputs(exclude: [Glob('**')], root: root).includedFiles,
           isEmpty);
-    });
-
-    test('logs the excluded paths', () async {
-      Logger.root.level = Level.ALL;
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('Excluding these paths') &&
-              record.message.contains('$root/should_exclude.dart') &&
-              record.level == Level.FINE)));
-
-      buildInputs(exclude: [Glob('*_exclude.dart')], root: root);
     });
   });
 
