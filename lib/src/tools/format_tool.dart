@@ -71,13 +71,6 @@ class FormatTool extends DevTool {
   /// Run `dartfmt -h -v` to see all available args.
   List<String> formatterArgs;
 
-  /// The globs to include as inputs to the dart formatter.
-  ///
-  /// The default is `.` (e.g. `dartfmt .`) which runs the formatter on all
-  /// known dart project directories (`benchmark/`, `bin/`, `example/`, `test/`,
-  /// `tool/`, `web/`) as well as dart files in the root.
-  List<Glob> include;
-
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
     context ??= DevToolExecutionContext();
@@ -264,21 +257,19 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
-  if (exclude != null) {
-    if (inputs.excludedFiles.isNotEmpty) {
-      _log.fine('Excluding these paths from formatting:\n  '
-          '${inputs.excludedFiles.join('\n')}');
-    }
+  if (inputs.excludedFiles?.isNotEmpty ?? false) {
+    _log.fine('Excluding these paths from formatting:\n  '
+        '${inputs.excludedFiles.join('\n')}');
+  }
 
-    if (inputs.skippedLinks.isNotEmpty) {
-      _log.fine('Excluding these links from formatting:\n  '
-          '${inputs.skippedLinks.join('\n')}');
-    }
+  if (inputs.skippedLinks?.isNotEmpty ?? false) {
+    _log.fine('Excluding these links from formatting:\n  '
+        '${inputs.skippedLinks.join('\n')}');
+  }
 
-    if (inputs.hiddenDirectories.isNotEmpty) {
-      _log.fine('Excluding these hidden directories from formatting:\n  '
-          '${inputs.hiddenDirectories.join('\n')}');
-    }
+  if (inputs.hiddenDirectories?.isNotEmpty ?? false) {
+    _log.fine('Excluding these hidden directories from formatting:\n  '
+        '${inputs.hiddenDirectories.join('\n')}');
   }
 
   final dartfmt = buildProcess(formatter);
