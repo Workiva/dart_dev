@@ -2,11 +2,7 @@ include: package:pedantic/analysis_options.1.8.0.yaml
 
 analyzer:
   exclude:
-    - test/tools/fixtures/**
-    # Tests that depend on globally activating a package create a separate,
-    # temporary pub cache directory that needs to be excluded from analysis to
-    # prevent its files from showing up in an IDE analysis pane.
-    - test_pub_cache**
+    - test/**/fixtures/**
   language:
     strict-inference: true
     strict-raw-types: true

@@ -1,0 +1,6 @@
+name: dart_dev_test_functional_analyze_failure
+version: 0.0.0
+
+dev_dependencies:
+  dart_dev:
+    path: ../../../../..
