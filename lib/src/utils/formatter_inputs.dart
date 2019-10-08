@@ -15,11 +15,16 @@ import 'package:path/path.dart' as p;
 /// By default these globs are assumed to be relative to the current working
 /// directory, but that can be overridden via [root] for testing purposes.
 FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
-  FormatterInputs inputs = FormatterInputs(Set(), Set(), Set(), Set());
+  final includedFiles = <String>{};
+  final excludedFiles = <String>{};
+  final skippedLinks = <String>{};
+  final hiddenDirectories = <String>{};
 
   exclude ??= <Glob>[];
 
-  if (exclude.isEmpty) inputs.includedFiles.add(root ?? '.');
+  if (exclude.isEmpty) {
+    return FormatterInputs({'.'});
+  }
 
   Directory dir = Directory(root ?? '.');
 
@@ -27,7 +32,7 @@ FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
     String relative = p.relative(entry.path, from: dir.path);
 
     if (entry is Link) {
-      inputs.links.add(relative);
+      skippedLinks.add(relative);
       continue;
     }
 
@@ -45,29 +50,30 @@ FormatterInputs getFormatterInputs({List<Glob> exclude, String root}) {
 
     if (hiddenIndex != null) {
       final hiddenDirectory = p.joinAll(parts.take(hiddenIndex + 1));
-      inputs.hiddenDirectories.add(hiddenDirectory);
+      hiddenDirectories.add(hiddenDirectory);
       continue;
     }
 
-    if (exclude.isNotEmpty) {
-      if (exclude.any((glob) => glob.matches(relative))) {
-        inputs.excludedFiles.add(relative);
-      } else {
-        if (entry is File) inputs.includedFiles.add(relative);
-      }
+    if (exclude.any((glob) => glob.matches(relative))) {
+      excludedFiles.add(relative);
+    } else {
+      if (entry is File) includedFiles.add(relative);
     }
   }
 
-  return inputs;
+  return FormatterInputs(includedFiles,
+      excludedFiles: excludedFiles,
+      skippedLinks: skippedLinks,
+      hiddenDirectories: hiddenDirectories);
 }
 
 class FormatterInputs {
-  FormatterInputs(this.includedFiles, this.links, this.excludedFiles,
-      this.hiddenDirectories);
+  FormatterInputs(this.includedFiles,
+      {this.skippedLinks, this.excludedFiles, this.hiddenDirectories});
 
   final Set<String> includedFiles;
 
-  final Set<String> links;
+  final Set<String> skippedLinks;
 
   final Set<String> excludedFiles;
 

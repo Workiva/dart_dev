@@ -269,9 +269,9 @@ FormatExecution buildExecution(
         '${inputs.excludedFiles.join('\n')}');
   }
 
-  if (inputs.links.isNotEmpty) {
+  if (inputs.skippedLinks.isNotEmpty) {
     _log.fine('Excluding these links from formatting:\n  '
-        '${inputs.links.join('\n')}');
+        '${inputs.skippedLinks.join('\n')}');
   }
 
   if (inputs.hiddenDirectories.isNotEmpty) {
