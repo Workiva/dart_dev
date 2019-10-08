@@ -1,879 +1,246 @@
 # Dart Dev Tools
 [![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dartlang.org/packages/dart_dev)
 [![Build Status](https://travis-ci.org/Workiva/dart_dev.svg?branch=master)](https://travis-ci.org/Workiva/dart_dev)
-[![codecov.io](http://codecov.io/github/Workiva/dart_dev/coverage.svg?branch=master)](http://codecov.io/github/Workiva/dart_dev?branch=master)
-[![documentation](https://img.shields.io/badge/Documentation-dart_dev-blue.svg)](https://www.dartdocs.org/documentation/dart_dev/latest/)
 
-> Centralized tooling for Dart projects. Consistent interface across projects.
-> Easily configurable.
+Centralized tooling for Dart projects. Consistent interface across projects.
+Easily configurable.
 
----
+- [Quick Start](#quick-start)
+- [Motivation & Goal](#motivation--goal)
+- [Project-Level Configuration](#project-level-configuration)
+- [Extending/Composing Functionality](#extendingcomposing-functionality)
+- [Shared Configuration](#shared-configuration)
 
-- [**Motivation**](#motivation)
-- [**Supported Tasks**](#supported-tasks)
-- [**Getting Started**](#getting-started)
-- [**Project Configuration**](#project-configuration)
-- [**CLI Usage**](#cli-usage)
-- [**Programmatic Usage**](#programmatic-usage)
-- [**BONUS: Functional Test Code Coverage**](#functional-test-code-coverage)
+## Quick Start
 
-## Motivation
+Add `dart_dev` as a dev dependency in your project:
 
-All Dart (https://dartlang.org) projects eventually share a common set of
-development requirements:
-
-- Tests (unit, integration, and functional)
-- Code coverage
-- Consistent code formatting
-- Static analysis to detect issues
-- Documentation generation
-- CSS generation using the Dart Sass compiler
-- Examples for manual testing/exploration
-- Applying a LICENSE file to all source files
-- Running dart unit tests on Sauce Labs
-
-Together, the Dart SDK and a couple of packages from the Dart team supply the
-necessary tooling to support the above requirements. But, the usage is
-inconsistent, configuration is limited to command-line arguments, and you
-inevitably end up with a slew of shell scripts in the `tool/` directory. While
-this works, it lacks a consistent usage pattern across multiple projects and
-requires an unnecessary amount of error-prone work to set up.
-
-This package improves on the above process by providing a number of benefits:
-
-#### Centralized Tooling
-By housing the APIs and CLIs for these various dev workflows in a single
-location, you no longer have to worry about keeping scripts in parity across
-multiple projects. Simply add the `dart_dev` package as a dependency, and you're
-ready to go.
-
-#### Versioned Tooling
-Any breaking changes to the APIs or CLIs within this package will be reflected
-by an appropriate version bump according to semver. You can safely upgrade your
-tooling to take advantage of continuous improvements and new features with
-minimal maintenance.
-
-#### Separation of Concerns
-Every task supported in `dart_dev` is separated into three pieces:
-
-1. API - programmatic execution via Dart code.
-2. CLI - script-based execution via the `dart_dev` executable.
-3. Configuration - singleton configuration instances for simple per-project configuration.
-
-#### Consistent Interface
-By providing a single executable (`dart_dev`) that supports multiple tasks with
-standardized options, project developers have a consistent interface for
-development across all projects that utilize this package. Configuration is
-handled on a per-project basis via a single Dart file, meaning that you don't
-have to know anything about a project to run tests or static analysis - you just
-need to know how to use the `dart_dev` tool.
-
-> **Note:** This is __not__ a replacement for the tooling provided by the Dart
-> SDK and packages like `test` or `dart_style`. Rather, `dart_dev` is a unified
-> interface for interacting with said tooling in a simplified manner.
-
-
-## Tasks
-
-A task is a single unit of execution within `dart_dev`. They are identified by
-a name and may or may not take arguments. Several supported tasks are provided
-by default. Consumers can supplement the supported tasks with project specific
-local tasks.
-
-### Supported Tasks
-
-- **Tests:** runs test suites (unit, integration, and functional) via the [`test` package test runner](https://github.com/dart-lang/test).
-- **Coverage:** collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the [`coverage` package](https://github.com/dart-lang/coverage).
-- **Code Formatting:** runs the [`dartfmt` tool from the `dart_style` package](https://github.com/dart-lang/dart_style) over source code.
-- **Static Analysis:** runs the [`dartanalyzer`](https://www.dartlang.org/tools/analyzer/) over source code.
-- **Compiling Sass:** runs the [`compile_sass` tool from the `w_common` package](https://github.com/workiva/w_common).
-- **Applying a License to Source Files:** copies a LICENSE file to all applicable files.
-- **Generate a test runner file:** that allows for faster test execution.
-- **Running dart unit tests on Sauce Labs:** compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
-- **Running concurrent dart commands:** allows continuous integration systems to run concurrently rather then serially.
-
-### Local Tasks
-
-A local task is a script or program that is discovered by `dart_dev`. By
-default, dart dev will recursively look for files in the project level `tool`
-directory that match the filename pattern `(task_name)_task.(executable_type)`.
-Any file matching this pattern is parsed and registered as a task.  The task
-discovery will not follow symlink directories by default. Symlink directory
-expansion can be enabled using the `followSymlinks` property in the `local`
-configuration field.
-
-Any arguments specified after the local task name are passed to the underlying
-task process as command line arguments. For instance, 
-`pub run dart_dev exampleTask --example-argument 23` would pass the example
-argument and value as additions to the underlying system command
-`dart exampleTask_task.dart --example-argument 23`. This allows the task to
-parse its arguments independently of dart_dev.
-
-Executable types identify how a given task should execute. Dart and bash
-scripts are supported out of the box. The set of available executable types can
-be expanded in the configuration as documented below.
-
-## Getting Started
-
-#### Install `dart_dev`
-Add the following to your `pubspec.yaml`:
 ```yaml
+# pubspec.yaml
 dev_dependencies:
-  coverage: ^0.8.0 # dart_dev is currently untested with coverage ^0.9.0
-  dart_dev: ^1.7.8
-  dart_style: ^1.0.7
-  dartdoc: ^0.13.0
-  test: ^0.12.24
+  dart_dev: ^3.0.0
 ```
 
-#### Create an Alias (optional)
-Add the following to your bash or zsh profile for convenience:
-```
-alias ddev='pub run dart_dev'
-```
-
-#### Bash Completion
-
-Bash command completion is available and easy to use. You'll want to install
-dart_dev globally: `pub global activate dart_dev`.
-
-Add the following to your `.bashrc`:
-
-```
-eval "$(pub global run dart_dev bash-completion)"
-```
-
-If you are using Bash installed through Homebrew, you'll also need to install
-the completion machinery with `brew install bash-completion`. Then make sure
-something like the following is in your `.bashrc` file:
-
-```
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-  . $(brew --prefix)/etc/bash_completion
-fi
-```
-
-Next time you load a Bash session you'll have basic completions for the `ddev`
-alias described above.
-
-#### Zsh Completion
-
-The Bash completion script will work for Zsh as well, but requires a little
-configuration. The following lines must all be found somewhere (and in this
-order, though they needn't be adjacent to one another) in your `.zshrc` file,
-or a file sourced from it:
-
-```
-autoload -U compinit
-compinit
-autoload -U bashcompinit
-bashcompinit
-eval "$(pub global run dart_dev bash-completion)"
-```
-
-#### Fish Completion
-
-Symlink or copy the file `tool/ddev.fish` into `~/.config/fish/completions/`
-(or wherever your completion scripts live).
-
-The completions expect a function called `ddev`. To meet this expectation create
-a new file in `~/.config/fish/functions` called `ddev.fish` and add the
-following content to the file.
-
-```fish
-function ddev
-  pub run dart_dev $argv
-end
-```
-
-#### Configuration
-In order to configure `dart_dev` for a specific project, run `ddev init` or
-`pub run dart_dev init` to generate the configuration file. This should create a
-`tool/dev.dart` file where each task can be configured as needed.
+Create a `tool/dev.dart` file. This is where you will configure which dart
+developer tools are available for your project and how they should behave.
 
 ```dart
+// tool/dev.dart
 import 'package:dart_dev/dart_dev.dart';
 
-main(args) async {
-  // Define the entry points for static analysis.
-  config.analyze.entryPoints = ['lib/', 'test/', 'tool/'];
-
-  // Define the directories where the LICENSE should be applied.
-  config.copyLicense.directories = ['example/', 'lib/'];
-
-  // Configure whether or not the HTML coverage report should be generated.
-  config.coverage.html = false;
-
-  // Define the paths to include when running the
-  // Dart formatter.
-  config.format.paths = ['lib/', 'test/', 'tool/'];
-
-  // Define overrides for local task discovery
-  config.local
-    ..taskPaths.add('bin')
-    ..commandFilePattern = '([a-zA-Z0-9]+)_task.([a-zA-Z0-9]+)'
-    ..executables['go'] = ['go', 'run'];
-
-  // Define the location of your test suites.
-  config.test
-    ..unitTests = ['test/unit/']
-    ..integrationTests = ['test/integration/']
-    ..functionalTests = ['test/functional'];
-
-  // Execute the dart_dev tooling.
-  await dev(args);
-}
+final config = {
+  'analyze': AnalyzeTool(),
+  'format': FormatTool(),
+  'test': TestTool(),
+  'serve': WebdevServeTool(),
+};
 ```
 
-[Full list of configuration options](#project-configuration).
-
-
-#### Try It Out
-The tooling in `dart_dev` works out of the box with happy defaults for each
-task. Run `ddev` or `pub run dart_dev` to see the help usage. Try it out by
-running any of the following tasks:
-
-```
-# with the alias
-ddev analyze
-ddev copy-license
-ddev coverage
-ddev format
-ddev gen-test-runner
-ddev task-runner
-ddev test
-ddev sass
-
-# without the alias
-pub run dart_dev analyze
-pub run dart_dev copy-license
-pub run dart_dev coverage
-pub run dart_dev format
-pub run dart_dev gen-test-runner
-pub run dart_dev task-runner
-pub run dart_dev test
-pub run dart_dev sass
-```
-
-Add the `-h` flag to any of the above commands to receive additional help
-information specific to that task.
-
-
-#### Convenience Tasks for Targeting Dart1 and/or Dart2
-
-To help with the transition from Dart1 to Dart2, you can leverage the `dart1-only`
-and `dart2-only` tasks to conditionally run another dart_dev task or any executable.
+Run any of these tools via the `dart_dev` command-line app:
 
 ```bash
-# Run a dart_dev task only on Dart1:
-$ ddev dart1-only test
-
-# Run a dart_dev task with additional args only on Dart1:
-$ ddev dart1-only -- format --check
-
-# Run an shell script only on Dart1:
-$ ddev dart1-only ./example.sh
-
-# Run an executable with additional args only on Dart1:
-$ ddev dart1-only -- pub serve web --port 8080
-
-# The `dart2-only` task works exactly the same, but only runs on Dart2:
-$ ddev dart2-only test
-$ ddev dart2-only -- format --check
-$ ddev dart2-only ./example.sh
-$ ddev dart2-only -- pub run build_runner serve web:8080
+$ pub run dart_dev analyze
+[INFO] Running subprocess:
+dartanalyzer .
+--------------------------
+Analyzing dart_dev...
+No issues found!
 ```
 
-
-
-## Project Configuration
-Project configuration occurs in the `tool/dev.dart` file where the `config`
-instance is imported from the `dart_dev` package. The bare minimum for this file
-is:
-
-```dart
-import 'package:dart_dev/dart_dev.dart';
-
-main(args) async {
-  // Available config objects:
-  config.analyze
-  config.copyLicense
-  config.coverage
-  config.format
-  config.genTestRunner
-  config.init
-  config.taskRunner
-  config.test
-
-  await dev(args);
-}
-```
-
-#### `analyze` Config
-All configuration options for the `analyze` task are found on the
-`config.analyze` object.
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>entryPoints</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>['lib/']</code></td>
-            <td>Entry points to analyze. Items in this list can be directories and/or files. Directories will be expanded (depth=1) to find Dart files.</td>
-        </tr>
-        <tr>
-            <td><code>fatalWarnings</code></td>
-            <td><code>bool</code></td>
-            <td><code>true</code></td>
-            <td>Treat non-type warnings as fatal.</td>
-        </tr>
-        <tr>
-            <td><code>hints</code></td>
-            <td><code>bool</code></td>
-            <td><code>true</code></td>
-            <td>Show hint results.</td>
-        </tr>
-        <tr>
-          	<td><code>fatalHints</code></td>
-          	<td><code>bool</code></td>
-          	<td><code>false</code></td>
-          	<td>Fail on hints (requests hints to be true).</td>
-        </tr>
-        <tr>
-            <td><code>strong</code></td>
-            <td><code>bool</code></td>
-            <td><code>false</code></td>
-            <td><a href="https://goo.gl/DqcBsw">Enable strong static checks</a></td>
-        </tr>
-    </tbody>
-</table>
-
-#### `copy-license` Config
-All configuration options for the `copy-license` task are found on the
-`config.copyLicense` object.
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>directories</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>['lib/']</code></td>
-            <td>All source files in these directories will have the LICENSE header applied.</td>
-        </tr>
-        <tr>
-            <td><code>licensePath</code></td>
-            <td><code>String</code></td>
-            <td><code>'LICENSE'</code></td>
-            <td>Path to the source LICENSE file that will be copied to all source files.</td>
-        </tr>
-    </tbody>
-</table>
-
-#### `coverage` config
-All configuration options for the `coverage` task are found on the
-`config.coverage` object. However, the `coverage` task also uses the test suite
-configuration from the `config.test` object.
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>html</code></td>
-            <td><code>bool</code></td>
-            <td><code>true</code></td>
-            <td>Whether or not to generate the HTML report.</td>
-        </tr>
-        <tr>
-            <td><code>output</code></td>
-            <td><code>String</code></td>
-            <td><code>'coverage/'</code></td>
-            <td>Output directory for coverage artifacts.</td>
-        </tr>
-        <tr>
-            <td><code>reportOn</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>['lib/']</code></td>
-            <td>List of paths to include in the generated coverage report (LCOV and HTML).</td>
-        </tr>
-        <tr>
-            <td><code>pubServe</code></td>
-            <td><code>bool</code></td>
-            <td><code>false</code></td>
-            <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
-        </tr>
-        <tr>
-            <td><code>seleniumCommand</code></td>
-            <td><code>String</code></td>
-            <td><code>"selenium-server"</code></td>
-            <td>Command used to execute Selenium for functional testing.</td>
-        </tr>
-        <tr>
-            <td><code>seleniumSuccess</code></td>
-            <td><code>String</code></td>
-            <td><code>"Selenium Server is up and running"</code></td>
-            <td>Value used to verify that Selenium has been started successfully.  This value is accurate for v2.48.0 of Selenium Server.</td>
-        </tr>
-    </tbody>
-</table>
-
-> Note: "lcov" must be installed in order to generate the HTML report.
+> We recommend adding a `ddev` alias:
 >
-> If you're using brew, you can install it with:
->    `brew update && brew install lcov`
->
-> Otherwise, visit http://ltp.sourceforge.net/coverage/lcov.php
-
-#### `format` Config
-All configuration options for the `format` task are found on the `config.format`
-object.
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>check</code></td>
-            <td><code>bool</code></td>
-            <td><code>false</code></td>
-            <td>Dry-run; checks if formatter needs to be run and sets exit code accordingly.</td>
-        </tr>
-        <tr>
-            <td><code>paths</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>['lib/']</code></td>
-            <td>Files/directories to run the formatter on. All files (any depth) in the given directories will be formatted.</td>
-        </tr>
-    </tbody>
-</table>
-
-#### `gen-test-runner` Config
-All configuration options for the `gen-test-runner` task are found on the `config.genTestRunner`
-object.
-
-##### `GenTestRunner`
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>configs</code></td>
-            <td><code>List&lt;TestRunnerConfig&gt;</code></td>
-            <td><code>[TestRunnerConfig()]</code></td>
-            <td>The list of runner configurations used to create individual test runners</td>
-        </tr>
-        <tr>
-            <td><code>check</code></td>
-            <td><code>bool/code></td>
-            <td><code>false</code></td>
-            <td>If true, will only check to ensure the runner is up-to-date</td>
-        </tr>
-    </tbody>
-</table>
-
-**Note:** if you plan to use the `--check` option, be sure to exclude
-the `generated_runner_test.dart` file from formatting. This can be done
-by adding it to the `config.format.exclude` list.
-
-#### Local Config
-All configuration options for the local task discovery are found on the
-`config.local` object.
-
-##### Local Discovery
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>taskPaths</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>['tool']</code></td>
-            <td>A list of project level paths to search for file matching the task pattern.</td>
-        </tr>
-        <tr>
-            <td><code>followSymlinks</code></td>
-            <td><code>bool</code></td>
-            <td><code>false</code></td>
-            <td>Should dart dev expand on symbolic links encountered in any <code>taskPath</code>?</td>
-        </tr>
-        <tr>
-            <td><code>commandFilePattern</code></td>
-            <td><code>String</code></td>
-            <td><code>'([a-zA-Z0-9]+)_task.([a-zA-Z0-9]+)'</code></td>
-            <td>A Regular Expression which matches two groups that represent the task name and executable type.</td>
-        </tr>
-        <tr>
-            <td><code>executables</code></td>
-            <td><code>Map&lt;String, List&lt;String&gt;&gt;</code></td>
-            <td><code>'{'dart': ['dart'], 'sh': ['bash'] }'</code></td>
-            <td>A lookup table that matches an executable type to a set of strings to prefix the execution of a task file with.</td>
-        </tr>
-    </tbody>
-</table>
-
-##### `TestRunnerConfig`
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>dartHeaders</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>[]</code></td>
-            <td>Any lines of dart code that should exist between test file imports and the main method</td>
-        </tr>      
-        <tr>
-            <td><code>preTestCommands</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>[]</code></td>
-            <td>Commands to be executed in the generated file's main method before test execution</td>
-        </tr>        
-        <tr>
-            <td><code>directory</code></td>
-            <td><code>String</code></td>
-            <td><code>'test/'</code></td>
-            <td>The directory to search for test files in</td>
-        </tr>
-        <tr>
-            <td><code>env</code></td>
-            <td><code>Environment</code></td>
-            <td><code>Environment.browser</code></td>
-            <td>The environment to run tests in ('vm', 'browser', 'both')</td>
-        </tr>
-        <tr>
-            <td><code>filename</code></td>
-            <td><code>String</code></td>
-            <td><code>'generated_runner'</code></td>
-            <td>The name of the generated test runner file</td>
-        </tr>
-        <tr>
-            <td><code>genHtml</code></td>
-            <td><code>bool</code></td>
-            <td><code>false</code></td>
-            <td>Whether or not a companion html file should be generated</td>
-        </tr>
-        <tr>
-            <td><code>htmlHeaders</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>[]</code></td>
-            <td>The list of custom html elements to include in the companion html file</td>
-        </tr>
-    </tbody>
-</table>
-
-#### `task-runner` Config
-All configuration options for the `task-runner` task are found on the `config.taskRunnerConfig`
-object.
-
-##### `TaskRunnerConfig`
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>tasksToRun</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>['pub run dart_dev format --check','pub run dart_dev analyze','pub run dart_dev test']</code></td>
-            <td>The list of tasks to run</td>
-        </tr>
-    </tbody>
-</table>
-
-#### `test` Config
-All configuration options for the `test` task are found on the `config.test`
-object.
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>concurrency</code></td>
-            <td><code>int</code></td>
-            <td><code>4</code></td>
-            <td>Number of concurrent test suites run.</td>
-        </tr>
-        <tr>
-            <td><code>functionalTests</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>[]</code></td>
-            <td>Functional test locations. Items in this list can be directories and/or files.</td>
-        </tr>
-        <tr>
-            <td><code>integrationTests</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>[]</code></td>
-            <td>Integration test locations. Items in this list can be directories and/or files.</td>
-        </tr>
-        <tr>
-            <td><code>platforms</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>[]</code></td>
-            <td>Platforms on which to run the tests (handled by the Dart test runner). See https://github.com/dart-lang/test#platform-selector-syntax for a full list of supported platforms.
-            <strong>* Not all platforms are supported by all continuous integration servers.  Please consult your CI server's documentation for more details.</strong>
-            </td>
-        </tr>
-        <tr>
-            <td><code>unitTests</code></td>
-            <td><code>List&lt;String&gt;</code></td>
-            <td><code>['test/']</code></td>
-            <td>Unit test locations. Items in this list can be directories and/or files.</td>
-        </tr>
-        <tr>
-            <td><code>pubServe</code></td>
-            <td><code>bool</code></td>
-            <td><code>false</code></td>
-            <td>Whether or not to serve browser tests using a Pub server.<br>If <code>true</code>, make sure to follow the <code>test</code> package's <a href="https://github.com/dart-lang/test#testing-with-barback">setup instructions</a> and include the <code>test/pub_serve</code> transformer.</td>
-        </tr>
-        <tr>
-            <td><code>pubServePort</code></td>
-            <td><code>int</code></td>
-            <td><code>0</code></td>
-            <td>Port used by the Pub server for browser tests.  The default value will randomly select an open port to use.</td>
-        </tr>
-    </tbody>
-</table>
-* Individual test files can be executed by appending their path to the end of the command.
-```
-ddev test path/to/test_name path/to/another/test_name
-```
-
-* Individual tests can be executed by passing in a test name or regex pattern of a test that would be loaded by the test runner
-```
-ddev test -n 'run only this test'
-```
-
-* A new `pub serve` instance is created for every test run. To use a specific `pub serve` instance, pass `--pub-serve-port` to the CLI.
-```
-$ pub serve --port 56001 test
-$ ddev test --pub-serve --pub-serve-port 56001
-```
-
-## CLI Usage
-This package comes with a single executable: `dart_dev`. To run this executable:
-`ddev` or `pub run dart_dev`. This usage will simply display the usage help text
-along with a list of supported tasks:
-
-```
-$ ddev
-Standardized tooling for Dart projects.
-
-Usage: pub run dart_dev [task] [options]
-
-    --[no-]color    Colorize the output.
-                    (defaults to on)
-
--h, --help          Shows this usage.
--q, --quiet         Minimizes the logging output.
-    --version       Shows the dart_dev package version.
-
-Supported tasks:
-
-    analyze
-    copy-license
-    coverage
-    format
-    gen-test-runner
-    init
-    test
-```
-
-- Static analysis: `ddev analyze`
-- Applying license to source files: `ddev copy-license`
-- Code coverage: `ddev coverage`
-- Dart formatter: `ddev format`
-- Generate test runner: `ddev gen-test-runner`
-- Initialization: `ddev init`
-- Tests: `ddev test`
-
-Add the `-h` flag to any of the above commands to see task-specific flags and options.
-
-> Any project configuration defined in the `tool/dev.dart` file should be
-> reflected in the execution of the above commands. CLI flags and options will
-> override said configuration.
-
-
-## Programmatic Usage
-The tooling facilitated by this package can also be executed via a programmatic
-Dart API:
-
-```dart
-import 'package:dart_dev/api.dart' as api;
-
-main() async {
-  await api.analyze();
-  await api.format();
-  await api.init();
-  await api.test();
-}
-```
-
-Check out the source of these API methods for additional documentation.
-
-> In order to provide a clean API, these methods do not leverage the
-> configuration instances that the command-line interfaces do. Because of this,
-> the default usage may be different. You can access said configurations from
-> the main `package:dart_dev/dart_dev.dart` import.
-
-## Functional Test Code Coverage
-
-If you're running functional tests with [Selenium](http://www.seleniumhq.org/)
-and [webdriver.dart](https://github.com/google/webdriver.dart), dart_dev can
-help you run the Selenium standalone server and collect coverage from those
-functional tests.
-
-As the webdriver.dart project documents, `selenium-server-standalone` and
-`chromedriver` are required dependencies.
-
-### `selenium-server-standalone`
-
-```
-brew install selenium-server-standalone
-```
-
-> If you need to use multiple versions of Selenium, you can create a local
-> executable and store it in your project's `tool/` directory (and check it in
-> to version control). You can then pass the path to this local executable to
-> the Selenium helper (see [configuring dart_dev to run Selenium](#configuring-dart_dev-to-run-selenium)).
->
-> ```
-> cd tool/
-> curl -o selenium-server-standalone.jar http://selenium-release.storage.googleapis.com/2.48/selenium-server-standalone-2.48.2.jar
-> echo '#!/usr/bin/env bash' | tee -a selenium-server
-> echo 'DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"' | tee -a selenium-server
-> echo 'exec java -jar $DIR/selenium-server-standalone.jar "$@"' | tee -a selenium-server
-> chmod +x selenium-server
+> ```bash
+> alias ddev='pub run dart_dev'
 > ```
 
-### `chromedriver`
+Configure your project's tools as necessary:
 
-Normally, `chromedriver` could be installed with brew, but to collect coverage,
-the functional tests need to be run in Dartium, which requires an older version
-of `chromedriver` (currently 2.14).
-
-Download `chromedriver` 2.14 here:
-```
-https://chromedriver.storage.googleapis.com/index.html?path=2.14/
-```
-
-Unzip and run the executable once to place it in `/usr/local/bin/`.
-
-### Configuring dart_dev to run Selenium
-
-**tool/dev.dart**
 ```dart
+// tool/dev.dart
 import 'package:dart_dev/dart_dev.dart';
-import 'package:dart_dev/util.dart' show SeleniumHelper;
+import 'package:glob/glob.dart';
 
-main() async {
-  // By default, this helper assumes the `selenium-server` executable is in the path
-  var selenium = new SeleniumHelper();
-
-  // If you have a local executable, point to it like so:
-  var selenium = new SeleniumHelper(executablePath: 'tool/selenium-server');
-
-  config.test
-    ..beforeFunctionalTests = [selenium.start]
-    ..afterFunctionalTests = [selenium.stop];
-}
+final config = {
+  'analyze': AnalyzeTool()
+    ..dartanalyzerArgs = ['--fatal-infos'],
+  'format': FormatTool()
+    ..exclude = [Glob('lib/src/generated/**.dart')],
+  'test': TestTool()
+    ..testArgs = ['-P', 'unit'],
+  'serve': WebdevServeTool()
+    ..webdevArgs = ['--debug', 'example:8080', 'web:8081'],
+};
 ```
 
-> **Note:** you may also want to spin up a pub instance here to serve the
-> application that will be exercised in your functional tests.
+## Motivation & Goal
 
-### Example functional test
+Most Dart projects eventually share a common set of development requirements
+(e.g. static analysis, formatting, test running, serving, etc.). The Dart SDK
+along with some core packages supply the necessary tooling for these developer
+tasks (e.g. `dartanalyzer`, `dartfmt`, or `pub run test`).
+
+While the core tooling gets us far, there are two areas in which we feel it
+falls short:
+
+1. Inconsistencies across projects in how these tools must be used in order to
+   to accomplish common developer tasks.
+
+2. Functionality gaps for more complex use cases.
+
+With `dart_dev`, we attempt to address #1 by providing a way to configure all of
+these common developer tasks at the project level, and #2 by composing
+additional functionality around existing tools.
+
+This package is built with configurability and extensiblity in mind, with the
+hope that you and your teams will find value in creating your own tools and
+shared configurations. Ideally, you or your team can settle on a shared
+configuration that individual projects can consume; projects with unique
+requirements can tweak the configuration as necessary; and developers can rely
+on the convention of a simple, consistent command-line interface regardless of
+the project they are in.
+
+## Project-Level Configuration
+
+Every task should be able to be configured at the project-level so that any
+variance across projects becomes a configuration detail that need not be
+memorized or referenced in order to run said task.
+
+Consider formatting as an example. The default approach to formatting files is
+to run `dartfmt -w .`. But, some projects may want to exclude certain files that
+would otherwise be formatted by this command. Or, some projects may want to use
+`pub run dart_style:format` instead of `dartfmt`. Currently, there is no
+project-level configuration supported by the formatter, so these sorts of things
+just have to be documented in a `README.md` or `CONTRIBUTING.md`.
+
+With `dart_dev`, this can be accomplished like so:
 
 ```dart
-import 'package:test/test.dart';
-import 'package:webdriver/io.dart';
+// tool/dev.dart
+import 'package:dart_dev/dart_dev.dart';
 
-WebDriver driver;
-
-void main() {
-  setUp(() async {
-    var options = {
-      'browserName': 'chrome',
-      'chromeOptions': {
-        'binary': 'path/to/dartium'
-      }
-    };
-    driver = await createDriver(desired: options);
-  });
-
-  // Do not quit the webdriver because the test and coverage tasks will handle
-  // closing the browser when complete.
-  //tearDown(() => driver.quit());
-
-  test('test', () async {
-    // This requires that your application is being served at localhost:8080
-    await driver.get('http://localhost:8080');
-    // interact with application
-  });
-}
+final config = {
+  'format': FormatTool()
+    ..exclude = [Glob('lib/src/**.g.dart')]
+    ..formatter = Formatter.dartStyle,
+};
 ```
 
-> The `coverage` and `test` tasks will both handle closing any Dartium instances
-> that were opened via the `WebDriver` once the tests are complete. You will
-> need to omit the standard `tearDown(() => driver.quit());` from your test
-> setups or code coverage cannot be collected.
+```bash
+$ ddev format
+[INFO] Running subprocess:
+pub run dart_style:format -w <3 paths>
+--------------------------------------
+Unchanged ./lib/foo.dart
+Unchanged ./lib/src/bar.dart
+Formatted ./lib/src/baz.dart
+```
+
+## Extending/Composing Functionality
+
+Using existing tooling provided by (or conventionalized by) the Dart community
+should always be the goal, but the reality is that there are gaps. Certain use
+cases can be made more convenient and new use cases may arise.
+
+Consider test running as an example. For simple projects, `pub run test` is
+sufficient. In fact, the test package supports a huge amount of project-level
+configuration via `dart_test.yaml`, which means that for projects that are
+properly configured, `pub run test` just works.
+
+Unfortunately, at this time, projects that rely on builders must run tests via
+`pub run build_runner test`. Based on the project, you would need to know which
+test command should be run.
+
+With `dart_dev`, the `TestTool` handles this automatically by checking the
+project's `pubspec.yaml` for a dependency on `build_test`. If present, tests
+will be run via `pub run build_runner test`, otherwise it falls back to the
+default of `pub run test`.
+
+```bash
+# In a project without a `build_test` dependency:
+$ ddev test
+[INFO] Running subprocess:
+pub run test
+----------------------------
+00:01 +75: All tests passed!
+
+
+# In a project with a `build_test` dependency:
+$ ddev test
+[INFO] Running subprocess:
+pub run build_runner test
+----------------------------
+[INFO] Generating build script completed, took 425ms
+[INFO] Creating build script snapshot... completed, took 13.6s
+[INFO] Building new asset graph completed, took 960ms
+[INFO] Checking for unexpected pre-existing outputs. completed, took 1ms
+[INFO] Running build completed, took 12.4s
+[INFO] Caching finalized dependency graph completed, took 71ms
+[INFO] Creating merged output dir `/var/folders/vb/k8ccjw095q16jrwktw31ctmm0000gn/T/build_runner_testBkm6gS/` completed, took 260ms
+[INFO] Writing asset manifest completed, took 3ms
+[INFO] Succeeded after 12.8s with 1276 outputs (2525 actions)
+Running tests...
+
+00:00 +75: All tests passed!
+```
+
+Additionally, `TestTool` automatically applies [`--build-filter`][build-filter]
+options to the `pub run build_runner test` command to help reduce build time and
+speed up dev iteration when running a subset of the available tests.
+
+Generally speaking, these dart tool abstractions provide a place to address
+functionality gaps in the underlying tools or make certain use cases more
+convenient or efficient.
+
+> Check out the [API documentation][api-docs] to see all of the available tools,
+> their configuration options, and details on how they work.
+
+## Shared Configuration
+
+This package provides `coreConfig` as a minimal base configuration of `dart_dev`
+tools.
+
+To use this shared config in your project:
+
+```dart
+// tool/dev.dart
+import 'package:dart_dev/dart_dev.dart';
+
+final config = coreConfig;
+```
+
+This shared config contains the following targets:
+
+- `ddev analyze`
+- `ddev format`
+- `ddev serve`
+- `ddev test`
+
+The actual configuration of each of these targets can be found here:
+[`lib/src/core_config.dart`][core-config]
+
+`coreConfig` is just a getter that returns a `Map<String, DevTool>` object, so
+extending it or customizing it is as easy as creating your own `Map`, spreading
+the shared config, and then adding your own entries:
+
+```dart
+// tool/dev.dart
+import 'package:dart_dev/dart_dev.dart';
+
+final config = {
+  ...coreConfig,
+
+  // Override a target by including it after `...coreConfig`:
+  'format': FormatTool()
+    ..formatter = Formatter.dartStyle,
+
+  // Add a custom target:
+  'github': ProcessTool(
+      'open', ['https://github.com/Workiva/dart_dev']),
+
+  // etc.
+};
+```
+
+[api-docs]: https://pub.dev/documentation/dart_dev/latest/dart_dev/dart_dev-library.html
+[build-filter]: https://github.com/dart-lang/build/blob/master/build_runner/CHANGELOG.md#new-feature-build-filters
+[core-config]: https://github.com/Workiva/dart_dev/blob/master/lib/src/core_config.dart

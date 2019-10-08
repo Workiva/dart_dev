@@ -1,6 +1,0 @@
-name: exclusions
-version: 0.0.0
-dev_dependencies:
-  dart_dev:
-    path: ../../..
-  dart_style: any

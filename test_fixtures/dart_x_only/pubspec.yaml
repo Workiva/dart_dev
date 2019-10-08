@@ -1,6 +1,0 @@
-name: dart_x_only
-private: true
-
-dev_dependencies:
-  dart_dev:
-    path: ../../
