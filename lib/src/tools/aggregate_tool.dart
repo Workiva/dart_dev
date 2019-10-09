@@ -5,6 +5,14 @@ import 'package:args/command_runner.dart';
 
 import '../dart_dev_tool.dart';
 
+// TODO: There are two use cases here and they probably need to be solved
+// separately and not via a single "compose()" fn.
+// UC1: Adding setup/teardown logic. Like tests, this logic needs to run
+//      even if the task fails. Example: starting an integration server prior to
+//      running tests and then tearing the server down after the tests.
+// UC2: Chaining tasks together (like a shell `&&`). If any task in the chain
+//      fails, the failure should be returned immediately (subsequent tasks
+//      should not run).
 class AggregateTool extends DevTool {
   AggregateTool(this._tool) {
     description = _tool.description;
