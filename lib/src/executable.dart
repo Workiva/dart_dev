@@ -33,11 +33,7 @@ Future<void> run(List<String> args) async {
   attachLoggerToStdio(args);
 
   if (!File(_devDartPath).existsSync()) {
-    final toolDir = p.join(p.absolute(p.current), 'tool');
-    stderr
-      ..writeln('Could not find a file named "dev.dart" in "$toolDir".')
-      ..writeln('More info: https://github.com/Workiva/dart_dev#TODO');
-    return ExitCode.config.code;
+    _log.fine('No custom `tool/dev.dart` file found; using default config.');
   }
 
   generateRunScript();
@@ -50,8 +46,10 @@ Future<void> run(List<String> args) async {
 
 void generateRunScript() {
   if (shouldWriteRunScript) {
-    createCacheDir();
-    _runScript.writeAsStringSync(buildDartDevRunScriptContents());
+    logTimedSync(_log, 'Generating run script', () {
+      createCacheDir();
+      _runScript.writeAsStringSync(buildDartDevRunScriptContents());
+    }, level: Level.INFO);
   }
 }
 
@@ -59,16 +57,21 @@ bool get shouldWriteRunScript =>
     !_runScript.existsSync() ||
     _runScript.readAsStringSync() != buildDartDevRunScriptContents();
 
-String buildDartDevRunScriptContents() => '''
+String buildDartDevRunScriptContents() {
+  final hasCustomToolDevDart = File(_devDartPath).existsSync();
+  return '''
 import 'dart:io';
 
+import 'package:dart_dev/src/core_config.dart';
 import 'package:dart_dev/src/executable.dart' as executable;
-import '$_relativeDevDartPath' as custom_dev;
+${hasCustomToolDevDart ? "import '$_relativeDevDartPath' as custom_dev;" : ""}
 
 void main(List<String> args) async {
-  await executable.runWithConfig(args, () => custom_dev.config);
+  await executable.runWithConfig(args,
+    () => ${hasCustomToolDevDart ? 'custom_dev.config' : 'coreConfig'});
 }
 ''';
+}
 
 Future<void> runWithConfig(
     List<String> args, _ConfigGetter configGetter) async {
