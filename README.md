@@ -1,4 +1,5 @@
 # Dart Dev Tools
+
 [![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dartlang.org/packages/dart_dev)
 [![Build Status](https://travis-ci.org/Workiva/dart_dev.svg?branch=master)](https://travis-ci.org/Workiva/dart_dev)
 
@@ -12,6 +13,8 @@ Easily configurable.
 - [Shared Configuration](#shared-configuration)
 
 ## Quick Start
+
+> Upgrading from v2? Check out the [upgrade guide][upgrade-guide].
 
 Add `dart_dev` as a dev dependency in your project:
 
@@ -244,3 +247,4 @@ final config = {
 [api-docs]: https://pub.dev/documentation/dart_dev/latest/dart_dev/dart_dev-library.html
 [build-filter]: https://github.com/dart-lang/build/blob/master/build_runner/CHANGELOG.md#new-feature-build-filters
 [core-config]: https://github.com/Workiva/dart_dev/blob/master/lib/src/core_config.dart
+[upgrade-guide]: doc/v3_upgrade_guide.md
