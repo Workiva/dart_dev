@@ -59,8 +59,10 @@ class AnalyzeTool extends DevTool {
 
   @override
   FutureOr<int> run([DevToolExecutionContext context]) =>
-      runProcessAndEnsureExit(buildProcess(context ?? DevToolExecutionContext(),
-          configuredAnalyzerArgs: analyzerArgs, include: include));
+      runProcessAndEnsureExit(
+          buildProcess(context ?? DevToolExecutionContext(),
+              configuredAnalyzerArgs: analyzerArgs, include: include),
+          log: _log);
 
   @override
   Command<int> toCommand(String name) => DevToolCommand(name, this,

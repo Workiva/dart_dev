@@ -66,7 +66,8 @@ class WebdevServeTool extends DevTool {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredWebdevArgs: webdevArgs);
-    return execution.exitCode ?? runProcessAndEnsureExit(execution.process);
+    return execution.exitCode ??
+        runProcessAndEnsureExit(execution.process, log: _log);
   }
 
   @override

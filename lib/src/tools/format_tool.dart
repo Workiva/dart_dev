@@ -79,7 +79,8 @@ class FormatTool extends DevTool {
         defaultMode: defaultMode,
         exclude: exclude,
         formatter: formatter);
-    return execution.exitCode ?? runProcessAndEnsureExit(execution.process);
+    return execution.exitCode ??
+        runProcessAndEnsureExit(execution.process, log: _log);
   }
 
   @override

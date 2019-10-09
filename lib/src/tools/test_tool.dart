@@ -74,7 +74,8 @@ class TestTool extends DevTool {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredTestArgs: testArgs);
-    return execution.exitCode ?? runProcessAndEnsureExit(execution.process);
+    return execution.exitCode ??
+        runProcessAndEnsureExit(execution.process, log: _log);
   }
 
   @override

@@ -44,6 +44,7 @@ class ProcessTool extends DevTool {
     }
     logSubprocessHeader(_log, '$_executable ${_args.join(' ')}');
     return runProcessAndEnsureExit(
-        ProcessDeclaration(_executable, _args, mode: _mode));
+        ProcessDeclaration(_executable, _args, mode: _mode),
+        log: _log);
   }
 }
