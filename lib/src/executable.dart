@@ -9,7 +9,6 @@ import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
 import 'dart_dev_runner.dart';
-import 'events.dart' as events;
 import 'utils/assert_dir_is_dart_package.dart';
 import 'utils/dart_tool_cache.dart';
 import 'utils/ensure_process_exit.dart';
@@ -110,5 +109,4 @@ Future<void> runWithConfig(
     }
     exitCode = ExitCode.unavailable.code;
   }
-  await events.close();
 }

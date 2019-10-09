@@ -1,10 +1,16 @@
 import 'dart:async';
 
-Future<void> close() async => await onCommandCompleteController.close();
+Future<void> commandComplete(CommandResult result) async {
+  await Future.wait(
+      _commandCompleteListeners.map((listener) => listener(result)));
+}
 
-Stream<CommandResult> get onCommandComplete =>
-    onCommandCompleteController.stream;
-final onCommandCompleteController = StreamController<CommandResult>();
+void onCommandComplete(FutureOr<dynamic> callback(CommandResult result)) {
+  _commandCompleteListeners.add(callback);
+}
+
+final _commandCompleteListeners =
+    <FutureOr<dynamic> Function(CommandResult result)>[];
 
 class CommandResult {
   CommandResult(this.args, this.exitCode, this.duration);

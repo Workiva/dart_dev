@@ -47,8 +47,8 @@ class DartDevRunner extends CommandRunner<int> {
     final stopwatch = Stopwatch()..start();
     final exitCode = (await super.run(args)) ?? 0;
     stopwatch.stop();
-    events.onCommandCompleteController
-        .add(events.CommandResult(args, exitCode, stopwatch.elapsed));
+    await events.commandComplete(
+        events.CommandResult(args, exitCode, stopwatch.elapsed));
     return exitCode;
   }
 }
