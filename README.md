@@ -207,7 +207,6 @@ This shared config contains the following targets:
 
 - `ddev analyze`
 - `ddev format`
-- `ddev serve`
 - `ddev test`
 
 The actual configuration of each of these targets can be found here:

@@ -8,6 +8,5 @@ import 'package:dart_dev/dart_dev.dart';
 Map<String, DevTool> get coreConfig => {
       'analyze': AnalyzeTool(),
       'format': FormatTool(),
-      'serve': WebdevServeTool(),
       'test': TestTool(),
     };
