@@ -30,20 +30,11 @@ dev_dependencies:
   dart_dev: ^3.0.0
 ```
 
-Create a `tool/dart_dev/config.dart` file. This is where you will configure
-which dart developer tools are available for your project and how they should behave.
+By default, this provides three core tasks:
 
-```dart
-// tool/dart_dev/config.dart
-import 'package:dart_dev/dart_dev.dart';
-
-final config = {
-  'analyze': AnalyzeTool(),
-  'format': FormatTool(),
-  'test': TestTool(),
-  'serve': WebdevServeTool(),
-};
-```
+- `analyze`
+- `format`
+- `test`
 
 Run any of these tools via the `dart_dev` command-line app:
 
@@ -62,22 +53,23 @@ No issues found!
 > alias ddev='pub run dart_dev'
 > ```
 
-Configure your project's tools as necessary:
+Additional Dart developer tools can be added and every tool can be configured.
+To do this, create a `tool/dart_dev/config.dart` file like so:
 
 ```dart
 // tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
-import 'package:glob/glob.dart';
 
 final config = {
-  'analyze': AnalyzeTool()
-    ..dartanalyzerArgs = ['--fatal-infos'],
-  'format': FormatTool()
-    ..exclude = [Glob('lib/src/generated/**.dart')],
-  'test': TestTool()
-    ..testArgs = ['-P', 'unit'],
+  // See the "Shared Configuration" section for more info on this.
+  ...coreConfig,
+
+  // Override or add new tools and configure them as desired.
+  'analyze': AnalyzeTool(),
+  'format': FormatTool(),
+  'test': TestTool(),
   'serve': WebdevServeTool()
-    ..webdevArgs = ['--debug', 'example:8080', 'web:8081'],
+    ..webdevArgs = ['example:8080'],
 };
 ```
 
