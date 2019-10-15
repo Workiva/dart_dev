@@ -43,8 +43,6 @@ of them return a non-zero code, the chain will exit immediately.
 - Tool utilities
   - `chainTool()`
   - [`setUpTool()`][set-up-tool]
-- Configs
-  - [`coreConfig`][core-config]
 - Other
   - [v3 upgrade guide][v3-upgrade-guide]
 
@@ -59,5 +57,4 @@ of them return a non-zero code, the chain will exit immediately.
 [webdev-serve-tool]: /doc/tools/webdev-serve-tool.md
 [chain-tool]: /doc/tool-utils/chain-tool.md
 [set-up-tool]: /doc/tool-utils/set-up-tool.md
-[core-config]: /doc/configs/core-config.md
 [v3-upgrade-guide]: /doc/v3-upgrade-guide.md

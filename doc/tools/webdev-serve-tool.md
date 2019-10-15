@@ -5,9 +5,6 @@ package.
 
 ## Usage
 
-> _This tool is included in the [`coreConfig`][core-config] and is runnable by
-> default via `ddev serve`._
-
 ```dart
 // tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
@@ -43,7 +40,7 @@ final config = {
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
-  'format': TestTool()
+  'serve': WebdevServeTool()
     ..buildArgs = ['--delete-conflicting-outputs']
 };
 ```
@@ -71,8 +68,6 @@ $ ddev help serve
 - Tool utilities
   - [`chainTool()`][chain-tool]
   - [`setUpTool()`][set-up-tool]
-- Configs
-  - [`coreConfig`][core-config]
 - Other
   - [v3 upgrade guide][v3-upgrade-guide]
 
@@ -87,5 +82,4 @@ $ ddev help serve
 [webdev-serve-tool]: /doc/tools/webdev-serve-tool.md
 [chain-tool]: /doc/tool-utils/chain-tool.md
 [set-up-tool]: /doc/tool-utils/set-up-tool.md
-[core-config]: /doc/configs/core-config.md
 [v3-upgrade-guide]: /doc/v3-upgrade-guide.md

@@ -37,5 +37,4 @@ The `dart_dev` package includes:
 [webdev-serve-tool]: /doc/tools/webdev-serve-tool.md
 [chain-tool]: /doc/tool-utils/chain-tool.md
 [set-up-tool]: /doc/tool-utils/set-up-tool.md
-[core-config]: /doc/configs/core-config.md
 [v3-upgrade-guide]: /doc/v3-upgrade-guide.md

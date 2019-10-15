@@ -9,8 +9,8 @@ import 'package:dart_dev/dart_dev.dart';
 
 final config = {
   'test': setUpTool(TestTool(),
-    before: [DartFunctionTool(startTestServer)],
-    after: [DartFunctionTool(stopTestServer)],
+    setUp: [DartFunctionTool(startTestServer)],
+    tearDown: [DartFunctionTool(stopTestServer)],
   ),
 };
 
@@ -21,8 +21,8 @@ Future<int> stopTestServer(_) async { ... }
 With `setUpTool`, there is one required tool, an optional list of tools to run
 before it, and an optional list of tools to run after it. The required tool is
 the only one that receives and parses args from the CLI. The tools will be run
-sequentially and in order (before tools, required tool, after tools). If any of
-the tools return a non-zero exit code, that code will be returned at the end,
+sequentially and in order (setup tools, required tool, teardown tools). If any
+of the tools return a non-zero exit code, that code will be returned at the end,
 but all tools will run.
 
 ---
@@ -42,8 +42,6 @@ but all tools will run.
 - Tool utilities
   - [`chainTool()`][chain-tool]
   - `setUpTool()`
-- Configs
-  - [`coreConfig`][core-config]
 - Other
   - [v3 upgrade guide][v3-upgrade-guide]
 
@@ -58,5 +56,4 @@ but all tools will run.
 [webdev-serve-tool]: /doc/tools/webdev-serve-tool.md
 [chain-tool]: /doc/tool-utils/chain-tool.md
 [set-up-tool]: /doc/tool-utils/set-up-tool.md
-[core-config]: /doc/configs/core-config.md
 [v3-upgrade-guide]: /doc/v3-upgrade-guide.md
