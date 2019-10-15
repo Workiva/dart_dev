@@ -22,7 +22,7 @@ final _log = Logger('Format');
 /// A dart_dev tool that runs the dart formatter on the current project.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
-/// `tool/dev.dart`:
+/// `tool/dart_dev/config.dart`:
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -33,7 +33,7 @@ final _log = Logger('Format');
 ///     pub run dart_dev format
 ///
 /// This tool can be configured by modifying any of its fields:
-///     // tool/dev.dart
+///     // tool/dart_dev/config.dart
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -254,7 +254,7 @@ FormatExecution buildExecution(
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '
         'with the configured includes and excludes.\n'
-        'Please modify the excludes and/or includes in "tool/dev.dart".');
+        'Please modify the excludes and/or includes in "tool/dart_dev/config.dart".');
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 

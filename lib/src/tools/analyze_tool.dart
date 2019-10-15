@@ -18,7 +18,7 @@ final _log = Logger('Analyze');
 /// A dart_dev tool that runs the `dartanalyzer` on the current project.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
-/// `tool/dev.dart`:
+/// `tool/dart_dev/config.dart`:
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -29,7 +29,7 @@ final _log = Logger('Analyze');
 ///     pub run dart_dev analyze
 ///
 /// This tool can be configured by modifying any of its fields:
-///     // tool/dev.dart
+///     // tool/dart_dev/config.dart
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {

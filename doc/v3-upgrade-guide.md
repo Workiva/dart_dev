@@ -1,14 +1,14 @@
 # Upgrading from v2 to v3
 
 Nothing fundamental has changed in terms of the goal of this package. However,
-v3 _is_ a breaking release and as a consumer, your `tool/dev.dart` will need to
-be updated in order to consume it.
+v3 _is_ a breaking release and as a consumer, your project configuration file
+will need to be updated in order to consume it.
 
 The updated [readme] is a good place to start. It provides a refreshed overview
 of dart_dev and how it works. Once you've read that, this guide will hopefully
 help draw connections from the old to the new with some examples.
 
-## Configuration Syntax
+## Configuration File & Syntax
 
 With v2, the `package:dart_dev/dart_dev.dart` entrypoint exported a mutable
 `config` object with sub-objects for each configurable task. The `tool/dev.dart`
@@ -28,12 +28,12 @@ void main(args) async {
 ```
 
 In v3, dart_dev now expects a top-level `Map<String, DevTool> config` getter to
-exist in `tool/dev.dart`. The keys in this map are the command names (i.e. a key
-of `format` means that it is runnable via `ddev format`), and the values are the
-implementations of the tool.
+exist in `tool/dart_dev/config.dart`. The keys in this map are the command names
+(i.e. a key of `format` means that it is runnable via `ddev format`), and the
+values are the implementations of the tool.
 
 ```dart
-// tool/dev.dart -- v3
+// tool/dart_dev/config.dart -- v3
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
@@ -46,13 +46,13 @@ final config = {
 
 This updated config pattern has a couple of important differences:
 
-* The available commands are completely configurable. With v2, we were pretty
+- The available commands are completely configurable. With v2, we were pretty
   much locked into the commands defined in this package. There was some
   rudimentary support for "local tasks" defined in the `tool/` directory, but
   those were not then easily shared. In v3 you have complete control, which
   makes it much easier to extend or compose functionality.
 
-* There is no `main()` block, which makes the setup a bit simpler (you don't
+- There is no `main()` block, which makes the setup a bit simpler (you don't
   have to call `dev(args)`). Any runtime logic that previously lived in this
   `main()` block can be moved either to top-level variable declarations or
   functions that are then called by one or more `DevTool`s.
@@ -70,7 +70,7 @@ These are the core developer tasks and they are still available by default via
 these tools further, you can do so:
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
@@ -125,9 +125,10 @@ created to serve this specific use case.
 
 ### `ddev init`
 
-In v3, the boilerplate for `tool/dev.dart` is pretty minimal and if omitted
-altogether the shared `coreConfig` will be used by default. For projects that do
-want to configure, it is easy to copy & paste from other projects or the readme.
+In v3, the boilerplate for `tool/dart_dev/config.dart` is pretty minimal and if
+omitted altogether the shared `coreConfig` will be used by default. For projects
+that do want to configure, it is easy to copy & paste from other projects or the
+readme.
 
 ### `ddev task-runner`
 
@@ -151,3 +152,39 @@ compiling your SASS files via the dart 2 build system.
 [readme]: /README.md
 [sass-builder]: https://pub.dev/packages/sass_builder
 [test-html-builder]: https://pub.dev/packages/test_html_builder
+
+---
+---
+
+<!-- Table of Contents -->
+
+- Tools
+  - [`AnalyzeTool`][analyze-tool]
+  - [`DartFunctionTool`][dart-function-tool]
+  - [`FormatTool`][format-tool]
+  - [`ProcessTool`][process-tool]
+  - [`TestTool`][test-tool]
+  - [`TuneupCheckTool`][tuneup-check-tool]
+  - [`WebdevBuildTool`][webdev-build-tool]
+  - [`WebdevServeTool`][webdev-serve-tool]
+- Tool utilities
+  - [`chainTool()`][chain-tool]
+  - [`setUpTool()`][set-up-tool]
+- Configs
+  - [`coreConfig`][core-config]
+- Other
+  - [v3 upgrade guide][v3-upgrade-guide]
+
+<!-- Table of Contents Links -->
+[analyze-tool]: /doc/tools/analyze-tool.md
+[tuneup-check-tool]: /doc/tools/tuneup-check-tool.md
+[dart-function-tool]: /doc/tools/dart-function-tool.md
+[format-tool]: /doc/tools/format-tool.md
+[process-tool]: /doc/tools/process-tool.md
+[test-tool]: /doc/tools/test-tool.md
+[webdev-build-tool]: /doc/tools/webdev-build-tool.md
+[webdev-serve-tool]: /doc/tools/webdev-serve-tool.md
+[chain-tool]: /doc/tool-utils/chain-tool.md
+[set-up-tool]: /doc/tool-utils/set-up-tool.md
+[core-config]: /doc/configs/core-config.md
+[v3-upgrade-guide]: /doc/v3-upgrade-guide.md

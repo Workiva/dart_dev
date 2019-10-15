@@ -128,7 +128,7 @@ void main() {
           emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains(
                   'formatter cannot run because no inputs could be found') &&
-              record.message.contains('tool/dev.dart') &&
+              record.message.contains('tool/dart_dev/config.dart') &&
               record.level == Level.SEVERE)));
 
       final context = DevToolExecutionContext();

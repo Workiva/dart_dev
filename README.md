@@ -24,11 +24,11 @@ dev_dependencies:
   dart_dev: ^3.0.0
 ```
 
-Create a `tool/dev.dart` file. This is where you will configure which dart
-developer tools are available for your project and how they should behave.
+Create a `tool/dart_dev/config.dart` file. This is where you will configure
+which dart developer tools are available for your project and how they should behave.
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
@@ -59,7 +59,7 @@ No issues found!
 Configure your project's tools as necessary:
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 
@@ -118,7 +118,7 @@ just have to be documented in a `README.md` or `CONTRIBUTING.md`.
 With `dart_dev`, this can be accomplished like so:
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
@@ -200,16 +200,8 @@ convenient or efficient.
 ## Shared Configuration
 
 This package provides `coreConfig` as a minimal base configuration of `dart_dev`
-tools.
-
-To use this shared config in your project:
-
-```dart
-// tool/dev.dart
-import 'package:dart_dev/dart_dev.dart';
-
-final config = coreConfig;
-```
+tools. It is the default configuration if your project does not have a
+`tool/dart_dev/config.dart`.
 
 This shared config contains the following targets:
 
@@ -226,7 +218,7 @@ extending it or customizing it is as easy as creating your own `Map`, spreading
 the shared config, and then adding your own entries:
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {

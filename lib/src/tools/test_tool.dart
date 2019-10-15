@@ -25,7 +25,7 @@ final _log = Logger('Test');
 /// `pub run build_runner test`.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
-/// `tool/dev.dart`:
+/// `tool/dart_dev/config.dart`:
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -36,7 +36,7 @@ final _log = Logger('Test');
 ///     pub run dart_dev test
 ///
 /// This tool can be configured by modifying any of its fields:
-///     // tool/dev.dart
+///     // tool/dart_dev/config.dart
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -275,8 +275,8 @@ TestExecution buildExecution(
       configuredBuildArgs.isNotEmpty) {
     _log.severe('This project is configured to run tests with buildArgs, but '
         '"build_test" is not a direct dependency in this project.\n'
-        'Either remove these buildArgs in tool/dev.dart or add "build_test" to '
-        'the pubspec.yaml.');
+        'Either remove these buildArgs in tool/dart_dev/config.dart or add '
+        '"build_test" to the pubspec.yaml.');
     return TestExecution.exitEarly(ExitCode.config.code);
   }
 
