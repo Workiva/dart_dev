@@ -6,7 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 Future<DevToolFunctionalTestResult> runDevToolFunctionalTest(
-    command, String projectTemplatePath,
+    String command, String projectTemplatePath,
     {List<String> args, bool verbose}) async {
   // Setup a temporary directory on which this tool will be run, using the given
   // project template as a starting point.
@@ -82,69 +82,69 @@ class DevToolFunctionalTestResult {
   File fileAt(String path) => File(p.join(_tempDir.absolute.path, path));
 }
 
-Matcher exitsWith(matcher) => _ExitsWith(matcher);
+Matcher exitsWith(dynamic matcher) => _ExitsWith(matcher);
 
 class _ExitsWith extends CustomMatcher {
-  _ExitsWith(matcher)
+  _ExitsWith(dynamic matcher)
       : super('DevTool that exits with a code that is', 'exit code', matcher);
 
   @override
-  Object featureValueOf(actual) {
+  Object featureValueOf(dynamic actual) {
     return (actual as DevToolFunctionalTestResult).exitCode;
   }
 }
 
-Matcher printsToStderr(matcher) => _PrintsToStderr(matcher);
+Matcher printsToStderr(dynamic matcher) => _PrintsToStderr(matcher);
 
 class _PrintsToStderr extends CustomMatcher {
-  _PrintsToStderr(matcher)
+  _PrintsToStderr(dynamic matcher)
       : super('DevTool that prints stderr lines that', 'stderr lines', matcher);
 
   @override
-  Object featureValueOf(actual) {
+  Object featureValueOf(dynamic actual) {
     return (actual as DevToolFunctionalTestResult).stderr;
   }
 }
 
-Matcher printsToStdout(matcher) => _PrintsToStdout(matcher);
+Matcher printsToStdout(dynamic matcher) => _PrintsToStdout(matcher);
 
 class _PrintsToStdout extends CustomMatcher {
-  _PrintsToStdout(matcher)
+  _PrintsToStdout(dynamic matcher)
       : super('DevTool that prints stdout lines that', 'stdout lines', matcher);
 
   @override
-  Object featureValueOf(actual) {
+  Object featureValueOf(dynamic actual) {
     return (actual as DevToolFunctionalTestResult).stdout;
   }
 }
 
-Matcher producesFile(String path, [matcher]) =>
+Matcher producesFile(String path, [dynamic matcher]) =>
     _ProducesFile(path, matcher ?? _FileSystemEntityExists());
 
 class _ProducesFile extends CustomMatcher {
-  _ProducesFile(this.path, matcher)
+  _ProducesFile(this.path, dynamic matcher)
       : super('DevTool that produces file at $path that', 'file', matcher);
 
   final String path;
 
   @override
-  Object featureValueOf(actual) {
+  Object featureValueOf(dynamic actual) {
     return (actual as DevToolFunctionalTestResult).fileAt(path);
   }
 }
 
-Matcher producesDirectory(String path, [matcher]) =>
+Matcher producesDirectory(String path, [dynamic matcher]) =>
     _ProducesDirectory(path, matcher ?? _FileSystemEntityExists());
 
 class _ProducesDirectory extends CustomMatcher {
-  _ProducesDirectory(this.path, matcher)
+  _ProducesDirectory(this.path, dynamic matcher)
       : super('DevTool that produces directory at $path that', 'directory',
             matcher);
 
   final String path;
 
   @override
-  Object featureValueOf(actual) {
+  Object featureValueOf(dynamic actual) {
     return (actual as DevToolFunctionalTestResult).directoryAt(path);
   }
 }
