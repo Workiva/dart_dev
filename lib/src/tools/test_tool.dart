@@ -101,6 +101,9 @@ class TestToolCommand extends DevToolCommand {
     ..addSeparator('======== Running Tests')
     ..addMultiOption('preset',
         abbr: 'P', help: 'The configuration preset(s) to use.')
+    ..addFlag('release',
+        help: 'Build with release mode defaults for builders.\n'
+            'This only applies in projects that run tests with build_runner.')
     ..addSeparator('======== Other Options')
     ..addOption('test-args',
         help: 'Args to pass to the test runner process.\n'
@@ -179,11 +182,14 @@ List<String> buildArgs({
     // process in this order:
     // 1. Statically configured args from [WebdevServeTool.buildArgs]
     ...configuredBuildArgs ?? <String>[],
-    // 2. Build filters to narrow the build to only the target tests.
+    // 2. Pass through the --release flag if provided.
+    if (getFlagValue(argResults, 'release'))
+      '--release',
+    // 3. Build filters to narrow the build to only the target tests.
     //    (If no test dirs/files are passed in as args, then no build filters
     //     will be created.)
     ...buildFiltersForTestArgs(argResults?.rest),
-    // 3. Args passed to --build-args
+    // 4. Args passed to --build-args
     ...splitSingleOptionValue(argResults, 'build-args'),
   ];
 
@@ -271,6 +277,12 @@ TestExecution buildExecution(
       context.argResults['build-args'] != null) {
     context.usageException('Can only use --build-args in a project that has a '
         'direct dependency on "build_test" in the pubspec.yaml.');
+  }
+
+  if (!hasBuildTest && getFlagValue(context.argResults, 'release')) {
+    _log.warning(yellow.wrap('The --release flag is only applicable in '
+        'projects that run tests with build_runner, and this project does not.\n'
+        'It will have no effect.'));
   }
 
   if (!packageIsImmediateDependency('test', path: path)) {

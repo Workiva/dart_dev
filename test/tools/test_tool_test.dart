@@ -2,6 +2,7 @@
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
+import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
@@ -18,8 +19,14 @@ void main() {
       final argParser = TestTool().toCommand('t').argParser;
       expect(
           argParser.options.keys,
-          containsAll(
-              ['name', 'plain-name', 'preset', 'test-args', 'build-args']));
+          containsAll([
+            'name',
+            'plain-name',
+            'preset',
+            'release',
+            'test-args',
+            'build-args',
+          ]));
 
       expect(argParser.options['name'].type, OptionType.multiple);
       expect(argParser.options['name'].abbr, 'n');
@@ -32,6 +39,9 @@ void main() {
       expect(argParser.options['preset'].type, OptionType.multiple);
       expect(argParser.options['preset'].abbr, 'P');
       expect(argParser.options['preset'].splitCommas, isTrue);
+
+      expect(argParser.options['release'].type, OptionType.flag);
+      expect(argParser.options['release'].abbr, isNull);
 
       expect(argParser.options['test-args'].type, OptionType.single);
       expect(argParser.options['build-args'].type, OptionType.single);
@@ -89,6 +99,13 @@ void main() {
     });
 
     group('with useBuildTest=true', () {
+      test('forwards the --release flag', () {
+        final argParser = TestTool().toCommand('t').argParser;
+        final argResults = argParser.parse(['--release']);
+        expect(buildArgs(argResults: argResults, useBuildTest: true),
+            orderedEquals(['run', 'build_runner', 'test', '--release']));
+      });
+
       test('combines configured args with cli args (in that order)', () {
         final argParser = TestTool().toCommand('t').argParser;
         final argResults = argParser
@@ -271,6 +288,24 @@ void main() {
           expect(execution.process.args,
               orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo', '-v']));
         });
+
+        test(
+            'and logs a warning if --release is used in a non-build project',
+            () => overrideAnsiOutput(false, () {
+                  Logger.root.level = Level.ALL;
+                  expect(
+                      Logger.root.onRecord,
+                      emitsThrough(predicate<LogRecord>((record) =>
+                          record.message.contains(
+                              'The --release flag is only applicable') &&
+                          record.level == Level.WARNING)));
+
+                  final argParser = TestTool().toCommand('t').argParser;
+                  final argResults = argParser.parse(['--release']);
+                  final context =
+                      DevToolExecutionContext(argResults: argResults);
+                  buildExecution(context, path: path);
+                }));
 
         test('and logs the test subprocess', () {
           Logger.root.level = Level.ALL;
