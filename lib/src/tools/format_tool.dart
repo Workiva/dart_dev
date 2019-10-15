@@ -38,7 +38,7 @@ final _log = Logger('Format');
 ///
 ///     final config = {
 ///       'format': FormatTool()
-///         ..defaultMode = FormatMode.assertNoChanges
+///         ..defaultMode = FormatMode.check
 ///         ..exclude = [Glob('lib/src/generated/**.dart')]
 ///         ..formatter = Formatter.dartStyle,
 ///     };
@@ -95,11 +95,10 @@ class FormatTool extends DevTool {
             abbr: 'n',
             negatable: false,
             help: 'Show which files would be modified but make no changes.')
-        ..addFlag('assert',
-            abbr: 'a',
+        ..addFlag('check',
+            abbr: 'c',
             negatable: false,
-            help:
-                'Assert that no changes need to be made by setting the exit code '
+            help: 'Check if changes need to be made and set the exit code '
                 'accordingly.\nImplies "--dry-run" and "--set-exit-if-changed".')
         ..addSeparator('======== Other Options')
         ..addOption('formatter-args',
@@ -134,7 +133,7 @@ class FormatExecution {
 /// Modes supported by the dart formatter.
 enum FormatMode {
   // dartfmt -n --set-exit-if-changed
-  assertNoChanges,
+  check,
   // dartfmt -n
   dryRun,
   // dartfmt -w
@@ -177,7 +176,7 @@ Iterable<String> buildArgs(
     // Combine all args that should be passed through to the dartfmt in this
     // order:
     // 1. Mode flag(s), if configured
-    if (mode == FormatMode.assertNoChanges) ...[
+    if (mode == FormatMode.check) ...[
       '-n',
       '--set-exit-if-changed',
     ],
@@ -317,7 +316,7 @@ void logCommand(
 }
 
 /// Attempts to parse and return a single [FormatMode] from [argResults] by
-/// checking for the supported mode flags (`--assert`, `--dry-run`, and
+/// checking for the supported mode flags (`--check`, `--dry-run`, and
 /// `--overwrite`).
 ///
 /// If more than one of these mode flags are used together, [usageException]
@@ -326,26 +325,26 @@ void logCommand(
 /// If none of the mode flags were enabled, this returns `null`.
 FormatMode validateAndParseMode(
     ArgResults argResults, void Function(String message) usageException) {
-  final assertNoChanges = argResults['assert'] ?? false;
+  final check = argResults['check'] ?? false;
   final dryRun = argResults['dry-run'] ?? false;
   final overwrite = argResults['overwrite'] ?? false;
 
-  if (assertNoChanges && dryRun && overwrite) {
+  if (check && dryRun && overwrite) {
     usageException(
-        'Cannot use --assert and --dry-run and --overwrite at the same time.');
+        'Cannot use --check and --dry-run and --overwrite at the same time.');
   }
-  if (assertNoChanges && dryRun) {
-    usageException('Cannot use --assert and --dry-run at the same time.');
+  if (check && dryRun) {
+    usageException('Cannot use --check and --dry-run at the same time.');
   }
-  if (assertNoChanges && overwrite) {
-    usageException('Cannot use --assert and --overwrite at the same time.');
+  if (check && overwrite) {
+    usageException('Cannot use --check and --overwrite at the same time.');
   }
   if (dryRun && overwrite) {
     usageException('Cannot use --dry-run and --overwrite at the same time.');
   }
 
-  if (assertNoChanges) {
-    return FormatMode.assertNoChanges;
+  if (check) {
+    return FormatMode.check;
   }
   if (dryRun) {
     return FormatMode.dryRun;
