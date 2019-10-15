@@ -1,6 +1,7 @@
-import 'package:args/args.dart';
+// The utility in this file was originally modeled after:
+// https://github.com/dart-lang/build/blob/14747dbf8c2f1bb44f89e2cb0726744278a23685/build_runner/lib/src/entrypoint/run_script.dart#L35-L63
 
-// TODO: credit build pkg
+import 'package:args/args.dart';
 
 /// Returns `true` if any positional args are found in [argResults] before the
 /// `--` separator, and `false` otherise.

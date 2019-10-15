@@ -21,7 +21,7 @@ void main() {
     test('toCommand overrides the argParser', () {
       final argParser = FormatTool().toCommand('t').argParser;
       expect(argParser.options.keys,
-          containsAll(['overwrite', 'dry-run', 'assert', 'formatter-args']));
+          containsAll(['overwrite', 'dry-run', 'check', 'formatter-args']));
 
       expect(argParser.options['overwrite'].type, OptionType.flag);
       expect(argParser.options['overwrite'].abbr, 'w');
@@ -31,9 +31,9 @@ void main() {
       expect(argParser.options['dry-run'].abbr, 'n');
       expect(argParser.options['dry-run'].negatable, isFalse);
 
-      expect(argParser.options['assert'].type, OptionType.flag);
-      expect(argParser.options['assert'].abbr, 'a');
-      expect(argParser.options['assert'].negatable, isFalse);
+      expect(argParser.options['check'].type, OptionType.flag);
+      expect(argParser.options['check'].abbr, 'c');
+      expect(argParser.options['check'].negatable, isFalse);
 
       expect(argParser.options['formatter-args'].type, OptionType.single);
     });
@@ -54,8 +54,8 @@ void main() {
           orderedEquals(['a', 'b', '-n']));
     });
 
-    test('mode=assert', () {
-      expect(buildArgs(['a', 'b'], FormatMode.assertNoChanges),
+    test('mode=check', () {
+      expect(buildArgs(['a', 'b'], FormatMode.check),
           orderedEquals(['a', 'b', '-n', '--set-exit-if-changed']));
     });
 
@@ -128,7 +128,7 @@ void main() {
           emitsThrough(predicate<LogRecord>((record) =>
               record.message.contains(
                   'formatter cannot run because no inputs could be found') &&
-              record.message.contains('tool/dev.dart') &&
+              record.message.contains('tool/dart_dev/config.dart') &&
               record.level == Level.SEVERE)));
 
       final context = DevToolExecutionContext();
@@ -344,35 +344,35 @@ void main() {
           DevToolExecutionContext(commandName: 'test_format').usageException;
     });
 
-    test('--assert and --dry-run and --overwrite throws UsageException', () {
+    test('--check and --dry-run and --overwrite throws UsageException', () {
       final argResults =
-          argParser.parse(['--assert', '--dry-run', '--overwrite']);
+          argParser.parse(['--check', '--dry-run', '--overwrite']);
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
-                contains('--assert and --dry-run and --overwrite'))));
+                contains('--check and --dry-run and --overwrite'))));
     });
 
-    test('--assert and --dry-run throws UsageException', () {
-      final argResults = argParser.parse(['--assert', '--dry-run']);
+    test('--check and --dry-run throws UsageException', () {
+      final argResults = argParser.parse(['--check', '--dry-run']);
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
-                contains('--assert and --dry-run'))));
+                contains('--check and --dry-run'))));
     });
 
-    test('--assert and --overwrite throws UsageException', () {
-      final argResults = argParser.parse(['--assert', '--overwrite']);
+    test('--check and --overwrite throws UsageException', () {
+      final argResults = argParser.parse(['--check', '--overwrite']);
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
-                contains('--assert and --overwrite'))));
+                contains('--check and --overwrite'))));
     });
 
     test('--dry-run and --overwrite throws UsageException', () {
@@ -385,10 +385,10 @@ void main() {
                 contains('--dry-run and --overwrite'))));
     });
 
-    test('--assert', () {
-      final argResults = argParser.parse(['--assert']);
-      expect(validateAndParseMode(argResults, usageException),
-          FormatMode.assertNoChanges);
+    test('--check', () {
+      final argResults = argParser.parse(['--check']);
+      expect(
+          validateAndParseMode(argResults, usageException), FormatMode.check);
     });
 
     test('--dry-run', () {

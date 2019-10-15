@@ -6,15 +6,21 @@
 Centralized tooling for Dart projects. Consistent interface across projects.
 Easily configurable.
 
+---
+
 - [Quick Start](#quick-start)
 - [Motivation & Goal](#motivation--goal)
 - [Project-Level Configuration](#project-level-configuration)
 - [Extending/Composing Functionality](#extendingcomposing-functionality)
 - [Shared Configuration](#shared-configuration)
+- [Additional Docs][docs]
 
 ## Quick Start
 
 > Upgrading from v2? Check out the [upgrade guide][upgrade-guide].
+
+> Looking for detailed guides on the available tools? Check out the
+> [additional docs][docs].
 
 Add `dart_dev` as a dev dependency in your project:
 
@@ -24,11 +30,11 @@ dev_dependencies:
   dart_dev: ^3.0.0
 ```
 
-Create a `tool/dev.dart` file. This is where you will configure which dart
-developer tools are available for your project and how they should behave.
+Create a `tool/dart_dev/config.dart` file. This is where you will configure
+which dart developer tools are available for your project and how they should behave.
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
@@ -59,7 +65,7 @@ No issues found!
 Configure your project's tools as necessary:
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 
@@ -118,7 +124,7 @@ just have to be documented in a `README.md` or `CONTRIBUTING.md`.
 With `dart_dev`, this can be accomplished like so:
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
@@ -194,28 +200,16 @@ Generally speaking, these dart tool abstractions provide a place to address
 functionality gaps in the underlying tools or make certain use cases more
 convenient or efficient.
 
-> Check out the [API documentation][api-docs] to see all of the available tools,
-> their configuration options, and details on how they work.
-
 ## Shared Configuration
 
 This package provides `coreConfig` as a minimal base configuration of `dart_dev`
-tools.
-
-To use this shared config in your project:
-
-```dart
-// tool/dev.dart
-import 'package:dart_dev/dart_dev.dart';
-
-final config = coreConfig;
-```
+tools. It is the default configuration if your project does not have a
+`tool/dart_dev/config.dart`.
 
 This shared config contains the following targets:
 
 - `ddev analyze`
 - `ddev format`
-- `ddev serve`
 - `ddev test`
 
 The actual configuration of each of these targets can be found here:
@@ -226,7 +220,7 @@ extending it or customizing it is as easy as creating your own `Map`, spreading
 the shared config, and then adding your own entries:
 
 ```dart
-// tool/dev.dart
+// tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
@@ -247,4 +241,5 @@ final config = {
 [api-docs]: https://pub.dev/documentation/dart_dev/latest/dart_dev/dart_dev-library.html
 [build-filter]: https://github.com/dart-lang/build/blob/master/build_runner/CHANGELOG.md#new-feature-build-filters
 [core-config]: https://github.com/Workiva/dart_dev/blob/master/lib/src/core_config.dart
-[upgrade-guide]: doc/v3_upgrade_guide.md
+[docs]: /doc/
+[upgrade-guide]: doc/v3-upgrade-guide.md

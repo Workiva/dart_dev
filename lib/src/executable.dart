@@ -20,7 +20,7 @@ final _runScriptPath = p.join(cacheDirPath, 'run.dart');
 
 final _runScript = File(_runScriptPath);
 
-const _devDartPath = 'tool/dev.dart';
+const _devDartPath = 'tool/dart_dev/config.dart';
 
 final _relativeDevDartPath = p.relative(
   p.absolute(_devDartPath),
@@ -33,7 +33,8 @@ Future<void> run(List<String> args) async {
   attachLoggerToStdio(args);
 
   if (!File(_devDartPath).existsSync()) {
-    _log.fine('No custom `tool/dev.dart` file found; using default config.');
+    _log.fine('No custom `tool/dart_dev/config.dart` file found; '
+        'using default config.');
   }
 
   generateRunScript();
@@ -89,7 +90,8 @@ Future<void> runWithConfig(
     config = configGetter();
   } catch (error) {
     stderr
-      ..writeln('Invalid "tool/dev.dart" in ${p.absolute(p.current)}')
+      ..writeln(
+          'Invalid "tool/dart_dev/config.dart" in ${p.absolute(p.current)}')
       ..writeln()
       ..writeln('It should provide a `Map<String, DevTool> config;` getter,'
           ' but it either does not exist or threw unexpectedly:')

@@ -1,6 +1,5 @@
 export 'src/utils/assert_no_positional_args_nor_args_after_separator.dart';
 export 'src/utils/cached_pubspec.dart';
-export 'src/utils/compose.dart';
 export 'src/utils/logging.dart'
     show humanReadable, logSubprocessHeader, logTimedAsync, logTimedSync;
 export 'src/utils/formatter_inputs.dart';

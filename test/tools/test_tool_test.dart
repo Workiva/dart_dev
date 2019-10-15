@@ -220,7 +220,7 @@ void main() {
           emitsThrough(predicate<LogRecord>((record) =>
               record.message
                   .contains('"build_test" is not a direct dependency') &&
-              record.message.contains('tool/dev.dart') &&
+              record.message.contains('tool/dart_dev/config.dart') &&
               record.message.contains('pubspec.yaml') &&
               record.level == Level.SEVERE)));
 

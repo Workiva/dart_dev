@@ -6,7 +6,6 @@ import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
-import 'package:path/path.dart' as p;
 
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
@@ -25,7 +24,7 @@ final _log = Logger('Test');
 /// `pub run build_runner test`.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
-/// `tool/dev.dart`:
+/// `tool/dart_dev/config.dart`:
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -36,7 +35,7 @@ final _log = Logger('Test');
 ///     pub run dart_dev test
 ///
 /// This tool can be configured by modifying any of its fields:
-///     // tool/dev.dart
+///     // tool/dart_dev/config.dart
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -79,39 +78,49 @@ class TestTool extends DevTool {
   }
 
   @override
-  Command<int> toCommand(String name) => DevToolCommand(name, this,
-      argParser: ArgParser()
-        ..addSeparator('======== Selecting Tests')
-        ..addMultiOption('name',
-            abbr: 'n',
-            help: 'A substring of the name of the test to run.\n'
-                'Regular expression syntax is supported.\n'
-                'If passed multiple times, tests must match all substrings.',
-            splitCommas: false)
-        ..addMultiOption('plain-name',
-            abbr: 'N',
-            help: 'A plain-text substring of the name of the test to run.\n'
-                'If passed multiple times, tests must match all substrings.',
-            splitCommas: false)
-        ..addSeparator('======== Running Tests')
-        ..addMultiOption('preset',
-            abbr: 'P', help: 'The configuration preset(s) to use.')
-        ..addSeparator('======== Other Options')
-        ..addOption('test-args',
-            help: 'Args to pass to the test runner process.\n'
-                'Run "pub run test -h -v" to see all available options.')
-        ..addOption('build-args',
-            help: 'Args to pass to the build runner process.\n'
-                'Run "pub run build_runner test -h -v" to see all available '
-                'options.\n'
-                'Note: these args are only applicable if the current project '
-                'depends on "build_test".'));
+  Command<int> toCommand(String name) => TestToolCommand(name, this);
+}
+
+class TestToolCommand extends DevToolCommand {
+  TestToolCommand(String name, DevTool devTool) : super(name, devTool);
+
+  @override
+  final ArgParser argParser = ArgParser()
+    ..addSeparator('======== Selecting Tests')
+    ..addMultiOption('name',
+        abbr: 'n',
+        help: 'A substring of the name of the test to run.\n'
+            'Regular expression syntax is supported.\n'
+            'If passed multiple times, tests must match all substrings.',
+        splitCommas: false)
+    ..addMultiOption('plain-name',
+        abbr: 'N',
+        help: 'A plain-text substring of the name of the test to run.\n'
+            'If passed multiple times, tests must match all substrings.',
+        splitCommas: false)
+    ..addSeparator('======== Running Tests')
+    ..addMultiOption('preset',
+        abbr: 'P', help: 'The configuration preset(s) to use.')
+    ..addSeparator('======== Other Options')
+    ..addOption('test-args',
+        help: 'Args to pass to the test runner process.\n'
+            'Run "pub run test -h -v" to see all available options.')
+    ..addOption('build-args',
+        help: 'Args to pass to the build runner process.\n'
+            'Run "pub run build_runner test -h -v" to see all available '
+            'options.\n'
+            'Note: these args are only applicable if the current project '
+            'depends on "build_test".');
+
+  @override
+  String get usage =>
+      super.usage.replaceFirst('[arguments]', '[files or directories...]');
 }
 
 /// A declarative representation of an execution of the [TestTool].
 ///
 /// This class allows the [TestTool] to break its execution up into two steps:
-/// 1. Validation of confg/inputs and creation of this class.
+/// 1. Validation of config/inputs and creation of this class.
 /// 2. Execution of expensive or hard-to-test logic based on step 1.
 ///
 /// As a result, nearly all of the logic in [TestTool] can be tested via the
@@ -275,8 +284,8 @@ TestExecution buildExecution(
       configuredBuildArgs.isNotEmpty) {
     _log.severe('This project is configured to run tests with buildArgs, but '
         '"build_test" is not a direct dependency in this project.\n'
-        'Either remove these buildArgs in tool/dev.dart or add "build_test" to '
-        'the pubspec.yaml.');
+        'Either remove these buildArgs in tool/dart_dev/config.dart or add '
+        '"build_test" to the pubspec.yaml.');
     return TestExecution.exitEarly(ExitCode.config.code);
   }
 

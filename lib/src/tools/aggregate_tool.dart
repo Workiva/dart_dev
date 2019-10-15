@@ -5,23 +5,28 @@ import 'package:args/command_runner.dart';
 
 import '../dart_dev_tool.dart';
 
-// TODO: There are two use cases here and they probably need to be solved
-// separately and not via a single "compose()" fn.
-// UC1: Adding setup/teardown logic. Like tests, this logic needs to run
-//      even if the task fails. Example: starting an integration server prior to
-//      running tests and then tearing the server down after the tests.
-// UC2: Chaining tasks together (like a shell `&&`). If any task in the chain
-//      fails, the failure should be returned immediately (subsequent tasks
-//      should not run).
+DevTool chainTool(DevTool tool, {List<DevTool> before, List<DevTool> after}) =>
+    AggregateTool(tool, before: before, after: after, failEarly: true);
+
+DevTool setUpTool(DevTool tool, {List<DevTool> before, List<DevTool> after}) =>
+    AggregateTool(tool, before: before, after: after, failEarly: false);
+
 class AggregateTool extends DevTool {
-  AggregateTool(this._tool) {
+  AggregateTool(DevTool tool,
+      {List<DevTool> after, List<DevTool> before, bool failEarly})
+      : _after = after,
+        _before = before,
+        _failEarly = failEarly ?? true,
+        _tool = tool {
     description = _tool.description;
     hidden = _tool.hidden;
   }
 
-  List<DevTool> after;
+  final List<DevTool> _after;
 
-  List<DevTool> before;
+  final List<DevTool> _before;
+
+  final bool _failEarly;
 
   final DevTool _tool;
 
@@ -30,18 +35,27 @@ class AggregateTool extends DevTool {
     context ??= DevToolExecutionContext();
     int code;
 
-    for (final tool in before ?? <DevTool>[]) {
-      code = await tool.run(DevToolExecutionContext(verbose: context.verbose));
-      if (code != 0) {
+    int worseOf(int a, [int b]) => (b ?? 0) == 0 ? a : b;
+
+    for (final tool in _before ?? <DevTool>[]) {
+      code = worseOf(
+          await tool.run(DevToolExecutionContext(verbose: context.verbose)),
+          code);
+      if (_failEarly && code != 0) {
         return code;
       }
     }
 
-    code = await _tool.run(context);
+    code = worseOf(await _tool.run(context), code);
+    if (_failEarly && code != 0) {
+      return code;
+    }
 
-    for (final tool in after ?? <DevTool>[]) {
-      code = await tool.run(DevToolExecutionContext(verbose: context.verbose));
-      if (code != 0) {
+    for (final tool in _after ?? <DevTool>[]) {
+      code = worseOf(
+          await tool.run(DevToolExecutionContext(verbose: context.verbose)),
+          code);
+      if (_failEarly && code != 0) {
         return code;
       }
     }

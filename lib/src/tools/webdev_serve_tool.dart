@@ -22,7 +22,7 @@ final _log = Logger('WebdevServe');
 /// project using the `webdev` package.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
-/// `tool/dev.dart`:
+/// `tool/dart_dev/config.dart`:
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -33,7 +33,7 @@ final _log = Logger('WebdevServe');
 ///     pub run dart_dev serve
 ///
 /// This tool can be configured by modifying any of its fields:
-///     // tool/dev.dart
+///     // tool/dart_dev/config.dart
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {

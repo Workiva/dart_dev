@@ -12,5 +12,5 @@ addons:
 script:
   - pub run dependency_validator -i pedantic
   - pub run dart_dev analyze
-  - pub run dart_dev format --assert
+  - pub run dart_dev format --check
   - pub run dart_dev test

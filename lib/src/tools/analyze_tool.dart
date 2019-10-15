@@ -18,7 +18,7 @@ final _log = Logger('Analyze');
 /// A dart_dev tool that runs the `dartanalyzer` on the current project.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
-/// `tool/dev.dart`:
+/// `tool/dart_dev/config.dart`:
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -29,7 +29,7 @@ final _log = Logger('Analyze');
 ///     pub run dart_dev analyze
 ///
 /// This tool can be configured by modifying any of its fields:
-///     // tool/dev.dart
+///     // tool/dart_dev/config.dart
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
@@ -51,10 +51,8 @@ class AnalyzeTool extends DevTool {
 
   /// The globs to include as entry points to run static analysis on.
   ///
-  /// The default is `.` (e.g. `dartanalyzer .`) which runs analysis on all
-  /// public entry points in `lib/` and all dart files in other known
-  /// directories (`benchmark/`, `bin/`, `example/`, `test/`, `tool/`, `web/`),
-  /// as well as any dart files in the project root.
+  /// The default is `.` (e.g. `dartanalyzer .`) which runs analysis on all Dart
+  /// files in the current working directory.
   List<Glob> include;
 
   @override
@@ -183,51 +181,3 @@ void logCommand(
     logSubprocessHeader(_log, '$exeAndArgs <${entrypoints.length} paths>');
   }
 }
-
-/// TODO: This may be a useful util, but is currently unused and will remain
-///       private until a need arises (or alternatively we delete it).
-///
-/// Returns a list of Globs that match all of the standard Dart project
-/// analysis entry points:
-/// - public dart files in lib/ (i.e. not in lib/src/)
-/// - all dart files in benchmark/, bin/, example/, test/, tool/, and web/
-///
-/// Normally, using the default include glob of `.` is sufficient for most
-/// projects. However, if customization is needed, this method may help.
-List<Glob> buildAnalyzerIncludeGlobs({
-  bool includeBenchmark,
-  bool includeBin,
-  bool includeExample,
-  bool includeLib,
-  bool includeRoot,
-  bool includeTest,
-  bool includeTool,
-  bool includeWeb,
-}) =>
-    [
-      // All public entry points (dart files in lib/ except those in lib/src/).
-      if (includeLib != false) ...[
-        Glob('lib/*.dart'),
-        Glob('lib/?/**.dart'),
-        Glob('lib/??/**.dart'),
-        Glob('lib/[^s][^r][^c]*/**.dart'),
-      ],
-
-      // All dart files in the rest of the standard dart project directories.
-      if (includeBenchmark != false)
-        Glob('benchmark/**.dart'),
-      if (includeBin != false)
-        Glob('bin/**.dart'),
-      if (includeExample != false)
-        Glob('example/**.dart'),
-      if (includeTest != false)
-        Glob('test/**.dart'),
-      if (includeTool != false)
-        Glob('tool/**.dart'),
-      if (includeWeb != false)
-        Glob('web/**.dart'),
-
-      // All top-level dart files.
-      if (includeRoot != false)
-        Glob('*.dart'),
-    ];
