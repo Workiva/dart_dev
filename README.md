@@ -6,15 +6,21 @@
 Centralized tooling for Dart projects. Consistent interface across projects.
 Easily configurable.
 
+---
+
 - [Quick Start](#quick-start)
 - [Motivation & Goal](#motivation--goal)
 - [Project-Level Configuration](#project-level-configuration)
 - [Extending/Composing Functionality](#extendingcomposing-functionality)
 - [Shared Configuration](#shared-configuration)
+- [Additional Docs][docs]
 
 ## Quick Start
 
 > Upgrading from v2? Check out the [upgrade guide][upgrade-guide].
+
+> Looking for detailed guides on the available tools? Check out the
+> [additional docs][docs].
 
 Add `dart_dev` as a dev dependency in your project:
 
@@ -194,9 +200,6 @@ Generally speaking, these dart tool abstractions provide a place to address
 functionality gaps in the underlying tools or make certain use cases more
 convenient or efficient.
 
-> Check out the [API documentation][api-docs] to see all of the available tools,
-> their configuration options, and details on how they work.
-
 ## Shared Configuration
 
 This package provides `coreConfig` as a minimal base configuration of `dart_dev`
@@ -238,4 +241,5 @@ final config = {
 [api-docs]: https://pub.dev/documentation/dart_dev/latest/dart_dev/dart_dev-library.html
 [build-filter]: https://github.com/dart-lang/build/blob/master/build_runner/CHANGELOG.md#new-feature-build-filters
 [core-config]: https://github.com/Workiva/dart_dev/blob/master/lib/src/core_config.dart
-[upgrade-guide]: doc/v3_upgrade_guide.md
+[docs]: /doc/
+[upgrade-guide]: doc/v3-upgrade-guide.md
