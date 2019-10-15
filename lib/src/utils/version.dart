@@ -1,3 +1,6 @@
+// The utility in this file was originally modeled after:
+// https://github.com/dart-lang/test/blob/1ccf56082adf35d5436e09793f547dbaa2e48218/pkgs/test_core/lib/src/runner/version.dart#L9-L60
+
 import 'dart:io';
 
 import 'package:yaml/yaml.dart';
@@ -7,8 +10,6 @@ import 'package:yaml/yaml.dart';
 ///
 /// This is a semantic version, optionally followed by a space and additional
 /// data about its source.
-///
-/// TODO: credit test pkg https://github.com/dart-lang/test/blob/1ccf56082adf35d5436e09793f547dbaa2e48218/pkgs/test_core/lib/src/runner/version.dart
 final String dartDevVersion = (() {
   dynamic lockfile;
   try {
