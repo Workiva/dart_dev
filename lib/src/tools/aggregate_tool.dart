@@ -8,7 +8,8 @@ import '../dart_dev_tool.dart';
 DevTool chainTool(DevTool tool, {List<DevTool> before, List<DevTool> after}) =>
     AggregateTool(tool, before: before, after: after, failEarly: true);
 
-DevTool setUpTool(DevTool tool, {List<DevTool> setUp, List<DevTool> tearDown}) =>
+DevTool setUpTool(DevTool tool,
+        {List<DevTool> setUp, List<DevTool> tearDown}) =>
     AggregateTool(tool, before: setUp, after: tearDown, failEarly: false);
 
 class AggregateTool extends DevTool {
