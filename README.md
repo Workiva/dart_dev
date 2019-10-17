@@ -232,6 +232,6 @@ final config = {
 
 [api-docs]: https://pub.dev/documentation/dart_dev/latest/dart_dev/dart_dev-library.html
 [build-filter]: https://github.com/dart-lang/build/blob/master/build_runner/CHANGELOG.md#new-feature-build-filters
-[core-config]: https://github.com/Workiva/dart_dev/blob/master/lib/src/core_config.dart
+[core-config]: /lib/src/core_config.dart
 [docs]: /doc/
 [upgrade-guide]: doc/v3-upgrade-guide.md

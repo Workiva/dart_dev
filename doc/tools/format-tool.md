@@ -95,6 +95,8 @@ final config = {
 $ ddev help format
 ```
 
+[core-config]: /lib/src/core_config.dart
+
 ---
 ---
 

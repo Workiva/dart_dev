@@ -126,6 +126,7 @@ $ ddev help test
 
 [build-filters]: https://github.com/dart-lang/build/blob/master/build_runner/CHANGELOG.md#new-feature-build-filters
 [build-system]: https://github.com/dart-lang/build
+[core-config]: /lib/src/core_config.dart
 [coverage]: https://github.com/dart-lang/test/blob/master/pkgs/test/README.md#collecting-code-coverage
 [coverage-issue]: https://github.com/dart-lang/test/issues/36
 [dart-test-yaml]: https://github.com/dart-lang/test/blob/master/pkgs/test/doc/configuration.md

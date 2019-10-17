@@ -60,6 +60,7 @@ $ ddev help analyze
 
 [analyzer-exclude-issue]: https://github.com/dart-lang/sdk/issues/25551
 [analysis-exclude]: https://dart.dev/guides/language/analysis-options#excluding-code-from-analysis
+[core-config]: /lib/src/core_config.dart
 
 ---
 ---
