@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
+import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
@@ -20,10 +21,12 @@ final _runScriptPath = p.join(cacheDirPath, 'run.dart');
 
 final _runScript = File(_runScriptPath);
 
-const _devDartPath = 'tool/dart_dev/config.dart';
+const _configPath = 'tool/dart_dev/config.dart';
+
+const _oldDevDartPath = 'tool/dev.dart';
 
 final _relativeDevDartPath = p.relative(
-  p.absolute(_devDartPath),
+  p.absolute(_configPath),
   from: p.absolute(p.dirname(_runScriptPath)),
 );
 
@@ -32,9 +35,18 @@ final _log = Logger('DartDev');
 Future<void> run(List<String> args) async {
   attachLoggerToStdio(args);
 
-  if (!File(_devDartPath).existsSync()) {
+  final configExists = File(_configPath).existsSync();
+  final oldDevDartExists = File(_oldDevDartPath).existsSync();
+
+  if (!configExists) {
     _log.fine('No custom `tool/dart_dev/config.dart` file found; '
         'using default config.');
+  }
+  if (oldDevDartExists) {
+    _log.warning(yellow.wrap(
+        'dart_dev v3 now expects configuration to be at `$_configPath`,\n'
+        'but `$_oldDevDartPath` still exists. View the guide to see how to upgrade:\n'
+        'https://github.com/Workiva/dart_dev/blob/master/doc/v3-upgrade-guide.md'));
   }
 
   generateRunScript();
@@ -59,7 +71,7 @@ bool get shouldWriteRunScript =>
     _runScript.readAsStringSync() != buildDartDevRunScriptContents();
 
 String buildDartDevRunScriptContents() {
-  final hasCustomToolDevDart = File(_devDartPath).existsSync();
+  final hasCustomToolDevDart = File(_configPath).existsSync();
   return '''
 import 'dart:io';
 
