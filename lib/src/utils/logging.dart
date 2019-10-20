@@ -148,7 +148,7 @@ T logTimedSync<T>(
   return result;
 }
 
-Function(LogRecord) stdIOLogListener({bool verbose}) =>
+void Function(LogRecord) stdIOLogListener({bool verbose}) =>
     (record) => io.stdout.write(colorLog(record, verbose: verbose));
 
 String _loggerName(LogRecord record, bool verbose) {

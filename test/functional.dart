@@ -153,7 +153,7 @@ class _FileSystemEntityExists extends CustomMatcher {
   _FileSystemEntityExists() : super('exists', 'exists', isTrue);
 
   @override
-  Object featureValueOf(actual) {
+  Object featureValueOf(dynamic actual) {
     return (actual as FileSystemEntity).existsSync();
   }
 }
