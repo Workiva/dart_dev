@@ -7,6 +7,7 @@ import 'package:glob/glob.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
+import 'package:path/path.dart' as p;
 
 import '../../utils.dart';
 import '../dart_dev_tool.dart';
@@ -104,6 +105,85 @@ class FormatTool extends DevTool {
         ..addOption('formatter-args',
             help: 'Args to pass to the "dartfmt" process.\n'
                 'Run "dartfmt -h -v" to see all available options.'));
+
+  /// Builds and returns the object that contains:
+  /// - The file paths
+  /// - The paths that were excluded by an exclude glob
+  /// - The paths that were skipped because they are links
+  /// - The hidden directories(start with a '.') that were skipped
+  ///
+  /// The file paths will include all .dart files in [path] (and its subdirectories),
+  /// except any paths that match the expanded [exclude] globs.
+  ///
+  /// By default these globs are assumed to be relative to the current working
+  /// directory, but that can be overridden via [root] for testing purposes.
+  static FormatterInputs getInputs(
+      {List<Glob> exclude, bool expandCwd, String root}) {
+    expandCwd ??= false;
+    final includedFiles = <String>{};
+    final excludedFiles = <String>{};
+    final skippedLinks = <String>{};
+    final hiddenDirectories = <String>{};
+
+    exclude ??= <Glob>[];
+
+    if (exclude.isEmpty && !expandCwd) {
+      return FormatterInputs({'.'});
+    }
+
+    final dir = Directory(root ?? '.');
+
+    for (final entry in dir.listSync(recursive: true, followLinks: false)) {
+      final relative = p.relative(entry.path, from: dir.path);
+
+      if (entry is Link) {
+        skippedLinks.add(relative);
+        continue;
+      }
+
+      if (entry is File && !entry.path.endsWith('.dart')) continue;
+
+      // If the path is in a subdirectory starting with ".", ignore it.
+      final parts = p.split(relative);
+      int hiddenIndex;
+      for (var i = 0; i < parts.length; i++) {
+        if (parts[i].startsWith(".")) {
+          hiddenIndex = i;
+          break;
+        }
+      }
+
+      if (hiddenIndex != null) {
+        final hiddenDirectory = p.joinAll(parts.take(hiddenIndex + 1));
+        hiddenDirectories.add(hiddenDirectory);
+        continue;
+      }
+
+      if (exclude.any((glob) => glob.matches(relative))) {
+        excludedFiles.add(relative);
+      } else {
+        if (entry is File) includedFiles.add(relative);
+      }
+    }
+
+    return FormatterInputs(includedFiles,
+        excludedFiles: excludedFiles,
+        skippedLinks: skippedLinks,
+        hiddenDirectories: hiddenDirectories);
+  }
+}
+
+class FormatterInputs {
+  FormatterInputs(this.includedFiles,
+      {this.skippedLinks, this.excludedFiles, this.hiddenDirectories});
+
+  final Set<String> includedFiles;
+
+  final Set<String> skippedLinks;
+
+  final Set<String> excludedFiles;
+
+  final Set<String> hiddenDirectories;
 }
 
 /// A declarative representation of an execution of the [FormatTool].
@@ -248,7 +328,7 @@ FormatExecution buildExecution(
             'format tool to use "dartfmt" instead.'));
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
-  final inputs = getFormatterInputs(exclude: exclude, root: path);
+  final inputs = FormatTool.getInputs(exclude: exclude, root: path);
 
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '

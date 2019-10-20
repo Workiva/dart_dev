@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/utils/formatter_inputs.dart';
 import 'package:glob/glob.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
@@ -248,7 +247,7 @@ void main() {
     ];
 
     test('no excludes', () {
-      FormatterInputs formatterInputs = getFormatterInputs(root: root);
+      final formatterInputs = FormatTool.getInputs(root: root);
       expect(formatterInputs.includedFiles, unorderedEquals({'.'}));
       expect(formatterInputs.excludedFiles, null);
       expect(formatterInputs.hiddenDirectories, null);
@@ -257,7 +256,7 @@ void main() {
 
     test('custom excludes', () {
       FormatterInputs formatterInputs =
-          getFormatterInputs(exclude: [Glob('*_exclude.dart')], root: root);
+          FormatTool.getInputs(exclude: [Glob('*_exclude.dart')], root: root);
 
       expect(
           formatterInputs.includedFiles,
@@ -276,7 +275,7 @@ void main() {
 
     test('empty inputs due to excludes config', () async {
       expect(
-          getFormatterInputs(exclude: [Glob('**')], root: root).includedFiles,
+          FormatTool.getInputs(exclude: [Glob('**')], root: root).includedFiles,
           isEmpty);
     });
   });
