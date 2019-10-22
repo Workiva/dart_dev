@@ -47,6 +47,39 @@ final _log = Logger('Test');
 /// It is also possible to run this tool directly in a dart script:
 ///     TestTool().run();
 class TestTool extends DevTool {
+  @override
+  final ArgParser argParser = ArgParser()
+    ..addSeparator('======== Selecting Tests')
+    ..addMultiOption('name',
+        abbr: 'n',
+        help: 'A substring of the name of the test to run.\n'
+            'Regular expression syntax is supported.\n'
+            'If passed multiple times, tests must match all substrings.',
+        splitCommas: false)
+    ..addMultiOption('plain-name',
+        abbr: 'N',
+        help: 'A plain-text substring of the name of the test to run.\n'
+            'If passed multiple times, tests must match all substrings.',
+        splitCommas: false)
+    ..addSeparator('======== Running Tests')
+    ..addMultiOption('preset',
+        abbr: 'P', help: 'The configuration preset(s) to use.')
+    ..addFlag('release',
+        help: 'Build with release mode defaults for builders.\n'
+            'This only applies in projects that run tests with build_runner.')
+    ..addSeparator('======== Other Options')
+    ..addOption('test-stdout',
+        help: 'Write the test process stdout to this file path.')
+    ..addOption('test-args',
+        help: 'Args to pass to the test runner process.\n'
+            'Run "pub run test -h -v" to see all available options.')
+    ..addOption('build-args',
+        help: 'Args to pass to the build runner process.\n'
+            'Run "pub run build_runner test -h -v" to see all available '
+            'options.\n'
+            'Note: these args are only applicable if the current project '
+            'depends on "build_test".');
+
   /// The args to pass to the `pub run build_runner test` process that will be
   /// run by this command when the current project depends on `build_test`.
   ///
@@ -83,37 +116,6 @@ class TestTool extends DevTool {
 
 class TestToolCommand extends DevToolCommand {
   TestToolCommand(String name, DevTool devTool) : super(name, devTool);
-
-  @override
-  final ArgParser argParser = ArgParser()
-    ..addSeparator('======== Selecting Tests')
-    ..addMultiOption('name',
-        abbr: 'n',
-        help: 'A substring of the name of the test to run.\n'
-            'Regular expression syntax is supported.\n'
-            'If passed multiple times, tests must match all substrings.',
-        splitCommas: false)
-    ..addMultiOption('plain-name',
-        abbr: 'N',
-        help: 'A plain-text substring of the name of the test to run.\n'
-            'If passed multiple times, tests must match all substrings.',
-        splitCommas: false)
-    ..addSeparator('======== Running Tests')
-    ..addMultiOption('preset',
-        abbr: 'P', help: 'The configuration preset(s) to use.')
-    ..addFlag('release',
-        help: 'Build with release mode defaults for builders.\n'
-            'This only applies in projects that run tests with build_runner.')
-    ..addSeparator('======== Other Options')
-    ..addOption('test-args',
-        help: 'Args to pass to the test runner process.\n'
-            'Run "pub run test -h -v" to see all available options.')
-    ..addOption('build-args',
-        help: 'Args to pass to the build runner process.\n'
-            'Run "pub run build_runner test -h -v" to see all available '
-            'options.\n'
-            'Note: these args are only applicable if the current project '
-            'depends on "build_test".');
 
   @override
   String get usage =>
@@ -181,39 +183,36 @@ List<String> buildArgs({
     // Combine all args that should be passed through to the build_runner
     // process in this order:
     // 1. Statically configured args from [WebdevServeTool.buildArgs]
-    ...configuredBuildArgs ?? <String>[],
+    ...?configuredBuildArgs,
     // 2. Pass through the --release flag if provided.
-    if (getFlagValue(argResults, 'release'))
+    if (getFlagValue(argResults, 'release') ?? false)
       '--release',
     // 3. Build filters to narrow the build to only the target tests.
     //    (If no test dirs/files are passed in as args, then no build filters
     //     will be created.)
     ...buildFiltersForTestArgs(argResults?.rest),
     // 4. Args passed to --build-args
-    ...splitSingleOptionValue(argResults, 'build-args'),
+    ...?splitSingleOptionValue(argResults, 'build-args'),
   ];
 
   final testArgs = <String>[
     // Combine all args that should be passed through to the webdev serve
     // process in this order:
     // 1. Statically configured args from [TestTool.testArgs]
-    ...configuredTestArgs ?? <String>[],
+    ...?configuredTestArgs,
     // 2. The -n|--name, -N|--plain-name, and -P|--preset options
-    ...getMultiOptionValues(argResults, 'name'),
-    ...getMultiOptionValues(argResults, 'plain-name'),
-    ...getMultiOptionValues(argResults, 'preset'),
+    ...?getMultiOptionValues(argResults, 'name'),
+    ...?getMultiOptionValues(argResults, 'plain-name'),
+    ...?getMultiOptionValues(argResults, 'preset'),
     // 3. Args passed to --test-args
-    ...splitSingleOptionValue(argResults, 'test-args'),
+    ...?splitSingleOptionValue(argResults, 'test-args'),
     // 4. Rest args passed to this command
-    ...argResults?.rest ?? <String>[],
+    ...?argResults?.rest,
   ];
 
   if (verbose) {
     if (!buildArgs.contains('-v') && !buildArgs.contains('--verbose')) {
       buildArgs.add('-v');
-    }
-    if (!testArgs.contains('-v') && !testArgs.contains('--verbose')) {
-      testArgs.add('-v');
     }
   }
 

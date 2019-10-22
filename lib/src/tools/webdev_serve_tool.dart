@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
@@ -51,15 +50,32 @@ class WebdevServeTool extends DevTool {
   /// Run `pub run build_runner build -h` to see all available args.
   List<String> buildArgs;
 
-  @override
-  String description = 'Run a local web development server and a file system '
-      'watcher that rebuilds on changes.';
-
   /// The args to pass to the `webdev serve` process that will be run by this
   /// tool.
   ///
   /// Run `pub global run webdev serve -h` to see all available args.
   List<String> webdevArgs;
+
+  // ---------------------------------------------------------------------------
+  // DevTool Overrides
+  // ---------------------------------------------------------------------------
+
+  final ArgParser argParser = ArgParser()
+    ..addFlag('release',
+        abbr: 'r', help: 'Build with release mode defaults for builders.')
+    ..addSeparator('======== Other Options')
+    ..addOption('webdev-args',
+        help: 'Args to pass to the webdev serve process.\n'
+            'Run "pub global run webdev serve -h -v" to see all available '
+            'options.')
+    ..addOption('build-args',
+        help: 'Args to pass to the build runner process.\n'
+            'Run "pub run build_runner build -h -v" to see all available '
+            'options.');
+
+  @override
+  String description = 'Run a local web development server and a file system '
+      'watcher that rebuilds on changes.';
 
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
@@ -69,21 +85,6 @@ class WebdevServeTool extends DevTool {
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
   }
-
-  @override
-  Command<int> toCommand(String name) => DevToolCommand(name, this,
-      argParser: ArgParser()
-        ..addFlag('release',
-            abbr: 'r', help: 'Build with release mode defaults for builders.')
-        ..addSeparator('======== Other Options')
-        ..addOption('webdev-args',
-            help: 'Args to pass to the webdev serve process.\n'
-                'Run "pub global run webdev serve -h -v" to see all available '
-                'options.')
-        ..addOption('build-args',
-            help: 'Args to pass to the build runner process.\n'
-                'Run "pub run build_runner build -h -v" to see all available '
-                'options.'));
 }
 
 /// A declarative representation of an execution of the [WebdevServeTool].
@@ -139,20 +140,20 @@ List<String> buildArgs(
     // Combine all args that should be passed through to the webdev serve
     // process in this order:
     // 1. Statically configured args from [WebdevServeTool.webdevArgs]
-    ...configuredWebdevArgs ?? <String>[],
+    ...?configuredWebdevArgs,
     // 2. The -r|--release flag
     if (argResults != null && argResults['release'] ?? false)
       '--release',
     // 3. Args passed to --webdev-args
-    ...splitSingleOptionValue(argResults, 'webdev-args'),
+    ...?splitSingleOptionValue(argResults, 'webdev-args'),
   ];
   final buildArgs = <String>[
     // Combine all args that should be passed through to the build_runner
     // process in this order:
     // 1. Statically configured args from [WebdevServeTool.buildArgs]
-    ...configuredBuildArgs ?? <String>[],
+    ...?configuredBuildArgs,
     // 2. Args passed to --build-args
-    ...splitSingleOptionValue(argResults, 'build-args'),
+    ...?splitSingleOptionValue(argResults, 'build-args'),
   ];
 
   if (verbose) {

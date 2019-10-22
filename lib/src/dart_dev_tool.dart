@@ -1,11 +1,32 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:dart_dev/dart_dev.dart';
 
-import '../src/utils/verbose_enabled.dart';
+import 'tools/function_tool.dart';
+import 'utils/verbose_enabled.dart';
 
 abstract class DevTool {
+  DevTool();
+
+  factory DevTool.fromFunction(
+          FutureOr<int> Function(DevToolExecutionContext context) function,
+          {ArgParser argParser}) =>
+      FunctionTool(function, argParser: argParser);
+
+  factory DevTool.fromProcess(String executable, List<String> args,
+          {ProcessStartMode mode}) =>
+      ProcessTool(executable, args, mode: mode);
+
+  /// The argument parser for this tool, if needed.
+  ///
+  /// When this tool is run from the command-line, this will be used to parse
+  /// the arguments. The results will be available via the
+  /// [DevToolExecutionContext] provided when calling [run].
+  ArgParser get argParser => null;
+
   /// This tool's description (which is included in the help/usage output) can
   /// be overridden by setting this field to a non-null value.
   String description;
@@ -33,18 +54,8 @@ abstract class DevTool {
   /// The default implementation of this method returns a [Command] that calls
   /// [run] when it is executed.
   ///
-  /// This method may be overridden by subclasses if the default behavior needs
-  /// to be modified further.
-  ///
-  /// To provide a custom [ArgParser]:
-  ///     @override
-  ///     Command<int> toCommand(String name) =>
-  ///         DevToolCommand(name, this, argParser: ArgParser()
-  ///           ..addFlag('foo')
-  ///           ..addOption('bar'));
-  ///
-  /// To further customize the returned [Command], create a new class that
-  /// extends [DevToolCommand] and override this method to return it:
+  /// This method can be overridden by subclasses to return a custom
+  /// implementation/extension of [DevToolCommand].
   ///     class CustomTool extends DevTool {
   ///       @override
   ///       Command<int> toCommand(String name) => CustomCommand(name, this);
@@ -104,15 +115,18 @@ class DevToolExecutionContext {
     }
     throw UsageException(message, '');
   }
+
+  DevToolExecutionContext withoutArgs() => DevToolExecutionContext(
+      commandName: commandName,
+      usageException: usageException,
+      verbose: verbose);
 }
 
 class DevToolCommand extends Command<int> {
-  DevToolCommand(this.name, this.devTool, {ArgParser argParser})
-      : _argParser = argParser;
+  DevToolCommand(this.name, this.devTool);
 
   @override
-  ArgParser get argParser => _argParser ?? super.argParser;
-  final ArgParser _argParser;
+  ArgParser get argParser => devTool.argParser ?? super.argParser;
 
   @override
   String get description => devTool.description ?? '';
