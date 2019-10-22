@@ -8,9 +8,9 @@ import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
+import '../../args_extension.dart';
 import '../../utils.dart';
 import '../dart_dev_tool.dart';
-import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
@@ -270,7 +270,7 @@ Iterable<String> buildArgs(
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,
     // 3. Args passed to --formatter-args
-    ...?splitSingleOptionValue(argResults, 'formatter-args'),
+    ...?argResults?.splitSingleOptionValue('formatter-args'),
   ];
   return args;
 }

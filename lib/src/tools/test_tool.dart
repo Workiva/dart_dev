@@ -7,8 +7,8 @@ import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 
+import '../../args_extension.dart';
 import '../dart_dev_tool.dart';
-import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_args_after_separator.dart';
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
@@ -185,14 +185,14 @@ List<String> buildArgs({
     // 1. Statically configured args from [WebdevServeTool.buildArgs]
     ...?configuredBuildArgs,
     // 2. Pass through the --release flag if provided.
-    if (getFlagValue(argResults, 'release') ?? false)
+    if (argResults?.flagValue('release') ?? false)
       '--release',
     // 3. Build filters to narrow the build to only the target tests.
     //    (If no test dirs/files are passed in as args, then no build filters
     //     will be created.)
     ...buildFiltersForTestArgs(argResults?.rest),
     // 4. Args passed to --build-args
-    ...?splitSingleOptionValue(argResults, 'build-args'),
+    ...?argResults?.splitSingleOptionValue('build-args'),
   ];
 
   final testArgs = <String>[
@@ -201,11 +201,11 @@ List<String> buildArgs({
     // 1. Statically configured args from [TestTool.testArgs]
     ...?configuredTestArgs,
     // 2. The -n|--name, -N|--plain-name, and -P|--preset options
-    ...?getMultiOptionValues(argResults, 'name'),
-    ...?getMultiOptionValues(argResults, 'plain-name'),
-    ...?getMultiOptionValues(argResults, 'preset'),
+    ...?argResults?.multiOptionValue('name'),
+    ...?argResults?.multiOptionValue('plain-name'),
+    ...?argResults?.multiOptionValue('preset'),
     // 3. Args passed to --test-args
-    ...?splitSingleOptionValue(argResults, 'test-args'),
+    ...?argResults?.splitSingleOptionValue('test-args'),
     // 4. Rest args passed to this command
     ...?argResults?.rest,
   ];
@@ -278,7 +278,7 @@ TestExecution buildExecution(
         'direct dependency on "build_test" in the pubspec.yaml.');
   }
 
-  if (!hasBuildTest && getFlagValue(context.argResults, 'release')) {
+  if (!hasBuildTest && (context?.argResults?.flagValue('release') ?? false)) {
     _log.warning(yellow.wrap('The --release flag is only applicable in '
         'projects that run tests with build_runner, and this project does not.\n'
         'It will have no effect.'));

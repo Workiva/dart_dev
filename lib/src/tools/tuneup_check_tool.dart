@@ -7,8 +7,8 @@ import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 
+import '../../args_extension.dart';
 import '../dart_dev_tool.dart';
-import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
@@ -103,7 +103,7 @@ Iterable<String> buildArgs({
 }) {
   verbose ??= false;
   var ignoreInfos = configuredIgnoreInfos ?? false;
-  if (!ignoreInfos && getFlagValue(argResults, 'ignore-infos')) {
+  if (!ignoreInfos && (argResults?.flagValue('ignore-infos') ?? false)) {
     ignoreInfos = true;
   }
   return [

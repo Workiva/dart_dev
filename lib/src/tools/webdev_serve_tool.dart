@@ -7,8 +7,8 @@ import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 
+import '../../args_extension.dart';
 import '../dart_dev_tool.dart';
-import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
 import '../utils/global_package_is_active_and_compatible.dart';
@@ -145,7 +145,7 @@ List<String> buildArgs(
     if (argResults != null && argResults['release'] ?? false)
       '--release',
     // 3. Args passed to --webdev-args
-    ...?splitSingleOptionValue(argResults, 'webdev-args'),
+    ...?argResults?.splitSingleOptionValue('webdev-args'),
   ];
   final buildArgs = <String>[
     // Combine all args that should be passed through to the build_runner
@@ -153,7 +153,7 @@ List<String> buildArgs(
     // 1. Statically configured args from [WebdevServeTool.buildArgs]
     ...?configuredBuildArgs,
     // 2. Args passed to --build-args
-    ...?splitSingleOptionValue(argResults, 'build-args'),
+    ...?argResults?.splitSingleOptionValue('build-args'),
   ];
 
   if (verbose) {

@@ -5,8 +5,8 @@ import 'package:args/args.dart';
 import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 
+import '../../args_extension.dart';
 import '../dart_dev_tool.dart';
-import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
 import '../utils/process_declaration.dart';
@@ -93,7 +93,7 @@ Iterable<String> buildArgs({
     // 1. Statically configured args from [AnalyzeTool.analyzerArgs]
     ...?configuredAnalyzerArgs,
     // 2. Args passed to --analyzer-args
-    ...?splitSingleOptionValue(argResults, 'analyzer-args'),
+    ...?argResults?.splitSingleOptionValue('analyzer-args'),
   ];
   if (verbose && !args.contains('-v') && !args.contains('--verbose')) {
     args.add('-v');
