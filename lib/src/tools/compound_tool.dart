@@ -18,6 +18,11 @@ mixin CompoundToolMixin on DevTool {
 
   final _specs = <DevToolSpec>[];
 
+  @override
+  String get description => _specs
+      .map((s) => s.tool.description)
+      .firstWhere((desc) => desc != null, orElse: () => null);
+
   void addTool(DevTool tool, {bool alwaysRun}) {
     final runWhen = alwaysRun ?? false ? RunWhen.always : RunWhen.passing;
     _specs.add(DevToolSpec(runWhen, tool));
