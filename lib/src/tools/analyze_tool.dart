@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:args/command_runner.dart';
 import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 
@@ -46,14 +45,24 @@ class AnalyzeTool extends DevTool {
   /// Run `dartanalyzer -h -v` to see all available args.
   List<String> analyzerArgs;
 
-  @override
-  String description = 'Run static analysis on dart files in this package.';
-
   /// The globs to include as entry points to run static analysis on.
   ///
   /// The default is `.` (e.g. `dartanalyzer .`) which runs analysis on all Dart
   /// files in the current working directory.
   List<Glob> include;
+
+  // ---------------------------------------------------------------------------
+  // DevTool Overrides
+  // ---------------------------------------------------------------------------
+
+  @override
+  final ArgParser argParser = ArgParser()
+    ..addOption('analyzer-args',
+        help: 'Args to pass to the "dartanalyzer" process.\n'
+            'Run "dartanalyzer -h -v" to see all available options.');
+
+  @override
+  String description = 'Run static analysis on dart files in this package.';
 
   @override
   FutureOr<int> run([DevToolExecutionContext context]) =>
@@ -61,13 +70,6 @@ class AnalyzeTool extends DevTool {
           buildProcess(context ?? DevToolExecutionContext(),
               configuredAnalyzerArgs: analyzerArgs, include: include),
           log: _log);
-
-  @override
-  Command<int> toCommand(String name) => DevToolCommand(name, this,
-      argParser: ArgParser()
-        ..addOption('analyzer-args',
-            help: 'Args to pass to the "dartanalyzer" process.\n'
-                'Run "dartanalyzer -h -v" to see all available options.'));
 }
 
 /// Returns a combined list of args for the `dartanalyzer` process.
@@ -89,9 +91,9 @@ Iterable<String> buildArgs({
     // Combine all args that should be passed through to the dartanalyzer in
     // this order:
     // 1. Statically configured args from [AnalyzeTool.analyzerArgs]
-    ...configuredAnalyzerArgs ?? <String>[],
+    ...?configuredAnalyzerArgs,
     // 2. Args passed to --analyzer-args
-    ...splitSingleOptionValue(argResults, 'analyzer-args'),
+    ...?splitSingleOptionValue(argResults, 'analyzer-args'),
   ];
   if (verbose && !args.contains('-v') && !args.contains('--verbose')) {
     args.add('-v');

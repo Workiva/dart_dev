@@ -104,18 +104,13 @@ $ ddev help format
 
 - Tools
   - [`AnalyzeTool`][analyze-tool]
-  - [`DartFunctionTool`][dart-function-tool]
-  - `FormatTool`
-  - [`ProcessTool`][process-tool]
+  - [`FormatTool`][format-tool]
   - [`TestTool`][test-tool]
   - [`TuneupCheckTool`][tuneup-check-tool]
   - [`WebdevBuildTool`][webdev-build-tool]
   - [`WebdevServeTool`][webdev-serve-tool]
-- Tool utilities
-  - [`chainTool()`][chain-tool]
-  - [`setUpTool()`][set-up-tool]
-- Other
-  - [v3 upgrade guide][v3-upgrade-guide]
+- [Creating, Extending, and Composing Tools][tool-composition]
+- [v3 upgrade guide][v3-upgrade-guide]
 
 <!-- Table of Contents Links -->
 [analyze-tool]: /doc/tools/analyze-tool.md
@@ -126,6 +121,5 @@ $ ddev help format
 [test-tool]: /doc/tools/test-tool.md
 [webdev-build-tool]: /doc/tools/webdev-build-tool.md
 [webdev-serve-tool]: /doc/tools/webdev-serve-tool.md
-[chain-tool]: /doc/tool-utils/chain-tool.md
-[set-up-tool]: /doc/tool-utils/set-up-tool.md
+[tool-composition]: /doc/tool-composition.md
 [v3-upgrade-guide]: /doc/v3-upgrade-guide.md

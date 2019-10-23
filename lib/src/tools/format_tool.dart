@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:args/command_runner.dart';
 import 'package:glob/glob.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
@@ -54,9 +53,6 @@ class FormatTool extends DevTool {
   ///     ddev format -w  # ovewrite
   FormatMode defaultMode = FormatMode.overwrite;
 
-  @override
-  String description = 'Format dart files in this package.';
-
   /// The globs to exclude from the inputs to the dart formatter.
   ///
   /// By default, nothing is excluded.
@@ -72,6 +68,34 @@ class FormatTool extends DevTool {
   /// Run `dartfmt -h -v` to see all available args.
   List<String> formatterArgs;
 
+  // ---------------------------------------------------------------------------
+  // DevTool Overrides
+  // ---------------------------------------------------------------------------
+
+  @override
+  final ArgParser argParser = ArgParser()
+    ..addSeparator('======== Formatter Mode')
+    ..addFlag('overwrite',
+        abbr: 'w',
+        negatable: false,
+        help: 'Overwrite input files with formatted output.')
+    ..addFlag('dry-run',
+        abbr: 'n',
+        negatable: false,
+        help: 'Show which files would be modified but make no changes.')
+    ..addFlag('check',
+        abbr: 'c',
+        negatable: false,
+        help: 'Check if changes need to be made and set the exit code '
+            'accordingly.\nImplies "--dry-run" and "--set-exit-if-changed".')
+    ..addSeparator('======== Other Options')
+    ..addOption('formatter-args',
+        help: 'Args to pass to the "dartfmt" process.\n'
+            'Run "dartfmt -h -v" to see all available options.');
+
+  @override
+  String description = 'Format dart files in this package.';
+
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
     context ??= DevToolExecutionContext();
@@ -83,28 +107,6 @@ class FormatTool extends DevTool {
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
   }
-
-  @override
-  Command<int> toCommand(String name) => DevToolCommand(name, this,
-      argParser: ArgParser()
-        ..addSeparator('======== Formatter Mode')
-        ..addFlag('overwrite',
-            abbr: 'w',
-            negatable: false,
-            help: 'Overwrite input files with formatted output.')
-        ..addFlag('dry-run',
-            abbr: 'n',
-            negatable: false,
-            help: 'Show which files would be modified but make no changes.')
-        ..addFlag('check',
-            abbr: 'c',
-            negatable: false,
-            help: 'Check if changes need to be made and set the exit code '
-                'accordingly.\nImplies "--dry-run" and "--set-exit-if-changed".')
-        ..addSeparator('======== Other Options')
-        ..addOption('formatter-args',
-            help: 'Args to pass to the "dartfmt" process.\n'
-                'Run "dartfmt -h -v" to see all available options.'));
 
   /// Builds and returns the object that contains:
   /// - The file paths
@@ -266,9 +268,9 @@ Iterable<String> buildArgs(
       '-n',
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
-    ...configuredFormatterArgs ?? <String>[],
+    ...?configuredFormatterArgs,
     // 3. Args passed to --formatter-args
-    ...splitSingleOptionValue(argResults, 'formatter-args'),
+    ...?splitSingleOptionValue(argResults, 'formatter-args'),
   ];
   return args;
 }

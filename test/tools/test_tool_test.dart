@@ -158,29 +158,23 @@ void main() {
             'unit',
             '-N',
             'foo',
-            '-v'
           ]));
     });
 
     test('does not insert a duplicate verbose flag (-v)', () {
       expect(
           buildArgs(
-              configuredBuildArgs: ['-v'],
-              configuredTestArgs: ['-v'],
-              useBuildTest: true,
-              verbose: true),
-          orderedEquals(['run', 'build_runner', 'test', '-v', '--', '-v']));
+              configuredBuildArgs: ['-v'], useBuildTest: true, verbose: true),
+          orderedEquals(['run', 'build_runner', 'test', '-v']));
     });
 
     test('does not insert a duplicate verbose flag (--verbose)', () {
       expect(
           buildArgs(
               configuredBuildArgs: ['--verbose'],
-              configuredTestArgs: ['--verbose'],
               useBuildTest: true,
               verbose: true),
-          orderedEquals(
-              ['run', 'build_runner', 'test', '--verbose', '--', '--verbose']));
+          orderedEquals(['run', 'build_runner', 'test', '--verbose']));
     });
   });
 
@@ -274,19 +268,6 @@ void main() {
           expect(execution.process.executable, 'pub');
           expect(execution.process.args,
               orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo']));
-        });
-
-        test('with verbose=true', () {
-          final argParser = TestTool().toCommand('t').argParser;
-          final argResults = argParser.parse(['--test-args', '-n foo']);
-          final context =
-              DevToolExecutionContext(argResults: argResults, verbose: true);
-          final execution = buildExecution(context,
-              configuredTestArgs: ['-P', 'unit'], path: path);
-          expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'pub');
-          expect(execution.process.args,
-              orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo', '-v']));
         });
 
         test(
@@ -390,7 +371,6 @@ void main() {
                 'unit',
                 '-n',
                 'foo',
-                '-v'
               ]));
         });
 

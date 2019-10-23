@@ -149,7 +149,9 @@ T logTimedSync<T>(
 }
 
 void Function(LogRecord) stdIOLogListener({bool verbose}) =>
-    (record) => io.stdout.write(colorLog(record, verbose: verbose));
+    (record) => io.stdout.write(record.message.trim().isEmpty
+        ? '\n' * (record.message.split('\n').length - 1)
+        : colorLog(record, verbose: verbose));
 
 String _loggerName(LogRecord record, bool verbose) {
   final maybeSplit = record.level >= Level.WARNING ? '\n' : ' ';

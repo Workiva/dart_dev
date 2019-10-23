@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:args/command_runner.dart';
 import 'package:glob/glob.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
@@ -46,6 +45,14 @@ class TuneupCheckTool extends DevTool {
   /// Whether `--ignore-infos` should be passed to `tuneup check`.
   bool ignoreInfos;
 
+  // ---------------------------------------------------------------------------
+  // DevTool Overrides
+  // ---------------------------------------------------------------------------
+
+  @override
+  final ArgParser argParser = ArgParser()
+    ..addFlag('ignore-infos', help: 'Ignore any info level issues.');
+
   @override
   String description = 'Run static analysis on dart files in this package '
       'using the tuneup tool.';
@@ -57,11 +64,6 @@ class TuneupCheckTool extends DevTool {
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
   }
-
-  @override
-  Command<int> toCommand(String name) => DevToolCommand(name, this,
-      argParser: ArgParser()
-        ..addFlag('ignore-infos', help: 'Ignore any info level issues.'));
 }
 
 /// A declarative representation of an execution of the [TuneupCheckTool].
