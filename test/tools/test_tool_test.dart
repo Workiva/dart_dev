@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 
 import 'package:dart_dev/src/tools/test_tool.dart';
 
+import '../log_matchers.dart';
 import 'shared_tool_tests.dart';
 
 void main() {
@@ -211,10 +212,8 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('Cannot run tests') &&
-              record.message.contains('"test" in pubspec.yaml') &&
-              record.level == Level.SEVERE)));
+          emitsThrough(severeLogOf(allOf(contains('Cannot run tests'),
+              contains('"test" in pubspec.yaml')))));
 
       final path = 'test/tools/fixtures/test/missing_test_runner';
       final context = DevToolExecutionContext();
@@ -228,12 +227,10 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message
-                  .contains('"build_test" is not a direct dependency') &&
-              record.message.contains('tool/dart_dev/config.dart') &&
-              record.message.contains('pubspec.yaml') &&
-              record.level == Level.SEVERE)));
+          emitsThrough(severeLogOf(allOf(
+              contains('"build_test" is not a direct dependency'),
+              contains('tool/dart_dev/config.dart'),
+              contains('pubspec.yaml')))));
 
       final path =
           'test/tools/fixtures/test/has_test_runner_missing_build_test';
@@ -276,10 +273,8 @@ void main() {
                   Logger.root.level = Level.ALL;
                   expect(
                       Logger.root.onRecord,
-                      emitsThrough(predicate<LogRecord>((record) =>
-                          record.message.contains(
-                              'The --release flag is only applicable') &&
-                          record.level == Level.WARNING)));
+                      emitsThrough(warningLogOf(
+                          contains('The --release flag is only applicable'))));
 
                   final argParser = TestTool().toCommand('t').argParser;
                   final argResults = argParser.parse(['--release']);
@@ -290,11 +285,8 @@ void main() {
 
         test('and logs the test subprocess', () {
           Logger.root.level = Level.ALL;
-          expect(
-              Logger.root.onRecord,
-              emitsThrough(predicate<LogRecord>((record) =>
-                  record.message.contains('pub run test -P unit -n foo') &&
-                  record.level == Level.INFO)));
+          expect(Logger.root.onRecord,
+              emitsThrough(infoLogOf(contains('pub run test -P unit -n foo'))));
 
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);
@@ -378,10 +370,9 @@ void main() {
           Logger.root.level = Level.ALL;
           expect(
               Logger.root.onRecord,
-              emitsThrough(predicate<LogRecord>((record) =>
-                  record.message.contains(
-                      'pub run build_runner test foo -o test:build -- -P unit -n foo') &&
-                  record.level == Level.INFO)));
+              emitsThrough(infoLogOf(contains(
+                  'pub run build_runner test foo -o test:build -- -P unit '
+                  '-n foo'))));
 
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(

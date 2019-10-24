@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 
 import 'package:dart_dev/src/tools/webdev_serve_tool.dart';
 
+import '../log_matchers.dart';
 import '../utils.dart';
 import 'shared_tool_tests.dart';
 
@@ -173,10 +174,9 @@ void main() {
 
         expect(
             Logger.root.onRecord,
-            emitsThrough(predicate<LogRecord>((record) =>
-                record.message.contains('webdev serve could not run') &&
-                record.message.contains('pub global activate webdev ^2.0.0') &&
-                record.level == Level.SEVERE)));
+            emitsThrough(severeLogOf(allOf(
+                contains('webdev serve could not run'),
+                contains('pub global activate webdev ^2.0.0')))));
 
         expect(
             buildExecution(DevToolExecutionContext(),
@@ -264,10 +264,9 @@ void main() {
           Logger.root.level = Level.ALL;
           expect(
               Logger.root.onRecord,
-              emitsThrough(predicate<LogRecord>((record) =>
-                  record.message.contains(
-                      'pub global run webdev serve web --auto restart -- --delete-conflicting-outputs -o test:build') &&
-                  record.level == Level.INFO)));
+              emitsThrough(infoLogOf(
+                  contains('pub global run webdev serve web --auto restart -- '
+                      '--delete-conflicting-outputs -o test:build'))));
 
           final argParser = WebdevServeTool().toCommand('t').argParser;
           final argResults = argParser.parse([

@@ -6,14 +6,14 @@ import '../functional.dart';
 
 void main() {
   test('success', () async {
-    final result = await runDevToolFunctionalTest(
+    final process = await runDevToolFunctionalTest(
         'analyze', 'test/functional/fixtures/analyze/success');
-    expect(result, exitsWith(0));
+    await process.shouldExit(0);
   });
 
   test('failure', () async {
-    final result = await runDevToolFunctionalTest(
+    final process = await runDevToolFunctionalTest(
         'analyze', 'test/functional/fixtures/analyze/failure');
-    expect(result, exitsWith(greaterThan(0)));
+    await process.shouldExit(greaterThan(0));
   });
 }

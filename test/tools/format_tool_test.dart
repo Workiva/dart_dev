@@ -11,6 +11,7 @@ import 'package:test/test.dart';
 
 import 'package:dart_dev/src/tools/format_tool.dart';
 
+import '../log_matchers.dart';
 import 'shared_tool_tests.dart';
 
 void main() {
@@ -18,7 +19,7 @@ void main() {
     sharedDevToolTests(() => FormatTool());
 
     test('toCommand overrides the argParser', () {
-      final argParser = FormatTool().toCommand('t').argParser;
+      final argParser = FormatTool().argParser;
       expect(argParser.options.keys,
           containsAll(['overwrite', 'dry-run', 'check', 'formatter-args']));
 
@@ -106,12 +107,10 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('Cannot run "dart_style:format"') &&
-              record.message
-                  .contains('add "dart_style" to your pubspec.yaml') &&
-              record.message.contains('use "dartfmt" instead') &&
-              record.level == Level.SEVERE)));
+          emitsThrough(severeLogOf(allOf(
+              contains('Cannot run "dart_style:format"'),
+              contains('add "dart_style" to your pubspec.yaml'),
+              contains('use "dartfmt" instead')))));
 
       final context = DevToolExecutionContext();
       final execution = buildExecution(context,
@@ -124,11 +123,9 @@ void main() {
       Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains(
-                  'formatter cannot run because no inputs could be found') &&
-              record.message.contains('tool/dart_dev/config.dart') &&
-              record.level == Level.SEVERE)));
+          emitsThrough(severeLogOf(allOf(
+              contains('formatter cannot run because no inputs could be found'),
+              contains('tool/dart_dev/config.dart')))));
 
       final context = DevToolExecutionContext();
       final execution = buildExecution(context,
@@ -142,20 +139,12 @@ void main() {
       expect(
           Logger.root.onRecord,
           emitsInOrder([
-            predicate<LogRecord>((record) =>
-                record.message.contains('Excluding these paths') &&
-                record.message.contains('should_exclude.dart') &&
-                record.level == Level.FINE),
-            predicate<LogRecord>((record) =>
-                record.message.contains('Excluding these links') &&
-                record.message.contains('sub') &&
-                record.message.contains('example/file.dart') &&
-                record.level == Level.FINE),
-            predicate<LogRecord>((record) =>
-                record.message.contains('Excluding these hidden directories') &&
-                record.message.contains('.dart_tool_test') &&
-                record.message.contains('example/.pub_test') &&
-                record.level == Level.FINE)
+            fineLogOf(allOf(contains('Excluding these paths'),
+                contains('should_exclude.dart'))),
+            fineLogOf(allOf(contains('Excluding these links'),
+                contains('lib-link'), contains('link.dart'))),
+            fineLogOf(allOf(contains('Excluding these hidden directories'),
+                contains('.dart_tool_test'))),
           ]));
 
       buildExecution(DevToolExecutionContext(),
@@ -223,11 +212,8 @@ void main() {
 
       test('and logs the test subprocess', () {
         Logger.root.level = Level.ALL;
-        expect(
-            Logger.root.onRecord,
-            emitsThrough(predicate<LogRecord>((record) =>
-                record.message.contains('dartfmt .') &&
-                record.level == Level.INFO)));
+        expect(Logger.root.onRecord,
+            emitsThrough(infoLogOf(contains('dartfmt .'))));
 
         buildExecution(DevToolExecutionContext());
       });
@@ -236,15 +222,6 @@ void main() {
 
   group('getFormatterInputs', () {
     final root = 'test/tools/fixtures/format/globs';
-    final dirs = [
-      'benchmark',
-      'bin',
-      'example',
-      'lib',
-      'test',
-      'tool',
-      'web',
-    ];
 
     test('no excludes', () {
       final formatterInputs = FormatTool.getInputs(root: root);
@@ -262,21 +239,35 @@ void main() {
           formatterInputs.includedFiles,
           unorderedEquals({
             'file.dart',
-            for (final dir in dirs) '$dir/sub/file.dart',
+            'lib/sub/file.dart',
+            'other/file.dart',
           }));
 
       expect(formatterInputs.excludedFiles,
           unorderedEquals({'should_exclude.dart'}));
       expect(formatterInputs.hiddenDirectories,
-          unorderedEquals({'.dart_tool_test', 'example/.pub_test'}));
+          unorderedEquals({'.dart_tool_test'}));
       expect(formatterInputs.skippedLinks,
-          unorderedEquals({'sub', 'example/file.dart'}));
+          unorderedEquals({'lib-link', 'link.dart'}));
     });
 
     test('empty inputs due to excludes config', () async {
       expect(
           FormatTool.getInputs(exclude: [Glob('**')], root: root).includedFiles,
           isEmpty);
+    });
+
+    test('expandCwd forces . to be expanded to all files', () async {
+      final formatterInputs = FormatTool.getInputs(expandCwd: true, root: root);
+      expect(
+          formatterInputs.includedFiles,
+          unorderedEquals({
+            'file.dart',
+            'lib/sub/file.dart',
+            'other/file.dart',
+            'should_exclude.dart',
+          }));
+      expect(formatterInputs.excludedFiles, isEmpty);
     });
   });
 
@@ -302,32 +293,20 @@ void main() {
 
   group('logFormatCommand', () {
     test('<=5 inputs and verbose=false', () async {
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('dartfmt -x -y a b') &&
-              record.level == Level.INFO)));
-
+      expect(Logger.root.onRecord,
+          emitsThrough(infoLogOf(contains('dartfmt -x -y a b'))));
       logCommand('dartfmt', ['a', 'b'], ['-x', '-y']);
     });
 
     test('>5 inputs and verbose=true', () async {
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('dartfmt -x -y <6 paths>') &&
-              record.level == Level.INFO)));
-
+      expect(Logger.root.onRecord,
+          emitsThrough(infoLogOf(contains('dartfmt -x -y <6 paths>'))));
       logCommand('dartfmt', ['a', 'b', 'c', 'd', 'e', 'f'], ['-x', '-y']);
     });
 
     test('>5 inputs and verbose=false', () async {
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('dartfmt -x -y a b c d e f') &&
-              record.level == Level.INFO)));
-
+      expect(Logger.root.onRecord,
+          emitsThrough(infoLogOf(contains('dartfmt -x -y a b c d e f'))));
       logCommand('dartfmt', ['a', 'b', 'c', 'd', 'e', 'f'], ['-x', '-y'],
           verbose: true);
     });

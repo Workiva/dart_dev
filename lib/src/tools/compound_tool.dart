@@ -19,9 +19,11 @@ mixin CompoundToolMixin on DevTool {
   final _specs = <DevToolSpec>[];
 
   @override
-  String get description => _specs
+  String get description => _description ??= _specs
       .map((s) => s.tool.description)
       .firstWhere((desc) => desc != null, orElse: () => null);
+  set description(String value) => _description = value;
+  String _description;
 
   void addTool(DevTool tool, {bool alwaysRun}) {
     final runWhen = alwaysRun ?? false ? RunWhen.always : RunWhen.passing;
@@ -37,7 +39,7 @@ mixin CompoundToolMixin on DevTool {
 
     int code = 0;
     for (var i = 0; i < _specs.length; i++) {
-      if (!shouldRunTool(_specs[i], code)) continue;
+      if (!shouldRunTool(_specs[i].when, code)) continue;
       final newCode = await _specs[i].tool.run(context);
       _log.fine('Step ${i + 1}/${_specs.length} done (code: $newCode)');
       _log.info('\n\n');
@@ -50,8 +52,8 @@ mixin CompoundToolMixin on DevTool {
   }
 }
 
-bool shouldRunTool(DevToolSpec spec, int currentExitCode) {
-  switch (spec.when) {
+bool shouldRunTool(RunWhen runWhen, int currentExitCode) {
+  switch (runWhen) {
     case RunWhen.always:
       return true;
     case RunWhen.passing:

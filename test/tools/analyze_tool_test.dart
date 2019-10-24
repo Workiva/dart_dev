@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/tools/analyze_tool.dart';
 
+import '../log_matchers.dart';
 import 'shared_tool_tests.dart';
 
 void main() {
@@ -16,8 +17,8 @@ void main() {
   group('AnalyzeTool', () {
     sharedDevToolTests(() => AnalyzeTool());
 
-    test('toCommand overrides the argParser', () {
-      final argParser = AnalyzeTool().toCommand('t').argParser;
+    test('provides an argParser', () {
+      final argParser = AnalyzeTool().argParser;
       expect(argParser.options, contains('analyzer-args'));
       expect(argParser.options['analyzer-args'].type, OptionType.single);
     });
@@ -164,29 +165,20 @@ void main() {
     });
 
     test('with <=5 entrypoints', () {
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('dartanalyzer -t a b c d e') &&
-              record.level == Level.INFO)));
+      expect(Logger.root.onRecord,
+          emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e'))));
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e']);
     });
 
     test('with >5 entrypoints', () {
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('dartanalyzer -t <6 paths>') &&
-              record.level == Level.INFO)));
+      expect(Logger.root.onRecord,
+          emitsThrough(infoLogOf(contains('dartanalyzer -t <6 paths>'))));
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f']);
     });
 
     test('with >5 entrypoints in verbose mode', () {
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('dartanalyzer -t a b c d e f') &&
-              record.level == Level.INFO)));
+      expect(Logger.root.onRecord,
+          emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e f'))));
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'], verbose: true);
     });
   });
