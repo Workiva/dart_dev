@@ -58,7 +58,7 @@ void main() {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-n', 'foo', '-n', 'bar']);
       expect(buildArgs(argResults: argResults),
-          orderedEquals(['run', 'test', '--name', 'foo', '--name', 'bar']));
+          orderedEquals(['run', 'test', '--name=foo', '--name=bar']));
     });
 
     test('forwards the -N|--plain-name options', () {
@@ -67,14 +67,14 @@ void main() {
       expect(
           buildArgs(argResults: argResults),
           orderedEquals(
-              ['run', 'test', '--plain-name', 'foo', '--plain-name', 'bar']));
+              ['run', 'test', '--plain-name=foo', '--plain-name=bar']));
     });
 
     test('forwards the -P|--preset options', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-P', 'foo', '-P', 'bar']);
       expect(buildArgs(argResults: argResults),
-          orderedEquals(['run', 'test', '--preset', 'foo', '--preset', 'bar']));
+          orderedEquals(['run', 'test', '--preset=foo', '--preset=bar']));
     });
 
     group('with useBuildTest=false', () {
@@ -209,7 +209,6 @@ void main() {
 
     test('returns config exit code and logs if test is not a direct dependency',
         () {
-      Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
           emitsThrough(severeLogOf(allOf(contains('Cannot run tests'),
@@ -224,7 +223,6 @@ void main() {
     test(
         'returns config exit code and logs if configured to run tests with '
         'build args but build_test is not a direct dependency', () {
-      Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
           emitsThrough(severeLogOf(allOf(
@@ -270,7 +268,6 @@ void main() {
         test(
             'and logs a warning if --release is used in a non-build project',
             () => overrideAnsiOutput(false, () {
-                  Logger.root.level = Level.ALL;
                   expect(
                       Logger.root.onRecord,
                       emitsThrough(warningLogOf(
@@ -284,7 +281,6 @@ void main() {
                 }));
 
         test('and logs the test subprocess', () {
-          Logger.root.level = Level.ALL;
           expect(Logger.root.onRecord,
               emitsThrough(infoLogOf(contains('pub run test -P unit -n foo'))));
 
@@ -367,7 +363,6 @@ void main() {
         });
 
         test('and logs the test subprocess', () {
-          Logger.root.level = Level.ALL;
           expect(
               Logger.root.onRecord,
               emitsThrough(infoLogOf(contains(

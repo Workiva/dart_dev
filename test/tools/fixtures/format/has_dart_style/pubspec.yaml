@@ -1,6 +1,3 @@
 name: has_dart_style
-version: 0.0.0
-private: true
-
 dev_dependencies:
   dart_style: any

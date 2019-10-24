@@ -185,7 +185,7 @@ List<String> buildArgs({
     // 1. Statically configured args from [WebdevServeTool.buildArgs]
     ...?configuredBuildArgs,
     // 2. Pass through the --release flag if provided.
-    if (getFlagValue(argResults, 'release') ?? false)
+    if (flagValue(argResults, 'release') ?? false)
       '--release',
     // 3. Build filters to narrow the build to only the target tests.
     //    (If no test dirs/files are passed in as args, then no build filters
@@ -201,9 +201,10 @@ List<String> buildArgs({
     // 1. Statically configured args from [TestTool.testArgs]
     ...?configuredTestArgs,
     // 2. The -n|--name, -N|--plain-name, and -P|--preset options
-    ...?getMultiOptionValues(argResults, 'name'),
-    ...?getMultiOptionValues(argResults, 'plain-name'),
-    ...?getMultiOptionValues(argResults, 'preset'),
+    ...?multiOptionValue(argResults, 'name')?.map((v) => '--name=$v'),
+    ...?multiOptionValue(argResults, 'plain-name')
+        ?.map((v) => '--plain-name=$v'),
+    ...?multiOptionValue(argResults, 'preset')?.map((v) => '--preset=$v'),
     // 3. Args passed to --test-args
     ...?splitSingleOptionValue(argResults, 'test-args'),
     // 4. Rest args passed to this command
@@ -278,7 +279,7 @@ TestExecution buildExecution(
         'direct dependency on "build_test" in the pubspec.yaml.');
   }
 
-  if (!hasBuildTest && getFlagValue(context.argResults, 'release')) {
+  if (!hasBuildTest && (flagValue(context.argResults, 'release') ?? false)) {
     _log.warning(yellow.wrap('The --release flag is only applicable in '
         'projects that run tests with build_runner, and this project does not.\n'
         'It will have no effect.'));

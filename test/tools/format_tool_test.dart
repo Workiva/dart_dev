@@ -104,7 +104,6 @@ void main() {
     test(
         'returns config exit code and logs if configured formatter is '
         'dart_style but the package is not a direct dependency', () {
-      Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
           emitsThrough(severeLogOf(allOf(
@@ -120,7 +119,6 @@ void main() {
     });
 
     test('returns a config exit code if inputs list is empty', () {
-      Logger.root.level = Level.ALL;
       expect(
           Logger.root.onRecord,
           emitsThrough(severeLogOf(allOf(
@@ -211,7 +209,6 @@ void main() {
       });
 
       test('and logs the test subprocess', () {
-        Logger.root.level = Level.ALL;
         expect(Logger.root.onRecord,
             emitsThrough(infoLogOf(contains('dartfmt .'))));
 

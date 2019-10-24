@@ -160,10 +160,6 @@ void main() {
   });
 
   group('logCommand', () {
-    setUp(() {
-      Logger.root.level = Level.ALL;
-    });
-
     test('with <=5 entrypoints', () {
       expect(Logger.root.onRecord,
           emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e'))));

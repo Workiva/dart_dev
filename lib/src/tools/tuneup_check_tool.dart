@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:glob/glob.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
@@ -15,7 +14,7 @@ import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
 
-final _log = Logger('Analyze');
+final _log = Logger('TuneupCheck');
 
 /// A dart_dev tool that runs the `tuneup` on the current project.
 ///
@@ -102,13 +101,12 @@ Iterable<String> buildArgs({
   bool verbose,
 }) {
   verbose ??= false;
-  var ignoreInfos = configuredIgnoreInfos ?? false;
-  if (!ignoreInfos && getFlagValue(argResults, 'ignore-infos')) {
-    ignoreInfos = true;
-  }
+  var ignoreInfos = (configuredIgnoreInfos ?? false) ||
+      (flagValue(argResults, 'ignore-infos') ?? false);
   return [
     'run',
     'tuneup',
+    'check',
     if (ignoreInfos) '--ignore-infos',
     if (verbose ?? false) '--verbose',
   ];
@@ -133,7 +131,6 @@ Iterable<String> buildArgs({
 TuneupExecution buildExecution(
   DevToolExecutionContext context, {
   bool configuredIgnoreInfos,
-  List<Glob> include,
   String path,
 }) {
   if (context.argResults != null) {
