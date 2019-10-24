@@ -52,36 +52,6 @@ $ ddev hello --name Dart
 Hello, Dart!
 ```
 
-<!-- TODO -->
-### Handling command-line args (with extension methods)
-
-```dart
-// tool/dart_dev/config.dart
-import 'package:args/args.dart';
-import 'package:dart_dev/args_extension.dart';
-import 'package:dart_dev/dart_dev.dart';
-import 'package:io/io.dart';
-
-final helloArgParser = ArgParser()
-  ..addOption('name', help: 'Your name.');
-
-int hello([DevToolExecutionContext context]) {
-  final name = context?.argResults?.singleOptionValue('name');
-  print('Hello${name != null ? ', $name' : ''}!');
-  return ExitCode.success.code;
-}
-
-final config = {
-  'hello': DevTool.fromFunction(hello, argParser: helloArgParser),
-};
-```
-
-```bash
-$ ddev hello --name Dart
-Hello, Dart!
-```
-<!-- /TODO -->
-
 ## Create a tool that runs a subprocess
 
 ```dart
@@ -103,6 +73,7 @@ command-line args, you can compose the function and process tools like so:
 // tool/dart_dev/config.dart
 import 'dart:async';
 
+import 'package:args/args.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:io/io.dart';
 
@@ -202,7 +173,7 @@ class NewAnalyzeTool extends AnalyzeTool with CompoundToolMixin {
   final _strictModeArgParser = ArgParser()..addFlag('strict');
 
   int _parseStrictMode([DevToolExecutionContext context]) {
-    _strictModeEnabled = _context?.argResults != null &&
+    _strictModeEnabled = context?.argResults != null &&
         context.argResults['strict'] ?? false;
     return ExitCode.success.code;
   }

@@ -118,6 +118,7 @@ With `dart_dev`, this can be accomplished like so:
 ```dart
 // tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
+import 'pacakge:glob/glob.dart';
 
 final config = {
   'format': FormatTool()

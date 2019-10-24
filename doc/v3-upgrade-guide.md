@@ -15,7 +15,7 @@ With v2, the `package:dart_dev/dart_dev.dart` entrypoint exported a mutable
 file would feature a `main()` block that configured the `config` object as
 needed.
 
-```dart
+```dart test=false
 // tool/dev.dart -- v2
 import 'package:dart_dev/dart_dev.dart';
 
