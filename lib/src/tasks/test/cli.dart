@@ -172,23 +172,28 @@ class TestCli extends TaskCli {
           'files/directories');
     }
 
-    final mapRunnerToContents = <File /*generated runner file*/, String /* contents */>{};
+    final mapRunnerToContents =
+        <File /*generated runner file*/, String /* contents */ >{};
     // Build the list of tests to run.
     if (individualTestsSpecified) {
       // Individual tests explicitly passed in should override the test suites.
       if (dartMajorVersion == 2 && parsedArgs[_hackFastBuilds]) {
         reporter.warning(
             'WARNING: You\'re using `${_hackFastBuilds}`. This will re-write the generated test runners in your repo.\n'
-                'The test task will attempt to restore your generated runners after completion, but you may '
-                'have to re-run `pub run dart_dev gen-test-runner` and `pub run dart_dev format` if your runners have changed.\n\n');
-        final mapConfigToTestFiles = <TestRunnerConfig,
-            Set<String> /* tests to include in runner */>{};
+            'The test task will attempt to restore your generated runners after completion, but you may '
+            'have to re-run `pub run dart_dev gen-test-runner` and `pub run dart_dev format` if your runners have changed.\n\n');
+        final mapConfigToTestFiles =
+            <TestRunnerConfig, Set<String> /* tests to include in runner */ >{};
         // Construct mapping from config to tests which should be ran in that config
         final copyOfConfigs = new List.from(config.genTestRunner.configs);
         for (final _config in copyOfConfigs) {
-          for (final testFilePath in parsedArgs.rest) {
+          for (var testFilePath in parsedArgs.rest) {
+            if (testFilePath.startsWith('./')) {
+              testFilePath = testFilePath.replaceFirst('./', '');
+            }
             if (testFilePath.contains(_config.directory)) {
-              mapConfigToTestFiles.putIfAbsent(_config, () => new Set.from([testFilePath]));
+              mapConfigToTestFiles.putIfAbsent(
+                  _config, () => new Set.from([testFilePath]));
               mapConfigToTestFiles[_config].add(testFilePath);
             }
           }
@@ -197,7 +202,8 @@ class TestCli extends TaskCli {
         for (final _config in mapConfigToTestFiles.keys) {
           copyOfConfigs.remove(_config);
           final runnerFile = new File(_config.path);
-          mapRunnerToContents.putIfAbsent(runnerFile, () => runnerFile.readAsStringSync());
+          mapRunnerToContents.putIfAbsent(
+              runnerFile, () => runnerFile.readAsStringSync());
           await genTestRunner(_config,
               filesToInclude: mapConfigToTestFiles[_config].toList());
           tests.add(_config.path);
