@@ -33,20 +33,6 @@ final config = {
 By default this tool will run `pub run tuneup check` which will analyze all dart
 files in the current project.
 
-## Configuration
-
-`TuneupCheckTool` supports one configuration option which is the list of args to
-pass to the `dartanalyzer` process:
-
-```dart
-// tool/dart_dev/config.dart
-import 'package:dart_dev/dart_dev.dart';
-
-final config = {
-  'analyze': TuneupCheckTool(),
-};
-```
-
 ## Ignoring info outputs
 
 By default, `pub run tuneup check` will include "info"-level analysis messages
