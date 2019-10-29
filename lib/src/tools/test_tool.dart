@@ -242,7 +242,7 @@ List<String> buildArgs({
 /// (either directly or via a command-line app).
 ///
 /// [context] is the execution context that would be provided by [TestTool] when
-/// converted to a [DevToolCommand]. For tests, this can be manually creatd to
+/// converted to a [DevToolCommand]. For tests, this can be manually created to
 /// to imitate the various CLI inputs.
 ///
 /// [configuredBuildArgs] will be populated from [TestTool.buildArgs].

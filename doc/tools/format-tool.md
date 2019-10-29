@@ -28,11 +28,11 @@ the current project.
 `FormatTool` can be run in 3 modes:
 
 - `FormatMode.overwrite` (default)
-  - e.g. `dartfmt -w .`
+  - e.g. `ddev format -w`
 - `FormatMode.dryRun` (lists files that would be changed)
-  - e.g. `dartfmt -n .`
+  - e.g. `ddev format -n`
 - `FormatMode.check` (dry-run _and_ sets the exit code if changes are needed)
-  - e.g. `dartfmt -n --set-exit-if-changed .`
+  - e.g. `ddev format -c`
 
 ```dart
 // tool/dart_dev/config.dart

@@ -184,7 +184,7 @@ List<String> buildArgs(
 ///
 /// [context] is the execution context that would be provided by
 /// [WebdevServeTool] when converted to a [DevToolCommand]. For tests, this can
-/// be manually creatd to imitate the various CLI inputs.
+/// be manually created to imitate the various CLI inputs.
 ///
 /// [configuredWebdevArgs] will be populated from [WebdevServeTool.webdevArgs].
 ///
