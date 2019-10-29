@@ -84,7 +84,7 @@ While the core tooling gets us far, there are two areas in which we feel it
 falls short:
 
 1. Inconsistencies across projects in how these tools must be used in order to
-   to accomplish common developer tasks.
+   accomplish common developer tasks.
 
 2. Functionality gaps for more complex use cases.
 

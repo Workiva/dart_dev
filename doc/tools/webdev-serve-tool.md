@@ -61,7 +61,6 @@ $ ddev help serve
   - [`FormatTool`][format-tool]
   - [`TestTool`][test-tool]
   - [`TuneupCheckTool`][tuneup-check-tool]
-  - [`WebdevBuildTool`][webdev-build-tool]
   - [`WebdevServeTool`][webdev-serve-tool]
 - [Creating, Extending, and Composing Tools][tool-composition]
 - [v3 upgrade guide][v3-upgrade-guide]

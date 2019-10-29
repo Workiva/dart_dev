@@ -1,29 +1,41 @@
-# `AnalyzeTool`
+# `TuneupCheckTool`
 
-Statically analyzes the current project by running the `dartanalyzer`.
+Statically analyzes the current project via the `tuneup` package.
 
 ## Usage
 
-> _This tool is included in the [`coreConfig`][core-config] and is runnable by
-> default via `ddev analyze`._
+This is intended to be used as a drop-in replacement to the
+[`AnalyzeTool`][analyze-tool] to workaround an
+[open issue with `dartanalyzer` and excluding files][analyzer-exclude-issue] via
+`analysis_options.yaml`.
+
+Add `tuneup` as a dev dependency to your project:
+
+```yaml
+# pubspec.yaml
+dev_dependencies:
+  tuneup: ^0.3.6
+```
+
+Use it in your dart_dev config:
 
 ```dart
 // tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
-  'analyze': AnalyzeTool() // configure as necessary
+  'analyze': TuneupCheckTool()
 };
 ```
 
 ## Default behavior
 
-By default this tool will run `dartanalyzer .` which will analyze all dart files
-in the current project.
+By default this tool will run `pub run tuneup check` which will analyze all dart
+files in the current project.
 
 ## Configuration
 
-`AnalyzeTool` supports one configuration option which is the list of args to
+`TuneupCheckTool` supports one configuration option which is the list of args to
 pass to the `dartanalyzer` process:
 
 ```dart
@@ -31,26 +43,29 @@ pass to the `dartanalyzer` process:
 import 'package:dart_dev/dart_dev.dart';
 
 final config = {
-  'analyze': AnalyzeTool()
-    ..analyzerArgs = ['--fatal-infos', '--fatal-warnings']
+  'analyze': TuneupCheckTool(),
 };
 ```
 
-> _Always prefer configuring the analyzer via `analysis_options.yaml` when
-> possible. This ensures that other tools that leverage the analyzer or the
-> analysis server benefit from the configuration, as well._
+## Ignoring info outputs
+
+By default, `pub run tuneup check` will include "info"-level analysis messages
+in its output and fail if there are any. You can tell tuneup to ignore these:
+
+```dart
+// tool/dart_dev/config.dart
+import 'package:dart_dev/dart_dev.dart';
+
+final config = {
+  'analyze': TuneupCheckTool()
+    ..ignoreInfos = true,
+};
+```
 
 ## Excluding files from analysis
 
 The `analysis_options.yaml` configuration file
-[supports excluding files][analysis-exclude]. However, there is an
-[open issue with the `dartanalyzer` CLI][analyzer-exclude-issue] because it does
-not respect this list.
-
-If your project has files that need to be excluded from analysis (e.g. generated
-files), use the [`TuneupCheckTool`][tuneup-check-tool]. It uses the
-`tuneup` package to run analysis instead of `dartanalyzer` and it properly
-respects the exclude rules defined in `analysis_options.yaml`.
+[supports excluding files][analysis-exclude].
 
 ## Command-line options
 
@@ -60,7 +75,6 @@ $ ddev help analyze
 
 [analyzer-exclude-issue]: https://github.com/dart-lang/sdk/issues/25551
 [analysis-exclude]: https://dart.dev/guides/language/analysis-options#excluding-code-from-analysis
-[core-config]: /lib/src/core_config.dart
 
 ---
 ---

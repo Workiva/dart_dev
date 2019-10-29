@@ -27,9 +27,12 @@ the current project.
 
 `FormatTool` can be run in 3 modes:
 
-1. `FormatMode.overwrite`(default)
-2. `FormatMode.dryRun` (lists files that would be changed)
-3. `FormatMode.check` (dry-run _and_ sets the exit code if changes are needed)
+- `FormatMode.overwrite` (default)
+  - e.g. `dartfmt -w .`
+- `FormatMode.dryRun` (lists files that would be changed)
+  - e.g. `dartfmt -n .`
+- `FormatMode.check` (dry-run _and_ sets the exit code if changes are needed)
+  - e.g. `dartfmt -n --set-exit-if-changed .`
 
 ```dart
 // tool/dart_dev/config.dart
@@ -107,7 +110,6 @@ $ ddev help format
   - [`FormatTool`][format-tool]
   - [`TestTool`][test-tool]
   - [`TuneupCheckTool`][tuneup-check-tool]
-  - [`WebdevBuildTool`][webdev-build-tool]
   - [`WebdevServeTool`][webdev-serve-tool]
 - [Creating, Extending, and Composing Tools][tool-composition]
 - [v3 upgrade guide][v3-upgrade-guide]
