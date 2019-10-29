@@ -1,6 +1,0 @@
-name: default_unit
-version: 0.0.0
-dev_dependencies:
-  dart_dev:
-    path: ../../..
-  test: any

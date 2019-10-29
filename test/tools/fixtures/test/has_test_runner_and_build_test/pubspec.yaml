@@ -1,0 +1,4 @@
+name: has_test_runner_and_build_test
+dev_dependencies:
+  build_test: any
+  test: any

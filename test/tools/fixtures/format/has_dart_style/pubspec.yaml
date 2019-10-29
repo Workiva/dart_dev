@@ -1,0 +1,3 @@
+name: has_dart_style
+dev_dependencies:
+  dart_style: any

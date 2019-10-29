@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.0.0](https://github.com/Workiva/dart_dev/compare/2.2.1...3.0.0)
+
+**This is a major release of `dart_dev` with breaking changes.** It is also the
+first release that drops support for Dart 1.
+
+- [V3 upgrade guide][v3-upgrade-guide]
+- [Updated README][v3-readme]
+- [Additional docs][v3-docs]
+
+[v3-upgrade-guide]: https://github.com/Workiva/dart_dev/blob/3.0.0/doc/v3-upgrade-guide.md
+[v3-readme]: https://github.com/Workiva/dart_dev/blob/3.0.0/README.md
+[v3-docs]: https://github.com/Workiva/dart_dev/blob/3.0.0/doc/README.md
+
 ## [2.0.6](https://github.com/Workiva/dart_dev/compare/2.0.5...2.0.6)
 
 - **Improvement:** On dart 2, the `test` task now properly sets a non-zero

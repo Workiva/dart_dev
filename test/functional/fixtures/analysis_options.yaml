@@ -1,0 +1,14 @@
+# By default, when an analysis context is established, it will look for
+# configuration in an analysis_options.yaml file, starting in the current
+# directory and working up through parent directories until it finds one.
+
+# The analysis_options.yaml at the root of this project excludes the
+# test_fixtures/ directory because it intentionally contains code that would
+# otherwise get flagged by the analyzer as lints/warnings.
+
+# However, if the test_fixtures/ directory is excluded when trying to use the
+# analysis APIs on code in that directory (which is what our tests do), they
+# will fail.
+
+# This file works around that problem because the analysis context will use this
+# (empty) configuration instead, which does not exclude the test fixtures.

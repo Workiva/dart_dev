@@ -1,3 +1,0 @@
-(function () {
-    document.body = null;
-})();
