@@ -9,6 +9,43 @@ import '../dart_dev_tool.dart';
 
 final _log = Logger('CompoundTool');
 
+typedef ArgMapper = ArgResults Function(ArgParser parser, ArgResults results);
+
+/// Return a parsed [ArgResults] that only includes the option args (flags,
+/// single options, and multi options) supported by [parser].
+///
+/// Positional args and any option args not supported by [parser] will be
+/// excluded.
+///
+/// This [ArgMapper] is the default for tools added to a [CompoundTool].
+ArgResults takeOptionArgs(ArgParser parser, ArgResults results) =>
+    parser.parse(optionArgsOnly(results, allowedOptions: parser.options.keys));
+
+/// Return a parsed [ArgResults] that includes the option args (flags, single
+/// options, and multi options) supported by [parser] as well as any positional
+/// args.
+///
+/// Option args not supported by [parser] will be excluded.
+///
+/// Use this with a [CompoundTool] to indicate which tool should receive the
+/// positional args given to the compound target.
+///
+///     // tool/dart_dev/config.dart
+///     import 'package:dart_dev/dart_dev.dart';
+///
+///     final config = {
+///       'test': CompoundTool()
+///         // This tool will not receive any positional args
+///         ..addTool(startServerTool)
+///         // This tool will receive the test-specific option args as well as
+///         // any positional args given to `ddev test`.
+///         ..addTool(TestTool(), argMapper: takeAllArgs)
+///     };
+ArgResults takeAllArgs(ArgParser parser, ArgResults results) => parser.parse([
+      ...optionArgsOnly(results, allowedOptions: parser.options.keys),
+      ...results.rest,
+    ]);
+
 class CompoundTool extends DevTool with CompoundToolMixin {}
 
 mixin CompoundToolMixin on DevTool {
@@ -25,9 +62,9 @@ mixin CompoundToolMixin on DevTool {
   set description(String value) => _description = value;
   String _description;
 
-  void addTool(DevTool tool, {bool alwaysRun}) {
+  void addTool(DevTool tool, {bool alwaysRun, ArgMapper argMapper}) {
     final runWhen = alwaysRun ?? false ? RunWhen.always : RunWhen.passing;
-    _specs.add(DevToolSpec(runWhen, tool));
+    _specs.add(DevToolSpec(runWhen, tool, argMapper: argMapper));
     if (tool.argParser != null) {
       _argParser.addParser(tool.argParser);
     }
@@ -40,7 +77,8 @@ mixin CompoundToolMixin on DevTool {
     int code = 0;
     for (var i = 0; i < _specs.length; i++) {
       if (!shouldRunTool(_specs[i].when, code)) continue;
-      final newCode = await _specs[i].tool.run(context);
+      final newCode =
+          await _specs[i].tool.run(contextForTool(context, _specs[i]));
       _log.fine('Step ${i + 1}/${_specs.length} done (code: $newCode)');
       _log.info('\n\n');
       if (code == 0) {
@@ -50,6 +88,34 @@ mixin CompoundToolMixin on DevTool {
 
     return code;
   }
+}
+
+List<String> optionArgsOnly(ArgResults results,
+    {Iterable<String> allowedOptions}) {
+  final args = <String>[];
+  for (final option in results.options) {
+    if (!results.wasParsed(option)) continue;
+    if (allowedOptions != null && !allowedOptions.contains(option)) continue;
+    final value = results[option];
+    if (value is bool) {
+      args.add('--${value ? '' : 'no-'}$option');
+    } else if (value is Iterable) {
+      args.addAll([for (final v in value as List<String>) '--$option=$v']);
+    } else {
+      args.add('--$option=$value');
+    }
+  }
+  return args;
+}
+
+DevToolExecutionContext contextForTool(
+    DevToolExecutionContext baseContext, DevToolSpec spec) {
+  if (baseContext.argResults == null) return baseContext;
+
+  final parser = spec.tool.argParser ?? ArgParser();
+  final argMapper = spec.argMapper ?? takeOptionArgs;
+  return baseContext.update(
+      argResults: argMapper(parser, baseContext.argResults));
 }
 
 bool shouldRunTool(RunWhen runWhen, int currentExitCode) {
@@ -64,11 +130,13 @@ bool shouldRunTool(RunWhen runWhen, int currentExitCode) {
 }
 
 class DevToolSpec {
+  final ArgMapper argMapper;
+
   final DevTool tool;
 
   final RunWhen when;
 
-  DevToolSpec(this.when, this.tool);
+  DevToolSpec(this.when, this.tool, {this.argMapper});
 }
 
 enum RunWhen { always, passing }

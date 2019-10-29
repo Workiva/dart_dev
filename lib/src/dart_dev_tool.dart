@@ -86,6 +86,8 @@ class DevToolExecutionContext {
       : _usageException = usageException,
         verbose = verbose ?? false;
 
+  final void Function(String message) _usageException;
+
   /// The results from parsing the arguments passed to a [Command] if this tool
   /// was executed via a command-line app.
   ///
@@ -104,7 +106,20 @@ class DevToolExecutionContext {
   /// This will not be null; it defaults to `false`.
   final bool verbose;
 
-  final void Function(String message) _usageException;
+  /// Return a copy of this instance with optional updates; any field that does
+  /// not have an updated value will remain the same.
+  DevToolExecutionContext update({
+    ArgResults argResults,
+    String commandName,
+    void Function(String message) usageException,
+    bool verbose,
+  }) =>
+      DevToolExecutionContext(
+        argResults: argResults ?? this.argResults,
+        commandName: commandName ?? this.commandName,
+        usageException: usageException ?? this.usageException,
+        verbose: verbose ?? this.verbose,
+      );
 
   /// Calling this will throw a [UsageException] with [message] that should be
   /// caught by [CommandRunner] and used to set the exit code accordingly and
@@ -115,11 +130,6 @@ class DevToolExecutionContext {
     }
     throw UsageException(message, '');
   }
-
-  DevToolExecutionContext withoutArgs() => DevToolExecutionContext(
-      commandName: commandName,
-      usageException: usageException,
-      verbose: verbose);
 }
 
 class DevToolCommand extends Command<int> {

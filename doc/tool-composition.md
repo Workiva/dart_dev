@@ -140,6 +140,70 @@ final config = {
 };
 ```
 
+### Mapping args to tools
+
+`CompoundTool.addTool()` supports an optional `argMapper` parameter that can be
+used to customize the `ArgResults` instance that the tool gets when it runs.
+
+The typedef for this `argMapper` function is:
+
+```dart
+typedef ArgMapper = ArgResults Function(ArgParser parser, ArgResults results);
+```
+
+By default, subtools added to a `CompoundTool` will _only_ receive option args
+that are defined by their respective `ArgParser`:
+
+```dart
+// tool/dart_dev/config.dart
+import 'package:dart_dev/dart_dev.dart';
+
+final config = {
+  'example': CompoundTool()
+    // This subtool has an ArgParser that only supports the --foo flag.
+    ..addTool(DevTool.fromFunction((_) => 0,
+        argParser: ArgParser()..addFlag('foo')))
+
+    // This subtool has an ArgParser that only supports the --bar flag.
+    ..addTool(DevTool.fromFunction((_) => 0,
+        argParser: ArgParser()..addFlag('bar')))
+};
+```
+
+With the above configuration, running `ddev example --foo --bar` will result in
+the compound tool running the first subtool with only the `--foo` option
+followed by the second subtool with only the `--bar` option. Any positional args
+would be discarded.
+
+You may want one of the subtools to also receive the positional args. To
+illustrate this, our test tool example from above can be updated to allow
+positional args to be sent to the `TestTool` portion so that individual test
+files can be targeted.
+
+To do this, we can use the `takeAllArgs` function provided by dart_dev:
+
+```dart
+// tool/dart_dev/config.dart
+import 'package:dart_dev/dart_dev.dart';
+
+final config = {
+  'test': CompoundTool()
+    ..addTool(DevTool.fromFunction(startServer), alwaysRun: true)
+    // Using `takeAllArgs` on this subtool will allow it to receive
+    // the positional args passed to `ddev test` as well as any
+    // option args specific to the `TestTool`.
+    ..addTool(TestTool(), argMapper: takeAllArgs)
+    ..addTool(DevTool.fromFunction(stopServer), alwaysRun: true),
+};
+
+int startServer([DevToolExecutionContext context]) => 0;
+int stopServer([DevToolExecutionContext context]) => 0;
+```
+
+The default behavior for subtools along with using `takeAllArgs` for the subtool
+that needs the positional args should cover most use cases. However, you may
+write your own `ArgMapper` function if further customization is needed.
+
 ### Sharing state across tools
 
 With more complex use cases, it may be necessary to share or use state across
