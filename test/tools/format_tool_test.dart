@@ -7,6 +7,7 @@ import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:glob/glob.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 import 'package:dart_dev/src/tools/format_tool.dart';
@@ -15,7 +16,7 @@ import '../log_matchers.dart';
 import 'shared_tool_tests.dart';
 
 void main() {
-  group('FormatCommand', () {
+  group('FormatTool', () {
     sharedDevToolTests(() => FormatTool());
 
     test('toCommand overrides the argParser', () {
@@ -36,6 +37,73 @@ void main() {
       expect(argParser.options['check'].negatable, isFalse);
 
       expect(argParser.options['formatter-args'].type, OptionType.single);
+    });
+
+    group('getInputs', () {
+      final root = 'test/tools/fixtures/format/globs';
+
+      test('no excludes', () {
+        final formatterInputs = FormatTool.getInputs(root: root);
+        expect(formatterInputs.includedFiles, unorderedEquals({'.'}));
+        expect(formatterInputs.excludedFiles, null);
+        expect(formatterInputs.hiddenDirectories, null);
+        expect(formatterInputs.skippedLinks, null);
+      });
+
+      test('custom excludes', () {
+        FormatterInputs formatterInputs =
+            FormatTool.getInputs(exclude: [Glob('*_exclude.dart')], root: root);
+
+        expect(
+            formatterInputs.includedFiles,
+            unorderedEquals({
+              'file.dart',
+              'lib/sub/file.dart',
+              'linked.dart',
+              'other/file.dart',
+            }));
+
+        expect(formatterInputs.excludedFiles,
+            unorderedEquals({'should_exclude.dart'}));
+        expect(formatterInputs.hiddenDirectories,
+            unorderedEquals({'.dart_tool_test'}));
+        expect(formatterInputs.skippedLinks,
+            unorderedEquals({'links/lib-link', 'links/link.dart'}));
+      });
+
+      test('empty inputs due to excludes config', () async {
+        expect(
+            FormatTool.getInputs(exclude: [Glob('**')], root: root)
+                .includedFiles,
+            isEmpty);
+      });
+
+      test('expandCwd forces . to be expanded to all files', () async {
+        final formatterInputs =
+            FormatTool.getInputs(expandCwd: true, root: root);
+        expect(
+            formatterInputs.includedFiles,
+            unorderedEquals({
+              'file.dart',
+              'lib/sub/file.dart',
+              'linked.dart',
+              'other/file.dart',
+              'should_exclude.dart',
+            }));
+        expect(formatterInputs.excludedFiles, isEmpty);
+      });
+
+      test('followLinks follows linked files and directories', () async {
+        final formatterInputs = FormatTool.getInputs(
+            expandCwd: true, followLinks: true, root: p.join(root, 'links'));
+        expect(
+            formatterInputs.includedFiles,
+            unorderedEquals({
+              'lib-link/sub/file.dart',
+              'link.dart',
+            }));
+        expect(formatterInputs.skippedLinks, isEmpty);
+      });
     });
   });
 
@@ -214,57 +282,6 @@ void main() {
 
         buildExecution(DevToolExecutionContext());
       });
-    });
-  });
-
-  group('getFormatterInputs', () {
-    final root = 'test/tools/fixtures/format/globs';
-
-    test('no excludes', () {
-      final formatterInputs = FormatTool.getInputs(root: root);
-      expect(formatterInputs.includedFiles, unorderedEquals({'.'}));
-      expect(formatterInputs.excludedFiles, null);
-      expect(formatterInputs.hiddenDirectories, null);
-      expect(formatterInputs.skippedLinks, null);
-    });
-
-    test('custom excludes', () {
-      FormatterInputs formatterInputs =
-          FormatTool.getInputs(exclude: [Glob('*_exclude.dart')], root: root);
-
-      expect(
-          formatterInputs.includedFiles,
-          unorderedEquals({
-            'file.dart',
-            'lib/sub/file.dart',
-            'other/file.dart',
-          }));
-
-      expect(formatterInputs.excludedFiles,
-          unorderedEquals({'should_exclude.dart'}));
-      expect(formatterInputs.hiddenDirectories,
-          unorderedEquals({'.dart_tool_test'}));
-      expect(formatterInputs.skippedLinks,
-          unorderedEquals({'lib-link', 'link.dart'}));
-    });
-
-    test('empty inputs due to excludes config', () async {
-      expect(
-          FormatTool.getInputs(exclude: [Glob('**')], root: root).includedFiles,
-          isEmpty);
-    });
-
-    test('expandCwd forces . to be expanded to all files', () async {
-      final formatterInputs = FormatTool.getInputs(expandCwd: true, root: root);
-      expect(
-          formatterInputs.includedFiles,
-          unorderedEquals({
-            'file.dart',
-            'lib/sub/file.dart',
-            'other/file.dart',
-            'should_exclude.dart',
-          }));
-      expect(formatterInputs.excludedFiles, isEmpty);
     });
   });
 
