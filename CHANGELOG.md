@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/Workiva/dart_dev/compare/3.0.0...3.1.0)
+
+- Update `FormatTool.getInputs()` to support an optional `followLinks` param.
+  When enabled, links will be followed instead of skipped.
+- Export the `FormatterInputs` class that is the return type of
+  `FormatTool.getInputs()`.
+
 ## [3.0.0](https://github.com/Workiva/dart_dev/compare/2.2.1...3.0.0)
 
 **This is a major release of `dart_dev` with breaking changes.** It is also the

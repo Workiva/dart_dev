@@ -120,8 +120,10 @@ class FormatTool extends DevTool {
   /// By default these globs are assumed to be relative to the current working
   /// directory, but that can be overridden via [root] for testing purposes.
   static FormatterInputs getInputs(
-      {List<Glob> exclude, bool expandCwd, String root}) {
+      {List<Glob> exclude, bool expandCwd, bool followLinks, String root}) {
     expandCwd ??= false;
+    followLinks ??= false;
+
     final includedFiles = <String>{};
     final excludedFiles = <String>{};
     final skippedLinks = <String>{};
@@ -135,7 +137,8 @@ class FormatTool extends DevTool {
 
     final dir = Directory(root ?? '.');
 
-    for (final entry in dir.listSync(recursive: true, followLinks: false)) {
+    for (final entry
+        in dir.listSync(recursive: true, followLinks: followLinks)) {
       final relative = p.relative(entry.path, from: dir.path);
 
       if (entry is Link) {
@@ -177,15 +180,15 @@ class FormatTool extends DevTool {
 
 class FormatterInputs {
   FormatterInputs(this.includedFiles,
-      {this.skippedLinks, this.excludedFiles, this.hiddenDirectories});
-
-  final Set<String> includedFiles;
-
-  final Set<String> skippedLinks;
+      {this.excludedFiles, this.hiddenDirectories, this.skippedLinks});
 
   final Set<String> excludedFiles;
 
   final Set<String> hiddenDirectories;
+
+  final Set<String> includedFiles;
+
+  final Set<String> skippedLinks;
 }
 
 /// A declarative representation of an execution of the [FormatTool].
@@ -341,17 +344,17 @@ FormatExecution buildExecution(
 
   if (inputs.excludedFiles?.isNotEmpty ?? false) {
     _log.fine('Excluding these paths from formatting:\n  '
-        '${inputs.excludedFiles.join('\n')}');
+        '${inputs.excludedFiles.join('\n  ')}');
   }
 
   if (inputs.skippedLinks?.isNotEmpty ?? false) {
     _log.fine('Excluding these links from formatting:\n  '
-        '${inputs.skippedLinks.join('\n')}');
+        '${inputs.skippedLinks.join('\n  ')}');
   }
 
   if (inputs.hiddenDirectories?.isNotEmpty ?? false) {
     _log.fine('Excluding these hidden directories from formatting:\n  '
-        '${inputs.hiddenDirectories.join('\n')}');
+        '${inputs.hiddenDirectories.join('\n  ')}');
   }
 
   final dartfmt = buildProcess(formatter);

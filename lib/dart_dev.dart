@@ -4,7 +4,8 @@ export 'src/dart_dev_tool.dart'
 export 'src/tools/analyze_tool.dart' show AnalyzeTool;
 export 'src/tools/compound_tool.dart'
     show ArgMapper, CompoundTool, CompoundToolMixin, takeAllArgs;
-export 'src/tools/format_tool.dart' show FormatMode, Formatter, FormatTool;
+export 'src/tools/format_tool.dart'
+    show FormatMode, Formatter, FormatterInputs, FormatTool;
 export 'src/tools/process_tool.dart' show ProcessTool;
 export 'src/tools/test_tool.dart' show TestTool;
 export 'src/tools/tuneup_check_tool.dart' show TuneupCheckTool;
