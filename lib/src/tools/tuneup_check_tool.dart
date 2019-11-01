@@ -150,7 +150,7 @@ TuneupExecution buildExecution(
       argResults: context.argResults,
       configuredIgnoreInfos: configuredIgnoreInfos,
       verbose: context.verbose);
-  logSubprocessHeader(_log, 'pub ${args.join(' ')}');
+  logSubprocessHeader(_log, buildEscapedCommand('pub', args));
   return TuneupExecution.process(
       ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
 }

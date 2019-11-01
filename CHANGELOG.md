@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.1.1](https://github.com/Workiva/dart_dev/compare/3.1.0...3.1.1)
+
+- When printing the subprocess commands, option values with spaces are now
+  wrapped in quotes.
+
+    ```diff
+    [INFO] Running subprocess:
+    - pub run test -n Foo bar baz
+    + pub run test -n 'Foo bar baz'
+    ```
+
+  This ensures that developers can always copy & paste the subprocess commands
+  in order to run them manually when necessary.
+
 ## [3.1.0](https://github.com/Workiva/dart_dev/compare/3.0.0...3.1.0)
 
 - Update `FormatTool.getInputs()` to support an optional `followLinks` param.

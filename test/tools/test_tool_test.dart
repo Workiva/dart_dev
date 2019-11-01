@@ -58,7 +58,7 @@ void main() {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-n', 'foo', '-n', 'bar']);
       expect(buildArgs(argResults: argResults),
-          orderedEquals(['run', 'test', '--name=foo', '--name=bar']));
+          orderedEquals(['run', 'test', '--name', 'foo', '--name', 'bar']));
     });
 
     test('forwards the -N|--plain-name options', () {
@@ -67,14 +67,14 @@ void main() {
       expect(
           buildArgs(argResults: argResults),
           orderedEquals(
-              ['run', 'test', '--plain-name=foo', '--plain-name=bar']));
+              ['run', 'test', '--plain-name', 'foo', '--plain-name', 'bar']));
     });
 
     test('forwards the -P|--preset options', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-P', 'foo', '-P', 'bar']);
       expect(buildArgs(argResults: argResults),
-          orderedEquals(['run', 'test', '--preset=foo', '--preset=bar']));
+          orderedEquals(['run', 'test', '--preset', 'foo', '--preset', 'bar']));
     });
 
     group('with useBuildTest=false', () {

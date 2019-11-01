@@ -34,6 +34,14 @@ void attachLoggerToStdio(List<String> args) {
   Logger.root.onRecord.listen(stdIOLogListener(verbose: verbose));
 }
 
+String buildEscapedCommand(String executable, List<String> args) {
+  final quotedAndEscapedArgs = args.map((arg) {
+    if (!arg.contains(' ')) return arg;
+    return "'${arg.replaceAll("'", "\'")}'";
+  });
+  return '$executable ${quotedAndEscapedArgs.join(' ')}'.trim();
+}
+
 StringBuffer colorLog(LogRecord record, {bool verbose}) {
   verbose ??= false;
 

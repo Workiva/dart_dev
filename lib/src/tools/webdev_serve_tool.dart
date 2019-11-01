@@ -225,7 +225,7 @@ WebdevServeExecution buildExecution(
       configuredBuildArgs: configuredBuildArgs,
       configuredWebdevArgs: configuredWebdevArgs,
       verbose: context.verbose);
-  logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
+  logSubprocessHeader(_log, buildEscapedCommand('pub', args));
   return WebdevServeExecution.process(
       ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
 }

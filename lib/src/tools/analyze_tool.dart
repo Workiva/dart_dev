@@ -176,10 +176,12 @@ void logCommand(
   bool verbose,
 }) {
   verbose ??= false;
-  final exeAndArgs = 'dartanalyzer ${args.join(' ')}'.trim();
+  final executable = 'dartanalyzer';
   if (entrypoints.length <= 5 || verbose) {
-    logSubprocessHeader(_log, '$exeAndArgs ${entrypoints.join(' ')}');
+    logSubprocessHeader(
+        _log, buildEscapedCommand(executable, [...args, ...entrypoints]));
   } else {
-    logSubprocessHeader(_log, '$exeAndArgs <${entrypoints.length} paths>');
+    logSubprocessHeader(_log,
+        '${buildEscapedCommand(executable, args)} <${entrypoints.length} paths>');
   }
 }

@@ -392,11 +392,12 @@ void logCommand(
     String executable, Iterable<String> inputs, Iterable<String> args,
     {bool verbose}) {
   verbose ??= false;
-  final exeAndArgs = '$executable ${args.join(' ')}'.trim();
   if (inputs.length <= 5 || verbose) {
-    logSubprocessHeader(_log, '$exeAndArgs ${inputs.join(' ')}');
+    logSubprocessHeader(
+        _log, buildEscapedCommand(executable, [...args, ...inputs]));
   } else {
-    logSubprocessHeader(_log, '$exeAndArgs <${inputs.length} paths>');
+    logSubprocessHeader(_log,
+        '${buildEscapedCommand(executable, args)} <${inputs.length} paths>');
   }
 }
 

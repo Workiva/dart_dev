@@ -42,7 +42,7 @@ class ProcessTool extends DevTool {
           context.argResults, context.usageException,
           commandName: context.commandName);
     }
-    logSubprocessHeader(_log, '$_executable ${_args.join(' ')}');
+    logSubprocessHeader(_log, buildEscapedCommand(_executable, _args));
     return runProcessAndEnsureExit(
         ProcessDeclaration(_executable, _args, mode: _mode),
         log: _log);

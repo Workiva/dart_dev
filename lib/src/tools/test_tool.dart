@@ -201,10 +201,9 @@ List<String> buildArgs({
     // 1. Statically configured args from [TestTool.testArgs]
     ...?configuredTestArgs,
     // 2. The -n|--name, -N|--plain-name, and -P|--preset options
-    ...?multiOptionValue(argResults, 'name')?.map((v) => '--name=$v'),
-    ...?multiOptionValue(argResults, 'plain-name')
-        ?.map((v) => '--plain-name=$v'),
-    ...?multiOptionValue(argResults, 'preset')?.map((v) => '--preset=$v'),
+    ...?proxyMultiOptionValue(argResults, 'name'),
+    ...?proxyMultiOptionValue(argResults, 'plain-name'),
+    ...?proxyMultiOptionValue(argResults, 'preset'),
     // 3. Args passed to --test-args
     ...?splitSingleOptionValue(argResults, 'test-args'),
     // 4. Rest args passed to this command
@@ -234,6 +233,11 @@ List<String> buildArgs({
     ...testArgs,
   ];
 }
+
+Iterable<String> proxyMultiOptionValue(ArgResults argResults, String name) =>
+    multiOptionValue(argResults, name)
+        ?.map((v) => ['--$name', v])
+        ?.expand((pair) => pair);
 
 /// Returns a declarative representation of a test process to run based on the
 /// given parameters.
@@ -307,7 +311,7 @@ TestExecution buildExecution(
       configuredTestArgs: configuredTestArgs,
       useBuildTest: hasBuildTest,
       verbose: context.verbose);
-  logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
+  logSubprocessHeader(_log, buildEscapedCommand('pub', args));
   return TestExecution.process(
       ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
 }
