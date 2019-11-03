@@ -1,0 +1,33 @@
+name: Continuous Integration
+
+on: [push]
+
+jobs:
+  quality:
+    name: Quality
+
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        dart: ["2.3", "latest", "dev"]
+
+    runs-on: ${{ matrix.os }}
+    container:
+      image: google/dart:${{ matrix.dart }}
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install dependencies
+        run: pub get
+      - name: Validate dependencies
+        run: pub run dependency_validator -i pedantic
+      - name: Analyze
+        run: pub run dart_dev analyze
+      - name: Format
+        run: pub run dart_dev format --check
+      - name: Test
+        run: pub run dart_dev test
+      - name: Publish dry-run
+        run: pub publish --dry-run
