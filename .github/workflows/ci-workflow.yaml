@@ -77,7 +77,6 @@ jobs:
 
   test1:
     name: Test (1/4)
-    name: Format
     strategy:
       fail-fast: false
       matrix:
@@ -96,7 +95,6 @@ jobs:
 
   test2:
     name: Test (2/4)
-    name: Format
     strategy:
       fail-fast: false
       matrix:
@@ -115,7 +113,6 @@ jobs:
 
   test3:
     name: Test (3/4)
-    name: Format
     strategy:
       fail-fast: false
       matrix:
@@ -134,7 +131,6 @@ jobs:
 
   test4:
     name: Test (4/4)
-    name: Format
     strategy:
       fail-fast: false
       matrix:
