@@ -2,32 +2,119 @@ name: CI
 
 on: [push]
 
+JobDefaults: &job-defaults
+  strategy:
+    fail-fast: false
+    matrix:
+      dart: ["2.3", "latest", "dev"]
+  runs-on: ubuntu-latest
+  container: google/dart:${{ matrix.dart }}
+
 jobs:
-  quality:
-    name: Quality
-
-    strategy:
-      matrix:
-        os: ["ubuntu-latest"]
-        dart: ["2.3", "latest", "dev"]
-
-    runs-on: ${{ matrix.os }}
-    container:
-      image: google/dart:${{ matrix.dart }}
-
+  analyze:
+    name: Analyze
+    <<: *job-defaults
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v1
         with:
           fetch-depth: 1
       - name: Install dependencies
         run: pub get
-      - name: Validate dependencies
-        run: pub run dependency_validator -i pedantic
       - name: Analyze
         run: pub run dart_dev analyze
-      - name: Format
+
+  format:
+    name: Format
+    <<: *job-defaults
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install dependencies
+        run: pub get
+      - name: Analyze
         run: pub run dart_dev format --check
-      - name: Test
-        run: pub run dart_dev test --reporter=expanded
-      - name: Publish dry-run
+
+  publish-dry-run:
+    name: Publish Dry-Run
+    <<: *job-defaults
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install dependencies
+        run: pub get
+      - name: Analyze
         run: pub publish --dry-run
+
+  validate-deps:
+    name: Validate Deps
+    <<: *job-defaults
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install dependencies
+        run: pub get
+      - name: Analyze
+        run: pub run dependency_validator -i pedantic
+
+  test1:
+    name: Test (1/4)
+    name: Format
+    <<: *job-defaults
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install dependencies
+        run: pub get
+      - name: Analyze
+        run: pub run dart_dev test --test-args="--shard-index=0 --total-shards=4"
+
+  test2:
+    name: Test (2/4)
+    name: Format
+    <<: *job-defaults
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install dependencies
+        run: pub get
+      - name: Analyze
+        run: pub run dart_dev test --test-args="--shard-index=1 --total-shards=4"
+
+  test3:
+    name: Test (3/4)
+    name: Format
+    <<: *job-defaults
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install dependencies
+        run: pub get
+      - name: Analyze
+        run: pub run dart_dev test --test-args="--shard-index=2 --total-shards=4"
+
+  test4:
+    name: Test (4/4)
+    name: Format
+    <<: *job-defaults
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install dependencies
+        run: pub get
+      - name: Analyze
+        run: pub run dart_dev test --test-args="--shard-index=3 --total-shards=4"
