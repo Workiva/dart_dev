@@ -2,18 +2,15 @@ name: CI
 
 on: [push]
 
-JobDefaults: &job-defaults
-  strategy:
-    fail-fast: false
-    matrix:
-      dart: ["2.3", "latest", "dev"]
-  runs-on: ubuntu-latest
-  container: google/dart:${{ matrix.dart }}
-
 jobs:
   analyze:
     name: Analyze
-    <<: *job-defaults
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -26,7 +23,12 @@ jobs:
 
   format:
     name: Format
-    <<: *job-defaults
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -39,7 +41,12 @@ jobs:
 
   publish-dry-run:
     name: Publish Dry-Run
-    <<: *job-defaults
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -52,7 +59,12 @@ jobs:
 
   validate-deps:
     name: Validate Deps
-    <<: *job-defaults
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -66,7 +78,12 @@ jobs:
   test1:
     name: Test (1/4)
     name: Format
-    <<: *job-defaults
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -80,7 +97,12 @@ jobs:
   test2:
     name: Test (2/4)
     name: Format
-    <<: *job-defaults
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -94,7 +116,12 @@ jobs:
   test3:
     name: Test (3/4)
     name: Format
-    <<: *job-defaults
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -108,7 +135,12 @@ jobs:
   test4:
     name: Test (4/4)
     name: Format
-    <<: *job-defaults
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
