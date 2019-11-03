@@ -12,14 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     container: google/dart:${{ matrix.dart }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Install dependencies
-        run: pub get
-      - name: Analyze
-        run: pub run dart_dev analyze
+      - run: pub get --no-precompile
+      - run: pub run dart_dev analyze
 
   format:
     name: Format
@@ -30,14 +27,11 @@ jobs:
     runs-on: ubuntu-latest
     container: google/dart:${{ matrix.dart }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Install dependencies
-        run: pub get
-      - name: Analyze
-        run: pub run dart_dev format --check
+      - run: pub get --no-precompile
+      - run: pub run dart_dev format --check
 
   publish-dry-run:
     name: Publish Dry-Run
@@ -48,14 +42,11 @@ jobs:
     runs-on: ubuntu-latest
     container: google/dart:${{ matrix.dart }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Install dependencies
-        run: pub get
-      - name: Analyze
-        run: pub publish --dry-run
+      - run: pub get --no-precompile
+      - run: pub publish --dry-run
 
   validate-deps:
     name: Validate Deps
@@ -66,17 +57,14 @@ jobs:
     runs-on: ubuntu-latest
     container: google/dart:${{ matrix.dart }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Install dependencies
-        run: pub get
-      - name: Analyze
-        run: pub run dependency_validator -i pedantic
+      - run: pub get --no-precompile
+      - run: pub run dependency_validator -i pedantic
 
   test1:
-    name: Test (1/4)
+    name: Test (1/5)
     strategy:
       fail-fast: false
       matrix:
@@ -84,17 +72,14 @@ jobs:
     runs-on: ubuntu-latest
     container: google/dart:${{ matrix.dart }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Install dependencies
-        run: pub get
-      - name: Analyze
-        run: pub run dart_dev test --test-args="--shard-index=0 --total-shards=4"
+      - run: pub get --no-precompile
+      - run: pub run dart_dev test --test-args="--shard-index=0 --total-shards=5"
 
   test2:
-    name: Test (2/4)
+    name: Test (2/5)
     strategy:
       fail-fast: false
       matrix:
@@ -102,17 +87,14 @@ jobs:
     runs-on: ubuntu-latest
     container: google/dart:${{ matrix.dart }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Install dependencies
-        run: pub get
-      - name: Analyze
-        run: pub run dart_dev test --test-args="--shard-index=1 --total-shards=4"
+      - run: pub get --no-precompile
+      - run: pub run dart_dev test --test-args="--shard-index=1 --total-shards=5"
 
   test3:
-    name: Test (3/4)
+    name: Test (3/5)
     strategy:
       fail-fast: false
       matrix:
@@ -120,17 +102,14 @@ jobs:
     runs-on: ubuntu-latest
     container: google/dart:${{ matrix.dart }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Install dependencies
-        run: pub get
-      - name: Analyze
-        run: pub run dart_dev test --test-args="--shard-index=2 --total-shards=4"
+      - run: pub get --no-precompile
+      - run: pub run dart_dev test --test-args="--shard-index=2 --total-shards=5"
 
   test4:
-    name: Test (4/4)
+    name: Test (4/5)
     strategy:
       fail-fast: false
       matrix:
@@ -138,11 +117,23 @@ jobs:
     runs-on: ubuntu-latest
     container: google/dart:${{ matrix.dart }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - name: Install dependencies
-        run: pub get
-      - name: Analyze
-        run: pub run dart_dev test --test-args="--shard-index=3 --total-shards=4"
+      - run: pub get --no-precompile
+      - run: pub run dart_dev test --test-args="--shard-index=3 --total-shards=5"
+
+  test5:
+    name: Test (4/5)
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ["2.3", "latest", "dev"]
+    runs-on: ubuntu-latest
+    container: google/dart:${{ matrix.dart }}
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - run: pub get --no-precompile
+      - run: pub run dart_dev test --test-args="--shard-index=4 --total-shards=5"
