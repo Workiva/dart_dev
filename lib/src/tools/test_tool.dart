@@ -64,6 +64,15 @@ class TestTool extends DevTool {
     ..addSeparator('======== Running Tests')
     ..addMultiOption('preset',
         abbr: 'P', help: 'The configuration preset(s) to use.')
+    ..addOption('reporter',
+        allowed: ['compact', 'expanded', 'json'],
+        defaultsTo: 'compact',
+        help: 'The runner used to print test results.',
+        allowedHelp: {
+          'compact': 'A single line, updated continuously.',
+          'expanded': 'A separate line for each update.',
+          'json': 'A machine-readable format (see https://goo.gl/gBsV1a).'
+        })
     ..addFlag('release',
         help: 'Build with release mode defaults for builders.\n'
             'This only applies in projects that run tests with build_runner.')
@@ -200,7 +209,9 @@ List<String> buildArgs({
     // process in this order:
     // 1. Statically configured args from [TestTool.testArgs]
     ...?configuredTestArgs,
-    // 2. The -n|--name, -N|--plain-name, and -P|--preset options
+    // 2. The --reporter, -n|--name, -N|--plain-name, and -P|--preset options
+    if (argResults?.wasParsed('reporter') ?? false)
+      '--reporter=${singleOptionValue(argResults, 'reporter')}',
     ...?multiOptionValue(argResults, 'name')?.map((v) => '--name=$v'),
     ...?multiOptionValue(argResults, 'plain-name')
         ?.map((v) => '--plain-name=$v'),

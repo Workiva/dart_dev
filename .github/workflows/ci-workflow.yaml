@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: CI
 
 on: [push]
 
@@ -28,6 +28,6 @@ jobs:
       - name: Format
         run: pub run dart_dev format --check
       - name: Test
-        run: pub run dart_dev test
+        run: pub run dart_dev test --reporter=expanded
       - name: Publish dry-run
         run: pub publish --dry-run
