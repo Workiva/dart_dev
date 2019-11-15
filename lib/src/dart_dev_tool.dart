@@ -17,8 +17,9 @@ abstract class DevTool {
       FunctionTool(function, argParser: argParser);
 
   factory DevTool.fromProcess(String executable, List<String> args,
-          {ProcessStartMode mode}) =>
-      ProcessTool(executable, args, mode: mode);
+          {ProcessStartMode mode, String workingDirectory}) =>
+      ProcessTool(executable, args,
+          mode: mode, workingDirectory: workingDirectory);
 
   /// The argument parser for this tool, if needed.
   ///
