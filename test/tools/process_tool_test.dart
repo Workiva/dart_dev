@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 @TestOn('vm')
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
@@ -15,6 +17,15 @@ void main() {
     test('forwards the returned exit code', () async {
       final tool = DevTool.fromProcess('false', []);
       expect(await tool.run(), isNonZero);
+    });
+
+    test('can run from a custom working directory', () async {
+      final tool = DevTool.fromProcess('pwd', [], workingDirectory: 'lib')
+          as ProcessTool;
+      expect(await tool.run(), isZero);
+      final stdout =
+          (await tool.process.stdout.transform(utf8.decoder).join('')).trim();
+      expect(stdout, endsWith('/dart_dev/lib'));
     });
 
     test('throws UsageException when args are present', () {
