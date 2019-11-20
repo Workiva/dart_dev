@@ -1,10 +1,12 @@
 # Changelog
 
-## [3.2.0](https://github.com/Workiva/dart_dev/compare/3.1.0...3.2.0)
+## [3.2.0 + 3.2.1](https://github.com/Workiva/dart_dev/compare/3.1.0...3.2.1)
 
 - Add an optional `String workingDirectory` parameter when creating a
   `DevTool.fromProcess()` or `ProcessTool()`.
 - Expose the `Process` created by a `ProcessTool` via a public field.
+- Fix release configuration (the 3.2.0 release did not get created properly).
+- Add SDK constraints to all of the test fixture `pubspec.yaml` files.
 
 ## [3.1.0](https://github.com/Workiva/dart_dev/compare/3.0.0...3.1.0)
 
