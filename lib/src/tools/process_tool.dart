@@ -8,7 +8,6 @@ import '../dart_dev_tool.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
 import '../utils/process_declaration.dart';
-import '../utils/run_process_and_ensure_exit.dart';
 
 final _log = Logger('Process');
 
