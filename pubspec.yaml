@@ -1,13 +1,6 @@
 name: dart_dev
-version: 3.2.1
+version: 3.2.2
 description: Centralized tooling for Dart projects. Consistent interface across projects. Easily configurable.
-authors:
-  - Workiva Client Platform Team <clientplatform@workiva.com>
-  - Dustin Lessard <dustin.lessard@workiva.com>
-  - Evan Weible <evan.weible@workiva.com>
-  - Jay Udey <jay.udey@workiva.com>
-  - Max Peterson <maxwell.peterson@workiva.com>
-  - Trent Grover <trent.grover@workiva.com>
 homepage: https://github.com/Workiva/dart_dev
 
 environment:

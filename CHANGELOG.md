@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.2.2](https://github.com/Workiva/dart_dev/compare/3.2.1...3.2.2)
+
+- Remove unnecessary newlines from `CompoundTool` output.
+- Remove deprecated `authors` field from `pubspec.yaml`
+
 ## [3.2.0 + 3.2.1](https://github.com/Workiva/dart_dev/compare/3.1.0...3.2.1)
 
 - Add an optional `String workingDirectory` parameter when creating a

@@ -79,8 +79,7 @@ mixin CompoundToolMixin on DevTool {
       if (!shouldRunTool(_specs[i].when, code)) continue;
       final newCode =
           await _specs[i].tool.run(contextForTool(context, _specs[i]));
-      _log.fine('Step ${i + 1}/${_specs.length} done (code: $newCode)');
-      _log.info('\n\n');
+      _log.fine('Step ${i + 1}/${_specs.length} done (code: $newCode)\n');
       if (code == 0) {
         code = newCode;
       }
