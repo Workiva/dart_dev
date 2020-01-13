@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.3.0](https://github.com/Workiva/dart_dev/compare/3.2.2...3.3.0)
+
+- Added the `--reporter` option to `TestTool` so that a reporter can be selected
+  directly instead of having to use `--test-args="--reporter <reporter>"`.
+
 ## [3.2.2](https://github.com/Workiva/dart_dev/compare/3.2.1...3.2.2)
 
 - Remove unnecessary newlines from `CompoundTool` output.
