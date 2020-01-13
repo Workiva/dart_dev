@@ -77,6 +77,13 @@ void main() {
           orderedEquals(['run', 'test', '--preset=foo', '--preset=bar']));
     });
 
+    test('forwards the --reporter option', () {
+      final argParser = TestTool().toCommand('t').argParser;
+      final argResults = argParser.parse(['--reporter', 'expanded']);
+      expect(buildArgs(argResults: argResults),
+          orderedEquals(['run', 'test', '--reporter=expanded']));
+    });
+
     group('with useBuildTest=false', () {
       test('combines configured args with cli args (in that order)', () {
         final argParser = TestTool().toCommand('t').argParser;

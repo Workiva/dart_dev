@@ -67,6 +67,19 @@ class TestTool extends DevTool {
     ..addFlag('release',
         help: 'Build with release mode defaults for builders.\n'
             'This only applies in projects that run tests with build_runner.')
+    ..addSeparator('======== Output')
+    ..addOption('reporter',
+        help: 'The runner used to print test results.',
+        allowed: [
+          'compact',
+          'expanded',
+          'json'
+        ],
+        allowedHelp: {
+          'compact': 'A single line, updated continuously.',
+          'expanded': 'A separate line for each update.',
+          'json': 'A machine-readable format (see https://goo.gl/gBsV1a).'
+        })
     ..addSeparator('======== Other Options')
     ..addOption('test-stdout',
         help: 'Write the test process stdout to this file path.')
@@ -200,14 +213,17 @@ List<String> buildArgs({
     // process in this order:
     // 1. Statically configured args from [TestTool.testArgs]
     ...?configuredTestArgs,
-    // 2. The -n|--name, -N|--plain-name, and -P|--preset options
+    // 2. The --reporter option.
+    if (argResults?.wasParsed('reporter') ?? false)
+      '--reporter=' + singleOptionValue(argResults, 'reporter'),
+    // 3. The -n|--name, -N|--plain-name, and -P|--preset options
     ...?multiOptionValue(argResults, 'name')?.map((v) => '--name=$v'),
     ...?multiOptionValue(argResults, 'plain-name')
         ?.map((v) => '--plain-name=$v'),
     ...?multiOptionValue(argResults, 'preset')?.map((v) => '--preset=$v'),
-    // 3. Args passed to --test-args
+    // 4. Args passed to --test-args
     ...?splitSingleOptionValue(argResults, 'test-args'),
-    // 4. Rest args passed to this command
+    // 5. Rest args passed to this command
     ...?argResults?.rest,
   ];
 

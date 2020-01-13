@@ -49,15 +49,35 @@ Run dart tests in this package.
 
 Usage: dart_dev test [files or directories...]
 ======== Selecting Tests
--n, --name          A substring of the name of the test to run.
-                    Regular expression syntax is supported.
-                    If passed multiple times, tests must match all substrings.
+-n, --name              A substring of the name of the test to run.
+                        Regular expression syntax is supported.
+                        If passed multiple times, tests must match all substrings.
 
--N, --plain-name    A plain-text substring of the name of the test to run.
-                    If passed multiple times, tests must match all substrings.
+-N, --plain-name        A plain-text substring of the name of the test to run.
+                        If passed multiple times, tests must match all substrings.
 
 ======== Running Tests
--P, --preset        The configuration preset(s) to use.
+-P, --preset            The configuration preset(s) to use.
+    --[no-]release      Build with release mode defaults for builders.
+                        This only applies in projects that run tests with build_runner.
+
+======== Output
+    --reporter          The runner used to print test results.
+
+          [compact]     A single line, updated continuously.
+          [expanded]    A separate line for each update.
+          [json]        A machine-readable format (see https://goo.gl/gBsV1a).
+
+======== Other Options
+    --test-stdout       Write the test process stdout to this file path.
+    --test-args         Args to pass to the test runner process.
+                        Run "pub run test -h -v" to see all available options.
+
+    --build-args        Args to pass to the build runner process.
+                        Run "pub run build_runner test -h -v" to see all available options.
+                        Note: these args are only applicable if the current project depends on "build_test".
+
+-h, --help              Print this usage information.
 ```
 
 Additionally, in projects that use `build_runner` to run tests, the `TestTool`
