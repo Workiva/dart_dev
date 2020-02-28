@@ -8,5 +8,6 @@ export 'src/tools/format_tool.dart'
     show FormatMode, Formatter, FormatterInputs, FormatTool;
 export 'src/tools/process_tool.dart' show ProcessTool;
 export 'src/tools/test_tool.dart' show TestTool;
+export 'src/tools/noop_tool.dart' show NoopTool;
 export 'src/tools/tuneup_check_tool.dart' show TuneupCheckTool;
 export 'src/tools/webdev_serve_tool.dart' show WebdevServeTool;
