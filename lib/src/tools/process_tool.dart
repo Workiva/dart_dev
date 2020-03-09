@@ -43,9 +43,6 @@ class ProcessTool extends DevTool {
   Process get process => _process;
   Process _process;
 
-  BackgroundProcessTool backgrounded({Duration startAfterDelay}) =>
-      BackgroundProcessTool._(_executable, _args, _mode, startAfterDelay);
-
   @override
   FutureOr<int> run([DevToolExecutionContext context]) async {
     context ??= DevToolExecutionContext();
@@ -67,35 +64,47 @@ class BackgroundProcessTool {
   final List<String> _args;
   final String _executable;
   final ProcessStartMode _mode;
-  final Duration _startAfterDelay;
+  final Duration _delayAfterStart;
+  final String _workingDirectory;
 
-  BackgroundProcessTool._(
-      this._executable, this._args, this._mode, this._startAfterDelay);
+  BackgroundProcessTool(String executable, List<String> args,
+      {ProcessStartMode mode,
+      Duration delayAfterStart,
+      String workingDirectory})
+      : _args = args,
+        _executable = executable,
+        _mode = mode,
+        _delayAfterStart = delayAfterStart,
+        _workingDirectory = workingDirectory;
+
+  Process get process => _process;
+  Process _process;
 
   DevTool get starter => DevTool.fromFunction(_start);
 
   DevTool get stopper => DevTool.fromFunction(_stop);
 
-  Process _process;
-
   bool _processHasExited = false;
 
   Future<int> _start(DevToolExecutionContext context) async {
-    assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults, context.usageException,
-        commandName: context.commandName);
+    if (context.argResults != null) {
+      assertNoPositionalArgsNorArgsAfterSeparator(
+          context.argResults, context.usageException,
+          commandName: context.commandName);
+    }
     logSubprocessHeader(_log, '$_executable ${_args.join(' ')}');
 
     final mode = _mode ??
         (context.verbose
             ? ProcessStartMode.inheritStdio
             : ProcessStartMode.normal);
-    _process = await Process.start(_executable, _args, mode: mode);
+    _process = await Process.start(_executable, _args,
+        mode: mode, workingDirectory: _workingDirectory);
     ensureProcessExit(_process);
     unawaited(_process.exitCode.then((_) => _processHasExited = true));
 
-    if (_startAfterDelay != null) {
-      await Future<void>.delayed(_startAfterDelay);
+    if (_delayAfterStart != null) {
+      await Future<void>.delayed(_delayAfterStart);
     }
 
     if (_processHasExited) {
@@ -108,9 +117,11 @@ class BackgroundProcessTool {
   }
 
   Future<int> _stop(DevToolExecutionContext context) async {
-    assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults, context.usageException,
-        commandName: context.commandName);
+    if (context.argResults != null) {
+      assertNoPositionalArgsNorArgsAfterSeparator(
+          context.argResults, context.usageException,
+          commandName: context.commandName);
+    }
     _log.info('Stopping: $_executable ${_args.join(' ')}');
     _process?.kill();
     await _process.exitCode;

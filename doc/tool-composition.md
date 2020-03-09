@@ -140,6 +140,24 @@ final config = {
 };
 ```
 
+### `BackgroundProcessTool`
+
+The `BackgroundProcessTool` can be used in conjunction with `CompoundTool` to
+wrap a tool with the starting and stopping of a background subprocess:
+
+```dart
+final testServer = BackgroundProcessTool(
+    'node', ['tool/server.js'],
+    delayAfterStart: Duration(seconds: 1));
+
+final config = {
+  'test': CompoundTool()
+    ..addTool(testServer.starter, alwaysRun: true)
+    ..addTool(TestTool())
+    ..addTool(testServer.stopper, alwaysRun: true),
+};
+```
+
 ### Mapping args to tools
 
 `CompoundTool.addTool()` supports an optional `argMapper` parameter that can be
