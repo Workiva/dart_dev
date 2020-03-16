@@ -55,6 +55,6 @@ Future<TestProcess> runDevToolFunctionalTest(
     }
   }
 
-  final args = <String>['run', 'dart_dev', ...command.split(' ')];
-  return TestProcess.start('pub', args, workingDirectory: d.sandbox);
+  final allArgs = <String>['run', 'dart_dev', command, ...?args];
+  return TestProcess.start('pub', allArgs, workingDirectory: d.sandbox);
 }
