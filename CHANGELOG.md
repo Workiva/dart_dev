@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.4.0](https://github.com/Workiva/dart_dev/compare/3.3.0...3.4.0)
+
+- Added `BackgroundProcessTool` to make it easier to run background processes as
+  a part of a `CompoundTool`.
+
 ## [3.3.0](https://github.com/Workiva/dart_dev/compare/3.2.2...3.3.0)
 
 - Added the `--reporter` option to `TestTool` so that a reporter can be selected
