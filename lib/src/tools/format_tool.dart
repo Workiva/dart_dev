@@ -135,12 +135,14 @@ class FormatTool extends DevTool {
     bool expandCwd,
     bool followLinks,
     String root,
-    bool collapseDirectories = false,
+    bool collapseDirectories,
   }) {
-    _log.finest(
-        'getInputs exclude $exclude, expandCwd $expandCwd, followLinks $followLinks, root $root, collapseDirectories $collapseDirectories');
     expandCwd ??= false;
     followLinks ??= false;
+    collapseDirectories ??= false;
+    _log.finest(
+      'getInputs exclude $exclude, expandCwd $expandCwd, followLinks $followLinks, root $root, collapseDirectories $collapseDirectories',
+    );
 
     final includedFiles = <String>{};
     final excludedFiles = <String>{};

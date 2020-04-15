@@ -230,7 +230,7 @@ void main() {
 
     test('logs the excluded paths, skipped links and hidden directories',
         () async {
-      Logger.root.level = Level.ALL;
+      Logger.root.level = Level.FINER;
       expect(
           Logger.root.onRecord,
           emitsInOrder([
