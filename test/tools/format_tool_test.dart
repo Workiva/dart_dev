@@ -73,24 +73,30 @@ void main() {
 
       test('custom excludes with collapseDirectories', () {
         FormatterInputs formatterInputs = FormatTool.getInputs(
-            exclude: [Glob('*_exclude.dart')],
-            root: root,
-            collapseDirectories: true);
+          exclude: [Glob('*_exclude.dart')],
+          root: root,
+          collapseDirectories: true,
+        );
 
         expect(
-            formatterInputs.includedFiles,
-            unorderedEquals({
-              'file.dart',
-              'lib',
-              'linked.dart',
-              'other',
-              'links',
-            }));
+          formatterInputs.includedFiles,
+          unorderedEquals({
+            'file.dart',
+            'lib',
+            'linked.dart',
+            'other',
+            'links',
+          }),
+        );
 
-        expect(formatterInputs.excludedFiles,
-            unorderedEquals({'should_exclude.dart'}));
-        expect(formatterInputs.hiddenDirectories,
-            unorderedEquals({'.dart_tool_test'}));
+        expect(
+          formatterInputs.excludedFiles,
+          unorderedEquals({'should_exclude.dart'}),
+        );
+        expect(
+          formatterInputs.hiddenDirectories,
+          unorderedEquals({'.dart_tool_test'}),
+        );
         expect(formatterInputs.skippedLinks, isEmpty);
       });
 

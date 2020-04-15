@@ -130,12 +130,13 @@ class FormatTool extends DevTool {
   ///
   /// If collapseDirectories is true, directories that contain no exclusions will wind up in the [FormatterInputs],
   /// rather than each file in that tree.  You may get unexpected results if this and followLinks are both true.
-  static FormatterInputs getInputs(
-      {List<Glob> exclude,
-      bool expandCwd,
-      bool followLinks,
-      String root,
-      bool collapseDirectories = false}) {
+  static FormatterInputs getInputs({
+    List<Glob> exclude,
+    bool expandCwd,
+    bool followLinks,
+    String root,
+    bool collapseDirectories = false,
+  }) {
     _log.finest(
         'getInputs exclude $exclude, expandCwd $expandCwd, followLinks $followLinks, root $root, collapseDirectories $collapseDirectories');
     expandCwd ??= false;
@@ -156,7 +157,6 @@ class FormatTool extends DevTool {
 
     String currentDirectory = '';
     bool skipFilesInDirectory = false;
-
     for (final entry
         in dir.listSync(recursive: true, followLinks: followLinks)) {
       final relative = p.relative(entry.path, from: dir.path);
@@ -404,7 +404,10 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
   final inputs = FormatTool.getInputs(
-      exclude: exclude, root: path, collapseDirectories: collapseDirectories);
+    exclude: exclude,
+    root: path,
+    collapseDirectories: collapseDirectories,
+  );
 
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '
