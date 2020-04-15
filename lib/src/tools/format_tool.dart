@@ -104,13 +104,14 @@ class FormatTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
     context ??= DevToolExecutionContext();
-    final execution = buildExecution(context,
-        configuredFormatterArgs: formatterArgs,
-        defaultMode: defaultMode,
-        exclude: exclude,
-        formatter: formatter,
-        collapseDirectories: collapseDirectories,
-        );
+    final execution = buildExecution(
+      context,
+      configuredFormatterArgs: formatterArgs,
+      defaultMode: defaultMode,
+      exclude: exclude,
+      formatter: formatter,
+      collapseDirectories: collapseDirectories,
+    );
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
   }
@@ -130,8 +131,13 @@ class FormatTool extends DevTool {
   /// If collapseDirectories is true, directories that contain no exclusions will wind up in the [FormatterInputs],
   /// rather than each file in that tree.  You may get unexpected results if this and followLinks are both true.
   static FormatterInputs getInputs(
-      {List<Glob> exclude, bool expandCwd, bool followLinks, String root, bool collapseDirectories = false}) {
-    _log.finest('getInputs exclude $exclude, expandCwd $expandCwd, followLinks $followLinks, root $root, collapseDirectories $collapseDirectories');
+      {List<Glob> exclude,
+      bool expandCwd,
+      bool followLinks,
+      String root,
+      bool collapseDirectories = false}) {
+    _log.finest(
+        'getInputs exclude $exclude, expandCwd $expandCwd, followLinks $followLinks, root $root, collapseDirectories $collapseDirectories');
     expandCwd ??= false;
     followLinks ??= false;
 
@@ -213,7 +219,8 @@ class FormatTool extends DevTool {
             _log.finest('directory has excludes');
           } else {
             skipFilesInDirectory = true;
-            _log.finest("directory does not have excludes skipping children and adding $relative");
+            _log.finest(
+                "directory does not have excludes skipping children and adding $relative");
             includedFiles.add(relative);
           }
         }
@@ -396,7 +403,8 @@ FormatExecution buildExecution(
             'format tool to use "dartfmt" instead.'));
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
-  final inputs = FormatTool.getInputs(exclude: exclude, root: path, collapseDirectories: collapseDirectories);
+  final inputs = FormatTool.getInputs(
+      exclude: exclude, root: path, collapseDirectories: collapseDirectories);
 
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '

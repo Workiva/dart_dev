@@ -72,8 +72,10 @@ void main() {
       });
 
       test('custom excludes with collapseDirectories', () {
-        FormatterInputs formatterInputs =
-        FormatTool.getInputs(exclude: [Glob('*_exclude.dart')], root: root, collapseDirectories: true);
+        FormatterInputs formatterInputs = FormatTool.getInputs(
+            exclude: [Glob('*_exclude.dart')],
+            root: root,
+            collapseDirectories: true);
 
         expect(
             formatterInputs.includedFiles,
