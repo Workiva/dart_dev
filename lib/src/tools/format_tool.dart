@@ -58,6 +58,8 @@ class FormatTool extends DevTool {
   /// By default, nothing is excluded.
   List<Glob> exclude;
 
+  bool collapseDirectories = false;
+
   /// The formatter to run, one of:
   /// - `dartfmt` (provided by the SDK)
   /// - `pub run dart_style:format` (provided by the `dart_style` package)
@@ -103,7 +105,9 @@ class FormatTool extends DevTool {
         configuredFormatterArgs: formatterArgs,
         defaultMode: defaultMode,
         exclude: exclude,
-        formatter: formatter);
+        formatter: formatter,
+        collapseDirectories: collapseDirectories,
+        );
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
   }
@@ -120,8 +124,8 @@ class FormatTool extends DevTool {
   /// By default these globs are assumed to be relative to the current working
   /// directory, but that can be overridden via [root] for testing purposes.
   static FormatterInputs getInputs(
-      {List<Glob> exclude, bool expandCwd, bool followLinks, String root}) {
-    print(">>> getInputs root $root");
+      {List<Glob> exclude, bool expandCwd, bool followLinks, String root, bool collapseDirectories = false}) {
+    print(">>> getInputs exclude $exclude, expandCwd $expandCwd, followLinks $followLinks, root $root, collapseDirectories $collapseDirectories");
     expandCwd ??= false;
     followLinks ??= false;
 
@@ -184,7 +188,7 @@ class FormatTool extends DevTool {
         hiddenDirectories.add(hiddenDirectory);
         currentDirectory = relative;
         print('>>> skipping hidden dir $hiddenDirectory');
-        skipFilesInDirectory = true;
+        if (collapseDirectories) skipFilesInDirectory = true;
         continue;
       }
 
@@ -203,9 +207,11 @@ class FormatTool extends DevTool {
             print('>>> There are excludes in there!');
           } else {
             print('>>> No excludes!');
-            skipFilesInDirectory = true;
-            print(">>> Adding $relative");
-            includedFiles.add(relative);
+            if (collapseDirectories) {
+              skipFilesInDirectory = true;
+              print(">>> Adding $relative");
+              includedFiles.add(relative);
+            }
           }
         }
 
@@ -364,6 +370,7 @@ FormatExecution buildExecution(
   List<Glob> exclude,
   Formatter formatter,
   String path,
+  bool collapseDirectories,
 }) {
   FormatMode mode;
   if (context.argResults != null) {
@@ -386,7 +393,7 @@ FormatExecution buildExecution(
             'format tool to use "dartfmt" instead.'));
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
-  final inputs = FormatTool.getInputs(exclude: exclude, root: path);
+  final inputs = FormatTool.getInputs(exclude: exclude, root: path, collapseDirectories: collapseDirectories);
 
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '

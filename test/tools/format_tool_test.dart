@@ -58,18 +58,38 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'file.dart',
-              'lib',
+              'lib/sub/file.dart',
               'linked.dart',
-              'links',
-              'other',
+              'other/file.dart',
             }));
 
         expect(formatterInputs.excludedFiles,
             unorderedEquals({'should_exclude.dart'}));
         expect(formatterInputs.hiddenDirectories,
             unorderedEquals({'.dart_tool_test'}));
-//        expect(formatterInputs.skippedLinks,
-//            unorderedEquals({'links/lib-link', 'links/link.dart'})); // TODO is this okay?
+        expect(formatterInputs.skippedLinks,
+            unorderedEquals({'links/lib-link', 'links/link.dart'}));
+      });
+
+      test('custom excludes with collapseDirectories', () {
+        FormatterInputs formatterInputs =
+        FormatTool.getInputs(exclude: [Glob('*_exclude.dart')], root: root, collapseDirectories: true);
+
+        expect(
+            formatterInputs.includedFiles,
+            unorderedEquals({
+              'file.dart',
+              'lib',
+              'linked.dart',
+              'other',
+              'links',
+            }));
+
+        expect(formatterInputs.excludedFiles,
+            unorderedEquals({'should_exclude.dart'}));
+        expect(formatterInputs.hiddenDirectories,
+            unorderedEquals({'.dart_tool_test'}));
+        expect(formatterInputs.skippedLinks, isEmpty);
       });
 
       test('empty inputs due to excludes config', () async {
@@ -86,11 +106,10 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'file.dart',
-              'lib',
+              'lib/sub/file.dart',
               'linked.dart',
-              'other',
+              'other/file.dart',
               'should_exclude.dart',
-              'links', // TODO is this okay?
             }));
         expect(formatterInputs.excludedFiles, isEmpty);
       });
@@ -101,7 +120,7 @@ void main() {
         expect(
             formatterInputs.includedFiles,
             unorderedEquals({
-              'lib-link',
+              'lib-link/sub/file.dart',
               'link.dart',
             }));
         expect(formatterInputs.skippedLinks, isEmpty);
