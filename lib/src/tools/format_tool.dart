@@ -121,6 +121,7 @@ class FormatTool extends DevTool {
   /// directory, but that can be overridden via [root] for testing purposes.
   static FormatterInputs getInputs(
       {List<Glob> exclude, bool expandCwd, bool followLinks, String root}) {
+    print(">>> getInputs root $root");
     expandCwd ??= false;
     followLinks ??= false;
 
@@ -131,22 +132,42 @@ class FormatTool extends DevTool {
 
     exclude ??= <Glob>[];
 
+    print(">>> exclude $exclude\n\n");
+
     if (exclude.isEmpty && !expandCwd) {
       return FormatterInputs({'.'});
     }
 
     final dir = Directory(root ?? '.');
 
+    String currentDirectory = '';
+    bool skipFilesInDirectory = false;
+
     for (final entry
         in dir.listSync(recursive: true, followLinks: followLinks)) {
       final relative = p.relative(entry.path, from: dir.path);
+      print(">>> Processing relative $relative");
+
+      if (p.isWithin(currentDirectory, relative)) {
+        if (skipFilesInDirectory) {
+          print(">>> skipping child $entry");
+          continue;
+        }
+      } else {
+        // the file/dir in not inside, cancel skipping.
+        skipFilesInDirectory = false;
+      }
 
       if (entry is Link) {
+        print('>>> skipping link $relative');
         skippedLinks.add(relative);
         continue;
       }
 
-      if (entry is File && !entry.path.endsWith('.dart')) continue;
+      if (entry is File && !entry.path.endsWith('.dart')) {
+        print('>>> skipping non-dart file $relative');
+        continue;
+      }
 
       // If the path is in a subdirectory starting with ".", ignore it.
       final parts = p.split(relative);
@@ -161,20 +182,47 @@ class FormatTool extends DevTool {
       if (hiddenIndex != null) {
         final hiddenDirectory = p.joinAll(parts.take(hiddenIndex + 1));
         hiddenDirectories.add(hiddenDirectory);
+        currentDirectory = relative;
+        print('>>> skipping hidden dir $hiddenDirectory');
+        skipFilesInDirectory = true;
         continue;
       }
 
       if (exclude.any((glob) => glob.matches(relative))) {
+        print('>>> Excluding $relative');
         excludedFiles.add(relative);
       } else {
-        if (entry is File) includedFiles.add(relative);
+        if (entry is Directory) {
+          print('>>> That was a directory!');
+          // TODO Clean this up
+          currentDirectory = relative;
+          // Looks like we can rely on the order of files coming from listSync.
+          // So, if a directory does not match any of the globs, and does not contain any of the globs, we should be able to just add that directory and stop recursing.
+          if (exclude.any((glob) => p.isWithin(
+              entry.path, p.relative(glob.toString(), from: dir.path)))) {
+            print('>>> There are excludes in there!');
+          } else {
+            print('>>> No excludes!');
+            skipFilesInDirectory = true;
+            print(">>> Adding $relative");
+            includedFiles.add(relative);
+          }
+        }
+
+        if (entry is File && !skipFilesInDirectory) {
+          print(">>> Adding $relative");
+          includedFiles.add(relative);
+        }
       }
     }
 
-    return FormatterInputs(includedFiles,
+    var formatterInputs = FormatterInputs(includedFiles,
         excludedFiles: excludedFiles,
         skippedLinks: skippedLinks,
         hiddenDirectories: hiddenDirectories);
+
+    print(">>> The end.  $formatterInputs");
+    return formatterInputs;
   }
 }
 
@@ -189,6 +237,11 @@ class FormatterInputs {
   final Set<String> includedFiles;
 
   final Set<String> skippedLinks;
+
+  @override
+  String toString() {
+    return 'FormatterInputs{\nexcludedFiles:\n$excludedFiles,\nhiddenDirectories:\n$hiddenDirectories,\nincludedFiles:\n$includedFiles,\nskippedLinks:\n$skippedLinks,\n}';
+  }
 }
 
 /// A declarative representation of an execution of the [FormatTool].
