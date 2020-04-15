@@ -71,6 +71,35 @@ void main() {
             unorderedEquals({'links/lib-link', 'links/link.dart'}));
       });
 
+      test('custom excludes with collapseDirectories', () {
+        FormatterInputs formatterInputs = FormatTool.getInputs(
+          exclude: [Glob('*_exclude.dart')],
+          root: root,
+          collapseDirectories: true,
+        );
+
+        expect(
+          formatterInputs.includedFiles,
+          unorderedEquals({
+            'file.dart',
+            'lib',
+            'linked.dart',
+            'other',
+            'links',
+          }),
+        );
+
+        expect(
+          formatterInputs.excludedFiles,
+          unorderedEquals({'should_exclude.dart'}),
+        );
+        expect(
+          formatterInputs.hiddenDirectories,
+          unorderedEquals({'.dart_tool_test'}),
+        );
+        expect(formatterInputs.skippedLinks, isEmpty);
+      });
+
       test('empty inputs due to excludes config', () async {
         expect(
             FormatTool.getInputs(exclude: [Glob('**')], root: root)
@@ -201,7 +230,7 @@ void main() {
 
     test('logs the excluded paths, skipped links and hidden directories',
         () async {
-      Logger.root.level = Level.ALL;
+      Logger.root.level = Level.FINER;
       expect(
           Logger.root.onRecord,
           emitsInOrder([

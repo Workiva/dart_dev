@@ -58,6 +58,11 @@ class FormatTool extends DevTool {
   /// By default, nothing is excluded.
   List<Glob> exclude;
 
+  /// If true, pass whole directories with no exclusions to the formatter.
+  ///
+  /// This is helpful for large projects that may cause the formatter command to have too many arguments
+  bool collapseDirectories = false;
+
   /// The formatter to run, one of:
   /// - `dartfmt` (provided by the SDK)
   /// - `pub run dart_style:format` (provided by the `dart_style` package)
@@ -99,11 +104,14 @@ class FormatTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
     context ??= DevToolExecutionContext();
-    final execution = buildExecution(context,
-        configuredFormatterArgs: formatterArgs,
-        defaultMode: defaultMode,
-        exclude: exclude,
-        formatter: formatter);
+    final execution = buildExecution(
+      context,
+      configuredFormatterArgs: formatterArgs,
+      defaultMode: defaultMode,
+      exclude: exclude,
+      formatter: formatter,
+      collapseDirectories: collapseDirectories,
+    );
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
   }
@@ -119,10 +127,22 @@ class FormatTool extends DevTool {
   ///
   /// By default these globs are assumed to be relative to the current working
   /// directory, but that can be overridden via [root] for testing purposes.
-  static FormatterInputs getInputs(
-      {List<Glob> exclude, bool expandCwd, bool followLinks, String root}) {
+  ///
+  /// If collapseDirectories is true, directories that contain no exclusions will wind up in the [FormatterInputs],
+  /// rather than each file in that tree.  You may get unexpected results if this and followLinks are both true.
+  static FormatterInputs getInputs({
+    List<Glob> exclude,
+    bool expandCwd,
+    bool followLinks,
+    String root,
+    bool collapseDirectories,
+  }) {
     expandCwd ??= false;
     followLinks ??= false;
+    collapseDirectories ??= false;
+    _log.finest(
+      'getInputs exclude $exclude, expandCwd $expandCwd, followLinks $followLinks, root $root, collapseDirectories $collapseDirectories',
+    );
 
     final includedFiles = <String>{};
     final excludedFiles = <String>{};
@@ -137,16 +157,33 @@ class FormatTool extends DevTool {
 
     final dir = Directory(root ?? '.');
 
+    String currentDirectory = '';
+    bool skipFilesInDirectory = false;
     for (final entry
         in dir.listSync(recursive: true, followLinks: followLinks)) {
       final relative = p.relative(entry.path, from: dir.path);
+      _log.finest('\n== Processing relative $relative ==');
+
+      if (p.isWithin(currentDirectory, relative)) {
+        if (skipFilesInDirectory) {
+          _log.finest('skipping child $entry');
+          continue;
+        }
+      } else {
+        // the file/dir in not inside, cancel skipping.
+        skipFilesInDirectory = false;
+      }
 
       if (entry is Link) {
+        _log.finest('skipping link $relative');
         skippedLinks.add(relative);
         continue;
       }
 
-      if (entry is File && !entry.path.endsWith('.dart')) continue;
+      if (entry is File && !entry.path.endsWith('.dart')) {
+        _log.finest('skipping non-dart file $relative');
+        continue;
+      }
 
       // If the path is in a subdirectory starting with ".", ignore it.
       final parts = p.split(relative);
@@ -161,20 +198,49 @@ class FormatTool extends DevTool {
       if (hiddenIndex != null) {
         final hiddenDirectory = p.joinAll(parts.take(hiddenIndex + 1));
         hiddenDirectories.add(hiddenDirectory);
+        _log.finest('skipping hidden dir $hiddenDirectory');
+        if (collapseDirectories) {
+          currentDirectory = relative;
+          skipFilesInDirectory = true;
+        }
         continue;
       }
 
       if (exclude.any((glob) => glob.matches(relative))) {
+        _log.finest('excluding $relative');
         excludedFiles.add(relative);
       } else {
-        if (entry is File) includedFiles.add(relative);
+        if (collapseDirectories && entry is Directory) {
+          _log.finest('directory: $entry');
+          currentDirectory = relative;
+          // It seems we can rely on the order of files coming from listSync.
+          // If a directory does not match any of the globs, and does not contain any of the globs,
+          // we should be able to just add that directory and skip adding any of its children files or directories.
+          if (exclude.any((glob) => p.isWithin(
+              entry.path, p.relative(glob.toString(), from: dir.path)))) {
+            _log.finest('directory has excludes');
+          } else {
+            skipFilesInDirectory = true;
+            _log.finest(
+                "directory does not have excludes skipping children and adding $relative");
+            includedFiles.add(relative);
+          }
+        }
+
+        if (entry is File && !skipFilesInDirectory) {
+          _log.finest("adding $relative");
+          includedFiles.add(relative);
+        }
       }
     }
 
-    return FormatterInputs(includedFiles,
+    var formatterInputs = FormatterInputs(includedFiles,
         excludedFiles: excludedFiles,
         skippedLinks: skippedLinks,
         hiddenDirectories: hiddenDirectories);
+
+    _log.finest("getInputs done $formatterInputs");
+    return formatterInputs;
   }
 }
 
@@ -189,6 +255,11 @@ class FormatterInputs {
   final Set<String> includedFiles;
 
   final Set<String> skippedLinks;
+
+  @override
+  String toString() {
+    return 'FormatterInputs{\nexcludedFiles:\n$excludedFiles,\nhiddenDirectories:\n$hiddenDirectories,\nincludedFiles:\n$includedFiles,\nskippedLinks:\n$skippedLinks,\n}';
+  }
 }
 
 /// A declarative representation of an execution of the [FormatTool].
@@ -311,6 +382,7 @@ FormatExecution buildExecution(
   List<Glob> exclude,
   Formatter formatter,
   String path,
+  bool collapseDirectories,
 }) {
   FormatMode mode;
   if (context.argResults != null) {
@@ -333,7 +405,11 @@ FormatExecution buildExecution(
             'format tool to use "dartfmt" instead.'));
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
-  final inputs = FormatTool.getInputs(exclude: exclude, root: path);
+  final inputs = FormatTool.getInputs(
+    exclude: exclude,
+    root: path,
+    collapseDirectories: collapseDirectories,
+  );
 
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '
