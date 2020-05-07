@@ -185,7 +185,7 @@ class FormatTool extends DevTool {
           "${directoriesWithExcludes.length} directories contain excludes\n");
     }
 
-    String currentDirectory = '';
+    String currentDirectory = p.relative(dir.path, from: dir.path);
     bool skipFilesInDirectory = false;
     for (final entry
         in dir.listSync(recursive: true, followLinks: followLinks)) {
@@ -228,7 +228,7 @@ class FormatTool extends DevTool {
         hiddenDirectories.add(hiddenDirectory);
         _log.finest('skipping file $relative in hidden dir $hiddenDirectory\n');
         if (collapseDirectories) {
-          currentDirectory = relative;
+          currentDirectory = hiddenDirectory;
           skipFilesInDirectory = true;
         }
         continue;
@@ -266,12 +266,10 @@ class FormatTool extends DevTool {
 
     _log.finer("excluded ${excludedFiles.length} files\n");
 
-    var formatterInputs = FormatterInputs(includedFiles,
+    return FormatterInputs(includedFiles,
         excludedFiles: excludedFiles,
         skippedLinks: skippedLinks,
         hiddenDirectories: hiddenDirectories);
-
-    return formatterInputs;
   }
 }
 
