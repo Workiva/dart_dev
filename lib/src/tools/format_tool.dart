@@ -140,9 +140,6 @@ class FormatTool extends DevTool {
     expandCwd ??= false;
     followLinks ??= false;
     collapseDirectories ??= false;
-    _log.finest(
-      'getInputs exclude $exclude, expandCwd $expandCwd, followLinks $followLinks, root $root, collapseDirectories $collapseDirectories',
-    );
 
     final includedFiles = <String>{};
     final excludedFiles = <String>{};
@@ -157,16 +154,47 @@ class FormatTool extends DevTool {
 
     final dir = Directory(root ?? '.');
 
+    // Use Glob.listSync to get all directories which might include a matching file.
+    var directoriesWithExcludes = Set<String>();
+
+    if (collapseDirectories) {
+      for (var g in exclude) {
+        List<FileSystemEntity> matchingPaths;
+        try {
+          matchingPaths = g.listSync(followLinks: followLinks);
+        } on FileSystemException catch (_) {
+          _log.info("Glob '$g' did not match any paths.\n");
+        }
+        if (matchingPaths != null) {
+          for (var path in matchingPaths) {
+            if (path is Directory) {
+              directoriesWithExcludes.add(path.path);
+            } else {
+              directoriesWithExcludes.add(path.parent.path);
+            }
+          }
+        }
+      }
+
+      // This is all the directories that contain a match within them.
+      _log.finer("Directories with excludes:\n");
+      for (var dir in directoriesWithExcludes) {
+        _log.finer("  $dir\n");
+      }
+      _log.fine(
+          "${directoriesWithExcludes.length} directories contain excludes\n");
+    }
+
     String currentDirectory = '';
     bool skipFilesInDirectory = false;
     for (final entry
         in dir.listSync(recursive: true, followLinks: followLinks)) {
       final relative = p.relative(entry.path, from: dir.path);
-      _log.finest('\n== Processing relative $relative ==');
+      _log.finest('== Processing relative $relative ==\n');
 
       if (p.isWithin(currentDirectory, relative)) {
         if (skipFilesInDirectory) {
-          _log.finest('skipping child $entry');
+          _log.finest('skipping child $entry\n');
           continue;
         }
       } else {
@@ -175,13 +203,13 @@ class FormatTool extends DevTool {
       }
 
       if (entry is Link) {
-        _log.finest('skipping link $relative');
+        _log.finer('skipping link $relative\n');
         skippedLinks.add(relative);
         continue;
       }
 
       if (entry is File && !entry.path.endsWith('.dart')) {
-        _log.finest('skipping non-dart file $relative');
+        _log.finest('skipping non-dart file $relative\n');
         continue;
       }
 
@@ -198,7 +226,7 @@ class FormatTool extends DevTool {
       if (hiddenIndex != null) {
         final hiddenDirectory = p.joinAll(parts.take(hiddenIndex + 1));
         hiddenDirectories.add(hiddenDirectory);
-        _log.finest('skipping hidden dir $hiddenDirectory');
+        _log.finest('skipping file $relative in hidden dir $hiddenDirectory\n');
         if (collapseDirectories) {
           currentDirectory = relative;
           skipFilesInDirectory = true;
@@ -207,39 +235,42 @@ class FormatTool extends DevTool {
       }
 
       if (exclude.any((glob) => glob.matches(relative))) {
-        _log.finest('excluding $relative');
+        _log.finer('excluding $relative\n');
         excludedFiles.add(relative);
       } else {
         if (collapseDirectories && entry is Directory) {
-          _log.finest('directory: $entry');
+          _log.finest('directory: $entry\n');
           currentDirectory = relative;
-          // It seems we can rely on the order of files coming from listSync.
-          // If a directory does not match any of the globs, and does not contain any of the globs,
-          // we should be able to just add that directory and skip adding any of its children files or directories.
-          if (exclude.any((glob) => p.isWithin(
-              entry.path, p.relative(glob.toString(), from: dir.path)))) {
-            _log.finest('directory has excludes');
+          // It seems we can rely on the order of files coming from Directory.listSync.
+          // If the entry does not contain an excluded file,
+          // we skip adding any of its children files or directories.
+          if (directoriesWithExcludes.any(
+            (directoryWithExclude) =>
+                p.isWithin(entry.path, directoryWithExclude) ||
+                p.equals(entry.path, directoryWithExclude),
+          )) {
+            _log.finer('$relative has excludes\n');
           } else {
             skipFilesInDirectory = true;
-            _log.finest(
-                "directory does not have excludes skipping children and adding $relative");
+            _log.finer("$relative does not have excludes, skipping children\n");
             includedFiles.add(relative);
           }
         }
 
         if (entry is File && !skipFilesInDirectory) {
-          _log.finest("adding $relative");
+          _log.finest("adding $relative\n");
           includedFiles.add(relative);
         }
       }
     }
+
+    _log.fine("excluded ${excludedFiles.length} files\n");
 
     var formatterInputs = FormatterInputs(includedFiles,
         excludedFiles: excludedFiles,
         skippedLinks: skippedLinks,
         hiddenDirectories: hiddenDirectories);
 
-    _log.finest("getInputs done $formatterInputs");
     return formatterInputs;
   }
 }
