@@ -163,7 +163,7 @@ class FormatTool extends DevTool {
         try {
           matchingPaths = g.listSync(followLinks: followLinks);
         } on FileSystemException catch (_) {
-          _log.info("Glob '$g' did not match any paths.\n");
+          _log.finer("Glob '$g' did not match any paths.\n");
         }
         if (matchingPaths != null) {
           for (var path in matchingPaths) {
@@ -181,7 +181,7 @@ class FormatTool extends DevTool {
       for (var dir in directoriesWithExcludes) {
         _log.finer("  $dir\n");
       }
-      _log.fine(
+      _log.finer(
           "${directoriesWithExcludes.length} directories contain excludes\n");
     }
 
@@ -264,7 +264,7 @@ class FormatTool extends DevTool {
       }
     }
 
-    _log.fine("excluded ${excludedFiles.length} files\n");
+    _log.finer("excluded ${excludedFiles.length} files\n");
 
     var formatterInputs = FormatterInputs(includedFiles,
         excludedFiles: excludedFiles,

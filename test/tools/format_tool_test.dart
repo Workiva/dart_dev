@@ -230,7 +230,8 @@ void main() {
 
     test('logs the excluded paths, skipped links and hidden directories',
         () async {
-      Logger.root.level = Level.FINER;
+      var currentLevel = Logger.root.level;
+      Logger.root.level = Level.FINE;
       expect(
           Logger.root.onRecord,
           emitsInOrder([
@@ -245,6 +246,8 @@ void main() {
       buildExecution(DevToolExecutionContext(),
           exclude: [Glob('*_exclude.dart')],
           path: 'test/tools/fixtures/format/globs');
+
+      Logger.root.level = currentLevel;
     });
 
     group('returns a FormatExecution', () {
