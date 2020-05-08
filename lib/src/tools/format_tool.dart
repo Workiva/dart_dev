@@ -58,11 +58,6 @@ class FormatTool extends DevTool {
   /// By default, nothing is excluded.
   List<Glob> exclude;
 
-  /// If true, pass whole directories with no exclusions to the formatter.
-  ///
-  /// This is helpful for large projects that may cause the formatter command to have too many arguments
-  bool collapseDirectories = false;
-
   /// The formatter to run, one of:
   /// - `dartfmt` (provided by the SDK)
   /// - `pub run dart_style:format` (provided by the `dart_style` package)
@@ -110,7 +105,6 @@ class FormatTool extends DevTool {
       defaultMode: defaultMode,
       exclude: exclude,
       formatter: formatter,
-      collapseDirectories: collapseDirectories,
     );
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
@@ -284,11 +278,6 @@ class FormatterInputs {
   final Set<String> includedFiles;
 
   final Set<String> skippedLinks;
-
-  @override
-  String toString() {
-    return 'FormatterInputs{\nexcludedFiles:\n$excludedFiles,\nhiddenDirectories:\n$hiddenDirectories,\nincludedFiles:\n$includedFiles,\nskippedLinks:\n$skippedLinks,\n}';
-  }
 }
 
 /// A declarative representation of an execution of the [FormatTool].
@@ -411,7 +400,6 @@ FormatExecution buildExecution(
   List<Glob> exclude,
   Formatter formatter,
   String path,
-  bool collapseDirectories,
 }) {
   FormatMode mode;
   if (context.argResults != null) {
@@ -437,7 +425,7 @@ FormatExecution buildExecution(
   final inputs = FormatTool.getInputs(
     exclude: exclude,
     root: path,
-    collapseDirectories: collapseDirectories,
+    collapseDirectories: true,
   );
 
   if (inputs.includedFiles.isEmpty) {
