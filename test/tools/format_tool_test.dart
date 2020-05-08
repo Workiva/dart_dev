@@ -58,6 +58,7 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'file.dart',
+              'links/not_link.dart',
               'lib/sub/file.dart',
               'linked.dart',
               'other/file.dart',
@@ -114,6 +115,7 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'file.dart',
+              'links/not_link.dart',
               'lib/sub/file.dart',
               'linked.dart',
               'other/file.dart',
@@ -129,6 +131,7 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'lib-link/sub/file.dart',
+              'not_link.dart',
               'link.dart',
             }));
         expect(formatterInputs.skippedLinks, isEmpty);
@@ -228,7 +231,7 @@ void main() {
       expect(execution.exitCode, ExitCode.config.code);
     });
 
-    test('logs the excluded paths, skipped links and hidden directories',
+    test('logs the excluded paths and hidden directories',
         () async {
       var currentLevel = Logger.root.level;
       Logger.root.level = Level.FINE;
@@ -237,8 +240,6 @@ void main() {
           emitsInOrder([
             fineLogOf(allOf(contains('Excluding these paths'),
                 contains('should_exclude.dart'))),
-            fineLogOf(allOf(contains('Excluding these links'),
-                contains('lib-link'), contains('link.dart'))),
             fineLogOf(allOf(contains('Excluding these hidden directories'),
                 contains('.dart_tool_test'))),
           ]));
@@ -249,6 +250,24 @@ void main() {
 
       Logger.root.level = currentLevel;
     });
+
+    test('logs the skipped links',
+            () async {
+          var currentLevel = Logger.root.level;
+          Logger.root.level = Level.FINE;
+          expect(
+              Logger.root.onRecord,
+              emitsInOrder([
+            fineLogOf(allOf(contains('Excluding these links'),
+                contains('lib-link'), contains('link.dart'))),
+              ]));
+
+          buildExecution(DevToolExecutionContext(),
+              exclude: [Glob('*_exclude.dart')],
+              path: 'test/tools/fixtures/format/globs/links');
+
+          Logger.root.level = currentLevel;
+        });
 
     group('returns a FormatExecution', () {
       test('', () {
