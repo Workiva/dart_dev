@@ -231,8 +231,7 @@ void main() {
       expect(execution.exitCode, ExitCode.config.code);
     });
 
-    test('logs the excluded paths and hidden directories',
-        () async {
+    test('logs the excluded paths and hidden directories', () async {
       var currentLevel = Logger.root.level;
       Logger.root.level = Level.FINE;
       expect(
@@ -251,23 +250,22 @@ void main() {
       Logger.root.level = currentLevel;
     });
 
-    test('logs the skipped links',
-            () async {
-          var currentLevel = Logger.root.level;
-          Logger.root.level = Level.FINE;
-          expect(
-              Logger.root.onRecord,
-              emitsInOrder([
+    test('logs the skipped links', () async {
+      var currentLevel = Logger.root.level;
+      Logger.root.level = Level.FINE;
+      expect(
+          Logger.root.onRecord,
+          emitsInOrder([
             fineLogOf(allOf(contains('Excluding these links'),
                 contains('lib-link'), contains('link.dart'))),
-              ]));
+          ]));
 
-          buildExecution(DevToolExecutionContext(),
-              exclude: [Glob('*_exclude.dart')],
-              path: 'test/tools/fixtures/format/globs/links');
+      buildExecution(DevToolExecutionContext(),
+          exclude: [Glob('*_exclude.dart')],
+          path: 'test/tools/fixtures/format/globs/links');
 
-          Logger.root.level = currentLevel;
-        });
+      Logger.root.level = currentLevel;
+    });
 
     group('returns a FormatExecution', () {
       test('', () {
