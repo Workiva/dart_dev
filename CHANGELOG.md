@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.5.0](https://github.com/Workiva/dart_dev/compare/3.4.0...3.5.0)
+
+- Added an optional `collapseDirectories` param to `FormatTool.getInputs()`.
+  When `true`, it will return the smallest list of inputs possible by returning
+  parent directories instead of all of its individual children file paths
+  whenever it can. This behavior is now enabled by default when using the
+  `FormatTool` directly. It has no effect if there are no `exclude` globs
+  configured.
+
 ## [3.4.0](https://github.com/Workiva/dart_dev/compare/3.3.0...3.4.0)
 
 - Added `BackgroundProcessTool` to make it easier to run background processes as

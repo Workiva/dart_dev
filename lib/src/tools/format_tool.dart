@@ -99,11 +99,13 @@ class FormatTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
     context ??= DevToolExecutionContext();
-    final execution = buildExecution(context,
-        configuredFormatterArgs: formatterArgs,
-        defaultMode: defaultMode,
-        exclude: exclude,
-        formatter: formatter);
+    final execution = buildExecution(
+      context,
+      configuredFormatterArgs: formatterArgs,
+      defaultMode: defaultMode,
+      exclude: exclude,
+      formatter: formatter,
+    );
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
   }
@@ -119,10 +121,19 @@ class FormatTool extends DevTool {
   ///
   /// By default these globs are assumed to be relative to the current working
   /// directory, but that can be overridden via [root] for testing purposes.
-  static FormatterInputs getInputs(
-      {List<Glob> exclude, bool expandCwd, bool followLinks, String root}) {
+  ///
+  /// If collapseDirectories is true, directories that contain no exclusions will wind up in the [FormatterInputs],
+  /// rather than each file in that tree.  You may get unexpected results if this and followLinks are both true.
+  static FormatterInputs getInputs({
+    List<Glob> exclude,
+    bool expandCwd,
+    bool followLinks,
+    String root,
+    bool collapseDirectories,
+  }) {
     expandCwd ??= false;
     followLinks ??= false;
+    collapseDirectories ??= false;
 
     final includedFiles = <String>{};
     final excludedFiles = <String>{};
@@ -137,16 +148,64 @@ class FormatTool extends DevTool {
 
     final dir = Directory(root ?? '.');
 
+    // Use Glob.listSync to get all directories which might include a matching file.
+    var directoriesWithExcludes = Set<String>();
+
+    if (collapseDirectories) {
+      for (var g in exclude) {
+        List<FileSystemEntity> matchingPaths;
+        try {
+          matchingPaths = g.listSync(followLinks: followLinks);
+        } on FileSystemException catch (_) {
+          _log.finer("Glob '$g' did not match any paths.\n");
+        }
+        if (matchingPaths != null) {
+          for (var path in matchingPaths) {
+            if (path is Directory) {
+              directoriesWithExcludes.add(path.path);
+            } else {
+              directoriesWithExcludes.add(path.parent.path);
+            }
+          }
+        }
+      }
+
+      // This is all the directories that contain a match within them.
+      _log.finer("Directories with excludes:\n");
+      for (var dir in directoriesWithExcludes) {
+        _log.finer("  $dir\n");
+      }
+      _log.finer(
+          "${directoriesWithExcludes.length} directories contain excludes\n");
+    }
+
+    String currentDirectory = p.relative(dir.path, from: dir.path);
+    bool skipFilesInDirectory = false;
     for (final entry
         in dir.listSync(recursive: true, followLinks: followLinks)) {
       final relative = p.relative(entry.path, from: dir.path);
+      _log.finest('== Processing relative $relative ==\n');
+
+      if (p.isWithin(currentDirectory, relative)) {
+        if (skipFilesInDirectory) {
+          _log.finest('skipping child $entry\n');
+          continue;
+        }
+      } else {
+        // the file/dir in not inside, cancel skipping.
+        skipFilesInDirectory = false;
+      }
 
       if (entry is Link) {
+        _log.finer('skipping link $relative\n');
         skippedLinks.add(relative);
         continue;
       }
 
-      if (entry is File && !entry.path.endsWith('.dart')) continue;
+      if (entry is File && !entry.path.endsWith('.dart')) {
+        _log.finest('skipping non-dart file $relative\n');
+        continue;
+      }
 
       // If the path is in a subdirectory starting with ".", ignore it.
       final parts = p.split(relative);
@@ -161,15 +220,45 @@ class FormatTool extends DevTool {
       if (hiddenIndex != null) {
         final hiddenDirectory = p.joinAll(parts.take(hiddenIndex + 1));
         hiddenDirectories.add(hiddenDirectory);
+        _log.finest('skipping file $relative in hidden dir $hiddenDirectory\n');
+        if (collapseDirectories) {
+          currentDirectory = hiddenDirectory;
+          skipFilesInDirectory = true;
+        }
         continue;
       }
 
       if (exclude.any((glob) => glob.matches(relative))) {
+        _log.finer('excluding $relative\n');
         excludedFiles.add(relative);
       } else {
-        if (entry is File) includedFiles.add(relative);
+        if (collapseDirectories && entry is Directory) {
+          _log.finest('directory: $entry\n');
+          currentDirectory = relative;
+          // It seems we can rely on the order of files coming from Directory.listSync.
+          // If the entry does not contain an excluded file,
+          // we skip adding any of its children files or directories.
+          if (directoriesWithExcludes.any(
+            (directoryWithExclude) =>
+                p.isWithin(entry.path, directoryWithExclude) ||
+                p.equals(entry.path, directoryWithExclude),
+          )) {
+            _log.finer('$relative has excludes\n');
+          } else {
+            skipFilesInDirectory = true;
+            _log.finer("$relative does not have excludes, skipping children\n");
+            includedFiles.add(relative);
+          }
+        }
+
+        if (entry is File && !skipFilesInDirectory) {
+          _log.finest("adding $relative\n");
+          includedFiles.add(relative);
+        }
       }
     }
+
+    _log.finer("excluded ${excludedFiles.length} files\n");
 
     return FormatterInputs(includedFiles,
         excludedFiles: excludedFiles,
@@ -333,7 +422,11 @@ FormatExecution buildExecution(
             'format tool to use "dartfmt" instead.'));
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
-  final inputs = FormatTool.getInputs(exclude: exclude, root: path);
+  final inputs = FormatTool.getInputs(
+    exclude: exclude,
+    root: path,
+    collapseDirectories: true,
+  );
 
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '
