@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
@@ -12,7 +13,8 @@ import 'package:path/path.dart' as p;
 import 'dart_dev_runner.dart';
 import 'utils/assert_dir_is_dart_package.dart';
 import 'utils/dart_tool_cache.dart';
-import 'utils/ensure_process_exit.dart';
+
+//import 'utils/ensure_process_exit.dart';
 import 'utils/logging.dart';
 
 typedef _ConfigGetter = Map<String, DevTool> Function();
@@ -50,11 +52,63 @@ Future<void> run(List<String> args) async {
   }
 
   generateRunScript();
-  final process = await Process.start(
-      Platform.executable, [_runScriptPath, ...args],
-      mode: ProcessStartMode.inheritStdio);
-  ensureProcessExit(process);
-  exitCode = await process.exitCode;
+
+  await executeRunScriptInIsolate(args);
+//  final process = await Process.start(
+//      Platform.executable, [_runScriptPath, ...args],
+//      mode: ProcessStartMode.inheritStdio);
+//  ensureProcessExit(process);
+//  exitCode = await process.exitCode;
+}
+
+Future<void> executeRunScriptInIsolate(List<String> args) async {
+  _log.fine('Spawning isolate');
+
+  // These will allow the isolate to send messages back.
+  final onExitPort = ReceivePort();
+  final onErrorPort = ReceivePort();
+
+  onErrorPort.listen((message) {
+    // If we hit an uncaught error, exitCode may not have been set.
+    // Set it here.
+    if (exitCode == 0) {
+      exitCode = 1;
+    }
+
+    // The message has a specific format as indicated by the
+    // `Isolate.addErrorListener` doc comment.
+    final messageParts = message as List<dynamic>;
+    final errorString = messageParts[0] as String;
+    final stackTrace = messageParts[1] == null
+        ? null
+        : StackTrace.fromString(messageParts[1] as String);
+    _log.severe('Uncaught error from runner isolate', errorString, stackTrace);
+  });
+
+  await Isolate.spawnUri(
+    Uri.file(_runScript.absolute.path),
+    args,
+    null,
+    onExit: onExitPort.sendPort,
+    onError: onErrorPort.sendPort,
+    errorsAreFatal: true,
+  );
+
+  // When the isolate exits, it sends a single message to this port.
+  // Wait for it.
+  //
+  // The value of this Future will always be null.
+  //
+  // Since exitCode is global to the VM, if the isolate sets it, it gets
+  // set here as well.
+  //
+  // So, since executable.runWithConfig always sets exitCode, we don't have to
+  // handle worry about it!
+  await onExitPort.first;
+
+  // Close the error port so that it doesn't keep the process alive
+  // waiting for more errors.
+  onErrorPort.close();
 }
 
 void generateRunScript() {
