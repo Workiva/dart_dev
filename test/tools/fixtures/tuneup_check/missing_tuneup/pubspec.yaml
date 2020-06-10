@@ -1,3 +1,6 @@
 name: missing_tuneup
 environment:
  sdk: ">=2.3.0 <3.0.0"
+
+workiva:
+  disable_core_checks: true

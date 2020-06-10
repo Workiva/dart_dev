@@ -4,3 +4,6 @@ environment:
 dev_dependencies:
   build_test: any
   test: any
+
+workiva:
+  disable_core_checks: true
