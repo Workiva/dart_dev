@@ -5,3 +5,6 @@ environment:
 dev_dependencies:
   dart_dev:
     path: ../../../../..
+
+workiva:
+  disable_core_checks: true

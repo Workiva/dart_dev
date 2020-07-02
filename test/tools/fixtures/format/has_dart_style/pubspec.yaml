@@ -3,3 +3,6 @@ environment:
  sdk: ">=2.3.0 <3.0.0"
 dev_dependencies:
   dart_style: any
+
+workiva:
+  disable_core_checks: true
