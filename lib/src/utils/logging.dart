@@ -28,6 +28,8 @@ import 'parse_flag_from_args.dart';
 // Ensures this message does not get overwritten by later logs.
 const _logSuffix = '\n';
 
+final log = Logger('DartDev');
+
 void attachLoggerToStdio(List<String> args) {
   final verbose = parseFlagFromArgs(args, 'verbose', abbr: 'v');
   Logger.root.level = verbose ? Level.ALL : Level.INFO;
