@@ -53,7 +53,6 @@ Future<void> run(List<String> args) async {
 
   if (args.contains('hackFastFormat') && !oldDevDartExists) {
     await handleFastFormat(args);
-    log.warning(yellow.wrap('tight tight tight'));
     exitCode = 0;
     return;
   }

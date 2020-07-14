@@ -40,7 +40,7 @@ class ConfigVisitor extends GeneralizingAstVisitor {
       if (node.value.runtimeType.toString() != 'FormatTool') {
         usesCustomFormatter = true;
 
-        if (node.value.runtimeType.toString() != 'OverReactFormatTool') {
+        if (node.value.runtimeType.toString() == 'OverReactFormatTool') {
           usesOverReactFormat = true;
         }
       }
