@@ -7,7 +7,6 @@ import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/utils/config_visitor.dart';
 import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
-import 'package:glob/glob.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
@@ -72,7 +71,9 @@ Future<void> handleFastFormat(List<String> args) async {
 
   if (hasCustomToolDevDart) {
     final configVisitor = ConfigVisitor();
-    parseString(content: File(_configPath).readAsStringSync()).unit.accept(configVisitor);
+    parseString(content: File(_configPath).readAsStringSync())
+        .unit
+        .accept(configVisitor);
 
     if (configVisitor.usesOverReactFormat) {
       final formatTool = OverReactFormatTool();
@@ -81,10 +82,7 @@ Future<void> handleFastFormat(List<String> args) async {
         formatTool.lineLength = configVisitor.lineLength;
       }
 
-      final config = {
-        ...coreConfig,
-        'hackFastFormat': formatTool
-      };
+      final config = {...coreConfig, 'hackFastFormat': formatTool};
 
       exitCode = await DartDevRunner(config).run(args);
       return;

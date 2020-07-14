@@ -1,10 +1,9 @@
-import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import 'logging.dart';
 
-/// Visits a `dart_dev/config.dart` file and searches for a line length.
+/// Visits a `dart_dev/config.dart` file and searches for a custom formatter.
 ///
 /// Expects the configuration to be in the format of:
 /// ```dart
@@ -15,7 +14,7 @@ import 'logging.dart';
 ///     ..lineLength = 120,
 /// };
 /// ```
-class ConfigVisitor extends GeneralizingAstVisitor {
+class ConfigVisitor extends GeneralizingAstVisitor<void> {
   int lineLength;
   bool usesCustomFormatter = false;
   bool usesOverReactFormat = false;
@@ -26,53 +25,43 @@ class ConfigVisitor extends GeneralizingAstVisitor {
   visitMapLiteralEntry(MapLiteralEntry node) {
     super.visitMapLiteralEntry(node);
 
-    SimpleStringLiteral formatKey = node.key.childEntities.firstWhere((e) {
-      if (e is SimpleStringLiteral) {
-        if (e.value == 'format') {
-          return true;
+    String mapEntryKey = node.key.toSource().replaceAll("'", "");
+
+    void detectFormatter(String methodName) {
+      if (methodName != 'FormatTool') {
+        this.usesCustomFormatter = true;
+
+        if (methodName == 'OverReactFormatTool') {
+          this.usesOverReactFormat = true;
         }
       }
+    }
 
-      return false;
-    }, orElse: () => null);
+    if (mapEntryKey == "format") {
+      final mapEntryValue = node.value;
+      if (mapEntryValue is MethodInvocation) {
+        detectFormatter(mapEntryValue.methodName.name);
+      } else if (mapEntryValue is CascadeExpression) {
+        detectFormatter(
+            mapEntryValue.target.toSource().replaceAll(RegExp('[()]'), ''));
 
-    if (formatKey != null) {
-      if (node.value.runtimeType.toString() != 'FormatTool') {
-        usesCustomFormatter = true;
+        final lineLengthAssignment = mapEntryValue.cascadeSections
+            .whereType<AssignmentExpression>()
+            .firstWhere((assignment) {
+          final lhs = assignment.leftHandSide;
+          return lhs is PropertyAccess && lhs.propertyName.name == 'lineLength';
+        }, orElse: () => null);
 
-        if (node.value.runtimeType.toString() == 'OverReactFormatTool') {
-          usesOverReactFormat = true;
+        if (lineLengthAssignment != null) {
+          final lengthExpression = lineLengthAssignment.rightHandSide;
+          if (lengthExpression is IntegerLiteral) {
+            lineLength = lengthExpression.value;
+          } else {
+            log.warning(
+                'Line-length auto-detection attempted, but the value for the FormatTool\'s line-length setting could not be parsed.');
+          }
         }
       }
     }
   }
-
-  @override
-  visitCascadeExpression(CascadeExpression node) {
-    final lineLengthAssignment = node.cascadeSections
-        .whereType<AssignmentExpression>()
-        .firstWhere((assignment) {
-      final lhs = assignment.leftHandSide;
-      return lhs is PropertyAccess && lhs.propertyName.name == 'lineLength';
-    }, orElse: () => null);
-
-    if (lineLengthAssignment != null) {
-      final lengthExpression = lineLengthAssignment.rightHandSide;
-      if (lengthExpression is IntegerLiteral) {
-        lineLength = lengthExpression.value;
-      } else {
-        log.warning('Line-length auto-detection attempted, but the value for the FormatTool\'s line-length setting could not be parsed.');
-      }
-    }
-
-    return super.visitCascadeExpression(node);
-  }
-}
-
-/// A wrapper around a line-length value.
-///
-/// This is used to allow [ConfigVisitor] to mutate a reference that is declared
-/// (and returned by) [getLineLength].
-class _LineLength {
-  int lineLength;
 }

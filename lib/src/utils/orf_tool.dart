@@ -15,7 +15,8 @@ class OverReactFormatTool extends DevTool {
   int lineLength;
 
   @override
-  String description = 'Format dart files in this package with over_react_format.';
+  String description =
+      'Format dart files in this package with over_react_format.';
 
   @override
   FutureOr<int> run([DevToolExecutionContext context]) async {
@@ -25,8 +26,8 @@ class OverReactFormatTool extends DevTool {
       'over_react_format',
       if (lineLength != null) '--line-length=$lineLength'
     ];
-    final process =
-    ProcessDeclaration('pub', [...args, ...paths], mode: ProcessStartMode.inheritStdio);
+    final process = ProcessDeclaration('pub', [...args, ...paths],
+        mode: ProcessStartMode.inheritStdio);
     logCommand('pub', paths, args, verbose: context?.verbose);
     return runProcessAndEnsureExit(process);
   }
