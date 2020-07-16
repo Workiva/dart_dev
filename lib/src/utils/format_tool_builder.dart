@@ -41,11 +41,32 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         if (formatter != null) {
           final formatterType = formatter.rightHandSide;
           if (formatterType is PrefixedIdentifier) {
-            (formatDevTool as FormatTool).formatter = _detectFormatterForFormatTool(formatterType.identifier);
+            (formatDevTool as FormatTool).formatter =
+                _detectFormatterForFormatTool(formatterType.identifier);
           } else {
             log.warning(
                 'Tried to detect the type of Formatter configured for `FormatTool` but failed.');
           }
+        }
+
+        final formatterArgs =
+            formatterInvocation.getCascadeByProperty('formatterArgs');
+
+        if (formatterArgs != null) {
+          final argList = formatterArgs.rightHandSide;
+          if (argList is ListLiteral) {
+            final stringArgs = argList.elements
+                .whereType<StringLiteral>()
+                .map((e) => e.stringValue).toList();
+            (formatDevTool as FormatTool).formatterArgs = stringArgs;
+
+            if (stringArgs.length < argList.elements.length) {
+              // TODO handle letting user know that args were removed
+            }
+          }
+        } else {
+          log.warning(
+              'Tried to detect the type of Formatter configured for `FormatTool` but failed.');
         }
       } else if (formatDevTool is OverReactFormatTool) {
         final lineLengthAssignment =
@@ -54,7 +75,8 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         if (lineLengthAssignment != null) {
           final lengthExpression = lineLengthAssignment.rightHandSide;
           if (lengthExpression is IntegerLiteral) {
-            (formatDevTool as OverReactFormatTool).lineLength = lengthExpression.value;
+            (formatDevTool as OverReactFormatTool).lineLength =
+                lengthExpression.value;
           } else {
             log.warning(
                 'Line-length auto-detection attempted, but the value for the FormatTool\'s line-length setting could not be parsed.');
