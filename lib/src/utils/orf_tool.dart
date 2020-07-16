@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:args/args.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/utils.dart';
 import 'package:glob/glob.dart';
@@ -26,6 +25,10 @@ class OverReactFormatTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) async {
     Iterable<String> paths = context?.argResults?.rest;
+    if (paths?.isEmpty ?? true) {
+      final inputs = FormatTool.getInputs(exclude: exclude);
+      paths = inputs.includedFiles;
+    }
     final args = [
       'run',
       'over_react_format',

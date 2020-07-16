@@ -10,6 +10,13 @@ enum KnownFormatTools { FormatTool, OverReactFormatTool }
 
 /// Visits a `dart_dev/config.dart` file and searches for a custom formatter.
 ///
+/// When a custom formatter is found, this will look for possible configuration options
+/// and reconstruct them on a new formatter instance.
+///
+/// NOTE: Because the visitor doesn't have access to the scope of the configuration
+/// being parsed, most values need to be a literal type (ListLiteral, StringLiteral, IntLiteral)
+/// to be reconstructed.
+///
 /// Expects the configuration to be in the format of:
 /// ```dart
 /// import 'package:over_react_format/dart_dev_tool.dart';
@@ -33,18 +40,19 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
     if (mapEntryKey != 'format') return;
 
     final formatterInvocation = node.value;
-    formatDevTool = _detectFormatter(node.value);
+    formatDevTool = detectFormatter(node.value);
 
     if (formatterInvocation is CascadeExpression) {
-      List<Glob> excludesList = [];
+      List<Glob> reconstructedExcludesList = [];
 
       final excludeExpression =
           formatterInvocation.getCascadeByProperty('exclude');
       if (excludeExpression != null) {
-        final formatterType = excludeExpression.rightHandSide;
-        if (formatterType is ListLiteral) {
-          excludesList =
-              formatterType.elements.whereType<MethodInvocation>().where((e) {
+        final detectedExcludesList = excludeExpression.rightHandSide;
+        if (detectedExcludesList is ListLiteral) {
+          reconstructedExcludesList = detectedExcludesList.elements
+              .whereType<MethodInvocation>()
+              .where((e) {
             return e.argumentList.arguments.length == 1 &&
                 e.argumentList.arguments.first is StringLiteral;
           }).map((e) {
@@ -52,9 +60,14 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
                 (e.argumentList.arguments.first as StringLiteral).stringValue;
             return Glob(path);
           }).toList();
+
+          if (reconstructedExcludesList.length <
+              detectedExcludesList.elements.length) {
+            logWarningMessageFor(
+                KnownErrorOutcome.failedToReconstructAllExcludes);
+          }
         } else {
-          log.warning(
-              'Tried to detect the type of Formatter configured for `FormatTool` but failed.');
+          logWarningMessageFor(KnownErrorOutcome.failedToParseExcludes);
         }
       }
 
@@ -62,21 +75,21 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         FormatTool typedFormatDevTool = formatDevTool;
 
         final formatter = formatterInvocation.getCascadeByProperty('formatter');
-        if (excludesList.isNotEmpty) typedFormatDevTool.exclude = excludesList;
+        if (reconstructedExcludesList.isNotEmpty) {
+          typedFormatDevTool.exclude = reconstructedExcludesList;
+        }
         if (formatter != null) {
           final formatterType = formatter.rightHandSide;
           if (formatterType is PrefixedIdentifier) {
             typedFormatDevTool.formatter =
-                _detectFormatterForFormatTool(formatterType.identifier);
+                detectFormatterForFormatTool(formatterType.identifier);
           } else {
-            log.warning(
-                'Tried to detect the type of Formatter configured for `FormatTool` but failed.');
+            logWarningMessageFor(KnownErrorOutcome.failedToParseFormatter);
           }
         }
 
         final formatterArgs =
             formatterInvocation.getCascadeByProperty('formatterArgs');
-
         if (formatterArgs != null) {
           final argList = formatterArgs.rightHandSide;
           if (argList is ListLiteral) {
@@ -87,26 +100,27 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
             typedFormatDevTool.formatterArgs = stringArgs;
 
             if (stringArgs.length < argList.elements.length) {
-              // TODO handle letting user know that args were removed
+              logWarningMessageFor(
+                  KnownErrorOutcome.failedToReconstructFormatterArgs);
             }
           } else {
-            log.warning(
-                'Tried to detect the type of Formatter configured for `FormatTool` but failed.');
+            logWarningMessageFor(KnownErrorOutcome.failedToParseFormatterArgs);
           }
         }
       } else if (formatDevTool is OverReactFormatTool) {
         OverReactFormatTool typedFormatDevTool = formatDevTool;
         final lineLengthAssignment =
             formatterInvocation.getCascadeByProperty('lineLength');
-        if (excludesList.isNotEmpty) typedFormatDevTool.exclude = excludesList;
+        if (reconstructedExcludesList.isNotEmpty) {
+          typedFormatDevTool.exclude = reconstructedExcludesList;
+        }
         if (lineLengthAssignment != null) {
           final lengthExpression = lineLengthAssignment.rightHandSide;
           if (lengthExpression is IntegerLiteral) {
             (formatDevTool as OverReactFormatTool).lineLength =
                 lengthExpression.value;
           } else {
-            log.warning(
-                'Line-length auto-detection attempted, but the value for the FormatTool\'s line-length setting could not be parsed.');
+            logWarningMessageFor(KnownErrorOutcome.failedToParseLineLength);
           }
         }
       }
@@ -114,7 +128,63 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
   }
 }
 
-Formatter _detectFormatterForFormatTool(SimpleIdentifier formatterIdentifier) {
+enum KnownErrorOutcome {
+  failedToReconstructAllExcludes,
+  failedToParseExcludes,
+  failedToParseFormatter,
+  failedToReconstructFormatterArgs,
+  failedToParseFormatterArgs,
+  failedToParseLineLength,
+}
+
+void logWarningMessageFor(KnownErrorOutcome outcome) {
+  String errorMessage;
+
+  switch (outcome) {
+    case KnownErrorOutcome.failedToReconstructAllExcludes:
+      errorMessage = '''Failed to reconstruct all items in the excludes list.
+
+This is likely due to a `Glob` having more than one parameter (expected only one) or
+the path parameter not being a StringLiteral.
+''';
+      break;
+    case KnownErrorOutcome.failedToParseExcludes:
+      errorMessage = '''Failed to parse the excludes list.
+
+This is likely because the list is not a ListLiteral.
+''';
+      break;
+    case KnownErrorOutcome.failedToParseFormatter:
+      errorMessage = '''Failed to parse the formatter configuration.
+
+This is likely because the assigned value is not in the form `Formatter.<formatter_option>`.
+''';
+      break;
+    case KnownErrorOutcome.failedToReconstructFormatterArgs:
+      errorMessage =
+          '''Failed to reconstruct all items in the formatterArgs list.
+
+This is likely because the list contained types that were not StringLiterals.
+''';
+      break;
+    case KnownErrorOutcome.failedToParseFormatterArgs:
+      errorMessage = '''Failed to parse the formatterArgs list.
+
+This is likely because the list is not a ListLiteral.
+''';
+      break;
+    case KnownErrorOutcome.failedToParseLineLength:
+      errorMessage = '''Failed to parse the line-length configuration.
+
+This is likely because assignment does not use an IntegerLiteral.
+''';
+      break;
+  }
+
+  log.warning(errorMessage);
+}
+
+Formatter detectFormatterForFormatTool(SimpleIdentifier formatterIdentifier) {
   Formatter formatter;
 
   switch (formatterIdentifier.name) {
@@ -125,14 +195,13 @@ Formatter _detectFormatterForFormatTool(SimpleIdentifier formatterIdentifier) {
       formatter = Formatter.dartStyle;
       break;
     default:
-      // TODO handle unknown formatter
       break;
   }
 
   return formatter;
 }
 
-DevTool _detectFormatter(AstNode formatterNode) {
+DevTool detectFormatter(AstNode formatterNode) {
   String detectedFormatterName;
   DevTool tool;
 
