@@ -14,6 +14,11 @@ class OverReactFormatTool extends DevTool {
   /// Default is 80.
   int lineLength;
 
+  /// The globs to exclude from the inputs to the dart formatter.
+  ///
+  /// By default, nothing is excluded.
+  List<Glob> exclude;
+
   @override
   String description =
       'Format dart files in this package with over_react_format.';

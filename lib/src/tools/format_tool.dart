@@ -402,9 +402,14 @@ FormatExecution buildExecution(
   String path,
 }) {
   FormatMode mode;
+
+  final useRestForInputs = (context?.argResults?.rest?.isNotEmpty ?? false) &&
+      context.commandName == 'hackFastFormat';
+
   if (context.argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
         context.argResults, context.usageException,
+        allowRest: useRestForInputs,
         commandName: context.commandName,
         usageFooter: 'Arguments can be passed to the "dartfmt" process via the '
             '--formatter-args option.');
@@ -422,11 +427,14 @@ FormatExecution buildExecution(
             'format tool to use "dartfmt" instead.'));
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
-  final inputs = FormatTool.getInputs(
-    exclude: exclude,
-    root: path,
-    collapseDirectories: true,
-  );
+
+  final inputs = useRestForInputs
+      ? FormatterInputs({...context.argResults.rest})
+      : FormatTool.getInputs(
+          exclude: exclude,
+          root: path,
+          collapseDirectories: true,
+        );
 
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '

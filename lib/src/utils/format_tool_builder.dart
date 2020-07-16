@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:dart_dev/src/utils/orf_tool.dart';
+import 'package:glob/glob.dart';
 
 import '../../dart_dev.dart';
 import 'logging.dart';
@@ -35,13 +36,37 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
     formatDevTool = _detectFormatter(node.value);
 
     if (formatterInvocation is CascadeExpression) {
-      if (formatDevTool is FormatTool) {
-        final formatter = formatterInvocation.getCascadeByProperty('formatter');
+      List<Glob> excludesList = [];
 
+      final excludeExpression =
+          formatterInvocation.getCascadeByProperty('exclude');
+      if (excludeExpression != null) {
+        final formatterType = excludeExpression.rightHandSide;
+        if (formatterType is ListLiteral) {
+          excludesList =
+              formatterType.elements.whereType<MethodInvocation>().where((e) {
+            return e.argumentList.arguments.length == 1 &&
+                e.argumentList.arguments.first is StringLiteral;
+          }).map((e) {
+            final path =
+                (e.argumentList.arguments.first as StringLiteral).stringValue;
+            return Glob(path);
+          }).toList();
+        } else {
+          log.warning(
+              'Tried to detect the type of Formatter configured for `FormatTool` but failed.');
+        }
+      }
+
+      if (formatDevTool is FormatTool) {
+        FormatTool typedFormatDevTool = formatDevTool;
+
+        final formatter = formatterInvocation.getCascadeByProperty('formatter');
+        if (excludesList.isNotEmpty) typedFormatDevTool.exclude = excludesList;
         if (formatter != null) {
           final formatterType = formatter.rightHandSide;
           if (formatterType is PrefixedIdentifier) {
-            (formatDevTool as FormatTool).formatter =
+            typedFormatDevTool.formatter =
                 _detectFormatterForFormatTool(formatterType.identifier);
           } else {
             log.warning(
@@ -57,21 +82,23 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
           if (argList is ListLiteral) {
             final stringArgs = argList.elements
                 .whereType<StringLiteral>()
-                .map((e) => e.stringValue).toList();
-            (formatDevTool as FormatTool).formatterArgs = stringArgs;
+                .map((e) => e.stringValue)
+                .toList();
+            typedFormatDevTool.formatterArgs = stringArgs;
 
             if (stringArgs.length < argList.elements.length) {
               // TODO handle letting user know that args were removed
             }
+          } else {
+            log.warning(
+                'Tried to detect the type of Formatter configured for `FormatTool` but failed.');
           }
-        } else {
-          log.warning(
-              'Tried to detect the type of Formatter configured for `FormatTool` but failed.');
         }
       } else if (formatDevTool is OverReactFormatTool) {
+        OverReactFormatTool typedFormatDevTool = formatDevTool;
         final lineLengthAssignment =
             formatterInvocation.getCascadeByProperty('lineLength');
-
+        if (excludesList.isNotEmpty) typedFormatDevTool.exclude = excludesList;
         if (lineLengthAssignment != null) {
           final lengthExpression = lineLengthAssignment.rightHandSide;
           if (lengthExpression is IntegerLiteral) {
