@@ -5,7 +5,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/utils/config_visitor.dart';
+import 'package:dart_dev/src/utils/format_tool_builder.dart';
 import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
@@ -65,47 +65,24 @@ Future<void> run(List<String> args) async {
 }
 
 Future<void> handleFastFormat(List<String> args) async {
-  final hasCustomToolDevDart = File(_configPath).existsSync();
-
   assertDirIsDartPackage();
 
-  if (hasCustomToolDevDart) {
-    final configVisitor = ConfigVisitor();
-    parseString(content: File(_configPath).readAsStringSync())
+  DevTool formatTool;
+  final configFile = File(_configPath);
+  if (configFile.existsSync()) {
+    final configVisitor = FormatToolBuilder();
+    parseString(content: configFile.readAsStringSync())
         .unit
         .accept(configVisitor);
-
-    if (configVisitor.usesOverReactFormat) {
-      final formatTool = OverReactFormatTool();
-
-      if (configVisitor.lineLength != null) {
-        formatTool.lineLength = configVisitor.lineLength;
-      }
-
-      final config = {...coreConfig, 'hackFastFormat': formatTool};
-
-      exitCode = await DartDevRunner(config).run(args);
-      return;
-    }
+    formatTool = configVisitor
+        .formatDevTool; // could be null if no custom `format` entry found
   }
-
-  final filteredArgs = args.where((arg) => arg != 'hackFastFormat');
-  final completeArgs = filteredArgs.toList();
-  completeArgs.insert(0, 'format');
+  // TODO
+  //  formatTool ??= chooseDefaultFormatTool();
 
   try {
-    exitCode = await DartDevRunner(coreConfig).run(completeArgs);
-  } on UsageException catch (error) {
-    stderr.writeln(error);
-    exitCode = ExitCode.usage.code;
-  } catch (error, stack) {
-    log.severe('Uncaught Exception:', error, stack);
-    if (!parseFlagFromArgs(completeArgs, 'verbose', abbr: 'v')) {
-      // Always print the stack trace for an uncaught exception.
-      stderr.writeln(stack);
-    }
-    exitCode = ExitCode.unavailable.code;
-  }
+    exitCode = await DartDevRunner({'hackFastFormat': formatTool}).run(args);
+  } catch (_) {}
 }
 
 void generateRunScript() {
