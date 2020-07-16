@@ -12,12 +12,13 @@ import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
+import '../utils.dart';
 import 'dart_dev_runner.dart';
 import 'utils/assert_dir_is_dart_package.dart';
 import 'utils/dart_tool_cache.dart';
 import 'utils/ensure_process_exit.dart';
 import 'utils/logging.dart';
-import 'utils/orf_tool.dart';
+import 'utils/over_react_format_tool.dart';
 
 typedef _ConfigGetter = Map<String, DevTool> Function();
 
@@ -77,8 +78,7 @@ Future<void> handleFastFormat(List<String> args) async {
     formatTool = configVisitor
         .formatDevTool; // could be null if no custom `format` entry found
   }
-  // TODO
-  //  formatTool ??= chooseDefaultFormatTool();
+  formatTool ??= chooseDefaultFormatTool();
 
   try {
     exitCode = await DartDevRunner({'hackFastFormat': formatTool}).run(args);
@@ -154,4 +154,18 @@ Future<void> runWithConfig(
     }
     exitCode = ExitCode.unavailable.code;
   }
+}
+
+/// Returns [OverReactFormatTool] if `over_react_format` is a direct dependency,
+/// and the default [FormatTool] otherwise.
+DevTool chooseDefaultFormatTool({String path}) {
+  final pubspec = cachedPubspec(path: path);
+  const orf = 'over_react_format';
+  final hasOverReactFormat = pubspec.dependencies.containsKey(orf) ||
+      pubspec.devDependencies.containsKey(orf) ||
+      pubspec.dependencyOverrides.containsKey(orf);
+
+  return hasOverReactFormat
+      ? OverReactFormatTool()
+      : (FormatTool()..formatter = Formatter.dartStyle);
 }

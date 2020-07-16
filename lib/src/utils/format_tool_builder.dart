@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:dart_dev/src/utils/orf_tool.dart';
+import 'package:dart_dev/src/utils/over_react_format_tool.dart';
 import 'package:glob/glob.dart';
 
 import '../../dart_dev.dart';
@@ -14,7 +14,7 @@ enum KnownFormatTools { FormatTool, OverReactFormatTool }
 /// and reconstruct them on a new formatter instance.
 ///
 /// NOTE: Because the visitor doesn't have access to the scope of the configuration
-/// being parsed, most values need to be a literal type (ListLiteral, StringLiteral, IntLiteral)
+/// being parsed, most values need to be a literal type (ListLiteral, StringLiteral, IntegerLiteral)
 /// to be reconstructed.
 ///
 /// Expects the configuration to be in the format of:
