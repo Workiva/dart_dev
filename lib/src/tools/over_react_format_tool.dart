@@ -5,7 +5,7 @@ import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/utils.dart';
 import 'package:glob/glob.dart';
 
-import 'logging.dart';
+import '../utils/logging.dart';
 
 class OverReactFormatTool extends DevTool {
   /// Wrap lines longer than this.

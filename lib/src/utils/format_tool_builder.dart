@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:dart_dev/src/utils/over_react_format_tool.dart';
+import 'package:dart_dev/src/tools/over_react_format_tool.dart';
 import 'package:glob/glob.dart';
 
 import '../../dart_dev.dart';
@@ -29,7 +29,7 @@ enum KnownFormatTools { FormatTool, OverReactFormatTool }
 class FormatToolBuilder extends GeneralizingAstVisitor<void> {
   DevTool formatDevTool;
 
-  FormatToolBuilder();
+  bool failedToDetectAKnownFormatter = false;
 
   @override
   visitMapLiteralEntry(MapLiteralEntry node) {
@@ -41,6 +41,11 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
 
     final formatterInvocation = node.value;
     formatDevTool = detectFormatter(node.value);
+
+    if (formatDevTool == null) {
+      failedToDetectAKnownFormatter = true;
+      return;
+    }
 
     if (formatterInvocation is CascadeExpression) {
       List<Glob> reconstructedExcludesList = [];
@@ -216,8 +221,6 @@ DevTool detectFormatter(AstNode formatterNode) {
     tool = FormatTool();
   } else if (detectedFormatterName == 'OverReactFormatTool') {
     tool = OverReactFormatTool();
-  } else {
-    // FIXME handle unknown formatter
   }
 
   return tool;

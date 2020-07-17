@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
@@ -14,11 +15,11 @@ import 'package:path/path.dart' as p;
 
 import '../utils.dart';
 import 'dart_dev_runner.dart';
+import 'tools/over_react_format_tool.dart';
 import 'utils/assert_dir_is_dart_package.dart';
 import 'utils/dart_tool_cache.dart';
 import 'utils/ensure_process_exit.dart';
 import 'utils/logging.dart';
-import 'utils/over_react_format_tool.dart';
 
 typedef _ConfigGetter = Map<String, DevTool> Function();
 
@@ -53,7 +54,13 @@ Future<void> run(List<String> args) async {
 
   if (args.contains('hackFastFormat') && !oldDevDartExists) {
     await handleFastFormat(args);
-    exitCode = 0;
+
+    if (exitCode == ExitCode.config.code) {
+      log.severe('Failed to reconstruct the format tool\'s configuration.\n\n'
+          'This is likely because dart_dev expects either the FormatTool class or the\n'
+          'OverReactFormatTool class.');
+    }
+
     return;
   }
 
@@ -71,18 +78,30 @@ Future<void> handleFastFormat(List<String> args) async {
   DevTool formatTool;
   final configFile = File(_configPath);
   if (configFile.existsSync()) {
-    final configVisitor = FormatToolBuilder();
+    final toolBuilder = FormatToolBuilder();
     parseString(content: configFile.readAsStringSync())
         .unit
-        .accept(configVisitor);
-    formatTool = configVisitor
+        .accept(toolBuilder);
+    formatTool = toolBuilder
         .formatDevTool; // could be null if no custom `format` entry found
+
+    if (formatTool == null && toolBuilder.failedToDetectAKnownFormatter) {
+      exitCode = ExitCode.config.code;
+    }
   }
+
   formatTool ??= chooseDefaultFormatTool();
 
   try {
     exitCode = await DartDevRunner({'hackFastFormat': formatTool}).run(args);
-  } catch (_) {}
+  } catch (error, stack) {
+    log.severe('Uncaught Exception:', error, stack);
+    if (!parseFlagFromArgs(args, 'verbose', abbr: 'v')) {
+      // Always print the stack trace for an uncaught exception.
+      stderr.writeln(stack);
+    }
+    exitCode = ExitCode.unavailable.code;
+  }
 }
 
 void generateRunScript() {
