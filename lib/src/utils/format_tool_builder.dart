@@ -19,8 +19,6 @@ enum KnownFormatTools { FormatTool, OverReactFormatTool }
 ///
 /// Expects the configuration to be in the format of:
 /// ```dart
-/// import 'package:over_react_format/dart_dev_tool.dart';
-///
 /// final config = {
 ///   'format': OverReactFormatTool()
 ///     ..lineLength = 120,
