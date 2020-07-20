@@ -190,6 +190,18 @@ void main() {
             ..having((e) => e.message, 'usage', contains('--formatter-args'))));
     });
 
+    test('allows positional arguments when the command is hackFastFormat', () {
+      final argParser = FormatTool().toCommand('t').argParser;
+      final argResults = argParser.parse(['a/random/path']);
+      final context = DevToolExecutionContext(
+          argResults: argResults, commandName: 'hackFastFormat');
+      final execution = buildExecution(context);
+      expect(execution.exitCode, isNull);
+      expect(execution.process.executable, 'dartfmt');
+      expect(execution.process.args, orderedEquals(['a/random/path']));
+      expect(execution.process.mode, ProcessStartMode.inheritStdio);
+    });
+
     test('throws UsageException if args are given after a separator', () {
       final argResults = ArgParser().parse(['--', 'a']);
       final context = DevToolExecutionContext(
