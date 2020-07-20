@@ -6,8 +6,6 @@ import 'package:glob/glob.dart';
 import '../../dart_dev.dart';
 import 'logging.dart';
 
-enum KnownFormatTools { FormatTool, OverReactFormatTool }
-
 /// Visits a `dart_dev/config.dart` file and searches for a custom formatter.
 ///
 /// When a custom formatter is found, this will look for possible configuration options
