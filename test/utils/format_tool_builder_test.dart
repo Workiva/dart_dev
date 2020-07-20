@@ -143,7 +143,6 @@ void main() {
 
 const orf_noCascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
-import 'package:over_react_format/dart_dev_tool.dart';
 
 final config = {
   ...coreConfig,
@@ -153,7 +152,6 @@ final config = {
 
 const orf_cascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
-import 'package:over_react_format/dart_dev_tool.dart';
 
 final config = {
   ...coreConfig,
@@ -165,7 +163,6 @@ final config = {
 
 const formatTool_noCascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
-import 'package:over_react_format/dart_dev_tool.dart';
 
 final config = {
   ...coreConfig,
@@ -176,7 +173,6 @@ final config = {
 String formatTool_cascadeSrc({String formatter = 'dartfmt'}) =>
     '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
-import 'package:over_react_format/dart_dev_tool.dart';
 
 final config = {
   ...coreConfig,
@@ -189,7 +185,6 @@ final config = {
 
 const unknownFormatterTool = '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
-import 'package:over_react_format/dart_dev_tool.dart';
 
 final config = {
   ...coreConfig,
