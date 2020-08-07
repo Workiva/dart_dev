@@ -2,8 +2,8 @@ language: dart
 
 jobs:
   include:
-    - dart: "2.7.2"
-      name: "SDK: 2.7.2"
+    - dart: "2.4.1"
+      name: "SDK: 2.4.1"
       script:
         - pub run dart_dev analyze
         - pub run dart_dev test
@@ -11,7 +11,7 @@ jobs:
       name: "SDK: stable"
       script:
         - pub run dart_dev analyze
-        - pub run dependency_validator -i pedantic
+        - pub run dependency_validator -i pedantic over_react_format
         - pub run dart_dev format --check
         - pub run dart_dev test
         - pub publish --dry-run

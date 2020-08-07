@@ -46,8 +46,16 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
     if (formatterInvocation is CascadeExpression) {
       List<Glob> reconstructedExcludesList = [];
 
-      final excludeExpression =
-          formatterInvocation.getCascadeByProperty('exclude');
+      AssignmentExpression getCascadeByProperty(String property) {
+        return formatterInvocation.cascadeSections
+            .whereType<AssignmentExpression>()
+            .firstWhere((assignment) {
+          final lhs = assignment.leftHandSide;
+          return lhs is PropertyAccess && lhs.propertyName.name == property;
+        }, orElse: () => null);
+      }
+
+      final excludeExpression = getCascadeByProperty('exclude');
       if (excludeExpression != null) {
         final detectedExcludesList = excludeExpression.rightHandSide;
         if (detectedExcludesList is ListLiteral) {
@@ -75,7 +83,7 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
       if (formatDevTool is FormatTool) {
         FormatTool typedFormatDevTool = formatDevTool;
 
-        final formatter = formatterInvocation.getCascadeByProperty('formatter');
+        final formatter = getCascadeByProperty('formatter');
         if (reconstructedExcludesList.isNotEmpty) {
           typedFormatDevTool.exclude = reconstructedExcludesList;
         }
@@ -89,8 +97,7 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
           }
         }
 
-        final formatterArgs =
-            formatterInvocation.getCascadeByProperty('formatterArgs');
+        final formatterArgs = getCascadeByProperty('formatterArgs');
         if (formatterArgs != null) {
           final argList = formatterArgs.rightHandSide;
           if (argList is ListLiteral) {
@@ -110,8 +117,7 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         }
       } else if (formatDevTool is OverReactFormatTool) {
         OverReactFormatTool typedFormatDevTool = formatDevTool;
-        final lineLengthAssignment =
-            formatterInvocation.getCascadeByProperty('lineLength');
+        final lineLengthAssignment = getCascadeByProperty('lineLength');
         if (reconstructedExcludesList.isNotEmpty) {
           typedFormatDevTool.exclude = reconstructedExcludesList;
         }
@@ -220,14 +226,4 @@ DevTool detectFormatter(AstNode formatterNode) {
   }
 
   return tool;
-}
-
-extension on CascadeExpression {
-  AssignmentExpression getCascadeByProperty(String property) {
-    return cascadeSections.whereType<AssignmentExpression>().firstWhere(
-        (assignment) {
-      final lhs = assignment.leftHandSide;
-      return lhs is PropertyAccess && lhs.propertyName.name == property;
-    }, orElse: () => null);
-  }
 }

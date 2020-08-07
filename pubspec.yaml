@@ -4,7 +4,7 @@ description: Centralized tooling for Dart projects. Consistent interface across 
 homepage: https://github.com/Workiva/dart_dev
 
 environment:
- sdk: ">=2.7.2 <3.0.0"
+ sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
   analyzer: ^0.39.12
