@@ -231,8 +231,57 @@ final config = {
 };
 ```
 
+## Format on save
+dart_dev can be used to facilate formatting on save inside of JetBrains IDEs. For setup instructions, see below.
+
+__NOTE:__ This functionality is reliant upon the `pub run dart_dev` process running at least version `3.6.0` of this tool. Ensure that your `pubspec.yaml` specifies an appropriate version range, otherwise the method described below will not work.
+
+### A Note on VS Code
+A VS code extension exists to run either `dartfmt` or `over_react_format` on save. For information on it, see [its project](vs-code-formatter). However, that VS Code extension does not run `dart_dev`, but rather has its own logic to run a formatting command.
+
+### JetBrains IDEs (WebStorm, IntelliJ, etc.)
+Webstorm exposes a File Watcher utility that can be used to run commands when a file saves. For this approach, all you need to do is set up the file watcher. Shoutout to @patkujawa-wf for creating the original inspiration of this solution!
+
+#### `hackFastFormat`
+To facilitate the formatting on save capability, the command `hackFastFormat` was introduced. It is important because the standard format command is not optimized for this situation. `hackFastFormat` replicates the core behavior necessary for running the formatter, but excludes some functionality that the standard format command has. Consequently, it may behave differently. While it can be run directly from a shell, that is not the intended usecase.
+
+##### Known Limitations
+- Can only recognize the `FormatTool` and `OverReactFormatTool`. If you use a custom formatter, this will not work for you.
+- Can only run on targeted files. Because this command is optimized for formatting on save, the assumption is that it will only run on a single, specific file. If run without a target file, the command will throw a usage error. 
+
+#### Setting Up the File Watcher
+1. Go into Webstorm's preferences. It doesn't matter what project you do this in, as you'll ultimately want to make the watcher global. More on that later, though!
+1. Navigate to the "File Watchers" settings. This is under "Preferences > Tools > File Watchers". The File Watcher pane should look something like: 
+
+    <img src='./images/file_watcher_pane.png' width="75%" alt='File Watcher Pane'>
+
+1. Clicking on the import icon on the bottom toolbar.
+1. Import the `format_on_save.xml` file found in this project, at "[dart_dev/tool/file_watchers/format_on_save.xml](tool/file_watchers/ddev_format_on_save.xml)".
+1. After importing, change the watcher scoping (AKA "level") to `Global` on the right hand side under the "level" column, which makes the watcher available for use in all projects.
+1. In each project, you will also have to enable the watcher by checking the box on the file watcher's row.
+
+For additional reference on how the watcher is set up, see [JetBrains File Watcher Configuration](#jetbrains-file-watcher-configuration).
+
+
+#### JetBrains File Watcher Configuration
+<img src='./images/file_watcher_config.png' width="75%" alt='Final File Watcher Configuration'>
+  
+  1. __The Name:__ Webstorm treats this like the process name, so it's the identifier that will be used to display any output that the process is running. It can be whatever you like!
+  1. __File Type:__ `Dart`, since that's what the formatter was built for.
+  1. __Scope:__ `Project Files` will produce the desired effect, but if a different option works better for you then feel free! For more information on scoping, see [the docs](file-watcher-docs).
+  1. __Program:__ The exutable to run. In this case, it can just be `pub`. If there are any issues, providing a full path to the executable may have the desired outcome. For pub, this is most likely `/usr/local/bin/pub`.
+  1. __Arguments:__ The rest of the command, and by default should be `run dart_dev hackFastFormat "$FilePathRelativeToProjectRoot$"`. Here's the breakdown:
+      - `run dart_dev hackFastFormat`: Simply the process to run. 
+      - `"$FilePathRelativeToProjectRoot$"`: The environment variable that will target only the changed file.
+  1. __Output Paths to Refresh:__ `"$FilePathRelativeToProjectRoot$"`.
+  1. __Working Directory:__ `$ContentRoot$`.
+  1. __Advanced Options:__ Uncheck all the boxes. Again, if you experiment and find having some of them checked is better then feel free! However, the expected behavior occurs when none of them are checked.
+
+
 [api-docs]: https://pub.dev/documentation/dart_dev/latest/dart_dev/dart_dev-library.html
 [build-filter]: https://github.com/dart-lang/build/blob/master/build_runner/CHANGELOG.md#new-feature-build-filters
 [core-config]: https://github.com/Workiva/dart_dev/blob/master/lib/src/core_config.dart
 [docs]: https://github.com/Workiva/dart_dev/blob/master/doc/
+[file-watcher-docs] : https://www.jetbrains.com/help/webstorm/using-file-watchers.html#
 [upgrade-guide]: https://github.com/Workiva/dart_dev/blob/master/doc/v3-upgrade-guide.md
+[vs-code-formatter]: https://github.com/Workiva/vs-code-format-on-save/blob/master/README.md
