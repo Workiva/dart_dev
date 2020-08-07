@@ -428,6 +428,13 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
+  if (context.commandName == 'hackFastFormat' && !useRestForInputs) {
+    context.usageException('"hackFastFormat" must specify targets to format.\n'
+        'hackFastFormat should only be used to format specific files. '
+        'Running the command over an entire project may format files that '
+        'would be excluded using the standard "format" command.');
+  }
+
   final inputs = useRestForInputs
       ? FormatterInputs({...context.argResults.rest})
       : FormatTool.getInputs(
@@ -499,6 +506,10 @@ void logCommand(
   } else {
     logSubprocessHeader(_log, '$exeAndArgs <${inputs.length} paths>');
   }
+}
+
+void logError(String head, String body) {
+  _log.severe(red.wrap(head) + yellow.wrap(body));
 }
 
 /// Attempts to parse and return a single [FormatMode] from [argResults] by

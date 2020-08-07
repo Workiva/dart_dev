@@ -3,7 +3,6 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/tools/over_react_format_tool.dart';
-import 'package:glob/glob.dart';
 import 'package:test/test.dart';
 
 import 'package:dart_dev/src/utils/format_tool_builder.dart';
@@ -30,28 +29,6 @@ void main() {
           expect(visitor.formatDevTool, isA<OverReactFormatTool>());
           expect(
               (visitor.formatDevTool as OverReactFormatTool).lineLength, 120);
-        });
-
-        test('detects excludes', () {
-          final visitor = FormatToolBuilder();
-
-          parseString(content: orf_cascadeSrc).unit.accept(visitor);
-
-          expect(visitor.formatDevTool, isNotNull);
-          expect(visitor.formatDevTool, isA<OverReactFormatTool>());
-
-          OverReactFormatTool typedTool = visitor.formatDevTool;
-
-          final expectedGlobs = [
-            Glob('app/**'),
-            Glob('test/unit/generated_runner_test.dart')
-          ];
-
-          // A hacky variant of ordered equals, necessary because the two lists are not equal
-          // due to the Glob instances being different (even if they're provided the same path).
-          for (var i = 1; i < typedTool.exclude.length; i++) {
-            expect(typedTool.exclude[i].pattern, expectedGlobs[i].pattern);
-          }
         });
       });
     });
@@ -103,28 +80,6 @@ void main() {
           expect((visitor.formatDevTool as FormatTool).formatterArgs,
               orderedEquals(['-l', '120']));
         });
-
-        test('detects excludes', () {
-          final visitor = FormatToolBuilder();
-
-          parseString(content: formatTool_cascadeSrc()).unit.accept(visitor);
-
-          expect(visitor.formatDevTool, isNotNull);
-          expect(visitor.formatDevTool, isA<FormatTool>());
-
-          FormatTool typedTool = visitor.formatDevTool;
-
-          final expectedGlobs = [
-            Glob('app/**'),
-            Glob('test/unit/generated_runner_test.dart')
-          ];
-
-          // A hacky variant of ordered equals, necessary because the two lists are not equal
-          // due to the Glob instances being different.
-          for (var i = 1; i < typedTool.exclude.length; i++) {
-            expect(typedTool.exclude[i].pattern, expectedGlobs[i].pattern);
-          }
-        });
       });
     });
 
@@ -156,8 +111,7 @@ import 'package:glob/glob.dart';
 final config = {
   ...coreConfig,
   'format': OverReactFormatTool()
-    ..lineLength = 120
-    ..exclude = [Glob('app/**'), Glob('test/unit/generated_runner_test.dart')],
+    ..lineLength = 120,
 };
 ''';
 
@@ -178,8 +132,7 @@ final config = {
   ...coreConfig,
   'format': FormatTool()
     ..formatter = Formatter.$formatter
-    ..formatterArgs = ['-l', '120']
-    ..exclude = [Glob('app/**'), Glob('test/unit/generated_runner_test.dart')],
+    ..formatterArgs = ['-l', '120'],
 };
 ''';
 
@@ -190,7 +143,6 @@ final config = {
   ...coreConfig,
   'format': UnknownTool()
     ..formatter = Formatter.dartfmt
-    ..formatterArgs = ['-l', '120']
-    ..exclude = [Glob('test/unit/generated_runner_test.dart')],
+    ..formatterArgs = ['-l', '120'],
 };
 ''';

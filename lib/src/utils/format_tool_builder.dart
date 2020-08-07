@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:dart_dev/src/tools/over_react_format_tool.dart';
-import 'package:glob/glob.dart';
 
 import '../../dart_dev.dart';
 import 'logging.dart';
@@ -44,8 +43,6 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
     }
 
     if (formatterInvocation is CascadeExpression) {
-      List<Glob> reconstructedExcludesList = [];
-
       AssignmentExpression getCascadeByProperty(String property) {
         return formatterInvocation.cascadeSections
             .whereType<AssignmentExpression>()
@@ -55,38 +52,10 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         }, orElse: () => null);
       }
 
-      final excludeExpression = getCascadeByProperty('exclude');
-      if (excludeExpression != null) {
-        final detectedExcludesList = excludeExpression.rightHandSide;
-        if (detectedExcludesList is ListLiteral) {
-          reconstructedExcludesList = detectedExcludesList.elements
-              .whereType<MethodInvocation>()
-              .where((e) {
-            return e.argumentList.arguments.length == 1 &&
-                e.argumentList.arguments.first is StringLiteral;
-          }).map((e) {
-            final path =
-                (e.argumentList.arguments.first as StringLiteral).stringValue;
-            return Glob(path);
-          }).toList();
-
-          if (reconstructedExcludesList.length <
-              detectedExcludesList.elements.length) {
-            logWarningMessageFor(
-                KnownErrorOutcome.failedToReconstructAllExcludes);
-          }
-        } else {
-          logWarningMessageFor(KnownErrorOutcome.failedToParseExcludes);
-        }
-      }
-
       if (formatDevTool is FormatTool) {
         FormatTool typedFormatDevTool = formatDevTool;
 
         final formatter = getCascadeByProperty('formatter');
-        if (reconstructedExcludesList.isNotEmpty) {
-          typedFormatDevTool.exclude = reconstructedExcludesList;
-        }
         if (formatter != null) {
           final formatterType = formatter.rightHandSide;
           if (formatterType is PrefixedIdentifier) {
@@ -118,9 +87,6 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
       } else if (formatDevTool is OverReactFormatTool) {
         OverReactFormatTool typedFormatDevTool = formatDevTool;
         final lineLengthAssignment = getCascadeByProperty('lineLength');
-        if (reconstructedExcludesList.isNotEmpty) {
-          typedFormatDevTool.exclude = reconstructedExcludesList;
-        }
         if (lineLengthAssignment != null) {
           final lengthExpression = lineLengthAssignment.rightHandSide;
           if (lengthExpression is IntegerLiteral) {
@@ -135,8 +101,6 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
 }
 
 enum KnownErrorOutcome {
-  failedToReconstructAllExcludes,
-  failedToParseExcludes,
   failedToParseFormatter,
   failedToReconstructFormatterArgs,
   failedToParseFormatterArgs,
@@ -147,19 +111,6 @@ void logWarningMessageFor(KnownErrorOutcome outcome) {
   String errorMessage;
 
   switch (outcome) {
-    case KnownErrorOutcome.failedToReconstructAllExcludes:
-      errorMessage = '''Failed to reconstruct all items in the excludes list.
-
-This is likely due to a `Glob` having more than one parameter (expected only one) or
-the path parameter not being a StringLiteral.
-''';
-      break;
-    case KnownErrorOutcome.failedToParseExcludes:
-      errorMessage = '''Failed to parse the excludes list.
-
-This is likely because the list is not a ListLiteral.
-''';
-      break;
     case KnownErrorOutcome.failedToParseFormatter:
       errorMessage = '''Failed to parse the formatter configuration.
 

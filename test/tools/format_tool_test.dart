@@ -202,6 +202,21 @@ void main() {
       expect(execution.process.mode, ProcessStartMode.inheritStdio);
     });
 
+    test('requires positional arguments when the command is hackFastFormat',
+        () {
+      final argParser = FormatTool().toCommand('t').argParser;
+      final argResults = argParser.parse([]);
+      final context = DevToolExecutionContext(
+          argResults: argResults, commandName: 'hackFastFormat');
+      expect(
+          () => buildExecution(context),
+          throwsA(isA<UsageException>()
+            ..having(
+                (e) => e.message, 'command name', contains('hackFastFormat'))
+            ..having(
+                (e) => e.message, 'usage', contains('must specify targets'))));
+    });
+
     test('throws UsageException if args are given after a separator', () {
       final argResults = ArgParser().parse(['--', 'a']);
       final context = DevToolExecutionContext(
