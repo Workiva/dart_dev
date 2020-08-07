@@ -36,7 +36,7 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
     if (mapEntryKey != 'format') return;
 
     final formatterInvocation = node.value;
-    formatDevTool = detectFormatter(node.value);
+    formatDevTool = detectFormatter(formatterInvocation);
 
     if (formatDevTool == null) {
       failedToDetectAKnownFormatter = true;
@@ -124,8 +124,7 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         if (lineLengthAssignment != null) {
           final lengthExpression = lineLengthAssignment.rightHandSide;
           if (lengthExpression is IntegerLiteral) {
-            (formatDevTool as OverReactFormatTool).lineLength =
-                lengthExpression.value;
+            typedFormatDevTool.lineLength = lengthExpression.value;
           } else {
             logWarningMessageFor(KnownErrorOutcome.failedToParseLineLength);
           }

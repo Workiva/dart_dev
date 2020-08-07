@@ -55,12 +55,6 @@ Future<void> run(List<String> args) async {
   if (args.contains('hackFastFormat') && !oldDevDartExists) {
     await handleFastFormat(args);
 
-    if (exitCode == ExitCode.config.code) {
-      log.severe('Failed to reconstruct the format tool\'s configuration.\n\n'
-          'This is likely because dart_dev expects either the FormatTool class or the\n'
-          'OverReactFormatTool class.');
-    }
-
     return;
   }
 
@@ -87,6 +81,10 @@ Future<void> handleFastFormat(List<String> args) async {
 
     if (formatTool == null && toolBuilder.failedToDetectAKnownFormatter) {
       exitCode = ExitCode.config.code;
+      log.severe('Failed to reconstruct the format tool\'s configuration.\n\n'
+          'This is likely because dart_dev expects either the FormatTool class or the\n'
+          'OverReactFormatTool class.');
+      return;
     }
   }
 
