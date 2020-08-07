@@ -13,6 +13,7 @@ Easily configurable.
 - [Project-Level Configuration](#project-level-configuration)
 - [Extending/Composing Functionality](#extendingcomposing-functionality)
 - [Shared Configuration](#shared-configuration)
+- [Format on save](#format-on-save)
 - [Additional Docs][docs]
 
 ## Quick Start
@@ -282,6 +283,6 @@ For additional reference on how the watcher is set up, see [JetBrains File Watch
 [build-filter]: https://github.com/dart-lang/build/blob/master/build_runner/CHANGELOG.md#new-feature-build-filters
 [core-config]: https://github.com/Workiva/dart_dev/blob/master/lib/src/core_config.dart
 [docs]: https://github.com/Workiva/dart_dev/blob/master/doc/
-[file-watcher-docs] : https://www.jetbrains.com/help/webstorm/using-file-watchers.html#
+[file-watcher-docs]: https://www.jetbrains.com/help/webstorm/using-file-watchers.html#
 [upgrade-guide]: https://github.com/Workiva/dart_dev/blob/master/doc/v3-upgrade-guide.md
 [vs-code-formatter]: https://github.com/Workiva/vs-code-format-on-save/blob/master/README.md
