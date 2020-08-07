@@ -142,8 +142,7 @@ List<String> buildArgs(
     // 1. Statically configured args from [WebdevServeTool.webdevArgs]
     ...?configuredWebdevArgs,
     // 2. The -r|--release flag
-    if (argResults != null && argResults['release'] ?? false)
-      '--release',
+    if (argResults != null && argResults['release'] ?? false) '--release',
     // 3. Args passed to --webdev-args
     ...?splitSingleOptionValue(argResults, 'webdev-args'),
   ];

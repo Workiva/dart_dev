@@ -354,10 +354,8 @@ Iterable<String> buildArgs(
       '-n',
       '--set-exit-if-changed',
     ],
-    if (mode == FormatMode.overwrite)
-      '-w',
-    if (mode == FormatMode.dryRun)
-      '-n',
+    if (mode == FormatMode.overwrite) '-w',
+    if (mode == FormatMode.dryRun) '-n',
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,
