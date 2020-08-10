@@ -506,10 +506,6 @@ void logCommand(
   }
 }
 
-void logError(String head, String body) {
-  _log.severe(red.wrap(head) + yellow.wrap(body));
-}
-
 /// Attempts to parse and return a single [FormatMode] from [argResults] by
 /// checking for the supported mode flags (`--check`, `--dry-run`, and
 /// `--overwrite`).

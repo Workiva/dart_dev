@@ -233,9 +233,9 @@ final config = {
 ```
 
 ## Format on save
-dart_dev can be used to facilate formatting on save inside of JetBrains IDEs. For setup instructions, see below.
+dart_dev can be used to facilitate formatting on save inside of JetBrains IDEs. For setup instructions, see below.
 
-__NOTE:__ This functionality is reliant upon the `pub run dart_dev` process running at least version `3.6.0` of this tool. Ensure that your `pubspec.yaml` specifies an appropriate version range, otherwise the method described below will not work.
+__NOTE:__ This functionality is reliant upon the `pub run dart_dev` process running at least version `3.6.0` of this tool. Ensure that your `pubspec.yaml` specifies an appropriate version range, otherwise the method described below will not work. Another limitt only recognize the `FormatTool` and `OverReactFormatTool`. If you use a custom formatter, this will not work for you.
 
 ### A Note on VS Code
 A VS code extension exists to run either `dartfmt` or `over_react_format` on save. For information on it, see [its project](vs-code-formatter). However, that VS Code extension does not run `dart_dev`, but rather has its own logic to run a formatting command.
@@ -243,12 +243,51 @@ A VS code extension exists to run either `dartfmt` or `over_react_format` on sav
 ### JetBrains IDEs (WebStorm, IntelliJ, etc.)
 Webstorm exposes a File Watcher utility that can be used to run commands when a file saves. For this approach, all you need to do is set up the file watcher. Shoutout to @patkujawa-wf for creating the original inspiration of this solution!
 
-#### `hackFastFormat`
-To facilitate the formatting on save capability, the command `hackFastFormat` was introduced. It is important because the standard format command is not optimized for this situation. `hackFastFormat` replicates the core behavior necessary for running the formatter, but excludes some functionality that the standard format command has. Consequently, it may behave differently. While it can be run directly from a shell, that is not the intended usecase.
+__NOTE:__ There are three basic limitations when using this file watcher:
+1. dart_dev's minimum must be at least version `3.6.0`.
+1. Only dart_dev's `FormatTool` and OverReact Format's `OverReactFormatTool` are supported.
+1. Literals need to be used when possible when configuring the formatter. This primarily pertains to the formatter tool itself and setting the property that is responsible for line-length. For example:
+    ```dart
+    // Good
+    final Map<String, DevTool> config = {
+      // ... other config options
+      'format': FormatTool()
+        ..formatter = Formatter.dartStyle
+        ..formatterArgs = ['-l', '120'],
+    };
 
-##### Known Limitations
-- Can only recognize the `FormatTool` and `OverReactFormatTool`. If you use a custom formatter, this will not work for you.
-- Can only run on targeted files. Because this command is optimized for formatting on save, the assumption is that it will only run on a single, specific file. If run without a target file, the command will throw a usage error. 
+    // Bad
+
+    // Example 1: Line-length as a variable
+    const lineLength = 120;
+
+    final Map<String, DevTool> config = {
+      // ... other config options
+      'format': FormatTool()
+        ..formatter = Formatter.dartStyle
+        ..formatterArgs = ['-l', lineLength],
+    };
+
+    // Example 2: Args as a variable
+    const formatterArgs = ['-l', '120'];
+
+    final Map<String, DevTool> config = {
+      // ... other config options
+      'format': FormatTool()
+        ..formatter = Formatter.dartStyle
+        ..formatterArgs = formatterArgs,
+    };
+
+    // Example 3: Formatter as a variable
+    const formatter = FormatTool()
+        ..formatter = Formatter.dartStyle
+        ..formatterArgs = ['-l', '120'];
+
+    final Map<String, DevTool> config = {
+      // ... other config options
+      'format': formatter,
+    };
+    ```
 
 #### Setting Up the File Watcher
 1. Go into Webstorm's preferences. It doesn't matter what project you do this in, as you'll ultimately want to make the watcher global. More on that later, though!

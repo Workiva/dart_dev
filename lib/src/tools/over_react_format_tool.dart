@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/utils.dart';
-import 'package:io/io.dart';
 
 import '../tools/format_tool.dart';
 
@@ -21,20 +20,11 @@ class OverReactFormatTool extends DevTool {
   FutureOr<int> run([DevToolExecutionContext context]) async {
     Iterable<String> paths = context?.argResults?.rest;
     if (paths?.isEmpty ?? true) {
-      if (context != null) {
-        context.usageException(
-            '"hackFastFormat" must specify targets to format.\n'
-            'hackFastFormat should only be used to format specific files. '
-            'Running the command over an entire project may format files that '
-            'would be excluded using the standard "format" command.');
-      } else {
-        logError(
-            '"hackFastFormat" must specify targets to format.\n',
-            'hackFastFormat should only be used to format specific files. '
-                'Running the command over an entire project may format files that '
-                'would be excluded using the standard "format" command.');
-        return ExitCode.usage.code;
-      }
+      context.usageException(
+          '"hackFastFormat" must specify targets to format.\n'
+          'hackFastFormat should only be used to format specific files. '
+          'Running the command over an entire project may format files that '
+          'would be excluded using the standard "format" command.');
     }
     final args = [
       'run',
