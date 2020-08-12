@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.6.0](https://github.com/Workiva/dart_dev/compare/3.5.0...3.6.0)
+
+- Support a faster format command for better integration with JetBrains file
+  watching for format-on-save functionality.
+
 ## [3.5.0](https://github.com/Workiva/dart_dev/compare/3.4.0...3.5.0)
 
 - Added an optional `collapseDirectories` param to `FormatTool.getInputs()`.
