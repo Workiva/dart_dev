@@ -198,8 +198,7 @@ List<String> buildArgs({
     // 1. Statically configured args from [WebdevServeTool.buildArgs]
     ...?configuredBuildArgs,
     // 2. Pass through the --release flag if provided.
-    if (flagValue(argResults, 'release') ?? false)
-      '--release',
+    if (flagValue(argResults, 'release') ?? false) '--release',
     // 3. Build filters to narrow the build to only the target tests.
     //    (If no test dirs/files are passed in as args, then no build filters
     //     will be created.)
@@ -236,15 +235,12 @@ List<String> buildArgs({
   return [
     // `pub run test` or `pub run build_runner test`
     'run',
-    if (useBuildTest)
-      'build_runner',
+    if (useBuildTest) 'build_runner',
     'test',
 
     // Add the args targeting the build_runner command.
-    if (useBuildTest)
-      ...buildArgs,
-    if (useBuildTest && testArgs.isNotEmpty)
-      '--',
+    if (useBuildTest) ...buildArgs,
+    if (useBuildTest && testArgs.isNotEmpty) '--',
 
     // Add the args targeting the test command.
     ...testArgs,

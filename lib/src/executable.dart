@@ -1,15 +1,21 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
+import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
+import 'package:dart_dev/src/utils/format_tool_builder.dart';
 import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
+import '../utils.dart';
 import 'dart_dev_runner.dart';
+import 'tools/over_react_format_tool.dart';
 import 'utils/assert_dir_is_dart_package.dart';
 import 'utils/dart_tool_cache.dart';
 import 'utils/ensure_process_exit.dart';
@@ -30,23 +36,26 @@ final _relativeDevDartPath = p.relative(
   from: p.absolute(p.dirname(_runScriptPath)),
 );
 
-final _log = Logger('DartDev');
-
 Future<void> run(List<String> args) async {
   attachLoggerToStdio(args);
-
   final configExists = File(_configPath).existsSync();
   final oldDevDartExists = File(_oldDevDartPath).existsSync();
 
   if (!configExists) {
-    _log.fine('No custom `tool/dart_dev/config.dart` file found; '
+    log.fine('No custom `tool/dart_dev/config.dart` file found; '
         'using default config.');
   }
   if (oldDevDartExists) {
-    _log.warning(yellow.wrap(
+    log.warning(yellow.wrap(
         'dart_dev v3 now expects configuration to be at `$_configPath`,\n'
         'but `$_oldDevDartPath` still exists. View the guide to see how to upgrade:\n'
         'https://github.com/Workiva/dart_dev/blob/master/doc/v3-upgrade-guide.md'));
+  }
+
+  if (args.contains('hackFastFormat') && !oldDevDartExists) {
+    await handleFastFormat(args);
+
+    return;
   }
 
   generateRunScript();
@@ -57,9 +66,45 @@ Future<void> run(List<String> args) async {
   exitCode = await process.exitCode;
 }
 
+Future<void> handleFastFormat(List<String> args) async {
+  assertDirIsDartPackage();
+
+  DevTool formatTool;
+  final configFile = File(_configPath);
+  if (configFile.existsSync()) {
+    final toolBuilder = FormatToolBuilder();
+    parseString(content: configFile.readAsStringSync())
+        .unit
+        .accept(toolBuilder);
+    formatTool = toolBuilder
+        .formatDevTool; // could be null if no custom `format` entry found
+
+    if (formatTool == null && toolBuilder.failedToDetectAKnownFormatter) {
+      exitCode = ExitCode.config.code;
+      log.severe('Failed to reconstruct the format tool\'s configuration.\n\n'
+          'This is likely because dart_dev expects either the FormatTool class or the\n'
+          'OverReactFormatTool class.');
+      return;
+    }
+  }
+
+  formatTool ??= chooseDefaultFormatTool();
+
+  try {
+    exitCode = await DartDevRunner({'hackFastFormat': formatTool}).run(args);
+  } catch (error, stack) {
+    log.severe('Uncaught Exception:', error, stack);
+    if (!parseFlagFromArgs(args, 'verbose', abbr: 'v')) {
+      // Always print the stack trace for an uncaught exception.
+      stderr.writeln(stack);
+    }
+    exitCode = ExitCode.unavailable.code;
+  }
+}
+
 void generateRunScript() {
   if (shouldWriteRunScript) {
-    logTimedSync(_log, 'Generating run script', () {
+    logTimedSync(log, 'Generating run script', () {
       createCacheDir();
       _runScript.writeAsStringSync(buildDartDevRunScriptContents());
     }, level: Level.INFO);
@@ -93,7 +138,7 @@ Future<void> runWithConfig(
   try {
     assertDirIsDartPackage();
   } on DirectoryIsNotPubPackage catch (error) {
-    _log.severe(error);
+    log.severe(error);
     return ExitCode.usage.code;
   }
 
@@ -119,11 +164,25 @@ Future<void> runWithConfig(
     stderr.writeln(error);
     exitCode = ExitCode.usage.code;
   } catch (error, stack) {
-    _log.severe('Uncaught Exception:', error, stack);
+    log.severe('Uncaught Exception:', error, stack);
     if (!parseFlagFromArgs(args, 'verbose', abbr: 'v')) {
       // Always print the stack trace for an uncaught exception.
       stderr.writeln(stack);
     }
     exitCode = ExitCode.unavailable.code;
   }
+}
+
+/// Returns [OverReactFormatTool] if `over_react_format` is a direct dependency,
+/// and the default [FormatTool] otherwise.
+DevTool chooseDefaultFormatTool({String path}) {
+  final pubspec = cachedPubspec(path: path);
+  const orf = 'over_react_format';
+  final hasOverReactFormat = pubspec.dependencies.containsKey(orf) ||
+      pubspec.devDependencies.containsKey(orf) ||
+      pubspec.dependencyOverrides.containsKey(orf);
+
+  return hasOverReactFormat
+      ? OverReactFormatTool()
+      : (FormatTool()..formatter = Formatter.dartStyle);
 }

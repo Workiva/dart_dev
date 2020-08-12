@@ -354,10 +354,8 @@ Iterable<String> buildArgs(
       '-n',
       '--set-exit-if-changed',
     ],
-    if (mode == FormatMode.overwrite)
-      '-w',
-    if (mode == FormatMode.dryRun)
-      '-n',
+    if (mode == FormatMode.overwrite) '-w',
+    if (mode == FormatMode.dryRun) '-n',
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,
@@ -402,9 +400,14 @@ FormatExecution buildExecution(
   String path,
 }) {
   FormatMode mode;
+
+  final useRestForInputs = (context?.argResults?.rest?.isNotEmpty ?? false) &&
+      context.commandName == 'hackFastFormat';
+
   if (context.argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
         context.argResults, context.usageException,
+        allowRest: useRestForInputs,
         commandName: context.commandName,
         usageFooter: 'Arguments can be passed to the "dartfmt" process via the '
             '--formatter-args option.');
@@ -422,11 +425,21 @@ FormatExecution buildExecution(
             'format tool to use "dartfmt" instead.'));
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
-  final inputs = FormatTool.getInputs(
-    exclude: exclude,
-    root: path,
-    collapseDirectories: true,
-  );
+
+  if (context.commandName == 'hackFastFormat' && !useRestForInputs) {
+    context.usageException('"hackFastFormat" must specify targets to format.\n'
+        'hackFastFormat should only be used to format specific files. '
+        'Running the command over an entire project may format files that '
+        'would be excluded using the standard "format" command.');
+  }
+
+  final inputs = useRestForInputs
+      ? FormatterInputs({...context.argResults.rest})
+      : FormatTool.getInputs(
+          exclude: exclude,
+          root: path,
+          collapseDirectories: true,
+        );
 
   if (inputs.includedFiles.isEmpty) {
     _log.severe('The formatter cannot run because no inputs could be found '
