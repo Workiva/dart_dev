@@ -20,7 +20,7 @@ class OverReactFormatTool extends DevTool {
   FutureOr<int> run([DevToolExecutionContext context]) async {
     Iterable<String> paths = context?.argResults?.rest;
     if (paths?.isEmpty ?? true) {
-      context.usageException(
+      context?.usageException(
           '"hackFastFormat" must specify targets to format.\n'
           'hackFastFormat should only be used to format specific files. '
           'Running the command over an entire project may format files that '
