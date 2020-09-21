@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.6.1](https://github.com/Workiva/dart_dev/compare/3.6.0...3.6.1)
+
+- Fix issue where tests that load a deferred library would throw an exception 
+  when run with `pub run dart_dev test --path/to/file.dart`.
+
 ## [3.6.0](https://github.com/Workiva/dart_dev/compare/3.5.0...3.6.0)
 
 - Support a faster format command for better integration with JetBrains file
