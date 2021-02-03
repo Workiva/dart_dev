@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.6.3](https://github.com/Workiva/dart_dev/compare/3.6.3...3.6.1)
+## [3.6.4](https://github.com/Workiva/dart_dev/compare/3.6.4...3.6.1)
 
 - Widen `analyzer` constraint to `>=0.39.0 <0.42.0`
 
