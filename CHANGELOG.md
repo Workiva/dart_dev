@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.6.3](https://github.com/Workiva/dart_dev/compare/3.6.3...3.6.1)
+
+- Widen `analyzer` constraint to `>=0.39.0 <0.42.0`
+
 ## [3.6.1](https://github.com/Workiva/dart_dev/compare/3.6.0...3.6.1)
 
 - Fix issue where tests that load a deferred library would throw an exception 
