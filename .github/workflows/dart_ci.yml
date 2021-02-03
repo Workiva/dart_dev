@@ -1,0 +1,63 @@
+name: Dart CI
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'test_consume_*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [ 2.4.1, stable, dev ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v0.2
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Print Dart SDK version
+        run: dart --version
+
+      - id: install
+        name: Install dependencies
+        run: pub get
+
+      - name: Validate dependencies
+        run: pub run dependency_validator -i pedantic over_react_format
+        if: always() && steps.install.outcome == 'success'
+
+      - name: Analyze project source
+        run: pub run dart_dev analyze
+        if: always() && steps.install.outcome == 'success'
+
+      - name: Run tests
+        run: pub run dart_dev test
+        if: always() && steps.install.outcome == 'success'
+
+  format_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v0.2
+
+      - name: Print Dart SDK version
+        run: dart --version
+
+      - id: install
+        name: Install dependencies
+        run: pub get
+
+      - name: Verify formatting
+        run: pub run dart_dev format --check
+        if: always() && steps.install.outcome == 'success'
+
+      - name: Publish dry run
+        run: pub publish --dry-run
+        if: always() && steps.install.outcome == 'success'

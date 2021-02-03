@@ -1,7 +1,7 @@
 # Dart Dev Tools
 
 [![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dartlang.org/packages/dart_dev)
-[![Build Status](https://travis-ci.org/Workiva/dart_dev.svg?branch=master)](https://travis-ci.org/Workiva/dart_dev)
+[![Build Status](https://github.com/Workiva/dart_dev/workflows/Dart%20CI/badge.svg?branch=master)](https://github.com/Workiva/dart_dev/actions?query=workflow%3A%22Dart+CI%22+branch%3Amaster)
 
 Centralized tooling for Dart projects. Consistent interface across projects.
 Easily configurable.
