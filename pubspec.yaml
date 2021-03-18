@@ -7,24 +7,32 @@ environment:
  sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
-  analyzer: ">=0.39.0 <0.42.0"
-  args: ^1.5.2
+  analyzer: ">=0.39.0 <2.0.0"
+  args: ">=1.5.2 <3.0.0"
   async: ^2.3.0
   build_runner: ^1.7.0
-  completion: ^0.2.1+1
-  glob: ^1.1.7
-  io: ^0.3.3
-  logging: ^0.11.3+2
+  completion: ">=0.2.1+1 <2.0.0"
+  glob: ">=1.1.7 <3.0.0"
+  io: ">=0.3.3 <2.0.0"
+  logging: ">=0.11.3+2 <2.0.0"
   path: ^1.6.2
   pedantic: ^1.7.0
-  pub_semver: ^1.4.2
-  pubspec_parse: ^0.1.4
+  pub_semver: ">=1.4.2 <3.0.0"
+  pubspec_parse: ">=0.1.4 <2.0.0"
   stack_trace: ^1.9.3
-  yaml: ^2.1.16
+  yaml: ">=2.1.16 <4.0.0"
 
 dev_dependencies:
   dependency_validator: ^1.3.0
   matcher: ^0.12.5
   test: ^1.6.4
-  test_descriptor: ^1.2.0
+  test_descriptor: ">=1.2.0 <3.0.0"
   test_process: ^1.0.4
+
+
+dependency_overrides:
+  dependency_validator:
+    git:
+      url: git@github.com:workiva/dependency_validator.git
+      ref: dart212
+
