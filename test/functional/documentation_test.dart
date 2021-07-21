@@ -59,7 +59,7 @@ String pubspecWithPackages(Set<String> packages) {
   final buffer = StringBuffer()
     ..writeln('name: doc_test')
     ..writeln('environment:')
-    ..writeln('  sdk: ">=2.3.0 <3.0.0"')
+    ..writeln('  sdk: ">=2.7.0 <3.0.0"')
     ..writeln('dependencies:');
   for (final package in packages) {
     var constraint =

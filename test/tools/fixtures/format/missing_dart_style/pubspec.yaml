@@ -1,6 +1,6 @@
 name: missing_dart_style
 environment:
- sdk: ">=2.3.0 <3.0.0"
+ sdk: ">=2.7.0 <3.0.0"
 dev_dependencies:
   test: any
 

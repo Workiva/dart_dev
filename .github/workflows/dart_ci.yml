@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.4.1, stable, dev ]
+        sdk: [ 2.7.2, stable, dev ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v0.2
@@ -30,7 +30,7 @@ jobs:
         run: pub get
 
       - name: Validate dependencies
-        run: pub run dependency_validator -i pedantic over_react_format
+        run: pub run dependency_validator -i pedantic,over_react_format,meta
         if: always() && steps.install.outcome == 'success'
 
       - name: Analyze project source
