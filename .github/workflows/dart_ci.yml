@@ -30,7 +30,7 @@ jobs:
         run: pub get
 
       - name: Validate dependencies
-        run: pub run dependency_validator -i pedantic over_react_format
+        run: pub run dependency_validator -i pedantic over_react_format meta
         if: always() && steps.install.outcome == 'success'
 
       - name: Analyze project source
