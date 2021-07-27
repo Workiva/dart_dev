@@ -1,12 +1,17 @@
 # Changelog
 
+## [3.6.5](https://github.com/Workiva/dart_dev/compare/3.6.5...3.6.4)
+
+- Widen dependency ranges to allow resolution on Dart 2.7 and Dart 2.13
+- Switch to GitHub actions for CI
+
 ## [3.6.4](https://github.com/Workiva/dart_dev/compare/3.6.4...3.6.1)
 
 - Widen `analyzer` constraint to `>=0.39.0 <0.42.0`
 
 ## [3.6.1](https://github.com/Workiva/dart_dev/compare/3.6.0...3.6.1)
 
-- Fix issue where tests that load a deferred library would throw an exception 
+- Fix issue where tests that load a deferred library would throw an exception
   when run with `pub run dart_dev test --path/to/file.dart`.
 
 ## [3.6.0](https://github.com/Workiva/dart_dev/compare/3.5.0...3.6.0)
@@ -273,7 +278,7 @@ _September 8, 2015_
 
 - Documentation generation via the
   [dartdoc](https://github.com/dart-lang/dartdoc) package.
-  
+
 ### Changes
 
 - **Improvement:** The `coverage` task now checks for the `lcov` dependency
