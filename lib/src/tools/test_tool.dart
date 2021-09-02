@@ -162,12 +162,12 @@ class TestExecution {
 /// Builds and returns the full list of args for the test process that
 /// [TestTool] will start.
 ///
-/// If [useBuildTest] is true, the returned args will run tests via
+/// If [useBuildRunner] is true, the returned args will run tests via
 /// `pub run build_runner test`. Additional args targeting the build process
 /// will immediately follow and args targeting the test process will follow an
 /// arg separator (`--`).
 ///
-/// If [useBuildTest] is false, the returned args will run tests via
+/// If [useBuildRunner] is false, the returned args will run tests via
 /// `pub run test` and additional args targeting the test process will follow
 /// immediately. Build args will be ignored.
 ///
@@ -186,10 +186,10 @@ List<String> buildArgs({
   ArgResults argResults,
   List<String> configuredBuildArgs,
   List<String> configuredTestArgs,
-  bool useBuildTest,
+  bool useBuildRunner,
   bool verbose,
 }) {
-  useBuildTest ??= false;
+  useBuildRunner ??= false;
   verbose ??= false;
 
   final buildArgs = <String>[
@@ -235,12 +235,12 @@ List<String> buildArgs({
   return [
     // `pub run test` or `pub run build_runner test`
     'run',
-    if (useBuildTest) 'build_runner',
+    if (useBuildRunner) 'build_runner',
     'test',
 
     // Add the args targeting the build_runner command.
-    if (useBuildTest) ...buildArgs,
-    if (useBuildTest && testArgs.isNotEmpty) '--',
+    if (useBuildRunner) ...buildArgs,
+    if (useBuildRunner && testArgs.isNotEmpty) '--',
 
     // Add the args targeting the test command.
     ...testArgs,
@@ -283,15 +283,19 @@ TestExecution buildExecution(
             'passed to that process via the --build-args option.');
   }
 
+  final hasBuildRunner =
+      packageIsImmediateDependency('build_runner', path: path);
   final hasBuildTest = packageIsImmediateDependency('build_test', path: path);
-  if (!hasBuildTest &&
+  final useBuildRunner = hasBuildRunner && hasBuildTest;
+  if (!useBuildRunner &&
       context.argResults != null &&
       context.argResults['build-args'] != null) {
     context.usageException('Can only use --build-args in a project that has a '
-        'direct dependency on "build_test" in the pubspec.yaml.');
+        'direct dependency on both "build_runner" and "build_test" in the '
+        'pubspec.yaml.');
   }
 
-  if (!hasBuildTest && (flagValue(context.argResults, 'release') ?? false)) {
+  if (!useBuildRunner && (flagValue(context.argResults, 'release') ?? false)) {
     _log.warning(yellow.wrap('The --release flag is only applicable in '
         'projects that run tests with build_runner, and this project does not.\n'
         'It will have no effect.'));
@@ -303,13 +307,14 @@ TestExecution buildExecution(
     return TestExecution.exitEarly(ExitCode.config.code);
   }
 
-  if (!hasBuildTest &&
+  if (!useBuildRunner &&
       configuredBuildArgs != null &&
       configuredBuildArgs.isNotEmpty) {
     _log.severe('This project is configured to run tests with buildArgs, but '
-        '"build_test" is not a direct dependency in this project.\n'
-        'Either remove these buildArgs in tool/dart_dev/config.dart or add '
-        '"build_test" to the pubspec.yaml.');
+        'is missing a direct dependency on "build_runner" or "build_test".\n'
+        'Either remove these buildArgs in tool/dart_dev/config.dart or ensure '
+        'both "build_runner" and "build_test" are dependencies in the '
+        'pubspec.yaml.');
     return TestExecution.exitEarly(ExitCode.config.code);
   }
 
@@ -317,7 +322,7 @@ TestExecution buildExecution(
       argResults: context.argResults,
       configuredBuildArgs: configuredBuildArgs,
       configuredTestArgs: configuredTestArgs,
-      useBuildTest: hasBuildTest,
+      useBuildRunner: useBuildRunner,
       verbose: context.verbose);
   logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
   return TestExecution.process(
