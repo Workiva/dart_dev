@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.6.6](https://github.com/Workiva/dart_dev/compare/3.6.6...3.6.5)
+
+- Only use build_runner to run tests if the package has direct dependencies on
+both `build_runner` _and_ `build_test` (previously we only checked for
+`build_test`). For packages that contain builder implementations, they will
+likely have a dependency on `build_test` for use in their builder tests, but
+don't need to run tests via `build_runner`.
+
 ## [3.6.5](https://github.com/Workiva/dart_dev/compare/3.6.5...3.6.4)
 
 - Widen dependency ranges to allow resolution on Dart 2.7 and Dart 2.13
