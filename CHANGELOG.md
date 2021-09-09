@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.6.7](https://github.com/Workiva/dart_dev/compare/3.6.7...3.6.6)
+
+- Treat Dart 2.13.4 as the primary Dart SDK for development and CI.
+
 ## [3.6.6](https://github.com/Workiva/dart_dev/compare/3.6.6...3.6.5)
 
 - Only use build_runner to run tests if the package has direct dependencies on
