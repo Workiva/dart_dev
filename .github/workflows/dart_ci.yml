@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.7.2, stable, dev ]
+        sdk: [ 2.7.2, 2.13.4, stable, dev ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v0.2
@@ -46,6 +46,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v0.2
+        with:
+          sdk: 2.13.4
 
       - name: Print Dart SDK version
         run: dart --version
@@ -55,9 +57,9 @@ jobs:
         run: pub get
 
       - name: Verify formatting
-        run: pub run dart_dev format --check
+        run: dart run dart_dev format --check
         if: always() && steps.install.outcome == 'success'
 
       - name: Publish dry run
-        run: pub publish --dry-run
+        run: dart pub publish --dry-run
         if: always() && steps.install.outcome == 'success'
