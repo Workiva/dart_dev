@@ -1,6 +1,6 @@
 name: has_tuneup
 environment:
- sdk: ">=2.7.0 <3.0.0"
+ sdk: ">=2.11.0 <3.0.0"
 dev_dependencies:
   tuneup: any
 
