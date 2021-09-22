@@ -188,6 +188,9 @@ class CompoundArgParser implements ArgParser {
   // ---------------------------------------------------------------------------
 
   @override
+  void addSeparator(String text) => _compoundParser.addSeparator(text);
+
+  @override
   bool get allowTrailingOptions =>
       _subParsers.every((ap) => ap.allowTrailingOptions);
 
@@ -198,15 +201,18 @@ class CompoundArgParser implements ArgParser {
   Map<String, ArgParser> get commands => _compoundParser.commands;
 
   @override
+  defaultFor(String option) => _compoundParser.defaultFor(option);
+
+  @override
   Option findByAbbreviation(String abbr) =>
       _compoundParser.findByAbbreviation(abbr);
 
   @override
-  getDefault(String option) => _compoundParser.getDefault(option);
+  Option findByNameOrAlias(String name) =>
+      _compoundParser.findByNameOrAlias(name);
 
-  @deprecated
   @override
-  String getUsage() => usage;
+  getDefault(String option) => _compoundParser.defaultFor(option);
 
   @override
   Map<String, Option> get options => _compoundParser.options;
@@ -258,14 +264,16 @@ class CompoundArgParser implements ArgParser {
           bool defaultsTo = false,
           bool negatable = true,
           void Function(bool value) callback,
-          bool hide = false}) =>
+          bool hide = false,
+          List<String> aliases = const []}) =>
       _compoundParser.addFlag(name,
           abbr: abbr,
           help: help,
           defaultsTo: defaultsTo,
           negatable: negatable,
           callback: callback,
-          hide: hide);
+          hide: hide,
+          aliases: aliases);
 
   @override
   void addMultiOption(String name,
@@ -277,7 +285,8 @@ class CompoundArgParser implements ArgParser {
           Iterable<String> defaultsTo,
           void Function(List<String> values) callback,
           bool splitCommas = true,
-          bool hide = false}) =>
+          bool hide = false,
+          List<String> aliases = const []}) =>
       _compoundParser.addMultiOption(name,
           abbr: abbr,
           help: help,
@@ -287,7 +296,8 @@ class CompoundArgParser implements ArgParser {
           defaultsTo: defaultsTo,
           callback: callback,
           splitCommas: splitCommas,
-          hide: hide);
+          hide: hide,
+          aliases: aliases);
 
   @override
   void addOption(String name,
@@ -298,9 +308,9 @@ class CompoundArgParser implements ArgParser {
           Map<String, String> allowedHelp,
           String defaultsTo,
           Function callback,
-          bool allowMultiple = false,
-          bool splitCommas,
-          bool hide = false}) =>
+          bool mandatory = false,
+          bool hide = false,
+          List<String> aliases = const []}) =>
       _compoundParser.addOption(name,
           abbr: abbr,
           help: help,
@@ -309,12 +319,7 @@ class CompoundArgParser implements ArgParser {
           allowedHelp: allowedHelp,
           defaultsTo: defaultsTo,
           callback: callback,
-          // ignore: deprecated_member_use
-          allowMultiple: allowMultiple,
-          // ignore: deprecated_member_use
-          splitCommas: splitCommas,
-          hide: hide);
-
-  @override
-  void addSeparator(String text) => _compoundParser.addSeparator(text);
+          mandatory: mandatory,
+          hide: hide,
+          aliases: aliases);
 }
