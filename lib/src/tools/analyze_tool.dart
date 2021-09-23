@@ -67,11 +67,17 @@ class AnalyzeTool extends DevTool {
   String description = 'Run static analysis on dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) =>
-      runProcessAndEnsureExit(
+  FutureOr<int> run([DevToolExecutionContext context]) {
+      filterUnsupportedAnalyzerArgs();
+      return runProcessAndEnsureExit(
           buildProcess(context ?? DevToolExecutionContext(),
               configuredAnalyzerArgs: analyzerArgs, include: include),
           log: _log);
+  }
+
+  void filterUnsupportedAnalyzerArgs() =>
+    analyzerArgs?.removeWhere((arg) => !supportedAnalyzerArgs.contains(arg));
+    
 }
 
 /// Returns a combined list of args for the `dartanalyzer` process.
@@ -91,7 +97,7 @@ Iterable<String> buildArgs({
 }) {
   verbose ??= false;
   final args = <String>[
-    // Combine all args that should be passed through to the dart command in
+    // Combine all args that should be passed through to the dart executable in
     // this order:
     // 1. The analyze command
     'analyze',
