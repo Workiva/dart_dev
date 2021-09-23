@@ -45,6 +45,8 @@ class AnalyzeTool extends DevTool {
   /// Run `dartanalyzer -h -v` to see all available args.
   List<String> analyzerArgs;
 
+  final supportedAnalyzerArgs = ['-v', '--verbose', '--fatal-warnings', '--fatal-infos'];
+
   /// The globs to include as entry points to run static analysis on.
   ///
   /// The default is `.` (e.g. `dartanalyzer .`) which runs analysis on all Dart
@@ -81,6 +83,7 @@ class AnalyzeTool extends DevTool {
 ///
 /// If [verbose] is true and the verbose flag (`-v`) is not already included, it
 /// will be added.
+// ajw
 Iterable<String> buildArgs({
   ArgResults argResults,
   List<String> configuredAnalyzerArgs,
@@ -88,11 +91,13 @@ Iterable<String> buildArgs({
 }) {
   verbose ??= false;
   final args = <String>[
-    // Combine all args that should be passed through to the dartanalyzer in
+    // Combine all args that should be passed through to the dart command in
     // this order:
-    // 1. Statically configured args from [AnalyzeTool.analyzerArgs]
+    // 1. The analyze command
+    'analyze',
+    // 2. Statically configured args from [AnalyzeTool.analyzerArgs]
     ...?configuredAnalyzerArgs,
-    // 2. Args passed to --analyzer-args
+    // 3. Args passed to --analyzer-args
     ...?splitSingleOptionValue(argResults, 'analyzer-args'),
   ];
   if (verbose && !args.contains('-v') && !args.contains('--verbose')) {
@@ -152,7 +157,7 @@ ProcessDeclaration buildProcess(
         context.argResults, context.usageException,
         commandName: context.commandName,
         usageFooter:
-            'Arguments can be passed to the "dartanalyzer" process via '
+            'Arguments can be passed to the "dart analyze" process via '
             'the --analyzer-args option.');
   }
   final args = buildArgs(
@@ -161,7 +166,7 @@ ProcessDeclaration buildProcess(
       verbose: context.verbose);
   final entrypoints = buildEntrypoints(include: include, root: path);
   logCommand(args, entrypoints, verbose: context.verbose);
-  return ProcessDeclaration('dartanalyzer', [...args, ...entrypoints],
+  return ProcessDeclaration('dart', [...args, ...entrypoints],
       mode: ProcessStartMode.inheritStdio);
 }
 
@@ -176,7 +181,7 @@ void logCommand(
   bool verbose,
 }) {
   verbose ??= false;
-  final exeAndArgs = 'dartanalyzer ${args.join(' ')}'.trim();
+  final exeAndArgs = 'dart analyze ${args.join(' ')}'.trim();
   if (entrypoints.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${entrypoints.join(' ')}');
   } else {
