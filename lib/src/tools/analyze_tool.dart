@@ -14,7 +14,7 @@ import '../utils/run_process_and_ensure_exit.dart';
 
 final _log = Logger('Analyze');
 
-/// A dart_dev tool that runs the `dartanalyzer` on the current project.
+/// A dart_dev tool that runs the `dartanalyzer` or `dart analyze` on the current project.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
 /// `tool/dart_dev/config.dart`:
@@ -35,17 +35,18 @@ final _log = Logger('Analyze');
 ///       'analyze': AnalyzeTool()
 ///         ..analyzerArgs = ['--fatal-infos']
 ///         ..include = [Glob('.'), Glob('other/**.dart')],
+///         ..useDartAnalyze = false
 ///     };
 ///
 /// It is also possible to run this tool directly in a dart script:
 ///     AnalyzeTool().run();
 class AnalyzeTool extends DevTool {
-  /// The args to pass to the `dartanalyzer` process run by this tool.
+  /// The args to pass to the `dartanalyzer`  or `dart analyze` process run by this tool.
   ///
-  /// Run `dartanalyzer -h -v` to see all available args.
+  /// Run `dartanalyzer -h -v` or `dart analyze -h -v` to see all available args.
   List<String> analyzerArgs;
 
-  final supportedAnalyzerArgs = [
+  final supportedDartAnalyzeArgs = [
     '-v',
     '--verbose',
     '--fatal-warnings',
@@ -58,6 +59,8 @@ class AnalyzeTool extends DevTool {
   /// files in the current working directory.
   List<Glob> include;
 
+  /// The default tool for analysis will be `dartanalyzer` unless opted in here
+  /// to utilize `dart analyze`.
   bool useDartAnalyze;
 
   // ---------------------------------------------------------------------------
@@ -67,8 +70,8 @@ class AnalyzeTool extends DevTool {
   @override
   final ArgParser argParser = ArgParser()
     ..addOption('analyzer-args',
-        help: 'Args to pass to the "dartanalyzer" process.\n'
-            'Run "dartanalyzer -h -v" to see all available options.');
+        help: 'Args to pass to the "dartanalyzer" or "dart analyze" process.\n'
+            'Run "dartanalyzer -h -v" or `dart analyze -h -v" to see all available options.');
 
   @override
   String description = 'Run static analysis on dart files in this package.';
@@ -87,7 +90,8 @@ class AnalyzeTool extends DevTool {
 
   void filterUnsupportedAnalyzerArgs() {
     if (useDartAnalyze) {
-      analyzerArgs?.removeWhere((arg) => !supportedAnalyzerArgs.contains(arg));
+      analyzerArgs
+          ?.removeWhere((arg) => !supportedDartAnalyzeArgs.contains(arg));
     }
   }
 }
@@ -111,7 +115,7 @@ Iterable<String> buildArgs(
     // Combine all args that should be passed through to the dart executable in
     // this order:
     // 1. The analyze command if using dart analyze
-    useDartAnalyze ? 'analyze' : 'filler',
+    useDartAnalyze ? 'analyze' : null,
     // 2. Statically configured args from [AnalyzeTool.analyzerArgs]
     ...?configuredAnalyzerArgs,
     // 3. Args passed to --analyzer-args
@@ -120,7 +124,7 @@ Iterable<String> buildArgs(
   if (verbose && !args.contains('-v') && !args.contains('--verbose')) {
     args.add('-v');
   }
-  args.removeWhere((item) => item == 'filler');
+  args.removeWhere((item) => item == null);
   return args;
 }
 
