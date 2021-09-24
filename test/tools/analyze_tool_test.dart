@@ -124,6 +124,13 @@ void main() {
       expect(process.args, orderedEquals(['.']));
     });
 
+    test('returns a ProcessDeclaration with useDartAnalyze (default)', () {
+      final context = DevToolExecutionContext();
+      final process = buildProcess(context, useDartAnalyze: true);
+      expect(process.executable, 'dart');
+      expect(process.args, orderedEquals(['analyze', '.']));
+    });
+
     test('returns a ProcessDeclaration (with args)', () {
       final argParser = AnalyzeTool().toCommand('t').argParser;
       final argResults =
@@ -144,6 +151,29 @@ void main() {
             '/sdk',
             '${globRoot}file.dart',
             '${globRoot}file.txt',
+          ]));
+    });
+
+    test('returns a ProcessDeclaration with useDartAnalyzer (with args)', () {
+      final argParser = AnalyzeTool().toCommand('t').argParser;
+      final argResults =
+          argParser.parse(['--analyzer-args', '--dart-sdk /sdk']);
+      final context = DevToolExecutionContext(argResults: argResults);
+      final process = buildProcess(context,
+          configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
+          include: [Glob('*.dart')],
+          path: globRoot,
+          useDartAnalyze: true);
+      expect(process.executable, 'dart');
+      expect(
+          process.args,
+          orderedEquals([
+            'analyze',
+            '--fatal-infos',
+            '--fatal-warnings',
+            '--dart-sdk',
+            '/sdk',
+            '${globRoot}file.dart',
           ]));
     });
 
