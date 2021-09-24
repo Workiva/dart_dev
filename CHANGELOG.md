@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.7.0](https://github.com/Workiva/dart_dev/compare/3.7.0...3.6.7)
+
+- Export ArgResults utilities.
+
 ## [3.6.7](https://github.com/Workiva/dart_dev/compare/3.6.7...3.6.6)
 
 - Treat Dart 2.13.4 as the primary Dart SDK for development and CI.

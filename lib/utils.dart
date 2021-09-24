@@ -1,3 +1,4 @@
+export 'src/utils/arg_results_utils.dart';
 export 'src/utils/assert_no_positional_args_nor_args_after_separator.dart';
 export 'src/utils/cached_pubspec.dart';
 export 'src/utils/ensure_process_exit.dart';
