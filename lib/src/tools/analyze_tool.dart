@@ -53,6 +53,8 @@ class AnalyzeTool extends DevTool {
   /// files in the current working directory.
   List<Glob> include;
 
+  bool useDartAnalyze;
+
   // ---------------------------------------------------------------------------
   // DevTool Overrides
   // ---------------------------------------------------------------------------
@@ -68,16 +70,20 @@ class AnalyzeTool extends DevTool {
 
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
+      useDartAnalyze ??= false;
       filterUnsupportedAnalyzerArgs();
       return runProcessAndEnsureExit(
           buildProcess(context ?? DevToolExecutionContext(),
-              configuredAnalyzerArgs: analyzerArgs, include: include),
+              configuredAnalyzerArgs: analyzerArgs, include: include, useDartAnalyze: useDartAnalyze),
           log: _log);
   }
 
-  void filterUnsupportedAnalyzerArgs() =>
-    analyzerArgs?.removeWhere((arg) => !supportedAnalyzerArgs.contains(arg));
-    
+  void filterUnsupportedAnalyzerArgs() {
+    if (useDartAnalyze) {
+       analyzerArgs?.removeWhere((arg) => !supportedAnalyzerArgs.contains(arg));
+    }
+  }
+
 }
 
 /// Returns a combined list of args for the `dartanalyzer` process.
@@ -89,18 +95,18 @@ class AnalyzeTool extends DevTool {
 ///
 /// If [verbose] is true and the verbose flag (`-v`) is not already included, it
 /// will be added.
-// ajw
 Iterable<String> buildArgs({
   ArgResults argResults,
   List<String> configuredAnalyzerArgs,
   bool verbose,
+  bool useDartAnalyze
 }) {
   verbose ??= false;
   final args = <String>[
     // Combine all args that should be passed through to the dart executable in
     // this order:
-    // 1. The analyze command
-    'analyze',
+    // 1. The analyze command if using dart analyze
+    useDartAnalyze ? 'analyze' : 'filler',
     // 2. Statically configured args from [AnalyzeTool.analyzerArgs]
     ...?configuredAnalyzerArgs,
     // 3. Args passed to --analyzer-args
@@ -109,6 +115,7 @@ Iterable<String> buildArgs({
   if (verbose && !args.contains('-v') && !args.contains('--verbose')) {
     args.add('-v');
   }
+  args.removeWhere((item) => item == 'filler');
   return args;
 }
 
@@ -157,22 +164,25 @@ ProcessDeclaration buildProcess(
   List<String> configuredAnalyzerArgs,
   List<Glob> include,
   String path,
+  bool useDartAnalyze,
 }) {
   if (context.argResults != null) {
+    final analyzerUsed = useDartAnalyze ? 'dart analyze' : 'dartanalyzer';
     assertNoPositionalArgsNorArgsAfterSeparator(
         context.argResults, context.usageException,
         commandName: context.commandName,
         usageFooter:
-            'Arguments can be passed to the "dart analyze" process via '
+            'Arguments can be passed to the "${analyzerUsed}" process via '
             'the --analyzer-args option.');
   }
+  final analyzerCommand = useDartAnalyze ? 'dart' : 'dartanalyzer';
   final args = buildArgs(
       argResults: context.argResults,
       configuredAnalyzerArgs: configuredAnalyzerArgs,
-      verbose: context.verbose);
+      verbose: context.verbose, useDartAnalyze: useDartAnalyze);
   final entrypoints = buildEntrypoints(include: include, root: path);
   logCommand(args, entrypoints, verbose: context.verbose);
-  return ProcessDeclaration('dart', [...args, ...entrypoints],
+  return ProcessDeclaration(analyzerCommand, [...args, ...entrypoints],
       mode: ProcessStartMode.inheritStdio);
 }
 
