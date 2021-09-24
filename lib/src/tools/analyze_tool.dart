@@ -191,7 +191,8 @@ ProcessDeclaration buildProcess(
       verbose: context.verbose,
       useDartAnalyze: useDartAnalyze);
   final entrypoints = buildEntrypoints(include: include, root: path);
-  logCommand(args, entrypoints, verbose: context.verbose);
+  logCommand(args, entrypoints,
+      verbose: context.verbose, useDartAnalyzer: useDartAnalyze);
   return ProcessDeclaration(analyzerCommand, [...args, ...entrypoints],
       mode: ProcessStartMode.inheritStdio);
 }
@@ -205,9 +206,11 @@ void logCommand(
   Iterable<String> args,
   Iterable<String> entrypoints, {
   bool verbose,
+  bool useDartAnalyzer,
 }) {
   verbose ??= false;
-  final exeAndArgs = 'dart analyze ${args.join(' ')}'.trim();
+  final exeAndArgs =
+      '${useDartAnalyzer ? "dart " : "dartanalyzer"} ${args.join(' ')}'.trim();
   if (entrypoints.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${entrypoints.join(' ')}');
   } else {

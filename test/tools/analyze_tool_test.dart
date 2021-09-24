@@ -26,14 +26,17 @@ void main() {
 
   group('buildArgs', () {
     test('defaults to an empty list', () {
-      expect(buildArgs(), isEmpty);
+      expect(buildArgs(useDartAnalyze: false), isEmpty);
     });
 
     test('combines configured args and cli args (in that order)', () {
       final argParser = AnalyzeTool().toCommand('t').argParser;
       final argResults = argParser.parse(['--analyzer-args', 'c d']);
       expect(
-          buildArgs(argResults: argResults, configuredAnalyzerArgs: ['a', 'b']),
+          buildArgs(
+              argResults: argResults,
+              configuredAnalyzerArgs: ['a', 'b'],
+              useDartAnalyze: false),
           orderedEquals(['a', 'b', 'c', 'd']));
     });
 
@@ -44,17 +47,26 @@ void main() {
           buildArgs(
               argResults: argResults,
               configuredAnalyzerArgs: ['a', 'b'],
-              verbose: true),
+              verbose: true,
+              useDartAnalyze: false),
           orderedEquals(['a', 'b', 'c', 'd', '-v']));
     });
 
     test('does not insert a duplicate verbose flag (-v)', () {
-      expect(buildArgs(configuredAnalyzerArgs: ['-v'], verbose: true),
+      expect(
+          buildArgs(
+              configuredAnalyzerArgs: ['-v'],
+              verbose: true,
+              useDartAnalyze: false),
           orderedEquals(['-v']));
     });
 
     test('does not insert a duplicate verbose flag (--verbose)', () {
-      expect(buildArgs(configuredAnalyzerArgs: ['--verbose'], verbose: true),
+      expect(
+          buildArgs(
+              configuredAnalyzerArgs: ['--verbose'],
+              verbose: true,
+              useDartAnalyze: false),
           orderedEquals(['--verbose']));
     });
   });
@@ -84,7 +96,7 @@ void main() {
       final context = DevToolExecutionContext(
           argResults: argResults, commandName: 'test_analyze');
       expect(
-          () => buildProcess(context),
+          () => buildProcess(context, useDartAnalyze: false),
           throwsA(isA<UsageException>()
               .having(
                   (e) => e.message, 'command name', contains('test_analyze'))
@@ -97,7 +109,7 @@ void main() {
       final context = DevToolExecutionContext(
           argResults: argResults, commandName: 'test_analyze');
       expect(
-          () => buildProcess(context),
+          () => buildProcess(context, useDartAnalyze: false),
           throwsA(isA<UsageException>()
               .having(
                   (e) => e.message, 'command name', contains('test_analyze'))
@@ -107,7 +119,7 @@ void main() {
 
     test('returns a ProcessDeclaration (default)', () {
       final context = DevToolExecutionContext();
-      final process = buildProcess(context);
+      final process = buildProcess(context, useDartAnalyze: false);
       expect(process.executable, 'dartanalyzer');
       expect(process.args, orderedEquals(['.']));
     });
@@ -120,7 +132,8 @@ void main() {
       final process = buildProcess(context,
           configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
           include: [Glob('*.dart'), Glob('*.txt')],
-          path: globRoot);
+          path: globRoot,
+          useDartAnalyze: false);
       expect(process.executable, 'dartanalyzer');
       expect(
           process.args,
@@ -143,7 +156,8 @@ void main() {
       final process = buildProcess(context,
           configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
           include: [Glob('*.dart'), Glob('*.txt')],
-          path: globRoot);
+          path: globRoot,
+          useDartAnalyze: false);
       expect(process.executable, 'dartanalyzer');
       expect(
           process.args,
@@ -163,19 +177,21 @@ void main() {
     test('with <=5 entrypoints', () {
       expect(Logger.root.onRecord,
           emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e'))));
-      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e']);
+      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e'], useDartAnalyzer: false);
     });
 
     test('with >5 entrypoints', () {
       expect(Logger.root.onRecord,
           emitsThrough(infoLogOf(contains('dartanalyzer -t <6 paths>'))));
-      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f']);
+      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'],
+          useDartAnalyzer: false);
     });
 
     test('with >5 entrypoints in verbose mode', () {
       expect(Logger.root.onRecord,
           emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e f'))));
-      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'], verbose: true);
+      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'],
+          verbose: true, useDartAnalyzer: false);
     });
   });
 }
