@@ -96,6 +96,7 @@ Iterable<String> buildArgs(
     bool verbose,
     bool useDartAnalyze}) {
   verbose ??= false;
+  print('poo');
   final args = <String>[
     // Combine all args that should be passed through to the analyzer in
     // this order:
@@ -110,6 +111,7 @@ Iterable<String> buildArgs(
     args.add('-v');
   }
   args.removeWhere((item) => item == null);
+  print('ajw args ${args}');
   return args;
 }
 
@@ -169,7 +171,7 @@ ProcessDeclaration buildProcess(
             'Arguments can be passed to the "${analyzerUsed}" process via '
             'the --analyzer-args option.');
   }
-  final analyzerCommand = useDartAnalyze ? 'dart' : 'dartanalyzer';
+  final analyzerCommand = useDartAnalyze ? 'dart ' : 'dartanalyzer';
   final args = buildArgs(
       argResults: context.argResults,
       configuredAnalyzerArgs: configuredAnalyzerArgs,
@@ -196,6 +198,7 @@ void logCommand(
   verbose ??= false;
   final exeAndArgs =
       '${useDartAnalyzer ? "dart" : "dartanalyzer"} ${args.join(' ')}'.trim();
+
   if (entrypoints.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${entrypoints.join(' ')}');
   } else {

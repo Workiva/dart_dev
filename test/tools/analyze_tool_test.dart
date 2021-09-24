@@ -193,5 +193,11 @@ void main() {
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'],
           verbose: true, useDartAnalyzer: false);
     });
+
+    test('in useDartAnalyze mode', () {
+      expect(
+          Logger.root.onRecord, emitsThrough(infoLogOf(contains('dart -t a'))));
+      logCommand(['-t'], ['a'], useDartAnalyzer: true);
+    });
   });
 }
