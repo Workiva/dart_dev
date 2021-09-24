@@ -45,7 +45,12 @@ class AnalyzeTool extends DevTool {
   /// Run `dartanalyzer -h -v` to see all available args.
   List<String> analyzerArgs;
 
-  final supportedAnalyzerArgs = ['-v', '--verbose', '--fatal-warnings', '--fatal-infos'];
+  final supportedAnalyzerArgs = [
+    '-v',
+    '--verbose',
+    '--fatal-warnings',
+    '--fatal-infos'
+  ];
 
   /// The globs to include as entry points to run static analysis on.
   ///
@@ -70,20 +75,21 @@ class AnalyzeTool extends DevTool {
 
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
-      useDartAnalyze ??= false;
-      filterUnsupportedAnalyzerArgs();
-      return runProcessAndEnsureExit(
-          buildProcess(context ?? DevToolExecutionContext(),
-              configuredAnalyzerArgs: analyzerArgs, include: include, useDartAnalyze: useDartAnalyze),
-          log: _log);
+    useDartAnalyze ??= false;
+    filterUnsupportedAnalyzerArgs();
+    return runProcessAndEnsureExit(
+        buildProcess(context ?? DevToolExecutionContext(),
+            configuredAnalyzerArgs: analyzerArgs,
+            include: include,
+            useDartAnalyze: useDartAnalyze),
+        log: _log);
   }
 
   void filterUnsupportedAnalyzerArgs() {
     if (useDartAnalyze) {
-       analyzerArgs?.removeWhere((arg) => !supportedAnalyzerArgs.contains(arg));
+      analyzerArgs?.removeWhere((arg) => !supportedAnalyzerArgs.contains(arg));
     }
   }
-
 }
 
 /// Returns a combined list of args for the `dartanalyzer` process.
@@ -95,12 +101,11 @@ class AnalyzeTool extends DevTool {
 ///
 /// If [verbose] is true and the verbose flag (`-v`) is not already included, it
 /// will be added.
-Iterable<String> buildArgs({
-  ArgResults argResults,
-  List<String> configuredAnalyzerArgs,
-  bool verbose,
-  bool useDartAnalyze
-}) {
+Iterable<String> buildArgs(
+    {ArgResults argResults,
+    List<String> configuredAnalyzerArgs,
+    bool verbose,
+    bool useDartAnalyze}) {
   verbose ??= false;
   final args = <String>[
     // Combine all args that should be passed through to the dart executable in
@@ -179,7 +184,8 @@ ProcessDeclaration buildProcess(
   final args = buildArgs(
       argResults: context.argResults,
       configuredAnalyzerArgs: configuredAnalyzerArgs,
-      verbose: context.verbose, useDartAnalyze: useDartAnalyze);
+      verbose: context.verbose,
+      useDartAnalyze: useDartAnalyze);
   final entrypoints = buildEntrypoints(include: include, root: path);
   logCommand(args, entrypoints, verbose: context.verbose);
   return ProcessDeclaration(analyzerCommand, [...args, ...entrypoints],
