@@ -46,13 +46,6 @@ class AnalyzeTool extends DevTool {
   /// Run `dartanalyzer -h -v` or `dart analyze -h -v` to see all available args.
   List<String> analyzerArgs;
 
-  final supportedDartAnalyzeArgs = [
-    '-v',
-    '--verbose',
-    '--fatal-warnings',
-    '--fatal-infos'
-  ];
-
   /// The globs to include as entry points to run static analysis on.
   ///
   /// The default is `.` (e.g. `dartanalyzer .`) which runs analysis on all Dart
@@ -79,20 +72,12 @@ class AnalyzeTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
     useDartAnalyze ??= false;
-    filterUnsupportedAnalyzerArgs();
     return runProcessAndEnsureExit(
         buildProcess(context ?? DevToolExecutionContext(),
             configuredAnalyzerArgs: analyzerArgs,
             include: include,
             useDartAnalyze: useDartAnalyze),
         log: _log);
-  }
-
-  void filterUnsupportedAnalyzerArgs() {
-    if (useDartAnalyze) {
-      analyzerArgs
-          ?.removeWhere((arg) => !supportedDartAnalyzeArgs.contains(arg));
-    }
   }
 }
 
@@ -112,7 +97,7 @@ Iterable<String> buildArgs(
     bool useDartAnalyze}) {
   verbose ??= false;
   final args = <String>[
-    // Combine all args that should be passed through to the dart executable in
+    // Combine all args that should be passed through to the analyzer in
     // this order:
     // 1. The analyze command if using dart analyze
     useDartAnalyze ? 'analyze' : null,
@@ -197,7 +182,7 @@ ProcessDeclaration buildProcess(
       mode: ProcessStartMode.inheritStdio);
 }
 
-/// Logs the `dartanalyzer` command that will be run by [AnalyzeTool] so that
+/// Logs the `dartanalyzer` or `dart analyze` command that will be run by [AnalyzeTool] so that
 /// consumers can run it directly for debugging purposes.
 ///
 /// Unless [verbose] is true, the list of entrypoints will be abbreviated to
@@ -210,7 +195,7 @@ void logCommand(
 }) {
   verbose ??= false;
   final exeAndArgs =
-      '${useDartAnalyzer ? "dart " : "dartanalyzer"} ${args.join(' ')}'.trim();
+      '${useDartAnalyzer ? "dart" : "dartanalyzer"} ${args.join(' ')}'.trim();
   if (entrypoints.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${entrypoints.join(' ')}');
   } else {
