@@ -40,6 +40,19 @@ void main() {
           orderedEquals(['a', 'b', 'c', 'd']));
     });
 
+    test(
+        'combines configured args and cli args (in that order) with useDartAnalyze',
+        () {
+      final argParser = AnalyzeTool().toCommand('t').argParser;
+      final argResults = argParser.parse(['--analyzer-args', 'c d']);
+      expect(
+          buildArgs(
+              argResults: argResults,
+              configuredAnalyzerArgs: ['a', 'b'],
+              useDartAnalyze: true),
+          orderedEquals(['analyze', 'a', 'b', 'c', 'd']));
+    });
+
     test('inserts a verbose flag if not already present', () {
       final argParser = AnalyzeTool().toCommand('t').argParser;
       final argResults = argParser.parse(['--analyzer-args', 'c d']);
