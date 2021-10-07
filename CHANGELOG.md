@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.8.0](https://github.com/Workiva/dart_dev/compare/3.8.0...3.7.0)
+
+- Upgrade to analyzer ^1.0.0 and build_runner to ^2.0.0. This also brings along
+several other dependency upgrades.
+
 ## [3.7.0](https://github.com/Workiva/dart_dev/compare/3.7.0...3.6.7)
 
 - Export ArgResults utilities.

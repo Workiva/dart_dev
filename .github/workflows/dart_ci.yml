@@ -15,30 +15,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.7.2, 2.13.4, stable, dev ]
+        sdk: [ 2.13.4, stable, beta, dev ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v0.2
         with:
           sdk: ${{ matrix.sdk }}
 
-      - name: Print Dart SDK version
-        run: dart --version
-
       - id: install
         name: Install dependencies
-        run: pub get
+        run: dart pub get
 
       - name: Validate dependencies
-        run: pub run dependency_validator -i pedantic,over_react_format,meta
+        run: dart run dependency_validator
         if: always() && steps.install.outcome == 'success'
 
       - name: Analyze project source
-        run: pub run dart_dev analyze
+        run: dart run dart_dev analyze
         if: always() && steps.install.outcome == 'success'
 
       - name: Run tests
-        run: pub run dart_dev test
+        run: dart run dart_dev test
         if: always() && steps.install.outcome == 'success'
 
   format_and_publish:
@@ -49,12 +46,9 @@ jobs:
         with:
           sdk: 2.13.4
 
-      - name: Print Dart SDK version
-        run: dart --version
-
       - id: install
         name: Install dependencies
-        run: pub get
+        run: dart pub get
 
       - name: Verify formatting
         run: dart run dart_dev format --check
