@@ -8,7 +8,7 @@ Pubspec cachedPubspec({String path}) {
   _cachedPubspecs.putIfAbsent(
       sourceUrl,
       () => Pubspec.parse(File(sourceUrl).readAsStringSync(),
-          sourceUrl: sourceUrl));
+          sourceUrl: Uri.parse(sourceUrl)));
   return _cachedPubspecs[sourceUrl];
 }
 
