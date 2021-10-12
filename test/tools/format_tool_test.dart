@@ -178,6 +178,40 @@ void main() {
     });
   });
 
+  group('buildArgsForDartFormat', () {
+    test('no mode', () {
+      expect(
+          buildArgsForDartFormat(['a', 'b'], null), orderedEquals(['a', 'b']));
+    });
+
+    test('mode=dry-run', () {
+      expect(buildArgsForDartFormat(['a', 'b'], FormatMode.dryRun),
+          orderedEquals(['a', 'b', '-o', 'none', '.']));
+    });
+
+    test('mode=check', () {
+      expect(buildArgsForDartFormat(['a', 'b'], FormatMode.check),
+          orderedEquals(['a', 'b', '--set-exit-if-changed']));
+    });
+
+    test('combines configured args with cli args (in that order)', () {
+      final argParser = FormatTool().toCommand('t').argParser;
+      final argResults = argParser.parse(['--formatter-args', '--indent 2']);
+      expect(
+          buildArgsForDartFormat(['a', 'b'], FormatMode.overwrite,
+              argResults: argResults,
+              configuredFormatterArgs: ['--fix', '--follow-links']),
+          orderedEquals([
+            'a',
+            'b',
+            '--fix',
+            '--follow-links',
+            '--indent',
+            '2',
+          ]));
+    });
+  });
+
   group('buildExecution', () {
     test('throws UsageException if positional args are given', () {
       final argResults = ArgParser().parse(['a']);
