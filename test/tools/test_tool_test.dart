@@ -333,7 +333,7 @@ dev_dependencies:
           final context = DevToolExecutionContext();
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'pub');
+          expect(execution.process.executable, 'dart');
           expect(execution.process.args, orderedEquals(['run', 'test']));
         });
 
@@ -344,7 +344,7 @@ dev_dependencies:
           final execution = buildExecution(context,
               configuredTestArgs: ['-P', 'unit'], path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'pub');
+          expect(execution.process.executable, 'dart');
           expect(execution.process.args,
               orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo']));
         });
@@ -365,8 +365,10 @@ dev_dependencies:
                 }));
 
         test('and logs the test subprocess', () {
-          expect(Logger.root.onRecord,
-              emitsThrough(infoLogOf(contains('pub run test -P unit -n foo'))));
+          expect(
+              Logger.root.onRecord,
+              emitsThrough(
+                  infoLogOf(contains('dart run test -P unit -n foo'))));
 
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);
@@ -393,7 +395,7 @@ dev_dependencies:
           final context = DevToolExecutionContext();
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'pub');
+          expect(execution.process.executable, 'dart');
           expect(execution.process.args, orderedEquals(['run', 'test']));
         });
 
@@ -404,7 +406,7 @@ dev_dependencies:
           final execution = buildExecution(context,
               configuredTestArgs: ['-P', 'unit'], path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'pub');
+          expect(execution.process.executable, 'dart');
           expect(execution.process.args,
               orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo']));
         });
@@ -425,8 +427,10 @@ dev_dependencies:
                 }));
 
         test('and logs the test subprocess', () {
-          expect(Logger.root.onRecord,
-              emitsThrough(infoLogOf(contains('pub run test -P unit -n foo'))));
+          expect(
+              Logger.root.onRecord,
+              emitsThrough(
+                  infoLogOf(contains('dart run test -P unit -n foo'))));
 
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);
@@ -454,7 +458,7 @@ dev_dependencies:
           final context = DevToolExecutionContext();
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'pub');
+          expect(execution.process.executable, 'dart');
           expect(execution.process.args,
               orderedEquals(['run', 'build_runner', 'test']));
         });
@@ -469,7 +473,7 @@ dev_dependencies:
               configuredTestArgs: ['-P', 'unit'],
               path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'pub');
+          expect(execution.process.executable, 'dart');
           expect(
               execution.process.args,
               orderedEquals([
@@ -498,7 +502,7 @@ dev_dependencies:
               configuredTestArgs: ['-P', 'unit'],
               path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'pub');
+          expect(execution.process.executable, 'dart');
           expect(
               execution.process.args,
               orderedEquals([
@@ -521,7 +525,7 @@ dev_dependencies:
           expect(
               Logger.root.onRecord,
               emitsThrough(infoLogOf(contains(
-                  'pub run build_runner test foo -o test:build -- -P unit '
+                  'dart run build_runner test foo -o test:build -- -P unit '
                   '-n foo'))));
 
           final argParser = TestTool().toCommand('t').argParser;

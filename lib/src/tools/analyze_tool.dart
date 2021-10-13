@@ -26,7 +26,7 @@ final _log = Logger('Analyze');
 ///     };
 ///
 /// This will make it available via the `dart_dev` command-line app like so:
-///     pub run dart_dev analyze
+///     dart run dart_dev analyze
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart

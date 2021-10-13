@@ -29,7 +29,7 @@ final _log = Logger('WebdevServe');
 ///     };
 ///
 /// This will make it available via the `dart_dev` command-line app like so:
-///     pub run dart_dev serve
+///     dart run dart_dev serve
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
@@ -47,7 +47,7 @@ class WebdevServeTool extends DevTool {
   /// The args to pass to the `build_runner` process via the `webdev serve`
   /// process that will be run by this tool.
   ///
-  /// Run `pub run build_runner build -h` to see all available args.
+  /// Run `dart run build_runner build -h` to see all available args.
   List<String> buildArgs;
 
   /// The args to pass to the `webdev serve` process that will be run by this
@@ -70,7 +70,7 @@ class WebdevServeTool extends DevTool {
             'options.')
     ..addOption('build-args',
         help: 'Args to pass to the build runner process.\n'
-            'Run "pub run build_runner build -h -v" to see all available '
+            'Run "dart run build_runner build -h -v" to see all available '
             'options.');
 
   @override

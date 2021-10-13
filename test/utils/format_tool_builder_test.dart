@@ -56,7 +56,7 @@ void main() {
                 Formatter.dartfmt);
           });
 
-          test('darFormat', () {
+          test('dartFormat', () {
             final visitor = FormatToolBuilder();
 
             parseString(content: formatTool_cascadeSrc(formatter: 'dartFormat'))

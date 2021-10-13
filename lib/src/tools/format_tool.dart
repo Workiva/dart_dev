@@ -31,7 +31,7 @@ final _log = Logger('Format');
 ///     };
 ///
 /// This will make it available via the `dart_dev` command-line app like so:
-///     pub run dart_dev format
+///     dart run dart_dev format
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
@@ -61,12 +61,11 @@ class FormatTool extends DevTool {
 
   /// The formatter to run, one of:
   /// - `dartfmt` (provided by the SDK)
-  /// - `pub run dart_style:format` (provided by the `dart_style` package)
+  /// - `dart run dart_style:format` (provided by the `dart_style` package)
   Formatter formatter = Formatter.dartfmt;
 
-  /// The formatter to run, one of:
+  /// The formatter to run:
   /// - `dart format` (provided by the SDK >= 10)
-  /// - `pub run dart_style:format` (provided by the `dart_style` package)
   Formatter dartFormatter = Formatter.dartFormat;
 
   /// The args to pass to the formatter process run by this command.
@@ -334,7 +333,7 @@ enum Formatter {
 /// [FormatTool] will start.
 ///
 /// [executableArgs] will be included first and are only needed when using the
-/// `dart_style:format` executable (e.g. `pub run dart_style:format`).
+/// `dart_style:format` executable (e.g. `dart run dart_style:format`).
 ///
 /// Next, [mode] will be mapped to the appropriate formatter arg(s), e.g. `-w`,
 /// and included.
@@ -531,7 +530,7 @@ FormatExecution buildExecution(
 ///
 /// - [Formatter.dartfmt] -> `dartfmt`
 /// - [Formatter.dartFormat] -> `dart format`
-/// - [Formatter.dartStyle] -> `pub run dart_style:format`
+/// - [Formatter.dartStyle] -> `dart run dart_style:format`
 ProcessDeclaration buildProcess([Formatter formatter]) {
   switch (formatter) {
     case Formatter.dartStyle:

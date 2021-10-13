@@ -19,9 +19,9 @@ final _log = Logger('Test');
 
 /// A dart_dev tool that runs dart tests for the current project.
 ///
-/// Tests will be run via `pub run test` unless the current project depends on
+/// Tests will be run via `dart run test` unless the current project depends on
 /// `build_test`, in which case it will run tests via
-/// `pub run build_runner test`.
+/// `dart run build_runner test`.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
 /// `tool/dart_dev/config.dart`:
@@ -32,7 +32,7 @@ final _log = Logger('Test');
 ///     };
 ///
 /// This will make it available via the `dart_dev` command-line app like so:
-///     pub run dart_dev test
+///     dart run dart_dev test
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
@@ -85,29 +85,29 @@ class TestTool extends DevTool {
         help: 'Write the test process stdout to this file path.')
     ..addOption('test-args',
         help: 'Args to pass to the test runner process.\n'
-            'Run "pub run test -h -v" to see all available options.')
+            'Run "dart run test -h" to see all available options.')
     ..addOption('build-args',
         help: 'Args to pass to the build runner process.\n'
-            'Run "pub run build_runner test -h -v" to see all available '
+            'Run "dart run build_runner test -h" to see all available '
             'options.\n'
             'Note: these args are only applicable if the current project '
             'depends on "build_test".');
 
-  /// The args to pass to the `pub run build_runner test` process that will be
+  /// The args to pass to the `dart run build_runner test` process that will be
   /// run by this command when the current project depends on `build_test`.
   ///
-  /// Run `pub run build_runner test -h` to see all available args.
+  /// Run `dart run build_runner test -h` to see all available args.
   List<String> buildArgs;
 
   @override
   String description = 'Run dart tests in this package.';
 
-  /// The args to pass to the `pub run test` process (either directly or
-  /// through the `pub run build_runner test` process if applicable).
+  /// The args to pass to the `dart run test` process (either directly or
+  /// through the `dart run build_runner test` process if applicable).
   ///
-  /// Run `pub run test -h` to see all available args.
+  /// Run `dart run test -h` to see all available args.
   ///
-  /// Note that most of the command-line options for the `pub run test` process
+  /// Note that most of the command-line options for the `dart run test` process
   /// also have `dart_test.yaml` configuration counterparts. Rather than
   /// configuring this field, it is preferred that the project be configured via
   /// `dart_test.yaml` so that the configuration is used even when running tests
@@ -163,12 +163,12 @@ class TestExecution {
 /// [TestTool] will start.
 ///
 /// If [useBuildRunner] is true, the returned args will run tests via
-/// `pub run build_runner test`. Additional args targeting the build process
+/// `dart run build_runner test`. Additional args targeting the build process
 /// will immediately follow and args targeting the test process will follow an
 /// arg separator (`--`).
 ///
 /// If [useBuildRunner] is false, the returned args will run tests via
-/// `pub run test` and additional args targeting the test process will follow
+/// `dart run test` and additional args targeting the test process will follow
 /// immediately. Build args will be ignored.
 ///
 /// When building the build args portion of the list, the [configuredBuildArgs]
@@ -233,7 +233,7 @@ List<String> buildArgs({
   }
 
   return [
-    // `pub run test` or `pub run build_runner test`
+    // `dart run test` or `dart run build_runner test`
     'run',
     if (useBuildRunner) 'build_runner',
     'test',
@@ -324,9 +324,9 @@ TestExecution buildExecution(
       configuredTestArgs: configuredTestArgs,
       useBuildRunner: useBuildRunner,
       verbose: context.verbose);
-  logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
+  logSubprocessHeader(_log, 'dart ${args.join(' ')}'.trim());
   return TestExecution.process(
-      ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
+      ProcessDeclaration('dart', args, mode: ProcessStartMode.inheritStdio));
 }
 
 // NOTE: This currently depends on https://github.com/dart-lang/build/pull/2445
