@@ -62,11 +62,8 @@ class FormatTool extends DevTool {
   /// The formatter to run, one of:
   /// - `dartfmt` (provided by the SDK)
   /// - `dart run dart_style:format` (provided by the `dart_style` package)
+  /// - `dart format` (added in Dart SDK 2.10.0)
   Formatter formatter = Formatter.dartfmt;
-
-  /// The formatter to run:
-  /// - `dart format` (provided by the SDK >= 10)
-  Formatter dartFormatter = Formatter.dartFormat;
 
   /// The args to pass to the formatter process run by this command.
   ///
@@ -397,8 +394,8 @@ Iterable<String> buildArgsForDartFormat(
     // Combine all args that should be passed through to the dart format in this
     // order:
     // 1. Mode flag(s), if configured
-    if (mode == FormatMode.check) '--set-exit-if-changed',
-    if (mode == FormatMode.dryRun) ...['-o', 'none', '.'],
+    if (mode == FormatMode.check) ...['-o', 'none', '--set-exit-if-changed'],
+    if (mode == FormatMode.dryRun) ...['-o', 'none'],
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,

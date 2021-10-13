@@ -26,17 +26,14 @@ void main() {
 
   group('buildArgs', () {
     test('defaults to an empty list', () {
-      expect(buildArgs(useDartAnalyze: false), isEmpty);
+      expect(buildArgs(), isEmpty);
     });
 
     test('combines configured args and cli args (in that order)', () {
       final argParser = AnalyzeTool().toCommand('t').argParser;
       final argResults = argParser.parse(['--analyzer-args', 'c d']);
       expect(
-          buildArgs(
-              argResults: argResults,
-              configuredAnalyzerArgs: ['a', 'b'],
-              useDartAnalyze: false),
+          buildArgs(argResults: argResults, configuredAnalyzerArgs: ['a', 'b']),
           orderedEquals(['a', 'b', 'c', 'd']));
     });
 
@@ -60,26 +57,17 @@ void main() {
           buildArgs(
               argResults: argResults,
               configuredAnalyzerArgs: ['a', 'b'],
-              verbose: true,
-              useDartAnalyze: false),
+              verbose: true),
           orderedEquals(['a', 'b', 'c', 'd', '-v']));
     });
 
     test('does not insert a duplicate verbose flag (-v)', () {
-      expect(
-          buildArgs(
-              configuredAnalyzerArgs: ['-v'],
-              verbose: true,
-              useDartAnalyze: false),
+      expect(buildArgs(configuredAnalyzerArgs: ['-v'], verbose: true),
           orderedEquals(['-v']));
     });
 
     test('does not insert a duplicate verbose flag (--verbose)', () {
-      expect(
-          buildArgs(
-              configuredAnalyzerArgs: ['--verbose'],
-              verbose: true,
-              useDartAnalyze: false),
+      expect(buildArgs(configuredAnalyzerArgs: ['--verbose'], verbose: true),
           orderedEquals(['--verbose']));
     });
   });
@@ -109,7 +97,7 @@ void main() {
       final context = DevToolExecutionContext(
           argResults: argResults, commandName: 'test_analyze');
       expect(
-          () => buildProcess(context, useDartAnalyze: false),
+          () => buildProcess(context),
           throwsA(isA<UsageException>()
               .having(
                   (e) => e.message, 'command name', contains('test_analyze'))
@@ -122,7 +110,7 @@ void main() {
       final context = DevToolExecutionContext(
           argResults: argResults, commandName: 'test_analyze');
       expect(
-          () => buildProcess(context, useDartAnalyze: false),
+          () => buildProcess(context),
           throwsA(isA<UsageException>()
               .having(
                   (e) => e.message, 'command name', contains('test_analyze'))
@@ -132,7 +120,7 @@ void main() {
 
     test('returns a ProcessDeclaration (default)', () {
       final context = DevToolExecutionContext();
-      final process = buildProcess(context, useDartAnalyze: false);
+      final process = buildProcess(context);
       expect(process.executable, 'dartanalyzer');
       expect(process.args, orderedEquals(['.']));
     });
@@ -152,8 +140,7 @@ void main() {
       final process = buildProcess(context,
           configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
           include: [Glob('*.dart'), Glob('*.txt')],
-          path: globRoot,
-          useDartAnalyze: false);
+          path: globRoot);
       expect(process.executable, 'dartanalyzer');
       expect(
           process.args,
@@ -199,8 +186,7 @@ void main() {
       final process = buildProcess(context,
           configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
           include: [Glob('*.dart'), Glob('*.txt')],
-          path: globRoot,
-          useDartAnalyze: false);
+          path: globRoot);
       expect(process.executable, 'dartanalyzer');
       expect(
           process.args,

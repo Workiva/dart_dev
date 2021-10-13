@@ -36,7 +36,7 @@ final _log = Logger('Analyze');
 ///       'analyze': AnalyzeTool()
 ///         ..analyzerArgs = ['--fatal-infos']
 ///         ..include = [Glob('.'), Glob('other/**.dart')],
-///         ..useDartAnalyze = false
+///         ..useDartAnalyze = true
 ///     };
 ///
 /// It is also possible to run this tool directly in a dart script:
@@ -94,14 +94,15 @@ class AnalyzeTool extends DevTool {
 Iterable<String> buildArgs(
     {ArgResults argResults,
     List<String> configuredAnalyzerArgs,
-    bool verbose,
-    bool useDartAnalyze}) {
+    bool useDartAnalyze,
+    bool verbose}) {
+  useDartAnalyze ??= false;
   verbose ??= false;
   final args = <String>[
     // Combine all args that should be passed through to the analyzer in
     // this order:
     // 1. The analyze command if using dart analyze
-    useDartAnalyze ? 'analyze' : null,
+    if (useDartAnalyze) 'analyze',
     // 2. Statically configured args from [AnalyzeTool.analyzerArgs]
     ...?configuredAnalyzerArgs,
     // 3. Args passed to --analyzer-args
@@ -110,7 +111,6 @@ Iterable<String> buildArgs(
   if (verbose && !args.contains('-v') && !args.contains('--verbose')) {
     args.add('-v');
   }
-  args.removeWhere((item) => item == null);
   return args;
 }
 
@@ -161,6 +161,7 @@ ProcessDeclaration buildProcess(
   String path,
   bool useDartAnalyze,
 }) {
+  useDartAnalyze ??= false;
   if (context.argResults != null) {
     final analyzerUsed = useDartAnalyze ? 'dart analyze' : 'dartanalyzer';
     assertNoPositionalArgsNorArgsAfterSeparator(
@@ -170,7 +171,7 @@ ProcessDeclaration buildProcess(
             'Arguments can be passed to the "${analyzerUsed}" process via '
             'the --analyzer-args option.');
   }
-  final analyzerCommand = useDartAnalyze ? 'dart' : 'dartanalyzer';
+  final executable = useDartAnalyze ? 'dart' : 'dartanalyzer';
   final args = buildArgs(
       argResults: context.argResults,
       configuredAnalyzerArgs: configuredAnalyzerArgs,
@@ -179,7 +180,7 @@ ProcessDeclaration buildProcess(
   final entrypoints = buildEntrypoints(include: include, root: path);
   logCommand(args, entrypoints,
       verbose: context.verbose, useDartAnalyzer: useDartAnalyze);
-  return ProcessDeclaration(analyzerCommand, [...args, ...entrypoints],
+  return ProcessDeclaration(executable, [...args, ...entrypoints],
       mode: ProcessStartMode.inheritStdio);
 }
 
@@ -194,6 +195,7 @@ void logCommand(
   bool verbose,
   bool useDartAnalyzer,
 }) {
+  useDartAnalyzer ??= false;
   verbose ??= false;
   final exeAndArgs =
       '${useDartAnalyzer ? "dart" : "dartanalyzer"} ${args.join(' ')}'.trim();

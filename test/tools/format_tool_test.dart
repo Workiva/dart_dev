@@ -186,12 +186,12 @@ void main() {
 
     test('mode=dry-run', () {
       expect(buildArgsForDartFormat(['a', 'b'], FormatMode.dryRun),
-          orderedEquals(['a', 'b', '-o', 'none', '.']));
+          orderedEquals(['a', 'b', '-o', 'none']));
     });
 
     test('mode=check', () {
       expect(buildArgsForDartFormat(['a', 'b'], FormatMode.check),
-          orderedEquals(['a', 'b', '--set-exit-if-changed']));
+          orderedEquals(['a', 'b', '-o', 'none', '--set-exit-if-changed']));
     });
 
     test('combines configured args with cli args (in that order)', () {
