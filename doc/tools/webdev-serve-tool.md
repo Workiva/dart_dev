@@ -16,7 +16,7 @@ final config = {
 
 ## Default behavior
 
-By default this tool will run `pub global run webdev serve` which will build the
+By default this tool will run `dart pub global run webdev serve` which will build the
 `web/` directory using the Dart Dev Compiler and serve it on port 8080.
 
 ## Configuration

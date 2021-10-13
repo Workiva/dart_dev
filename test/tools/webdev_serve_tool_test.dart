@@ -33,14 +33,17 @@ void main() {
 
   group('buildArgs', () {
     test('(default)', () {
-      expect(buildArgs(), orderedEquals(['global', 'run', 'webdev', 'serve']));
+      expect(buildArgs(),
+          orderedEquals(['pub', 'global', 'run', 'webdev', 'serve']));
     });
 
     test('forwards the -r|--release flag', () {
       final argParser = WebdevServeTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-r']);
-      expect(buildArgs(argResults: argResults),
-          orderedEquals(['global', 'run', 'webdev', 'serve', '--release']));
+      expect(
+          buildArgs(argResults: argResults),
+          orderedEquals(
+              ['pub', 'global', 'run', 'webdev', 'serve', '--release']));
     });
 
     test('combines configured args with cli args (in that order)', () {
@@ -53,6 +56,7 @@ void main() {
               configuredBuildArgs: ['-o', 'web:build'],
               configuredWebdevArgs: ['web:9000', 'example:9001']),
           orderedEquals([
+            'pub',
             'global',
             'run',
             'webdev',
@@ -80,6 +84,7 @@ void main() {
               configuredWebdevArgs: ['web:9000', 'example:9001'],
               verbose: true),
           orderedEquals([
+            'pub',
             'global',
             'run',
             'webdev',
@@ -105,7 +110,7 @@ void main() {
               configuredWebdevArgs: ['-v'],
               verbose: true),
           orderedEquals(
-              ['global', 'run', 'webdev', 'serve', '-v', '--', '-v']));
+              ['pub', 'global', 'run', 'webdev', 'serve', '-v', '--', '-v']));
     });
 
     test('does not insert a duplicate verbose flag (--verbose)', () {
@@ -115,6 +120,7 @@ void main() {
               configuredWebdevArgs: ['--verbose'],
               verbose: true),
           orderedEquals([
+            'pub',
             'global',
             'run',
             'webdev',
@@ -174,7 +180,7 @@ void main() {
             Logger.root.onRecord,
             emitsThrough(severeLogOf(allOf(
                 contains('webdev serve could not run'),
-                contains('pub global activate webdev ^2.0.0')))));
+                contains('dart pub global activate webdev ^2.0.0')))));
 
         expect(
             buildExecution(DevToolExecutionContext(),
@@ -189,9 +195,9 @@ void main() {
         final execution = buildExecution(DevToolExecutionContext(),
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'pub');
+        expect(execution.process.executable, 'dart');
         expect(execution.process.args,
-            orderedEquals(['global', 'run', 'webdev', 'serve']));
+            orderedEquals(['pub', 'global', 'run', 'webdev', 'serve']));
       });
 
       test('with args', () {
@@ -204,10 +210,11 @@ void main() {
             configuredWebdevArgs: ['web:9000', 'example:9001'],
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'pub');
+        expect(execution.process.executable, 'dart');
         expect(
             execution.process.args,
             orderedEquals([
+              'pub',
               'global',
               'run',
               'webdev',
@@ -235,10 +242,11 @@ void main() {
             configuredWebdevArgs: ['web:9000', 'example:9001'],
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'pub');
+        expect(execution.process.executable, 'dart');
         expect(
             execution.process.args,
             orderedEquals([
+              'pub',
               'global',
               'run',
               'webdev',
@@ -261,9 +269,9 @@ void main() {
         overrideAnsiOutput(false, () {
           expect(
               Logger.root.onRecord,
-              emitsThrough(infoLogOf(
-                  contains('pub global run webdev serve web --auto restart -- '
-                      '--delete-conflicting-outputs -o test:build'))));
+              emitsThrough(infoLogOf(contains(
+                  'dart pub global run webdev serve web --auto restart -- '
+                  '--delete-conflicting-outputs -o test:build'))));
 
           final argParser = WebdevServeTool().toCommand('t').argParser;
           final argResults = argParser.parse([
