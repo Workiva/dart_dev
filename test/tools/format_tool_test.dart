@@ -373,7 +373,7 @@ void main() {
             formatter: Formatter.dartStyle,
             path: 'test/tools/fixtures/format/has_dart_style');
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'pub');
+        expect(execution.process.executable, 'dart');
         expect(execution.process.args,
             orderedEquals(['run', 'dart_style:format', '.']));
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
@@ -444,7 +444,7 @@ void main() {
 
     test('dart_style', () {
       final process = buildProcess(Formatter.dartStyle);
-      expect(process.executable, 'pub');
+      expect(process.executable, 'dart');
       expect(process.args, orderedEquals(['run', 'dart_style:format']));
     });
 

@@ -44,17 +44,17 @@ Future<TestProcess> runDevToolFunctionalTest(
     });
     pubspec.writeAsStringSync(updated);
 
-    final result =
-        Process.runSync('pub', ['get'], workingDirectory: pubspec.parent.path);
+    final result = Process.runSync('dart', ['pub', 'get'],
+        workingDirectory: pubspec.parent.path);
     if (result.exitCode != 0) {
       final origPath = p.join(p.relative(templateDir.absolute.path),
           p.relative(pubspec.absolute.path, from: d.sandbox));
-      throw StateError('pub get failed on: $origPath\n'
+      throw StateError('dart pub get failed on: $origPath\n'
           'STDOUT:\n${result.stdout}\n'
           'STDERR:\n${result.stderr}\n');
     }
   }
 
   final allArgs = <String>['run', 'dart_dev', command, ...?args];
-  return TestProcess.start('pub', allArgs, workingDirectory: d.sandbox);
+  return TestProcess.start('dart', allArgs, workingDirectory: d.sandbox);
 }

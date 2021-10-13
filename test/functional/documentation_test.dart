@@ -28,7 +28,7 @@ void main() {
         d.file('pubspec.yaml', pubspecSource),
       ]).create();
 
-      final pubGet = await TestProcess.start('pub', ['get'],
+      final pubGet = await TestProcess.start('dart', ['pub', 'get'],
           workingDirectory: '${d.sandbox}/project');
       printOnFailure('PUBSPEC:\n$pubspecSource\n');
       await pubGet.shouldExit(0);

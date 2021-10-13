@@ -534,7 +534,7 @@ FormatExecution buildExecution(
 ProcessDeclaration buildProcess([Formatter formatter]) {
   switch (formatter) {
     case Formatter.dartStyle:
-      return ProcessDeclaration('pub', ['run', 'dart_style:format']);
+      return ProcessDeclaration('dart', ['run', 'dart_style:format']);
     case Formatter.dartFormat:
       return ProcessDeclaration('dart', ['format']);
     case Formatter.dartfmt:
