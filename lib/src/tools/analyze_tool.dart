@@ -16,13 +16,14 @@ import '../utils/run_process_and_ensure_exit.dart';
 final _log = Logger('Analyze');
 
 /// A dart_dev tool that runs the `dartanalyzer` or `dart analyze` on the current project.
+/// If the `useDartAnalyze` flag is not specified it will default to `dartanalyzer`.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
 /// `tool/dart_dev/config.dart`:
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
-///       'analyze': AnalyzeTool(),
+///       'analyze': AnalyzeTool() ..useDartAnalyze = true,
 ///     };
 ///
 /// This will make it available via the `dart_dev` command-line app like so:
@@ -82,7 +83,8 @@ class AnalyzeTool extends DevTool {
   }
 }
 
-/// Returns a combined list of args for the `dartanalyzer` process.
+/// Returns a combined list of args for the `dartanalyzer`
+/// or `dart analyze` process.
 ///
 /// If [configuredAnalyzerArgs] is non-null, they will be included first.
 ///
@@ -151,6 +153,9 @@ Iterable<String> buildEntrypoints({List<Glob> include, String root}) {
 /// If non-null, [path] will override the current working directory for any
 /// operations that require it. This is intended for use by tests.
 ///
+/// If true, [useDartAnalyze] will utilize `dart analyze` for analysis.
+/// If null, it will default to utilze `dartanalyzer`.
+///
 /// The [AnalyzeTool] can be tested almost completely via this function by
 /// enumerating all of the possible parameter variations and making assertions
 /// on the declarative output.
@@ -192,8 +197,8 @@ ProcessDeclaration buildProcess(
 void logCommand(
   Iterable<String> args,
   Iterable<String> entrypoints, {
-  bool verbose,
   bool useDartAnalyzer,
+  bool verbose,
 }) {
   useDartAnalyzer ??= false;
   verbose ??= false;

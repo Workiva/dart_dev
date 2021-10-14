@@ -18,7 +18,7 @@ bool globalPackageIsActiveAndCompatible(
     {Map<String, String> environment}) {
   final executable = 'dart';
   final args = ['pub', 'global', 'list'];
-  final result = Process.runSync('dart', ['pub', 'global', 'list'],
+  final result = Process.runSync(executable, args,
       environment: environment, stderrEncoding: utf8, stdoutEncoding: utf8);
   if (result.exitCode != 0) {
     throw ProcessException(

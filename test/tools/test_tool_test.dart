@@ -52,37 +52,35 @@ void main() {
 
   group('buildArgs', () {
     test('(default)', () {
-      expect(buildArgs(), orderedEquals(['run', 'test']));
+      expect(buildArgs(), orderedEquals(['test']));
     });
 
     test('forwards the -n|--name options', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-n', 'foo', '-n', 'bar']);
       expect(buildArgs(argResults: argResults),
-          orderedEquals(['run', 'test', '--name=foo', '--name=bar']));
+          orderedEquals(['test', '--name=foo', '--name=bar']));
     });
 
     test('forwards the -N|--plain-name options', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-N', 'foo', '-N', 'bar']);
-      expect(
-          buildArgs(argResults: argResults),
-          orderedEquals(
-              ['run', 'test', '--plain-name=foo', '--plain-name=bar']));
+      expect(buildArgs(argResults: argResults),
+          orderedEquals(['test', '--plain-name=foo', '--plain-name=bar']));
     });
 
     test('forwards the -P|--preset options', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-P', 'foo', '-P', 'bar']);
       expect(buildArgs(argResults: argResults),
-          orderedEquals(['run', 'test', '--preset=foo', '--preset=bar']));
+          orderedEquals(['test', '--preset=foo', '--preset=bar']));
     });
 
     test('forwards the --reporter option', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['--reporter', 'expanded']);
       expect(buildArgs(argResults: argResults),
-          orderedEquals(['run', 'test', '--reporter=expanded']));
+          orderedEquals(['test', '--reporter=expanded']));
     });
 
     group('with useBuildTest=false', () {
@@ -92,7 +90,7 @@ void main() {
         expect(
             buildArgs(
                 argResults: argResults, configuredTestArgs: ['-P', 'unit']),
-            orderedEquals(['run', 'test', '-P', 'unit', '-N', 'foo']));
+            orderedEquals(['test', '-P', 'unit', '-N', 'foo']));
       });
 
       test('ignores build args if given', () {
@@ -103,7 +101,7 @@ void main() {
             buildArgs(
                 argResults: argResults,
                 configuredBuildArgs: ['-o', 'test:build']),
-            orderedEquals(['run', 'test']));
+            orderedEquals(['test']));
       });
     });
 
@@ -334,7 +332,7 @@ dev_dependencies:
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
           expect(execution.process.executable, 'dart');
-          expect(execution.process.args, orderedEquals(['run', 'test']));
+          expect(execution.process.args, orderedEquals(['test']));
         });
 
         test('with args', () {
@@ -346,7 +344,7 @@ dev_dependencies:
           expect(execution.exitCode, isNull);
           expect(execution.process.executable, 'dart');
           expect(execution.process.args,
-              orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo']));
+              orderedEquals(['test', '-P', 'unit', '-n', 'foo']));
         });
 
         test(
@@ -365,10 +363,8 @@ dev_dependencies:
                 }));
 
         test('and logs the test subprocess', () {
-          expect(
-              Logger.root.onRecord,
-              emitsThrough(
-                  infoLogOf(contains('dart run test -P unit -n foo'))));
+          expect(Logger.root.onRecord,
+              emitsThrough(infoLogOf(contains('dart test -P unit -n foo'))));
 
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);
@@ -396,7 +392,7 @@ dev_dependencies:
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
           expect(execution.process.executable, 'dart');
-          expect(execution.process.args, orderedEquals(['run', 'test']));
+          expect(execution.process.args, orderedEquals(['test']));
         });
 
         test('with args', () {
@@ -408,7 +404,7 @@ dev_dependencies:
           expect(execution.exitCode, isNull);
           expect(execution.process.executable, 'dart');
           expect(execution.process.args,
-              orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo']));
+              orderedEquals(['test', '-P', 'unit', '-n', 'foo']));
         });
 
         test(
@@ -427,10 +423,8 @@ dev_dependencies:
                 }));
 
         test('and logs the test subprocess', () {
-          expect(
-              Logger.root.onRecord,
-              emitsThrough(
-                  infoLogOf(contains('dart run test -P unit -n foo'))));
+          expect(Logger.root.onRecord,
+              emitsThrough(infoLogOf(contains('dart test -P unit -n foo'))));
 
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);

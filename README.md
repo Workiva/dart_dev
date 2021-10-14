@@ -42,7 +42,7 @@ Run any of these tools via the `dart_dev` command-line app:
 ```bash
 $ dart run dart_dev analyze
 [INFO] Running subprocess:
-dartanalyzer .
+dart analyze .
 --------------------------
 Analyzing dart_dev...
 No issues found!
@@ -79,7 +79,7 @@ final config = {
 Most Dart projects eventually share a common set of development requirements
 (e.g. static analysis, formatting, test running, serving, etc.). The Dart SDK
 along with some core packages supply the necessary tooling for these developer
-tasks (e.g. `dartanalyzer`, `dartfmt`, or `dart run test`).
+tasks (e.g. `dart analyze`, `dart format`, or `dart test`).
 
 While the core tooling gets us far, there are two areas in which we feel it
 falls short:
@@ -110,9 +110,10 @@ memorized or referenced in order to run said task.
 Consider formatting as an example. The default approach to formatting files is
 to run `dartfmt -w .`. But, some projects may want to exclude certain files that
 would otherwise be formatted by this command. Or, some projects may want to use
-`dart run dart_style:format` instead of `dartfmt`. Currently, there is no
-project-level configuration supported by the formatter, so these sorts of things
-just have to be documented in a `README.md` or `CONTRIBUTING.md`.
+`dart run dart_style:format` instead of `dartfmt` or `dart format` instead of 
+`dartfmt`. Currently, there is no project-level configuration supported by the 
+formatter, so these sorts of things just have to be documented in a `README.md` 
+or `CONTRIBUTING.md`.
 
 With `dart_dev`, this can be accomplished like so:
 
@@ -222,7 +223,7 @@ final config = {
 
   // Override a target by including it after `...coreConfig`:
   'format': FormatTool()
-    ..formatter = Formatter.dartStyle,
+    ..formatter = Formatter.dartFormat,
 
   // Add a custom target:
   'github': ProcessTool(

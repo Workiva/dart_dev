@@ -3,5 +3,8 @@ import 'package:glob/glob.dart';
 
 final config = {
   ...coreConfig,
-  'format': FormatTool()..exclude = [Glob('test/**/fixtures/**.dart')],
+  'analyze': AnalyzeTool()..useDartAnalyze = true,
+  'format': FormatTool()
+    ..exclude = [Glob('test/**/fixtures/**.dart')]
+    ..formatter = Formatter.dartFormat,
 };

@@ -212,21 +212,19 @@ void main() {
     test('with >5 entrypoints', () {
       expect(Logger.root.onRecord,
           emitsThrough(infoLogOf(contains('dartanalyzer -t <6 paths>'))));
-      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'],
-          useDartAnalyzer: false);
+      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f']);
     });
 
     test('with >5 entrypoints in verbose mode', () {
       expect(Logger.root.onRecord,
           emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e f'))));
-      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'],
-          verbose: true, useDartAnalyzer: false);
+      logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'], verbose: true);
     });
 
     test('in useDartAnalyze mode', () {
-      expect(
-          Logger.root.onRecord, emitsThrough(infoLogOf(contains('dart -t a'))));
-      logCommand(['-t'], ['a'], useDartAnalyzer: true);
+      expect(Logger.root.onRecord,
+          emitsThrough(infoLogOf(contains('dart analyze -t a'))));
+      logCommand(['analyze', '-t'], ['a'], useDartAnalyzer: true);
     });
   });
 }

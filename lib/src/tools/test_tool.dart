@@ -233,8 +233,8 @@ List<String> buildArgs({
   }
 
   return [
-    // `dart run test` or `dart run build_runner test`
-    'run',
+    // `dart test` or `dart run build_runner test`
+    if (useBuildRunner) 'run',
     if (useBuildRunner) 'build_runner',
     'test',
 
