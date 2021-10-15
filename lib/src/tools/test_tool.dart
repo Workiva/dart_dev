@@ -19,7 +19,7 @@ final _log = Logger('Test');
 
 /// A dart_dev tool that runs dart tests for the current project.
 ///
-/// Tests will be run via `dart run test` unless the current project depends on
+/// Tests will be run via `dart test` unless the current project depends on
 /// `build_test`, in which case it will run tests via
 /// `dart run build_runner test`.
 ///
@@ -85,7 +85,7 @@ class TestTool extends DevTool {
         help: 'Write the test process stdout to this file path.')
     ..addOption('test-args',
         help: 'Args to pass to the test runner process.\n'
-            'Run "dart run test -h" to see all available options.')
+            'Run "dart test -h" to see all available options.')
     ..addOption('build-args',
         help: 'Args to pass to the build runner process.\n'
             'Run "dart run build_runner test -h" to see all available '
@@ -102,12 +102,12 @@ class TestTool extends DevTool {
   @override
   String description = 'Run dart tests in this package.';
 
-  /// The args to pass to the `dart run test` process (either directly or
+  /// The args to pass to the `dart test` process (either directly or
   /// through the `dart run build_runner test` process if applicable).
   ///
-  /// Run `dart run test -h` to see all available args.
+  /// Run `dart test -h` to see all available args.
   ///
-  /// Note that most of the command-line options for the `dart run test` process
+  /// Note that most of the command-line options for the `dart test` process
   /// also have `dart_test.yaml` configuration counterparts. Rather than
   /// configuring this field, it is preferred that the project be configured via
   /// `dart_test.yaml` so that the configuration is used even when running tests
@@ -168,7 +168,7 @@ class TestExecution {
 /// arg separator (`--`).
 ///
 /// If [useBuildRunner] is false, the returned args will run tests via
-/// `dart run test` and additional args targeting the test process will follow
+/// `dart test` and additional args targeting the test process will follow
 /// immediately. Build args will be ignored.
 ///
 /// When building the build args portion of the list, the [configuredBuildArgs]

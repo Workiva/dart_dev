@@ -110,10 +110,9 @@ memorized or referenced in order to run said task.
 Consider formatting as an example. The default approach to formatting files is
 to run `dartfmt -w .`. But, some projects may want to exclude certain files that
 would otherwise be formatted by this command. Or, some projects may want to use
-`dart run dart_style:format` instead of `dartfmt` or `dart format` instead of 
-`dartfmt`. Currently, there is no project-level configuration supported by the 
-formatter, so these sorts of things just have to be documented in a `README.md` 
-or `CONTRIBUTING.md`.
+`pub run dart_style:format` instead of `dart format`. Currently, there is no
+project-level configuration supported by the formatter, so these sorts of things
+just have to be documented in a `README.md` or `CONTRIBUTING.md`.
 
 With `dart_dev`, this can be accomplished like so:
 
@@ -145,10 +144,10 @@ Using existing tooling provided by (or conventionalized by) the Dart community
 should always be the goal, but the reality is that there are gaps. Certain use
 cases can be made more convenient and new use cases may arise.
 
-Consider test running as an example. For simple projects, `dart run test` is
+Consider test running as an example. For simple projects, `dart test` is
 sufficient. In fact, the test package supports a huge amount of project-level
 configuration via `dart_test.yaml`, which means that for projects that are
-properly configured, `dart run test` just works.
+properly configured, `dart test` just works.
 
 Unfortunately, at this time, projects that rely on builders must run tests via
 `dart run build_runner test`. Based on the project, you would need to know which
@@ -157,13 +156,13 @@ test command should be run.
 With `dart_dev`, the `TestTool` handles this automatically by checking the
 project's `pubspec.yaml` for a dependency on `build_test`. If present, tests
 will be run via `dart run build_runner test`, otherwise it falls back to the
-default of `dart run test`.
+default of `dart test`.
 
 ```bash
 # In a project without a `build_test` dependency:
 $ ddev test
 [INFO] Running subprocess:
-dart run test
+dart test
 ----------------------------
 00:01 +75: All tests passed!
 
