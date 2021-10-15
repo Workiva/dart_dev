@@ -19,8 +19,8 @@ class TempPubCache {
 void globalActivate(String packageName, String constraint,
     {Map<String, String> environment}) {
   final result = Process.runSync(
-    'pub',
-    ['global', 'activate', packageName, constraint],
+    'dart',
+    ['pub', 'global', 'activate', packageName, constraint],
     environment: environment,
     stderrEncoding: utf8,
     stdoutEncoding: utf8,

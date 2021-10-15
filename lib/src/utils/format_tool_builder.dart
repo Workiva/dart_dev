@@ -148,6 +148,9 @@ Formatter detectFormatterForFormatTool(SimpleIdentifier formatterIdentifier) {
     case 'dartfmt':
       formatter = Formatter.dartfmt;
       break;
+    case 'dartFormat':
+      formatter = Formatter.dartFormat;
+      break;
     case 'dartStyle':
       formatter = Formatter.dartStyle;
       break;

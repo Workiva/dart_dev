@@ -30,12 +30,12 @@ final config = {
 
 ## Default behavior
 
-By default this tool will run `pub run tuneup check` which will analyze all dart
+By default this tool will run `dart run tuneup check` which will analyze all dart
 files in the current project.
 
 ## Ignoring info outputs
 
-By default, `pub run tuneup check` will include "info"-level analysis messages
+By default, `dart run tuneup check` will include "info"-level analysis messages
 in its output and fail if there are any. You can tell tuneup to ignore these:
 
 ```dart

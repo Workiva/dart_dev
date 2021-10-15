@@ -15,18 +15,19 @@ import '../utils/run_process_and_ensure_exit.dart';
 
 final _log = Logger('Analyze');
 
-/// A dart_dev tool that runs the `dartanalyzer` on the current project.
+/// A dart_dev tool that runs the `dartanalyzer` or `dart analyze` on the current project.
+/// If the `useDartAnalyze` flag is not specified it will default to `dartanalyzer`.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
 /// `tool/dart_dev/config.dart`:
 ///     import 'package:dart_dev/dart_dev.dart';
 ///
 ///     final config = {
-///       'analyze': AnalyzeTool(),
+///       'analyze': AnalyzeTool() ..useDartAnalyze = true,
 ///     };
 ///
 /// This will make it available via the `dart_dev` command-line app like so:
-///     pub run dart_dev analyze
+///     dart run dart_dev analyze
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
@@ -36,14 +37,15 @@ final _log = Logger('Analyze');
 ///       'analyze': AnalyzeTool()
 ///         ..analyzerArgs = ['--fatal-infos']
 ///         ..include = [Glob('.'), Glob('other/**.dart')],
+///         ..useDartAnalyze = true
 ///     };
 ///
 /// It is also possible to run this tool directly in a dart script:
 ///     AnalyzeTool().run();
 class AnalyzeTool extends DevTool {
-  /// The args to pass to the `dartanalyzer` process run by this tool.
+  /// The args to pass to the `dartanalyzer`  or `dart analyze` process run by this tool.
   ///
-  /// Run `dartanalyzer -h -v` to see all available args.
+  /// Run `dartanalyzer -h -v` or `dart analyze -h -v` to see all available args.
   List<String> analyzerArgs;
 
   /// The globs to include as entry points to run static analysis on.
@@ -52,6 +54,10 @@ class AnalyzeTool extends DevTool {
   /// files in the current working directory.
   List<Glob> include;
 
+  /// The default tool for analysis will be `dartanalyzer` unless opted in here
+  /// to utilize `dart analyze`.
+  bool useDartAnalyze;
+
   // ---------------------------------------------------------------------------
   // DevTool Overrides
   // ---------------------------------------------------------------------------
@@ -59,21 +65,26 @@ class AnalyzeTool extends DevTool {
   @override
   final ArgParser argParser = ArgParser()
     ..addOption('analyzer-args',
-        help: 'Args to pass to the "dartanalyzer" process.\n'
-            'Run "dartanalyzer -h -v" to see all available options.');
+        help: 'Args to pass to the "dartanalyzer" or "dart analyze" process.\n'
+            'Run "dartanalyzer -h -v" or `dart analyze -h -v" to see all available options.');
 
   @override
   String description = 'Run static analysis on dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) =>
-      runProcessAndEnsureExit(
-          buildProcess(context ?? DevToolExecutionContext(),
-              configuredAnalyzerArgs: analyzerArgs, include: include),
-          log: _log);
+  FutureOr<int> run([DevToolExecutionContext context]) {
+    useDartAnalyze ??= false;
+    return runProcessAndEnsureExit(
+        buildProcess(context ?? DevToolExecutionContext(),
+            configuredAnalyzerArgs: analyzerArgs,
+            include: include,
+            useDartAnalyze: useDartAnalyze),
+        log: _log);
+  }
 }
 
-/// Returns a combined list of args for the `dartanalyzer` process.
+/// Returns a combined list of args for the `dartanalyzer`
+/// or `dart analyze` process.
 ///
 /// If [configuredAnalyzerArgs] is non-null, they will be included first.
 ///
@@ -82,18 +93,21 @@ class AnalyzeTool extends DevTool {
 ///
 /// If [verbose] is true and the verbose flag (`-v`) is not already included, it
 /// will be added.
-Iterable<String> buildArgs({
-  ArgResults argResults,
-  List<String> configuredAnalyzerArgs,
-  bool verbose,
-}) {
+Iterable<String> buildArgs(
+    {ArgResults argResults,
+    List<String> configuredAnalyzerArgs,
+    bool useDartAnalyze,
+    bool verbose}) {
+  useDartAnalyze ??= false;
   verbose ??= false;
   final args = <String>[
-    // Combine all args that should be passed through to the dartanalyzer in
+    // Combine all args that should be passed through to the analyzer in
     // this order:
-    // 1. Statically configured args from [AnalyzeTool.analyzerArgs]
+    // 1. The analyze command if using dart analyze
+    if (useDartAnalyze) 'analyze',
+    // 2. Statically configured args from [AnalyzeTool.analyzerArgs]
     ...?configuredAnalyzerArgs,
-    // 2. Args passed to --analyzer-args
+    // 3. Args passed to --analyzer-args
     ...?splitSingleOptionValue(argResults, 'analyzer-args'),
   ];
   if (verbose && !args.contains('-v') && !args.contains('--verbose')) {
@@ -139,6 +153,9 @@ Iterable<String> buildEntrypoints({List<Glob> include, String root}) {
 /// If non-null, [path] will override the current working directory for any
 /// operations that require it. This is intended for use by tests.
 ///
+/// If true, [useDartAnalyze] will utilize `dart analyze` for analysis.
+/// If null, it will default to utilze `dartanalyzer`.
+///
 /// The [AnalyzeTool] can be tested almost completely via this function by
 /// enumerating all of the possible parameter variations and making assertions
 /// on the declarative output.
@@ -147,26 +164,32 @@ ProcessDeclaration buildProcess(
   List<String> configuredAnalyzerArgs,
   List<Glob> include,
   String path,
+  bool useDartAnalyze,
 }) {
+  useDartAnalyze ??= false;
   if (context.argResults != null) {
+    final analyzerUsed = useDartAnalyze ? 'dart analyze' : 'dartanalyzer';
     assertNoPositionalArgsNorArgsAfterSeparator(
         context.argResults, context.usageException,
         commandName: context.commandName,
         usageFooter:
-            'Arguments can be passed to the "dartanalyzer" process via '
+            'Arguments can be passed to the "${analyzerUsed}" process via '
             'the --analyzer-args option.');
   }
+  final executable = useDartAnalyze ? 'dart' : 'dartanalyzer';
   final args = buildArgs(
       argResults: context.argResults,
       configuredAnalyzerArgs: configuredAnalyzerArgs,
-      verbose: context.verbose);
+      verbose: context.verbose,
+      useDartAnalyze: useDartAnalyze);
   final entrypoints = buildEntrypoints(include: include, root: path);
-  logCommand(args, entrypoints, verbose: context.verbose);
-  return ProcessDeclaration('dartanalyzer', [...args, ...entrypoints],
+  logCommand(args, entrypoints,
+      verbose: context.verbose, useDartAnalyzer: useDartAnalyze);
+  return ProcessDeclaration(executable, [...args, ...entrypoints],
       mode: ProcessStartMode.inheritStdio);
 }
 
-/// Logs the `dartanalyzer` command that will be run by [AnalyzeTool] so that
+/// Logs the `dartanalyzer` or `dart analyze` command that will be run by [AnalyzeTool] so that
 /// consumers can run it directly for debugging purposes.
 ///
 /// Unless [verbose] is true, the list of entrypoints will be abbreviated to
@@ -174,10 +197,14 @@ ProcessDeclaration buildProcess(
 void logCommand(
   Iterable<String> args,
   Iterable<String> entrypoints, {
+  bool useDartAnalyzer,
   bool verbose,
 }) {
+  useDartAnalyzer ??= false;
   verbose ??= false;
-  final exeAndArgs = 'dartanalyzer ${args.join(' ')}'.trim();
+  final exeAndArgs =
+      '${useDartAnalyzer ? "dart" : "dartanalyzer"} ${args.join(' ')}'.trim();
+
   if (entrypoints.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${entrypoints.join(' ')}');
   } else {

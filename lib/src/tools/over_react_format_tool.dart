@@ -31,9 +31,9 @@ class OverReactFormatTool extends DevTool {
       'over_react_format',
       if (lineLength != null) '--line-length=$lineLength'
     ];
-    final process = ProcessDeclaration('pub', [...args, ...paths],
+    final process = ProcessDeclaration('dart', [...args, ...paths],
         mode: ProcessStartMode.inheritStdio);
-    logCommand('pub', paths, args, verbose: context?.verbose);
+    logCommand('dart', paths, args, verbose: context?.verbose);
     return runProcessAndEnsureExit(process);
   }
 }

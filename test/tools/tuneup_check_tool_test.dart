@@ -73,7 +73,7 @@ void main() {
       test('(default)', () {
         final execution = buildExecution(DevToolExecutionContext(), path: path);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'pub');
+        expect(execution.process.executable, 'dart');
         expect(
             execution.process.args, orderedEquals(['run', 'tuneup', 'check']));
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
@@ -86,7 +86,7 @@ void main() {
             DevToolExecutionContext(argResults: argResults, verbose: true);
         final execution = buildExecution(context, path: path);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'pub');
+        expect(execution.process.executable, 'dart');
         expect(
             execution.process.args,
             orderedEquals(
@@ -96,7 +96,7 @@ void main() {
 
       test('and logs the subprocess header', () {
         expect(Logger.root.onRecord,
-            emitsThrough(infoLogOf(allOf(contains('pub run tuneup check')))));
+            emitsThrough(infoLogOf(allOf(contains('dart run tuneup check')))));
 
         buildExecution(DevToolExecutionContext(), path: path);
       });

@@ -6,7 +6,7 @@ import 'package:pub_semver/pub_semver.dart';
 /// Returns `true` if [packageName] is globally activated at a version
 /// allowed by [constraint]. Returns `false` otherwise.
 ///
-/// This is determined by running a `pub global list` and looking for
+/// This is determined by running a `dart pub global list` and looking for
 /// [packageName] in the output and then testing its version against
 /// [constraint].
 ///
@@ -16,9 +16,9 @@ import 'package:pub_semver/pub_semver.dart';
 bool globalPackageIsActiveAndCompatible(
     String packageName, VersionConstraint constraint,
     {Map<String, String> environment}) {
-  final executable = 'pub';
-  final args = ['global', 'list'];
-  final result = Process.runSync('pub', ['global', 'list'],
+  final executable = 'dart';
+  final args = ['pub', 'global', 'list'];
+  final result = Process.runSync(executable, args,
       environment: environment, stderrEncoding: utf8, stdoutEncoding: utf8);
   if (result.exitCode != 0) {
     throw ProcessException(

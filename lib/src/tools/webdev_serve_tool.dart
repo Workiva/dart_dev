@@ -29,7 +29,7 @@ final _log = Logger('WebdevServe');
 ///     };
 ///
 /// This will make it available via the `dart_dev` command-line app like so:
-///     pub run dart_dev serve
+///     dart run dart_dev serve
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
@@ -47,13 +47,13 @@ class WebdevServeTool extends DevTool {
   /// The args to pass to the `build_runner` process via the `webdev serve`
   /// process that will be run by this tool.
   ///
-  /// Run `pub run build_runner build -h` to see all available args.
+  /// Run `dart run build_runner build -h` to see all available args.
   List<String> buildArgs;
 
   /// The args to pass to the `webdev serve` process that will be run by this
   /// tool.
   ///
-  /// Run `pub global run webdev serve -h` to see all available args.
+  /// Run `dart pub global run webdev serve -h` to see all available args.
   List<String> webdevArgs;
 
   // ---------------------------------------------------------------------------
@@ -66,11 +66,11 @@ class WebdevServeTool extends DevTool {
     ..addSeparator('======== Other Options')
     ..addOption('webdev-args',
         help: 'Args to pass to the webdev serve process.\n'
-            'Run "pub global run webdev serve -h -v" to see all available '
+            'Run "dart pub global run webdev serve -h -v" to see all available '
             'options.')
     ..addOption('build-args',
         help: 'Args to pass to the build runner process.\n'
-            'Run "pub run build_runner build -h -v" to see all available '
+            'Run "dart run build_runner build -h -v" to see all available '
             'options.');
 
   @override
@@ -118,7 +118,7 @@ class WebdevServeExecution {
 ///
 /// Since the `webdev` tool wraps a `build_runner` process, the returned list of
 /// args will be two portions with an arg separator between them, e.g.:
-///     pub global run webdev serve <webdev args> -- <build args>
+///     dart pub global run webdev serve <webdev args> -- <build args>
 ///
 /// When building the webdev args portion of the list, the
 /// [configuredWebdevArgs] will be included first (if non-null) followed by the
@@ -165,6 +165,7 @@ List<String> buildArgs(
   }
 
   return [
+    'pub',
     'global',
     'run',
     'webdev',
@@ -216,7 +217,7 @@ WebdevServeExecution buildExecution(
     _log.severe(red.wrap(styleBold.wrap('webdev serve') +
             ' could not run for this project.\n') +
         yellow.wrap('You must have `webdev` globally activated:\n'
-            '  pub global activate webdev ^2.0.0'));
+            '  dart pub global activate webdev ^2.0.0'));
     return WebdevServeExecution.exitEarly(ExitCode.config.code);
   }
   final args = buildArgs(
@@ -224,7 +225,7 @@ WebdevServeExecution buildExecution(
       configuredBuildArgs: configuredBuildArgs,
       configuredWebdevArgs: configuredWebdevArgs,
       verbose: context.verbose);
-  logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
+  logSubprocessHeader(_log, 'dart ${args.join(' ')}'.trim());
   return WebdevServeExecution.process(
-      ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
+      ProcessDeclaration('dart', args, mode: ProcessStartMode.inheritStdio));
 }

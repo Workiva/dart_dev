@@ -18,23 +18,23 @@ final config = {
 
 ## `test` vs `build_runner test`
 
-Historically, `pub run test` has been the canonical way to run Dart tests.
+Historically, `dart test` has been the canonical way to run Dart tests.
 With the introduction of the [build system][build-system], there is now a second
 way to run tests. Projects that rely on builder outputs must run tests via
-`pub run build_runner test`.
+`dart run build_runner test`.
 
 The `TestTool` will make this choice for you. If the current project has a
-dependency on `build_test`, it will run `pub run build_runner test`. Otherwise
-it will default to running `pub run test`.
+dependency on `build_test`, it will run `dart run build_runner test`. Otherwise
+it will default to running `dart test`.
 
 > It [appears][test-future] as though the long term goal is to integrate the
-> build system into the test runner so that `pub run test` is once again the
+> build system into the test runner so that `dart test` is once again the
 > canonical way to run tests.
 
 ## Default behavior
 
-By default this tool will run `pub run test`, unless there is a dependency on
-`build_test`, in which case it will run `pub run build_runner test`.
+By default this tool will run `dart test`, unless there is a dependency on
+`build_test`, in which case it will run `dart run build_runner test`.
 
 ## Running a subset of tests
 
@@ -71,10 +71,10 @@ Usage: dart_dev test [files or directories...]
 ======== Other Options
     --test-stdout       Write the test process stdout to this file path.
     --test-args         Args to pass to the test runner process.
-                        Run "pub run test -h -v" to see all available options.
+                        Run "dart test -h -v" to see all available options.
 
     --build-args        Args to pass to the build runner process.
-                        Run "pub run build_runner test -h -v" to see all available options.
+                        Run "dart run build_runner test -h -v" to see all available options.
                         Note: these args are only applicable if the current project depends on "build_test".
 
 -h, --help              Print this usage information.
@@ -89,7 +89,7 @@ iterating on tests much more efficient.
 ```bash
 $ ddev test test/foo/bar/ test/baz_test.dart
 [INFO] Running subprocess:
-pub run build_runner test --build-filter=test/foo/bar/** --build-filter=test/baz_test.dart.*_test.dart.js --build-filter=test/baz_test.html -- test/foo/bar/ test/baz_test.dart
+dart run build_runner test --build-filter=test/foo/bar/** --build-filter=test/baz_test.dart.*_test.dart.js --build-filter=test/baz_test.html -- test/foo/bar/ test/baz_test.dart
 ----------------------------------------------------------------------------
 ```
 

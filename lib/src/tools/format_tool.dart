@@ -31,7 +31,7 @@ final _log = Logger('Format');
 ///     };
 ///
 /// This will make it available via the `dart_dev` command-line app like so:
-///     pub run dart_dev format
+///     dart run dart_dev format
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
@@ -61,12 +61,13 @@ class FormatTool extends DevTool {
 
   /// The formatter to run, one of:
   /// - `dartfmt` (provided by the SDK)
-  /// - `pub run dart_style:format` (provided by the `dart_style` package)
+  /// - `dart run dart_style:format` (provided by the `dart_style` package)
+  /// - `dart format` (added in Dart SDK 2.10.0)
   Formatter formatter = Formatter.dartfmt;
 
   /// The args to pass to the formatter process run by this command.
   ///
-  /// Run `dartfmt -h -v` to see all available args.
+  /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
   List<String> formatterArgs;
 
   // ---------------------------------------------------------------------------
@@ -91,8 +92,8 @@ class FormatTool extends DevTool {
             'accordingly.\nImplies "--dry-run" and "--set-exit-if-changed".')
     ..addSeparator('======== Other Options')
     ..addOption('formatter-args',
-        help: 'Args to pass to the "dartfmt" process.\n'
-            'Run "dartfmt -h -v" to see all available options.');
+        help: 'Args to pass to the "dartfmt" or "dart format" process.\n'
+            'Run "dartfmt -h -v" or "dart format -h -v" to see all available options.');
 
   @override
   String description = 'Format dart files in this package.';
@@ -321,13 +322,15 @@ enum Formatter {
   dartfmt,
   // The formatter provided via the `dart_style` package.
   dartStyle,
+  // The formatter provided via the Dart 2.10 SDK
+  dartFormat,
 }
 
 /// Builds and returns the full list of args for the formatter process that
 /// [FormatTool] will start.
 ///
 /// [executableArgs] will be included first and are only needed when using the
-/// `dart_style:format` executable (e.g. `pub run dart_style:format`).
+/// `dart_style:format` executable (e.g. `dart run dart_style:format`).
 ///
 /// Next, [mode] will be mapped to the appropriate formatter arg(s), e.g. `-w`,
 /// and included.
@@ -357,6 +360,42 @@ Iterable<String> buildArgs(
     ],
     if (mode == FormatMode.overwrite) '-w',
     if (mode == FormatMode.dryRun) '-n',
+
+    // 2. Statically configured args from [FormatTool.formatterArgs]
+    ...?configuredFormatterArgs,
+    // 3. Args passed to --formatter-args
+    ...?splitSingleOptionValue(argResults, 'formatter-args'),
+  ];
+  return args;
+}
+
+/// Builds and returns the full list of args for the formatter process that
+/// [FormatTool] will start.
+///
+/// [executableArgs] will be included first and will include the
+/// `format` executable (e.g. `dart format`).
+///
+/// Next, [mode] will be mapped to the appropriate formatter arg(s), e.g. `-o`,
+/// and included.
+///
+/// If non-null, [configuredFormatterArgs] will be included next.
+///
+/// If [argResults] is non-null and the `--formatter-args` option is non-null,
+/// they will be included next.
+///
+/// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
+/// included, it will be added.
+Iterable<String> buildArgsForDartFormat(
+    Iterable<String> executableArgs, FormatMode mode,
+    {ArgResults argResults, List<String> configuredFormatterArgs}) {
+  final args = <String>[
+    ...executableArgs,
+
+    // Combine all args that should be passed through to the dart format in this
+    // order:
+    // 1. Mode flag(s), if configured
+    if (mode == FormatMode.check) ...['-o', 'none', '--set-exit-if-changed'],
+    if (mode == FormatMode.dryRun) ...['-o', 'none'],
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,
@@ -410,7 +449,8 @@ FormatExecution buildExecution(
         context.argResults, context.usageException,
         allowRest: useRestForInputs,
         commandName: context.commandName,
-        usageFooter: 'Arguments can be passed to the "dartfmt" process via the '
+        usageFooter:
+            'Arguments can be passed to the "dartfmt" or "dart format" process via the '
             '--formatter-args option.');
     mode = validateAndParseMode(context.argResults, context.usageException);
   }
@@ -464,14 +504,21 @@ FormatExecution buildExecution(
         '${inputs.hiddenDirectories.join('\n  ')}');
   }
 
-  final dartfmt = buildProcess(formatter);
-  final args = buildArgs(dartfmt.args, mode,
-      argResults: context.argResults,
-      configuredFormatterArgs: configuredFormatterArgs);
-  logCommand(dartfmt.executable, inputs.includedFiles, args,
+  final dartFormatter = buildProcess(formatter);
+  Iterable<String> args;
+  if (formatter == Formatter.dartFormat) {
+    args = buildArgsForDartFormat(dartFormatter.args, mode,
+        argResults: context.argResults,
+        configuredFormatterArgs: configuredFormatterArgs);
+  } else {
+    args = buildArgs(dartFormatter.args, mode,
+        argResults: context.argResults,
+        configuredFormatterArgs: configuredFormatterArgs);
+  }
+  logCommand(dartFormatter.executable, inputs.includedFiles, args,
       verbose: context.verbose);
   return FormatExecution.process(ProcessDeclaration(
-      dartfmt.executable, [...args, ...inputs.includedFiles],
+      dartFormatter.executable, [...args, ...inputs.includedFiles],
       mode: ProcessStartMode.inheritStdio));
 }
 
@@ -479,11 +526,14 @@ FormatExecution buildExecution(
 /// based on the given [formatter].
 ///
 /// - [Formatter.dartfmt] -> `dartfmt`
-/// - [Formatter.dartStyle] -> `pub run dart_style:format`
+/// - [Formatter.dartFormat] -> `dart format`
+/// - [Formatter.dartStyle] -> `dart run dart_style:format`
 ProcessDeclaration buildProcess([Formatter formatter]) {
   switch (formatter) {
     case Formatter.dartStyle:
-      return ProcessDeclaration('pub', ['run', 'dart_style:format']);
+      return ProcessDeclaration('dart', ['run', 'dart_style:format']);
+    case Formatter.dartFormat:
+      return ProcessDeclaration('dart', ['format']);
     case Formatter.dartfmt:
     default:
       return ProcessDeclaration('dartfmt', []);

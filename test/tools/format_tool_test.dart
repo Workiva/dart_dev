@@ -178,6 +178,40 @@ void main() {
     });
   });
 
+  group('buildArgsForDartFormat', () {
+    test('no mode', () {
+      expect(
+          buildArgsForDartFormat(['a', 'b'], null), orderedEquals(['a', 'b']));
+    });
+
+    test('mode=dry-run', () {
+      expect(buildArgsForDartFormat(['a', 'b'], FormatMode.dryRun),
+          orderedEquals(['a', 'b', '-o', 'none']));
+    });
+
+    test('mode=check', () {
+      expect(buildArgsForDartFormat(['a', 'b'], FormatMode.check),
+          orderedEquals(['a', 'b', '-o', 'none', '--set-exit-if-changed']));
+    });
+
+    test('combines configured args with cli args (in that order)', () {
+      final argParser = FormatTool().toCommand('t').argParser;
+      final argResults = argParser.parse(['--formatter-args', '--indent 2']);
+      expect(
+          buildArgsForDartFormat(['a', 'b'], FormatMode.overwrite,
+              argResults: argResults,
+              configuredFormatterArgs: ['--fix', '--follow-links']),
+          orderedEquals([
+            'a',
+            'b',
+            '--fix',
+            '--follow-links',
+            '--indent',
+            '2',
+          ]));
+    });
+  });
+
   group('buildExecution', () {
     test('throws UsageException if positional args are given', () {
       final argResults = ArgParser().parse(['a']);
@@ -323,19 +357,29 @@ void main() {
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
       });
 
+      test('with dartFormat', () {
+        final context = DevToolExecutionContext();
+        final execution =
+            buildExecution(context, formatter: Formatter.dartFormat);
+        expect(execution.exitCode, isNull);
+        expect(execution.process.executable, 'dart');
+        expect(execution.process.args, orderedEquals(['format', '.']));
+        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+      });
+
       test('with dart_style:format', () {
         final context = DevToolExecutionContext();
         final execution = buildExecution(context,
             formatter: Formatter.dartStyle,
             path: 'test/tools/fixtures/format/has_dart_style');
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'pub');
+        expect(execution.process.executable, 'dart');
         expect(execution.process.args,
             orderedEquals(['run', 'dart_style:format', '.']));
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
       });
 
-      test('with args', () {
+      test('dartfmt with args', () {
         final argParser = FormatTool().toCommand('t').argParser;
         final argResults =
             argParser.parse(['-w', '--formatter-args', '--indent 2']);
@@ -352,11 +396,35 @@ void main() {
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
       });
 
-      test('and logs the test subprocess', () {
+      test('dartFormat with args', () {
+        final argParser = FormatTool().toCommand('t').argParser;
+        final argResults = argParser.parse(['--formatter-args', '--indent 2']);
+        final context = DevToolExecutionContext(argResults: argResults);
+        final execution = buildExecution(context,
+            configuredFormatterArgs: ['--fix', '--follow-links'],
+            formatter: Formatter.dartFormat);
+        expect(execution.exitCode, isNull);
+        expect(execution.process.executable, 'dart');
+        expect(
+            execution.process.args,
+            orderedEquals(
+                ['format', '--fix', '--follow-links', '--indent', '2', '.']));
+        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+      });
+
+      test('and logs the test subprocess by default', () {
         expect(Logger.root.onRecord,
             emitsThrough(infoLogOf(contains('dartfmt .'))));
 
         buildExecution(DevToolExecutionContext());
+      });
+
+      test('and logs the test subprocess for dart format', () {
+        expect(Logger.root.onRecord,
+            emitsThrough(infoLogOf(contains('dart format .'))));
+
+        buildExecution(DevToolExecutionContext(),
+            formatter: Formatter.dartFormat);
       });
     });
   });
@@ -368,9 +436,15 @@ void main() {
       expect(process.args, isEmpty);
     });
 
+    test('dart format', () {
+      final process = buildProcess(Formatter.dartFormat);
+      expect(process.executable, 'dart');
+      expect(process.args, orderedEquals(['format']));
+    });
+
     test('dart_style', () {
       final process = buildProcess(Formatter.dartStyle);
-      expect(process.executable, 'pub');
+      expect(process.executable, 'dart');
       expect(process.args, orderedEquals(['run', 'dart_style:format']));
     });
 
