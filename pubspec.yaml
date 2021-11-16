@@ -12,6 +12,7 @@ dependencies:
   async: ^2.3.0
   build_runner: ^2.0.0
   completion: ^1.0.0
+  crypto: ^3.0.1
   glob: ^2.0.0
   io: ^1.0.0
   logging: ^1.0.0

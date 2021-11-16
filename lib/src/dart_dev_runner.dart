@@ -5,6 +5,7 @@ import 'package:args/command_runner.dart';
 
 import 'dart_dev_tool.dart';
 import 'events.dart' as events;
+import 'tools/clean_tool.dart';
 import 'utils/version.dart';
 
 // import 'package:completion/completion.dart' as completion;
@@ -12,6 +13,10 @@ import 'utils/version.dart';
 class DartDevRunner extends CommandRunner<int> {
   DartDevRunner(Map<String, DevTool> commands)
       : super('dart_dev', 'Dart tool runner.') {
+    // For backwards-compatibility, only add the `clean` command if it doesn't
+    // conflict with any configured command.
+    commands.putIfAbsent('clean', () => CleanTool());
+
     commands.forEach((name, builder) {
       final command = builder.toCommand(name);
       if (command.name != name) {
@@ -19,6 +24,7 @@ class DartDevRunner extends CommandRunner<int> {
       }
       addCommand(command);
     });
+
     argParser
       ..addFlag('verbose',
           abbr: 'v', negatable: false, help: 'Enables verbose logging.')

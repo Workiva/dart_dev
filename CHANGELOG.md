@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.9.0](https://github.com/Workiva/dart_dev/compare/3.9.0...3.8.0)
+
+- Add a `clean` command by default that removes temporary files used by
+dart_dev, like the compiled version of the run script.
+- Use `dart compile exe` to compile the `.dart_tool/dart_dev/run.dart` script
+for better startup performance on subsequent runs. This compilation step will be
+cached until `tool/dart_dev/config.dart`, the installed packages, or the current
+Dart SDK is changed.
+
 ## [3.8.0](https://github.com/Workiva/dart_dev/compare/3.8.0...3.7.0)
 
 - Upgrade to analyzer ^1.0.0 and build_runner to ^2.0.0. This also brings along
