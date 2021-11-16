@@ -28,4 +28,8 @@ class DartDevPaths {
   String get legacyConfig => _context.join('tool', 'dev.dart');
 
   String get runScript => cache('run.dart');
+
+  String get runExecutable => cache('run');
+
+  String get runExecutableDigest => cache('run.digest');
 }

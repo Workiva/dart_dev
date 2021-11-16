@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
+import 'package:crypto/crypto.dart';
 import 'package:dart_dev/dart_dev.dart';
+import 'package:glob/glob.dart';
+import 'package:glob/list_local_fs.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
+import 'package:pubspec_parse/pubspec_parse.dart';
 
 import 'dart_dev_runner.dart';
 import 'tools/over_react_format_tool.dart';
@@ -16,7 +21,6 @@ import 'utils/cached_pubspec.dart';
 import 'utils/dart_dev_paths.dart';
 import 'utils/dart_tool_cache.dart';
 import 'utils/ensure_process_exit.dart';
-import 'utils/executables.dart' as exe;
 import 'utils/format_tool_builder.dart';
 import 'utils/get_dart_version_comment.dart';
 import 'utils/logging.dart';
@@ -24,35 +28,37 @@ import 'utils/parse_flag_from_args.dart';
 
 typedef _ConfigGetter = Map<String, DevTool> Function();
 
-final paths = DartDevPaths();
-
-final _runScript = File(paths.runScript);
+final _paths = DartDevPaths();
 
 Future<void> run(List<String> args) async {
   attachLoggerToStdio(args);
 
-  final configExists = File(paths.config).existsSync();
-  final oldDevDartExists = File(paths.legacyConfig).existsSync();
+  final configExists = File(_paths.config).existsSync();
+  final oldDevDartExists = File(_paths.legacyConfig).existsSync();
 
   if (!configExists) {
-    log.fine('No custom `${paths.config}` file found; '
+    log.fine('No custom `${_paths.config}` file found; '
         'using default config.');
   }
   if (oldDevDartExists) {
     log.warning(yellow.wrap(
-        'dart_dev v3 now expects configuration to be at `${paths.config}`,\n'
-        'but `${paths.legacyConfig}` still exists. View the guide to see how to upgrade:\n'
+        'dart_dev v3 now expects configuration to be at `${_paths.config}`,\n'
+        'but `${_paths.legacyConfig}` still exists. View the guide to see how to upgrade:\n'
         'https://github.com/Workiva/dart_dev/blob/master/doc/v3-upgrade-guide.md'));
   }
 
   if (args.contains('hackFastFormat') && !oldDevDartExists) {
     await handleFastFormat(args);
-
     return;
   }
 
-  generateRunScript();
-  final process = await Process.start(exe.dart, [paths.runScript, ...args],
+  final processArgs = generateRunScript();
+  final process = await Process.start(
+      processArgs.first,
+      [
+        if (processArgs.length > 1) ...processArgs.sublist(1),
+        ...args,
+      ],
       mode: ProcessStartMode.inheritStdio);
   ensureProcessExit(process);
   exitCode = await process.exitCode;
@@ -62,7 +68,7 @@ Future<void> handleFastFormat(List<String> args) async {
   assertDirIsDartPackage();
 
   DevTool? formatTool;
-  final configFile = File(paths.config);
+  final configFile = File(_paths.config);
   if (configFile.existsSync()) {
     final toolBuilder = FormatToolBuilder();
     parseString(content: configFile.readAsStringSync())
@@ -94,25 +100,109 @@ Future<void> handleFastFormat(List<String> args) async {
   }
 }
 
-void generateRunScript() {
-  if (shouldWriteRunScript) {
+List<String> generateRunScript() {
+  // Generate the run script if it doesn't yet exist or regenerate it if the
+  // existing script is outdated.
+  final runScriptContents = buildDartDevRunScriptContents();
+  final runScriptFile = File(_paths.runScript);
+  final runExecutableFile = File(_paths.runExecutable);
+  final runExecutableDigestFile = File(_paths.runExecutableDigest);
+  if (!runScriptFile.existsSync() ||
+      runScriptFile.readAsStringSync() != runScriptContents) {
     logTimedSync(log, 'Generating run script', () {
       createCacheDir();
-      _runScript.writeAsStringSync(buildDartDevRunScriptContents());
+      runScriptFile.writeAsStringSync(runScriptContents);
     }, level: Level.INFO);
   }
+
+  // Generate a digest of inputs to the run script. We use this to determine
+  // whether we need to recompile the executable.
+  String? encodedDigest;
+  logTimedSync(log, 'Computing run script digest', () {
+    var configHasRelativeImports = false;
+    var configHasSamePackageImports = false;
+    final configFile = File(_paths.config);
+    if (configFile.existsSync()) {
+      final contents = configFile.readAsStringSync();
+      configHasRelativeImports =
+          RegExp(r'''^import ['"][^:]+$''', multiLine: true).hasMatch(contents);
+      final currentPackageName =
+          Pubspec.parse(File('pubspec.yaml').readAsStringSync()).name;
+      configHasSamePackageImports =
+          RegExp('''^import ['"]package:$currentPackageName\/''', multiLine: true)
+              .hasMatch(contents);
+    }
+
+    if (configHasSamePackageImports) {
+      log.fine(
+          'Skipping compilation because ${_paths.config} imports from its own package.');
+      // If the config imports from its own source files, we don't have a way of
+      // efficiently tracking changes that would require recompilation of this
+      // executable, so we skip the compilation altogether.
+      if (runExecutableFile.existsSync()) runExecutableFile.deleteSync();
+      if (runExecutableDigestFile.existsSync())
+        runExecutableDigestFile.deleteSync();
+      return;
+    }
+
+    final digest = md5.convert([
+      if (configFile.existsSync()) ...configFile.readAsBytesSync(),
+      if (configHasRelativeImports)
+        for (final file in Glob('tool/**.dart', recursive: true)
+            .listSync()
+            .whereType<File>()
+            .where(
+                (f) => p.canonicalize(f.path) != p.canonicalize(_paths.config)))
+          ...file.readAsBytesSync(),
+    ]);
+    encodedDigest = base64.encode(digest.bytes);
+  }, level: Level.FINE);
+
+  if (encodedDigest != null &&
+      (!runExecutableDigestFile.existsSync() ||
+          runExecutableDigestFile.readAsStringSync() != encodedDigest)) {
+    // Digest either didn't exist or is outdated, so we (re-)compile.
+    logTimedSync(log, 'Compiling run script', () {
+      // Delete the previous exectuable and digest so that if we hit a failure
+      // trying to compile, we don't leave the outdated one in place.
+      if (runExecutableFile.existsSync()) runExecutableFile.deleteSync();
+      if (runExecutableDigestFile.existsSync())
+        runExecutableDigestFile.deleteSync();
+
+      final args = [
+        'compile',
+        'exe',
+        _paths.runScript,
+        '-o',
+        _paths.runExecutable
+      ];
+      final result = Process.runSync(Platform.executable, args);
+      if (result.exitCode == 0) {
+        // Compilation succeeded. Write the new digest, as well.
+        runExecutableDigestFile.writeAsStringSync(encodedDigest!);
+      } else {
+        // Compilation failed. Dump some logs for debugging, but note to the
+        // user that dart_dev should still work.
+        log.warning(
+            'Could not compile run script; dart_dev will continue without precompilation.');
+        log.fine('CMD: ${Platform.executable} ${args.join(" ")}');
+        log.fine('STDOUT:\n${result.stdout}');
+        log.fine('STDERR:\n${result.stderr}');
+      }
+    });
+  }
+
+  return runExecutableFile.existsSync()
+      ? [_paths.runExecutable]
+      : [Platform.executable, 'run', _paths.runScript];
 }
 
-bool get shouldWriteRunScript =>
-    !_runScript.existsSync() ||
-    _runScript.readAsStringSync() != buildDartDevRunScriptContents();
-
 String buildDartDevRunScriptContents() {
-  final hasCustomToolDevDart = File(paths.config).existsSync();
+  final hasCustomToolDevDart = File(_paths.config).existsSync();
   // If the config has a dart version comment (e.g., if it opts out of null safety),
   // copy it over to the entrypoint so the program is run in that language version.
   var dartVersionComment = hasCustomToolDevDart
-      ? getDartVersionComment(File(paths.config).readAsStringSync())
+      ? getDartVersionComment(File(_paths.config).readAsStringSync())
       : null;
 
   return '''
@@ -121,7 +211,7 @@ import 'dart:io';
 
 import 'package:dart_dev/src/core_config.dart';
 import 'package:dart_dev/src/executable.dart' as executable;
-${hasCustomToolDevDart ? "import '${paths.configFromRunScriptForDart}' as custom_dev;" : ""}
+${hasCustomToolDevDart ? "import '${_paths.configFromRunScriptForDart}' as custom_dev;" : ""}
 
 void main(List<String> args) async {
   await executable.runWithConfig(args,
@@ -149,7 +239,7 @@ Future<void> runWithConfig(
     config = configGetter();
   } catch (error) {
     stderr
-      ..writeln('Invalid "${paths.config}" in ${p.absolute(p.current)}')
+      ..writeln('Invalid "${_paths.config}" in ${p.absolute(p.current)}')
       ..writeln()
       ..writeln('It should provide a `Map<String, DevTool> config;` getter,'
           ' but it either does not exist or threw unexpectedly:')
