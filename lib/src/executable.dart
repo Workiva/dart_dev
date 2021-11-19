@@ -59,7 +59,7 @@ Future<void> run(List<String> args) async {
 
   generateRunScript();
   final process = await Process.start(
-      Platform.executable, [_runScriptPath, ...args],
+      Platform.executable, ['run', _runScriptPath, ...args],
       mode: ProcessStartMode.inheritStdio);
   ensureProcessExit(process);
   exitCode = await process.exitCode;
