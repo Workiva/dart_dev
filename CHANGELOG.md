@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.7.1](https://github.com/Workiva/dart_dev/compare/3.7.1...3.7.0)
+
+- Update `TestTool` to allow arguments after a separator (`--`). These arguments
+will always be passed to the `dart test` process. The main use case for this is
+integration with IDE plugins that enable running tests directly from the IDE.
+- Update `FunctionTool` to allow arguments after a separator (`--`). There isn't
+a strong reason to disallow this since the function tool could do anything it
+wants with those args (and now we have a concrete use case for just that).
+- Fix a bug in `takeAllArgs` (the arg mapper util used with `CompoundTool`) so
+that it now properly restores the first separator (`--`) if present in the
+original arguments list.
+
 ## [3.7.0](https://github.com/Workiva/dart_dev/compare/3.7.0...3.6.7)
 
 - Export ArgResults utilities.

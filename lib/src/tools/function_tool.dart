@@ -36,9 +36,6 @@ class FunctionTool extends DevTool {
         assertNoPositionalArgsNorArgsAfterSeparator(
             context.argResults, context.usageException,
             commandName: context.commandName);
-      } else {
-        assertNoArgsAfterSeparator(context.argResults, context.usageException,
-            commandName: context.commandName);
       }
     }
     final exitCode = await _function(context);

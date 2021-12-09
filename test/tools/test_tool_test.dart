@@ -185,6 +185,44 @@ void main() {
               verbose: true),
           orderedEquals(['run', 'build_runner', 'test', '--verbose']));
     });
+
+    group('supports test args after a separator', () {
+      test('with no test file', () {
+        final argParser = TestTool().toCommand('t').argParser;
+        final argResults = argParser.parse(['--', '-r', 'json', '-j1']);
+        expect(
+            buildArgs(argResults: argResults, useBuildRunner: true),
+            orderedEquals([
+              'run',
+              'build_runner',
+              'test',
+              '--',
+              '-r',
+              'json',
+              '-j1',
+            ]));
+      });
+
+      test('with a test file', () {
+        final argParser = TestTool().toCommand('t').argParser;
+        final argResults =
+            argParser.parse(['--', '-r', 'json', '-j1', 'test/foo_test.dart']);
+        expect(
+            buildArgs(argResults: argResults, useBuildRunner: true),
+            orderedEquals([
+              'run',
+              'build_runner',
+              'test',
+              '--build-filter=test/foo_test.dart.*_test.dart.js*',
+              '--build-filter=test/foo_test.html',
+              '--',
+              '-r',
+              'json',
+              '-j1',
+              'test/foo_test.dart',
+            ]));
+      });
+    });
   });
 
   group('buildExecution', () {
