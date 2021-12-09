@@ -6,6 +6,7 @@ import 'package:dart_dev/dart_dev.dart';
 import 'package:logging/logging.dart';
 
 import '../dart_dev_tool.dart';
+import '../utils/rest_args_with_separator.dart';
 
 final _log = Logger('CompoundTool');
 
@@ -43,7 +44,7 @@ ArgResults takeOptionArgs(ArgParser parser, ArgResults results) =>
 ///     };
 ArgResults takeAllArgs(ArgParser parser, ArgResults results) => parser.parse([
       ...optionArgsOnly(results, allowedOptions: parser.options.keys),
-      ...results.rest,
+      ...restArgsWithSeparator(results),
     ]);
 
 class CompoundTool extends DevTool with CompoundToolMixin {}
