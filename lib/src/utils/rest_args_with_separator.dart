@@ -16,7 +16,7 @@ import 'package:args/args.dart';
 ///     print(results.rest);
 ///     // ['a', 'b', '--unknown', 'c']
 ///     print(restArgsWithSeparator(results));
-///     // ['a', 'b', '--', '--unknown', '-c']
+///     // ['a', 'b', '--', '--unknown', 'c']
 List<String> restArgsWithSeparator(ArgResults argResults) {
   // If no separator was used, return the rest args as is.
   if (!argResults.arguments.contains('--')) {
