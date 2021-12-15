@@ -381,8 +381,8 @@ dev_dependencies:
           final context = DevToolExecutionContext(argResults: argResults);
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'dart');
-          expect(execution.process.args, orderedEquals(['test', '-j1']));
+          expect(execution.process.executable, 'pub');
+          expect(execution.process.args, orderedEquals(['run', 'test', '-j1']));
         });
 
         test(
@@ -451,8 +451,8 @@ dev_dependencies:
           final context = DevToolExecutionContext(argResults: argResults);
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'dart');
-          expect(execution.process.args, orderedEquals(['test', '-j1']));
+          expect(execution.process.executable, 'pub');
+          expect(execution.process.args, orderedEquals(['run', 'test', '-j1']));
         });
 
         test(
@@ -539,7 +539,7 @@ dev_dependencies:
           final context = DevToolExecutionContext(argResults: argResults);
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, 'dart');
+          expect(execution.process.executable, 'pub');
           expect(
               execution.process.args,
               orderedEquals([
