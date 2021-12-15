@@ -1,19 +1,35 @@
 # Changelog
 
-## [3.8.0](https://github.com/Workiva/dart_dev/compare/3.8.0...3.7.0)
+## [3.8.2](https://github.com/Workiva/dart_dev/compare/3.8.1...3.8.2)
+
+- Update `TestTool` to allow arguments after a separator (`--`). These arguments
+will always be passed to the `dart test` process. The main use case for this is
+integration with IDE plugins that enable running tests directly from the IDE.
+- Update `FunctionTool` to allow arguments after a separator (`--`). There isn't
+a strong reason to disallow this since the function tool could do anything it
+wants with those args (and now we have a concrete use case for just that).
+- Fix a bug in `takeAllArgs` (the arg mapper util used with `CompoundTool`) so
+that it now properly restores the first separator (`--`) if present in the
+original arguments list.
+
+## [3.8.1](https://github.com/Workiva/dart_dev/compare/3.8.0..3.8.1)
+
+- Tech debt: use the new `dart` CLI everywhere.
+
+## [3.8.0](https://github.com/Workiva/dart_dev/compare/3.7.0...3.8.0)
 
 - Upgrade to analyzer ^1.0.0 and build_runner to ^2.0.0. This also brings along
 several other dependency upgrades.
 
-## [3.7.0](https://github.com/Workiva/dart_dev/compare/3.7.0...3.6.7)
+## [3.7.0](https://github.com/Workiva/dart_dev/compare/3.6.7...3.7.0)
 
 - Export ArgResults utilities.
 
-## [3.6.7](https://github.com/Workiva/dart_dev/compare/3.6.7...3.6.6)
+## [3.6.7](https://github.com/Workiva/dart_dev/compare/3.6.6...3.6.7)
 
 - Treat Dart 2.13.4 as the primary Dart SDK for development and CI.
 
-## [3.6.6](https://github.com/Workiva/dart_dev/compare/3.6.6...3.6.5)
+## [3.6.6](https://github.com/Workiva/dart_dev/compare/3.6.5...3.6.6)
 
 - Only use build_runner to run tests if the package has direct dependencies on
 both `build_runner` _and_ `build_test` (previously we only checked for
@@ -21,12 +37,12 @@ both `build_runner` _and_ `build_test` (previously we only checked for
 likely have a dependency on `build_test` for use in their builder tests, but
 don't need to run tests via `build_runner`.
 
-## [3.6.5](https://github.com/Workiva/dart_dev/compare/3.6.5...3.6.4)
+## [3.6.5](https://github.com/Workiva/dart_dev/compare/3.6.4...3.6.5)
 
 - Widen dependency ranges to allow resolution on Dart 2.7 and Dart 2.13
 - Switch to GitHub actions for CI
 
-## [3.6.4](https://github.com/Workiva/dart_dev/compare/3.6.4...3.6.1)
+## [3.6.4](https://github.com/Workiva/dart_dev/compare/3.6.1...3.6.4)
 
 - Widen `analyzer` constraint to `>=0.39.0 <0.42.0`
 

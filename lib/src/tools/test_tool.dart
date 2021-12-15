@@ -273,16 +273,6 @@ TestExecution buildExecution(
   List<String> configuredTestArgs,
   String path,
 }) {
-  if (context.argResults != null) {
-    assertNoArgsAfterSeparator(context.argResults, context.usageException,
-        commandName: context.commandName,
-        usageFooter:
-            'Arguments can be passed to the test runner process via the '
-            '--test-args option.\n'
-            'If this project runs tests via build_runner, arguments can be '
-            'passed to that process via the --build-args option.');
-  }
-
   final hasBuildRunner =
       packageIsImmediateDependency('build_runner', path: path);
   final hasBuildTest = packageIsImmediateDependency('build_test', path: path);
@@ -333,9 +323,10 @@ TestExecution buildExecution(
 // Additionally, consumers need to depend on build_web_compilers AND build_vm_compilers
 // We should add some guard-rails (don't use filters if either of those deps are
 // missing, and ensure adequate version of build_runner).
-Iterable<String> buildFiltersForTestArgs(List<String> testInputs) {
+Iterable<String> buildFiltersForTestArgs(List<String> testArgs) {
+  final testInputs = (testArgs ?? []).where((arg) => arg.startsWith('test'));
   final filters = <String>[];
-  for (final input in testInputs ?? []) {
+  for (final input in testInputs) {
     if (input.endsWith('.dart')) {
       filters..add('$input.*_test.dart.js*')..add(dartExtToHtml(input));
     } else {
