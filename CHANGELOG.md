@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.7.1](https://github.com/Workiva/dart_dev/compare/3.7.1...3.7.0)
+## [3.7.1](https://github.com/Workiva/dart_dev/compare/3.7.0...3.7.1)
 
 - Update `TestTool` to allow arguments after a separator (`--`). These arguments
 will always be passed to the `dart test` process. The main use case for this is
