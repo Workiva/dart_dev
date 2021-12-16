@@ -185,21 +185,47 @@ void main() {
               verbose: true),
           orderedEquals(['run', 'build_runner', 'test', '--verbose']));
     });
+
+    group('supports test args after a separator', () {
+      test('with no test file', () {
+        final argParser = TestTool().toCommand('t').argParser;
+        final argResults = argParser.parse(['--', '-r', 'json', '-j1']);
+        expect(
+            buildArgs(argResults: argResults, useBuildRunner: true),
+            orderedEquals([
+              'run',
+              'build_runner',
+              'test',
+              '--',
+              '-r',
+              'json',
+              '-j1',
+            ]));
+      });
+
+      test('with a test file', () {
+        final argParser = TestTool().toCommand('t').argParser;
+        final argResults =
+            argParser.parse(['--', '-r', 'json', '-j1', 'test/foo_test.dart']);
+        expect(
+            buildArgs(argResults: argResults, useBuildRunner: true),
+            orderedEquals([
+              'run',
+              'build_runner',
+              'test',
+              '--build-filter=test/foo_test.dart.*_test.dart.js*',
+              '--build-filter=test/foo_test.html',
+              '--',
+              '-r',
+              'json',
+              '-j1',
+              'test/foo_test.dart',
+            ]));
+      });
+    });
   });
 
   group('buildExecution', () {
-    test('throws UsageException if args are given after a separator', () {
-      final argResults = ArgParser().parse(['--', 'a']);
-      final context = DevToolExecutionContext(
-          argResults: argResults, commandName: 'test_test');
-      expect(
-          () => buildExecution(context),
-          throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'command name', contains('test_test'))
-            ..having((e) => e.message, 'help',
-                allOf(contains('--test-args'), contains('--build-args')))));
-    });
-
     test(
         'throws UsageException if --build-args is used but build_runner is not '
         'a direct dependency', () async {
@@ -349,6 +375,16 @@ dev_dependencies:
               orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo']));
         });
 
+        test('with args after a separator', () {
+          final argParser = TestTool().toCommand('t').argParser;
+          final argResults = argParser.parse(['--', '-j1']);
+          final context = DevToolExecutionContext(argResults: argResults);
+          final execution = buildExecution(context, path: d.sandbox);
+          expect(execution.exitCode, isNull);
+          expect(execution.process.executable, 'pub');
+          expect(execution.process.args, orderedEquals(['run', 'test', '-j1']));
+        });
+
         test(
             'and logs a warning if --release is used in a non-build project',
             () => overrideAnsiOutput(false, () {
@@ -407,6 +443,16 @@ dev_dependencies:
           expect(execution.process.executable, 'pub');
           expect(execution.process.args,
               orderedEquals(['run', 'test', '-P', 'unit', '-n', 'foo']));
+        });
+
+        test('with args after a separator', () {
+          final argParser = TestTool().toCommand('t').argParser;
+          final argResults = argParser.parse(['--', '-j1']);
+          final context = DevToolExecutionContext(argResults: argResults);
+          final execution = buildExecution(context, path: d.sandbox);
+          expect(execution.exitCode, isNull);
+          expect(execution.process.executable, 'pub');
+          expect(execution.process.args, orderedEquals(['run', 'test', '-j1']));
         });
 
         test(
@@ -484,6 +530,24 @@ dev_dependencies:
                 'unit',
                 '-n',
                 'foo'
+              ]));
+        });
+
+        test('with args after a separator', () {
+          final argParser = TestTool().toCommand('t').argParser;
+          final argResults = argParser.parse(['--', '-j1']);
+          final context = DevToolExecutionContext(argResults: argResults);
+          final execution = buildExecution(context, path: d.sandbox);
+          expect(execution.exitCode, isNull);
+          expect(execution.process.executable, 'pub');
+          expect(
+              execution.process.args,
+              orderedEquals([
+                'run',
+                'build_runner',
+                'test',
+                '--',
+                '-j1',
               ]));
         });
 

@@ -36,14 +36,10 @@ void main() {
           .run(DevToolExecutionContext(argResults: parser.parse(['--flag'])));
     });
 
-    test(
-        'throws UsageException with custom ArgParser and args after a separator',
-        () {
+    test('allows a custom ArgParser and args after a separator', () async {
       final tool = DevTool.fromFunction((_) => 0, argParser: ArgParser());
-      expect(
-          () => tool.run(DevToolExecutionContext(
-              argResults: ArgParser().parse(['--', 'foo']))),
-          throwsA(isA<UsageException>()));
+      await tool.run(DevToolExecutionContext(
+          argResults: ArgParser().parse(['--', 'foo'])));
     });
 
     test('logs a warning if no exit code is returned', () {
