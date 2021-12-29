@@ -28,3 +28,6 @@ dev_dependencies:
   test: ^1.15.7
   test_descriptor: ^2.0.0
   test_process: ^2.0.0
+
+dependency_overrides:
+  yaml: 3.0.0
