@@ -7,7 +7,7 @@ import 'package:test_process/test_process.dart';
 
 Future<TestProcess> runDevToolFunctionalTest(
     String command, String projectTemplatePath,
-    {List<String> args, bool verbose}) async {
+    {List<String>? args, bool? verbose}) async {
   // Setup a temporary directory on which this tool will be run, using the given
   // project template as a starting point.
   final templateDir = Directory(projectTemplatePath);

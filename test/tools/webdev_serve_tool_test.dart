@@ -22,12 +22,12 @@ void main() {
       expect(argParser.options.keys,
           containsAll(['release', 'webdev-args', 'build-args']));
 
-      expect(argParser.options['release'].type, OptionType.flag);
-      expect(argParser.options['release'].abbr, 'r');
-      expect(argParser.options['release'].negatable, isTrue);
+      expect(argParser.options['release']!.type, OptionType.flag);
+      expect(argParser.options['release']!.abbr, 'r');
+      expect(argParser.options['release']!.negatable, isTrue);
 
-      expect(argParser.options['webdev-args'].type, OptionType.single);
-      expect(argParser.options['build-args'].type, OptionType.single);
+      expect(argParser.options['webdev-args']!.type, OptionType.single);
+      expect(argParser.options['build-args']!.type, OptionType.single);
     });
   });
 
@@ -133,8 +133,8 @@ void main() {
   });
 
   group('buildExecution', () {
-    TempPubCache pubCacheWithWebdev;
-    TempPubCache pubCacheWithoutWebdev;
+    late TempPubCache pubCacheWithWebdev;
+    late TempPubCache pubCacheWithoutWebdev;
 
     setUpAll(() {
       pubCacheWithWebdev = TempPubCache();
@@ -195,8 +195,8 @@ void main() {
         final execution = buildExecution(DevToolExecutionContext(),
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
-        expect(execution.process.args,
+        expect(execution.process!.executable, 'dart');
+        expect(execution.process!.args,
             orderedEquals(['pub', 'global', 'run', 'webdev', 'serve']));
       });
 
@@ -210,9 +210,9 @@ void main() {
             configuredWebdevArgs: ['web:9000', 'example:9001'],
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
+        expect(execution.process!.executable, 'dart');
         expect(
-            execution.process.args,
+            execution.process!.args,
             orderedEquals([
               'pub',
               'global',
@@ -242,9 +242,9 @@ void main() {
             configuredWebdevArgs: ['web:9000', 'example:9001'],
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
+        expect(execution.process!.executable, 'dart');
         expect(
-            execution.process.args,
+            execution.process!.args,
             orderedEquals([
               'pub',
               'global',

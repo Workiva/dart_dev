@@ -49,14 +49,14 @@ Iterable<DartBlock> getDartBlocks() sync* {
     final source = file.readAsStringSync();
     var i = 1;
     for (final match in dartBlockPattern.allMatches(source)) {
-      final params = match.group(1).split(' ');
+      final params = match.group(1)!.split(' ');
       if (params.contains('test=false')) continue;
-      yield DartBlock.fromSource(match.group(1), file.path, i++);
+      yield DartBlock.fromSource(match.group(1)!, file.path, i++);
     }
   }
 }
 
-String pubspecWithPackages(Set<String> packages) {
+String pubspecWithPackages(Set<String?> packages) {
   final buffer = StringBuffer()
     ..writeln('name: doc_test')
     ..writeln('environment:')
@@ -72,14 +72,14 @@ String pubspecWithPackages(Set<String> packages) {
 
 class DartBlock {
   final int index;
-  final Set<String> packages;
+  final Set<String?> packages;
   final String source;
   final String sourceUrl;
 
   DartBlock.fromSource(this.source, this.sourceUrl, this.index)
       : packages = parsePackagesFromSource(source);
 
-  static Set<String> parsePackagesFromSource(String source) {
+  static Set<String?> parsePackagesFromSource(String source) {
     final packagePattern = RegExp(r'''['"]package:(\w+)\/.*['"]''');
     return Set.of(
         packagePattern.allMatches(source).map((match) => match.group(1)));

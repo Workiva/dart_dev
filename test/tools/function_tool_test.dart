@@ -2,10 +2,8 @@
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/dart_dev.dart';
-import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-import '../log_matchers.dart';
 import 'shared_tool_tests.dart';
 
 void main() {
@@ -29,7 +27,7 @@ void main() {
     test('accepts a custom ArgParser', () async {
       final parser = ArgParser()..addFlag('flag');
       final tool = DevTool.fromFunction((context) {
-        expect(context.argResults['flag'], isTrue);
+        expect(context.argResults!['flag'], isTrue);
         return 0;
       }, argParser: parser);
       await tool
@@ -40,12 +38,6 @@ void main() {
       final tool = DevTool.fromFunction((_) => 0, argParser: ArgParser());
       await tool.run(DevToolExecutionContext(
           argResults: ArgParser().parse(['--', 'foo'])));
-    });
-
-    test('logs a warning if no exit code is returned', () {
-      expect(Logger.root.onRecord,
-          emitsThrough(warningLogOf(contains('did not return an exit code'))));
-      DevTool.fromFunction((_) => null).run();
     });
   });
 }

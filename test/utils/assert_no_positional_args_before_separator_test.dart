@@ -7,7 +7,7 @@ import 'package:dart_dev/src/utils/assert_no_positional_args_before_separator.da
 void main() {
   final commandName = 'test';
   bool beforeSeparator = false;
-  bool usageExceptionCalled;
+  late bool usageExceptionCalled;
   void usageException(String msg) {
     usageExceptionCalled = true;
     expect(msg, contains('The "$commandName" command'));

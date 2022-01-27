@@ -6,7 +6,7 @@ void assertNoPositionalArgs(
   String name,
   ArgResults argResults,
   void usageException(String message), {
-  bool beforeSeparator,
+  bool? beforeSeparator,
 }) {
   beforeSeparator ??= false;
   if (hasAnyPositionalArgsBeforeSeparator(argResults)) {

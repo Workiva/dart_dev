@@ -10,16 +10,16 @@ class OverReactFormatTool extends DevTool {
   /// Wrap lines longer than this.
   ///
   /// Default is 80.
-  int lineLength;
+  int? lineLength;
 
   @override
-  String description =
+  String? description =
       'Format dart files in this package with over_react_format.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) async {
-    Iterable<String> paths = context?.argResults?.rest;
-    if (paths?.isEmpty ?? true) {
+  FutureOr<int> run([DevToolExecutionContext? context]) async {
+    List<String> paths = (context?.argResults?.rest) ?? [];
+    if (paths.isEmpty) {
       context?.usageException(
           '"hackFastFormat" must specify targets to format.\n'
           'hackFastFormat should only be used to format specific files. '

@@ -24,19 +24,19 @@ void main() {
       expect(argParser.options.keys,
           containsAll(['overwrite', 'dry-run', 'check', 'formatter-args']));
 
-      expect(argParser.options['overwrite'].type, OptionType.flag);
-      expect(argParser.options['overwrite'].abbr, 'w');
-      expect(argParser.options['overwrite'].negatable, isFalse);
+      expect(argParser.options['overwrite']!.type, OptionType.flag);
+      expect(argParser.options['overwrite']!.abbr, 'w');
+      expect(argParser.options['overwrite']!.negatable, isFalse);
 
-      expect(argParser.options['dry-run'].type, OptionType.flag);
-      expect(argParser.options['dry-run'].abbr, 'n');
-      expect(argParser.options['dry-run'].negatable, isFalse);
+      expect(argParser.options['dry-run']!.type, OptionType.flag);
+      expect(argParser.options['dry-run']!.abbr, 'n');
+      expect(argParser.options['dry-run']!.negatable, isFalse);
 
-      expect(argParser.options['check'].type, OptionType.flag);
-      expect(argParser.options['check'].abbr, 'c');
-      expect(argParser.options['check'].negatable, isFalse);
+      expect(argParser.options['check']!.type, OptionType.flag);
+      expect(argParser.options['check']!.abbr, 'c');
+      expect(argParser.options['check']!.negatable, isFalse);
 
-      expect(argParser.options['formatter-args'].type, OptionType.single);
+      expect(argParser.options['formatter-args']!.type, OptionType.single);
     });
 
     group('getInputs', () {
@@ -231,9 +231,9 @@ void main() {
           argResults: argResults, commandName: 'hackFastFormat');
       final execution = buildExecution(context);
       expect(execution.exitCode, isNull);
-      expect(execution.process.executable, 'dartfmt');
-      expect(execution.process.args, orderedEquals(['a/random/path']));
-      expect(execution.process.mode, ProcessStartMode.inheritStdio);
+      expect(execution.process!.executable, 'dartfmt');
+      expect(execution.process!.args, orderedEquals(['a/random/path']));
+      expect(execution.process!.mode, ProcessStartMode.inheritStdio);
     });
 
     test('requires positional arguments when the command is hackFastFormat',
@@ -333,9 +333,9 @@ void main() {
         final context = DevToolExecutionContext();
         final execution = buildExecution(context);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dartfmt');
-        expect(execution.process.args, orderedEquals(['.']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+        expect(execution.process!.executable, 'dartfmt');
+        expect(execution.process!.args, orderedEquals(['.']));
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('that uses defaultMode if no mode flag is given', () {
@@ -343,18 +343,18 @@ void main() {
         final execution =
             buildExecution(context, defaultMode: FormatMode.dryRun);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dartfmt');
-        expect(execution.process.args, orderedEquals(['-n', '.']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+        expect(execution.process!.executable, 'dartfmt');
+        expect(execution.process!.args, orderedEquals(['-n', '.']));
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('with dartfmt', () {
         final context = DevToolExecutionContext();
         final execution = buildExecution(context, formatter: Formatter.dartfmt);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dartfmt');
-        expect(execution.process.args, orderedEquals(['.']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+        expect(execution.process!.executable, 'dartfmt');
+        expect(execution.process!.args, orderedEquals(['.']));
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('with dartFormat', () {
@@ -362,9 +362,9 @@ void main() {
         final execution =
             buildExecution(context, formatter: Formatter.dartFormat);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
-        expect(execution.process.args, orderedEquals(['format', '.']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+        expect(execution.process!.executable, 'dart');
+        expect(execution.process!.args, orderedEquals(['format', '.']));
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('with dart_style:format', () {
@@ -373,10 +373,10 @@ void main() {
             formatter: Formatter.dartStyle,
             path: 'test/tools/fixtures/format/has_dart_style');
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
-        expect(execution.process.args,
+        expect(execution.process!.executable, 'dart');
+        expect(execution.process!.args,
             orderedEquals(['run', 'dart_style:format', '.']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('dartfmt with args', () {
@@ -388,12 +388,12 @@ void main() {
             configuredFormatterArgs: ['--fix', '--follow-links'],
             formatter: Formatter.dartfmt);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dartfmt');
+        expect(execution.process!.executable, 'dartfmt');
         expect(
-            execution.process.args,
+            execution.process!.args,
             orderedEquals(
                 ['-w', '--fix', '--follow-links', '--indent', '2', '.']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('dartFormat with args', () {
@@ -404,12 +404,12 @@ void main() {
             configuredFormatterArgs: ['--fix', '--follow-links'],
             formatter: Formatter.dartFormat);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
+        expect(execution.process!.executable, 'dart');
         expect(
-            execution.process.args,
+            execution.process!.args,
             orderedEquals(
                 ['format', '--fix', '--follow-links', '--indent', '2', '.']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('and logs the test subprocess by default', () {
@@ -477,8 +477,8 @@ void main() {
   });
 
   group('validateAndParseMode', () {
-    ArgParser argParser;
-    Function usageException;
+    late ArgParser argParser;
+    late Function usageException;
 
     setUp(() {
       argParser = FormatTool().toCommand('test_format').argParser;
@@ -490,7 +490,7 @@ void main() {
       final argResults =
           argParser.parse(['--check', '--dry-run', '--overwrite']);
       expect(
-          () => validateAndParseMode(argResults, usageException),
+          () => validateAndParseMode(argResults, usageException as void Function(String)),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
@@ -500,7 +500,7 @@ void main() {
     test('--check and --dry-run throws UsageException', () {
       final argResults = argParser.parse(['--check', '--dry-run']);
       expect(
-          () => validateAndParseMode(argResults, usageException),
+          () => validateAndParseMode(argResults, usageException as void Function(String)),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
@@ -510,7 +510,7 @@ void main() {
     test('--check and --overwrite throws UsageException', () {
       final argResults = argParser.parse(['--check', '--overwrite']);
       expect(
-          () => validateAndParseMode(argResults, usageException),
+          () => validateAndParseMode(argResults, usageException as void Function(String)),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
@@ -520,7 +520,7 @@ void main() {
     test('--dry-run and --overwrite throws UsageException', () {
       final argResults = argParser.parse(['--dry-run', '--overwrite']);
       expect(
-          () => validateAndParseMode(argResults, usageException),
+          () => validateAndParseMode(argResults, usageException as void Function(String)),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
@@ -530,24 +530,24 @@ void main() {
     test('--check', () {
       final argResults = argParser.parse(['--check']);
       expect(
-          validateAndParseMode(argResults, usageException), FormatMode.check);
+          validateAndParseMode(argResults, usageException as void Function(String)), FormatMode.check);
     });
 
     test('--dry-run', () {
       final argResults = argParser.parse(['--dry-run']);
       expect(
-          validateAndParseMode(argResults, usageException), FormatMode.dryRun);
+          validateAndParseMode(argResults, usageException as void Function(String)), FormatMode.dryRun);
     });
 
     test('--overwrite', () {
       final argResults = argParser.parse(['--overwrite']);
-      expect(validateAndParseMode(argResults, usageException),
+      expect(validateAndParseMode(argResults, usageException as void Function(String)),
           FormatMode.overwrite);
     });
 
     test('no mode flag', () {
       final argResults = argParser.parse([]);
-      expect(validateAndParseMode(argResults, usageException), isNull);
+      expect(validateAndParseMode(argResults, usageException as void Function(String)), isNull);
     });
   });
 }

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-void assertDirIsDartPackage({String path}) {
+void assertDirIsDartPackage({String? path}) {
   path ??= p.current;
   final pubspec = File(p.join(path, 'pubspec.yaml'));
   if (!pubspec.existsSync()) {

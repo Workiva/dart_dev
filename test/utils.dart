@@ -17,7 +17,7 @@ class TempPubCache {
 /// way to override certain things like the `PUB_CACHE` var that points pub to
 /// the global pub-cache directory.
 void globalActivate(String packageName, String constraint,
-    {Map<String, String> environment}) {
+    {Map<String, String>? environment}) {
   final result = Process.runSync(
     'dart',
     ['pub', 'global', 'activate', packageName, constraint],

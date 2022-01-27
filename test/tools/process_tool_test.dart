@@ -25,7 +25,7 @@ void main() {
           as ProcessTool;
       expect(await tool.run(), isZero);
       final stdout =
-          (await tool.process.stdout.transform(utf8.decoder).join('')).trim();
+          (await tool.process!.stdout.transform(utf8.decoder).join('')).trim();
       expect(stdout, endsWith('/dart_dev/lib'));
     });
 
@@ -53,7 +53,7 @@ void main() {
       var processHasExited = false;
       final tool = BackgroundProcessTool('sleep', ['5']);
       expect(await tool.starter.run(), isZero);
-      unawaited(tool.process.exitCode.then((_) => processHasExited = true));
+      unawaited(tool.process!.exitCode.then((_) => processHasExited = true));
       await Future<void>.delayed(Duration.zero);
       expect(processHasExited, isFalse);
       await tool.stopper.run();
@@ -64,7 +64,7 @@ void main() {
       final tool = BackgroundProcessTool('sleep', ['5']);
       final stopwatch = Stopwatch()..start();
       expect(await tool.starter.run(), isZero);
-      unawaited(tool.process.exitCode.then((_) => processHasExited = true));
+      unawaited(tool.process!.exitCode.then((_) => processHasExited = true));
       await Future<void>.delayed(Duration(seconds: 1));
       expect(processHasExited, isFalse);
       expect(await tool.stopper.run(), isZero);
@@ -90,7 +90,7 @@ void main() {
           workingDirectory: 'lib', delayAfterStart: Duration(seconds: 1));
       expect(await tool.starter.run(), isZero);
       final stdout =
-          (await tool.process.stdout.transform(utf8.decoder).join('')).trim();
+          (await tool.process!.stdout.transform(utf8.decoder).join('')).trim();
       expect(stdout, endsWith('/dart_dev/lib'));
     });
 

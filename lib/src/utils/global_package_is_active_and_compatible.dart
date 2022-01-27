@@ -15,7 +15,7 @@ import 'package:pub_semver/pub_semver.dart';
 /// passed to the [Process] that is run by this function.
 bool globalPackageIsActiveAndCompatible(
     String packageName, VersionConstraint constraint,
-    {Map<String, String> environment}) {
+    {Map<String, String>? environment}) {
   final executable = 'dart';
   final args = ['pub', 'global', 'list'];
   final result = Process.runSync(executable, args,

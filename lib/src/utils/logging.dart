@@ -36,7 +36,7 @@ void attachLoggerToStdio(List<String> args) {
   Logger.root.onRecord.listen(stdIOLogListener(verbose: verbose));
 }
 
-StringBuffer colorLog(LogRecord record, {bool verbose}) {
+StringBuffer colorLog(LogRecord record, {bool? verbose}) {
   verbose ??= false;
 
   AnsiCode color;
@@ -49,7 +49,7 @@ StringBuffer colorLog(LogRecord record, {bool verbose}) {
   }
   final level = color.wrap('[${record.level}]');
   final eraseLine = ansiOutputEnabled && !verbose ? '\x1b[2K\r' : '';
-  final lines = <Object>[
+  final lines = <Object?>[
     '$eraseLine$level ${_loggerName(record, verbose)}${record.message}'
   ];
 
@@ -58,7 +58,7 @@ StringBuffer colorLog(LogRecord record, {bool verbose}) {
   }
 
   if (record.stackTrace != null && verbose) {
-    final trace = Trace.from(record.stackTrace).terse;
+    final trace = Trace.from(record.stackTrace!).terse;
     lines.add(trace);
   }
 
@@ -102,12 +102,12 @@ String humanReadable(Duration duration) {
   return '${hours}h ${remaining.inMinutes}m';
 }
 
-void logSubprocessHeader(Logger logger, String command, {Level level}) {
+void logSubprocessHeader(Logger logger, String command, {Level? level}) {
   level ??= Level.INFO;
   logger.log(
       level,
       'Running subprocess:\n' +
-          magenta.wrap(command) +
+          magenta.wrap(command)! +
           '\n' +
           '-' * (io.stdout.hasTerminal ? io.stdout.terminalColumns : 79) +
           '\n');
@@ -120,7 +120,7 @@ Future<T> logTimedAsync<T>(
   Logger logger,
   String description,
   Future<T> action(), {
-  Level level,
+  Level? level,
 }) async {
   level ??= Level.INFO;
   final watch = Stopwatch()..start();
@@ -150,7 +150,7 @@ T logTimedSync<T>(
   return result;
 }
 
-void Function(LogRecord) stdIOLogListener({bool verbose}) =>
+void Function(LogRecord) stdIOLogListener({bool? verbose}) =>
     (record) => io.stdout.write(record.message.trim().isEmpty
         ? '\n' * (record.message.split('\n').length - 1)
         : colorLog(record, verbose: verbose));

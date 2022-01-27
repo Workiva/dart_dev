@@ -57,18 +57,18 @@ class FormatTool extends DevTool {
   /// The globs to exclude from the inputs to the dart formatter.
   ///
   /// By default, nothing is excluded.
-  List<Glob> exclude;
+  List<Glob>? exclude;
 
   /// The formatter to run, one of:
   /// - `dartfmt` (provided by the SDK)
   /// - `dart run dart_style:format` (provided by the `dart_style` package)
   /// - `dart format` (added in Dart SDK 2.10.0)
-  Formatter formatter = Formatter.dartfmt;
+  Formatter? formatter = Formatter.dartfmt;
 
   /// The args to pass to the formatter process run by this command.
   ///
   /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
-  List<String> formatterArgs;
+  List<String?>? formatterArgs;
 
   // ---------------------------------------------------------------------------
   // DevTool Overrides
@@ -96,10 +96,10 @@ class FormatTool extends DevTool {
             'Run "dartfmt -h -v" or "dart format -h -v" to see all available options.');
 
   @override
-  String description = 'Format dart files in this package.';
+  String? description = 'Format dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) {
+  FutureOr<int> run([DevToolExecutionContext? context]) {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(
       context,
@@ -108,8 +108,8 @@ class FormatTool extends DevTool {
       exclude: exclude,
       formatter: formatter,
     );
-    return execution.exitCode ??
-        runProcessAndEnsureExit(execution.process, log: _log);
+    return (execution.exitCode ??
+        runProcessAndEnsureExit(execution.process!, log: _log)) as FutureOr<int>;
   }
 
   /// Builds and returns the object that contains:
@@ -127,11 +127,11 @@ class FormatTool extends DevTool {
   /// If collapseDirectories is true, directories that contain no exclusions will wind up in the [FormatterInputs],
   /// rather than each file in that tree.  You may get unexpected results if this and followLinks are both true.
   static FormatterInputs getInputs({
-    List<Glob> exclude,
-    bool expandCwd,
-    bool followLinks,
-    String root,
-    bool collapseDirectories,
+    List<Glob>? exclude,
+    bool? expandCwd,
+    bool? followLinks,
+    String? root,
+    bool? collapseDirectories,
   }) {
     expandCwd ??= false;
     followLinks ??= false;
@@ -155,7 +155,7 @@ class FormatTool extends DevTool {
 
     if (collapseDirectories) {
       for (var g in exclude) {
-        List<FileSystemEntity> matchingPaths;
+        List<FileSystemEntity>? matchingPaths;
         try {
           matchingPaths = g.listSync(followLinks: followLinks);
         } on FileSystemException catch (_) {
@@ -211,7 +211,7 @@ class FormatTool extends DevTool {
 
       // If the path is in a subdirectory starting with ".", ignore it.
       final parts = p.split(relative);
-      int hiddenIndex;
+      int? hiddenIndex;
       for (var i = 0; i < parts.length; i++) {
         if (parts[i].startsWith(".")) {
           hiddenIndex = i;
@@ -273,13 +273,13 @@ class FormatterInputs {
   FormatterInputs(this.includedFiles,
       {this.excludedFiles, this.hiddenDirectories, this.skippedLinks});
 
-  final Set<String> excludedFiles;
+  final Set<String>? excludedFiles;
 
-  final Set<String> hiddenDirectories;
+  final Set<String>? hiddenDirectories;
 
   final Set<String> includedFiles;
 
-  final Set<String> skippedLinks;
+  final Set<String>? skippedLinks;
 }
 
 /// A declarative representation of an execution of the [FormatTool].
@@ -298,12 +298,12 @@ class FormatExecution {
   /// exit with this code.
   ///
   /// If null, there is more work to do.
-  final int exitCode;
+  final int? exitCode;
 
   /// A declarative representation of the formatter process that should be run.
   ///
   /// This process' result should become the final result of the [FormatTool].
-  final ProcessDeclaration process;
+  final ProcessDeclaration? process;
 }
 
 /// Modes supported by the dart formatter.
@@ -342,13 +342,13 @@ enum Formatter {
 ///
 /// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
 /// included, it will be added.
-Iterable<String> buildArgs(
-  Iterable<String> executableArgs,
-  FormatMode mode, {
-  ArgResults argResults,
-  List<String> configuredFormatterArgs,
+Iterable<String?> buildArgs(
+  Iterable<String?> executableArgs,
+  FormatMode? mode, {
+  ArgResults? argResults,
+  List<String?>? configuredFormatterArgs,
 }) {
-  final args = <String>[
+  final args = <String?>[
     ...executableArgs,
 
     // Combine all args that should be passed through to the dartfmt in this
@@ -385,10 +385,10 @@ Iterable<String> buildArgs(
 ///
 /// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
 /// included, it will be added.
-Iterable<String> buildArgsForDartFormat(
-    Iterable<String> executableArgs, FormatMode mode,
-    {ArgResults argResults, List<String> configuredFormatterArgs}) {
-  final args = <String>[
+Iterable<String?> buildArgsForDartFormat(
+    Iterable<String?> executableArgs, FormatMode? mode,
+    {ArgResults? argResults, List<String?>? configuredFormatterArgs}) {
+  final args = <String?>[
     ...executableArgs,
 
     // Combine all args that should be passed through to the dart format in this
@@ -433,37 +433,37 @@ Iterable<String> buildArgsForDartFormat(
 /// on the declarative output.
 FormatExecution buildExecution(
   DevToolExecutionContext context, {
-  List<String> configuredFormatterArgs,
-  FormatMode defaultMode,
-  List<Glob> exclude,
-  Formatter formatter,
-  String path,
+  List<String?>? configuredFormatterArgs,
+  FormatMode? defaultMode,
+  List<Glob>? exclude,
+  Formatter? formatter,
+  String? path,
 }) {
-  FormatMode mode;
+  FormatMode? mode;
 
-  final useRestForInputs = (context?.argResults?.rest?.isNotEmpty ?? false) &&
+  final useRestForInputs = (context.argResults?.rest.isNotEmpty ?? false) &&
       context.commandName == 'hackFastFormat';
 
   if (context.argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults, context.usageException,
+        context.argResults!, context.usageException,
         allowRest: useRestForInputs,
         commandName: context.commandName,
         usageFooter:
             'Arguments can be passed to the "dartfmt" or "dart format" process via the '
             '--formatter-args option.');
-    mode = validateAndParseMode(context.argResults, context.usageException);
+    mode = validateAndParseMode(context.argResults!, context.usageException);
   }
   mode ??= defaultMode;
 
   if (formatter == Formatter.dartStyle &&
       !packageIsImmediateDependency('dart_style', path: path)) {
-    _log.severe(red.wrap('Cannot run "dart_style:format".\n') +
+    _log.severe(red.wrap('Cannot run "dart_style:format".\n')! +
         yellow.wrap('You must either have a dependency on "dart_style" in '
             'pubspec.yaml or configure the format tool to use "dartfmt" '
             'instead.\n'
             'Either add "dart_style" to your pubspec.yaml or configure the '
-            'format tool to use "dartfmt" instead.'));
+            'format tool to use "dartfmt" instead.')!);
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
@@ -475,7 +475,7 @@ FormatExecution buildExecution(
   }
 
   final inputs = useRestForInputs
-      ? FormatterInputs({...context.argResults.rest})
+      ? FormatterInputs({...context.argResults!.rest})
       : FormatTool.getInputs(
           exclude: exclude,
           root: path,
@@ -491,21 +491,21 @@ FormatExecution buildExecution(
 
   if (inputs.excludedFiles?.isNotEmpty ?? false) {
     _log.fine('Excluding these paths from formatting:\n  '
-        '${inputs.excludedFiles.join('\n  ')}');
+        '${inputs.excludedFiles!.join('\n  ')}');
   }
 
   if (inputs.skippedLinks?.isNotEmpty ?? false) {
     _log.fine('Excluding these links from formatting:\n  '
-        '${inputs.skippedLinks.join('\n  ')}');
+        '${inputs.skippedLinks!.join('\n  ')}');
   }
 
   if (inputs.hiddenDirectories?.isNotEmpty ?? false) {
     _log.fine('Excluding these hidden directories from formatting:\n  '
-        '${inputs.hiddenDirectories.join('\n  ')}');
+        '${inputs.hiddenDirectories!.join('\n  ')}');
   }
 
   final dartFormatter = buildProcess(formatter);
-  Iterable<String> args;
+  Iterable<String?> args;
   if (formatter == Formatter.dartFormat) {
     args = buildArgsForDartFormat(dartFormatter.args, mode,
         argResults: context.argResults,
@@ -528,7 +528,7 @@ FormatExecution buildExecution(
 /// - [Formatter.dartfmt] -> `dartfmt`
 /// - [Formatter.dartFormat] -> `dart format`
 /// - [Formatter.dartStyle] -> `dart run dart_style:format`
-ProcessDeclaration buildProcess([Formatter formatter]) {
+ProcessDeclaration buildProcess([Formatter? formatter]) {
   switch (formatter) {
     case Formatter.dartStyle:
       return ProcessDeclaration('dart', ['run', 'dart_style:format']);
@@ -546,8 +546,8 @@ ProcessDeclaration buildProcess([Formatter formatter]) {
 /// Unless [verbose] is true, the list of inputs will be abbreviated to avoid an
 /// unnecessarily long log.
 void logCommand(
-    String executable, Iterable<String> inputs, Iterable<String> args,
-    {bool verbose}) {
+    String executable, Iterable<String> inputs, Iterable<String?> args,
+    {bool? verbose}) {
   verbose ??= false;
   final exeAndArgs = '$executable ${args.join(' ')}'.trim();
   if (inputs.length <= 5 || verbose) {
@@ -565,7 +565,7 @@ void logCommand(
 /// will be called with a message explaining that only one mode can be used.
 ///
 /// If none of the mode flags were enabled, this returns `null`.
-FormatMode validateAndParseMode(
+FormatMode? validateAndParseMode(
     ArgResults argResults, void Function(String message) usageException) {
   final check = argResults['check'] ?? false;
   final dryRun = argResults['dry-run'] ?? false;
