@@ -490,7 +490,8 @@ void main() {
       final argResults =
           argParser.parse(['--check', '--dry-run', '--overwrite']);
       expect(
-          () => validateAndParseMode(argResults, usageException as void Function(String)),
+          () => validateAndParseMode(
+              argResults, usageException as void Function(String)),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
@@ -500,7 +501,8 @@ void main() {
     test('--check and --dry-run throws UsageException', () {
       final argResults = argParser.parse(['--check', '--dry-run']);
       expect(
-          () => validateAndParseMode(argResults, usageException as void Function(String)),
+          () => validateAndParseMode(
+              argResults, usageException as void Function(String)),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
@@ -510,7 +512,8 @@ void main() {
     test('--check and --overwrite throws UsageException', () {
       final argResults = argParser.parse(['--check', '--overwrite']);
       expect(
-          () => validateAndParseMode(argResults, usageException as void Function(String)),
+          () => validateAndParseMode(
+              argResults, usageException as void Function(String)),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
@@ -520,7 +523,8 @@ void main() {
     test('--dry-run and --overwrite throws UsageException', () {
       final argResults = argParser.parse(['--dry-run', '--overwrite']);
       expect(
-          () => validateAndParseMode(argResults, usageException as void Function(String)),
+          () => validateAndParseMode(
+              argResults, usageException as void Function(String)),
           throwsA(isA<UsageException>()
             ..having((e) => e.message, 'command name', 'test_format')
             ..having((e) => e.message, 'usage footer',
@@ -530,24 +534,33 @@ void main() {
     test('--check', () {
       final argResults = argParser.parse(['--check']);
       expect(
-          validateAndParseMode(argResults, usageException as void Function(String)), FormatMode.check);
+          validateAndParseMode(
+              argResults, usageException as void Function(String)),
+          FormatMode.check);
     });
 
     test('--dry-run', () {
       final argResults = argParser.parse(['--dry-run']);
       expect(
-          validateAndParseMode(argResults, usageException as void Function(String)), FormatMode.dryRun);
+          validateAndParseMode(
+              argResults, usageException as void Function(String)),
+          FormatMode.dryRun);
     });
 
     test('--overwrite', () {
       final argResults = argParser.parse(['--overwrite']);
-      expect(validateAndParseMode(argResults, usageException as void Function(String)),
+      expect(
+          validateAndParseMode(
+              argResults, usageException as void Function(String)),
           FormatMode.overwrite);
     });
 
     test('no mode flag', () {
       final argResults = argParser.parse([]);
-      expect(validateAndParseMode(argResults, usageException as void Function(String)), isNull);
+      expect(
+          validateAndParseMode(
+              argResults, usageException as void Function(String)),
+          isNull);
     });
   });
 }

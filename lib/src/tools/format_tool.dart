@@ -109,7 +109,8 @@ class FormatTool extends DevTool {
       formatter: formatter,
     );
     return (execution.exitCode ??
-        runProcessAndEnsureExit(execution.process!, log: _log)) as FutureOr<int>;
+            runProcessAndEnsureExit(execution.process!, log: _log))
+        as FutureOr<int>;
   }
 
   /// Builds and returns the object that contains:

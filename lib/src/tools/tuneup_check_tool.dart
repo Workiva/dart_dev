@@ -61,7 +61,8 @@ class TuneupCheckTool extends DevTool {
     final execution = buildExecution(context ?? DevToolExecutionContext(),
         configuredIgnoreInfos: ignoreInfos);
     return (execution.exitCode ??
-        runProcessAndEnsureExit(execution.process!, log: _log)) as FutureOr<int>;
+            runProcessAndEnsureExit(execution.process!, log: _log))
+        as FutureOr<int>;
   }
 }
 
@@ -141,8 +142,8 @@ TuneupExecution buildExecution(
 
   if (!packageIsImmediateDependency('tuneup', path: path)) {
     _log.severe(red.wrap('Cannot run "tuneup check".\n')! +
-        yellow
-            .wrap('You must have a dependency on "tuneup" in pubspec.yaml.\n')!);
+        yellow.wrap(
+            'You must have a dependency on "tuneup" in pubspec.yaml.\n')!);
     return TuneupExecution.exitEarly(ExitCode.config.code);
   }
 
@@ -151,6 +152,7 @@ TuneupExecution buildExecution(
       configuredIgnoreInfos: configuredIgnoreInfos,
       verbose: context.verbose);
   logSubprocessHeader(_log, 'dart ${args.join(' ')}');
-  return TuneupExecution.process(
-      ProcessDeclaration('dart', args as List<String?>, mode: ProcessStartMode.inheritStdio));
+  return TuneupExecution.process(ProcessDeclaration(
+      'dart', args as List<String?>,
+      mode: ProcessStartMode.inheritStdio));
 }

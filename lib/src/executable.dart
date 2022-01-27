@@ -130,8 +130,7 @@ void main(List<String> args) async {
 ''';
 }
 
-Future<int> runWithConfig(
-    List<String> args, _ConfigGetter configGetter) async {
+Future<int> runWithConfig(List<String> args, _ConfigGetter configGetter) async {
   attachLoggerToStdio(args);
 
   try {

@@ -86,7 +86,8 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
           }
         }
       } else if (formatDevTool is OverReactFormatTool) {
-        OverReactFormatTool? typedFormatDevTool = formatDevTool as OverReactFormatTool?;
+        OverReactFormatTool? typedFormatDevTool =
+            formatDevTool as OverReactFormatTool?;
         final lineLengthAssignment = getCascadeByProperty('lineLength');
         if (lineLengthAssignment != null) {
           final lengthExpression = lineLengthAssignment.rightHandSide;
