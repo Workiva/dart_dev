@@ -9,4 +9,5 @@ Map<String, DevTool> get coreConfig => {
       'analyze': AnalyzeTool(),
       'format': FormatTool(),
       'test': TestTool(),
+      'tdd': TddTool(),
     };
