@@ -100,9 +100,11 @@ class TddTool extends DevTool {
 
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
+    print("actually running the TDD Tool");
     context ??= DevToolExecutionContext();
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredTestArgs: testArgs);
+    print("running $execution");
     return execution.exitCode ??
         runProcessAndEnsureExit(execution.process, log: _log);
   }
@@ -212,9 +214,6 @@ List<String> buildArgs({
   }
 
   return [
-    if (useBuildRunner) 'run',
-    'test',
-
     // Add the args targeting the build_runner command.
     // if (useBuildRunner) ...buildArgs,
     // if (useBuildRunner && testArgs.isNotEmpty) '--',
@@ -250,6 +249,7 @@ TestExecution buildExecution(
   List<String> configuredTestArgs,
   String path,
 }) {
+  print("building execution");
   if (!packageIsImmediateDependency('test', path: path)) {
     _log.severe(red.wrap('Cannot run tests.\n') +
         yellow.wrap('You must have a dependency on "test" in pubspec.yaml.\n'));
@@ -261,8 +261,10 @@ TestExecution buildExecution(
       configuredBuildArgs: configuredBuildArgs,
       configuredTestArgs: configuredTestArgs,
       verbose: context.verbose);
+  // I think this will leave the proxy running, which is bad.
   var hackyScript =
-      "while true; do dart run test ${args.join(' ')}; read -r ignored; done";
+      "dart run dart_dev:test_server & while true; do dart run test -p chrome -j 1 --pub-serve=8088  ${args.join(' ')}; read -r ignored; done";
+  print("Got hacky script = $hackyScript");
   logSubprocessHeader(_log, 'dart ${args.join(' ')}'.trim());
   return TestExecution.process(ProcessDeclaration(
       '/bin/sh', ['-c', hackyScript],
