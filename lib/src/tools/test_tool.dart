@@ -123,7 +123,7 @@ class TestTool extends DevTool {
   }
 
   @override
-  Command<int> toCommand(String name) => TestToolCommand(name, this);
+  Command<Object> toCommand(String name) => TestToolCommand(name, this);
 }
 
 class TestToolCommand extends DevToolCommand {
@@ -233,10 +233,13 @@ List<String> buildArgs({
 
   return [
     // `dart test` or `dart run build_runner test`
-    'run',
-//     if (useBuildRunner) 'build_runner',
-    'dart_dev:tweaked_build_runner.dart',
-    'test', '--',
+    if (useBuildRunner) ...[
+      'run',
+      'dart_dev:tweaked_build_runner',
+      'test',
+      '--'
+    ] else
+      'test',
 
     // Add the args targeting the build_runner command.
     if (useBuildRunner) ...buildArgs,

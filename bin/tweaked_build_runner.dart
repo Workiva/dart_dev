@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+/// Simplified version of the build_runner main that also does logging of the
+/// build summary.
 import 'dart:async';
 import 'dart:io';
 
@@ -12,12 +14,9 @@ import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 
 Future<void> main(List<String> args) async {
-  StreamSubscription<LogRecord> logListener;
-
-  Logger.root.level = Level.ALL;
   var f = File('alsoLogHere.txt');
   var listener1 = stdIOLogListener(verbose: true);
-  logListener = Logger.root.onRecord.listen((r) {
+  var logListener = Logger.root.onRecord.listen((r) {
     listener1(r);
     f.writeAsStringSync('$r\n', mode: FileMode.append, flush: true);
   });

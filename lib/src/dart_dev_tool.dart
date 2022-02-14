@@ -68,7 +68,7 @@ abstract class DevTool {
   ///       @override
   ///       String get usageFooter => 'Custom usage footer...';
   ///     }
-  Command<int> toCommand(String name) => DevToolCommand(name, this);
+  Command<Object> toCommand(String name) => DevToolCommand(name, this);
 }
 
 /// A representation of the command-line execution context in which a [DevTool]
@@ -133,7 +133,7 @@ class DevToolExecutionContext {
   }
 }
 
-class DevToolCommand extends Command<int> {
+class DevToolCommand extends Command<Object> {
   DevToolCommand(this.name, this.devTool);
 
   @override

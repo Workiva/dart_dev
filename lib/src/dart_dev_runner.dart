@@ -9,7 +9,7 @@ import 'utils/version.dart';
 
 // import 'package:completion/completion.dart' as completion;
 
-class DartDevRunner extends CommandRunner<int> {
+class DartDevRunner extends CommandRunner<Object> {
   DartDevRunner(Map<String, DevTool> commands)
       : super('dart_dev', 'Dart tool runner.') {
     commands.forEach((name, builder) {
@@ -45,11 +45,13 @@ class DartDevRunner extends CommandRunner<int> {
       return 0;
     }
     final stopwatch = Stopwatch()..start();
-    final exitCode = (await super.run(args)) ?? 0;
+    final basicResult = (await super.run(args));
     stopwatch.stop();
-    await events.commandComplete(
-        events.CommandResult(args, exitCode, stopwatch.elapsed));
-    return exitCode;
+    events.CommandResult result = (basicResult is events.CommandResult)
+        ? basicResult
+        : events.CommandResult(args, basicResult as int, stopwatch.elapsed);
+    await events.commandComplete(result);
+    return result.exitCode;
   }
 }
 
