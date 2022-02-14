@@ -9,7 +9,6 @@ import 'package:logging/logging.dart';
 
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
-import '../utils/assert_no_args_after_separator.dart';
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
@@ -233,10 +232,11 @@ List<String> buildArgs({
   }
 
   return [
-    // `pub run test` or `pub run build_runner test`
+    // `dart test` or `dart run build_runner test`
     'run',
-    if (useBuildRunner) 'build_runner',
-    'test',
+//     if (useBuildRunner) 'build_runner',
+    'dart_dev:tweaked_build_runner.dart',
+    'test', '--',
 
     // Add the args targeting the build_runner command.
     if (useBuildRunner) ...buildArgs,
