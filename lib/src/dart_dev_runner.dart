@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
@@ -9,7 +10,7 @@ import 'utils/version.dart';
 
 // import 'package:completion/completion.dart' as completion;
 
-class DartDevRunner extends CommandRunner<Object> {
+class DartDevRunner extends CommandRunner<int> {
   DartDevRunner(Map<String, DevTool> commands)
       : super('dart_dev', 'Dart tool runner.') {
     commands.forEach((name, builder) {
@@ -44,12 +45,28 @@ class DartDevRunner extends CommandRunner<Object> {
       print(dartDevVersion);
       return 0;
     }
+    // About the only mechanism I can find for communicating between the different levels of this
+    // is that this runner holds an actual list of command instances, so we can associate the log
+    // file path with that.
+    print("commands = $commands");
+    print("we're trying to execute ${argResults.name}");
+    print("or is that ${argResults.command.name}");
+    final command = commands[argResults.command.name];
+    print(
+        "We are trying to write a log at ${(command as DevToolCommand).logFilePath}");
     final stopwatch = Stopwatch()..start();
-    final basicResult = (await super.run(args));
+
+    print("running with ${args}");
+    final exitCode = (await super.run(args)) ?? 0;
     stopwatch.stop();
-    events.CommandResult result = (basicResult is events.CommandResult)
-        ? basicResult
-        : events.CommandResult(args, basicResult as int, stopwatch.elapsed);
+    String log;
+    if (command != null && command is DevToolCommand) {
+      print("We expect to read a log at ${command.logFilePath}");
+      log = await File(command.logFilePath).readAsString();
+      print("Got ${log.length} bytes of log");
+    }
+    events.CommandResult result =
+        events.CommandResult(args, exitCode, stopwatch.elapsed, log: log);
     await events.commandComplete(result);
     return result.exitCode;
   }

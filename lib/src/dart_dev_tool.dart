@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/dart_dev.dart';
+import 'package:path/path.dart' as path;
 
 import 'tools/function_tool.dart';
 import 'utils/verbose_enabled.dart';
@@ -68,7 +70,7 @@ abstract class DevTool {
   ///       @override
   ///       String get usageFooter => 'Custom usage footer...';
   ///     }
-  Command<Object> toCommand(String name) => DevToolCommand(name, this);
+  Command<int> toCommand(String name) => DevToolCommand(name, this);
 }
 
 /// A representation of the command-line execution context in which a [DevTool]
@@ -83,7 +85,8 @@ class DevToolExecutionContext {
       {this.argResults,
       this.commandName,
       void Function(String message) usageException,
-      bool verbose})
+      bool verbose,
+      this.logFilePath})
       : _usageException = usageException,
         verbose = verbose ?? false;
 
@@ -107,6 +110,8 @@ class DevToolExecutionContext {
   /// This will not be null; it defaults to `false`.
   final bool verbose;
 
+  String logFilePath;
+
   /// Return a copy of this instance with optional updates; any field that does
   /// not have an updated value will remain the same.
   DevToolExecutionContext update({
@@ -114,13 +119,14 @@ class DevToolExecutionContext {
     String commandName,
     void Function(String message) usageException,
     bool verbose,
+    String logFilePath,
   }) =>
       DevToolExecutionContext(
-        argResults: argResults ?? this.argResults,
-        commandName: commandName ?? this.commandName,
-        usageException: usageException ?? this.usageException,
-        verbose: verbose ?? this.verbose,
-      );
+          argResults: argResults ?? this.argResults,
+          commandName: commandName ?? this.commandName,
+          usageException: usageException ?? this.usageException,
+          verbose: verbose ?? this.verbose,
+          logFilePath: logFilePath ?? this.logFilePath);
 
   /// Calling this will throw a [UsageException] with [message] that should be
   /// caught by [CommandRunner] and used to set the exit code accordingly and
@@ -133,7 +139,7 @@ class DevToolExecutionContext {
   }
 }
 
-class DevToolCommand extends Command<Object> {
+class DevToolCommand extends Command<int> {
   DevToolCommand(this.name, this.devTool);
 
   @override
@@ -150,10 +156,16 @@ class DevToolCommand extends Command<Object> {
   @override
   final String name;
 
+  /// A probably unique file path to write logs to.
+  // TODO: A better name mechanism.
+  final String logFilePath = path.join(Directory.systemTemp.path,
+      '${Random(DateTime.now().microsecondsSinceEpoch).nextInt(1 << 32)}');
+
   @override
   Future<int> run() async => devTool.run(DevToolExecutionContext(
       argResults: argResults,
       commandName: name,
       usageException: usageException,
-      verbose: verboseEnabled(this)));
+      verbose: verboseEnabled(this),
+      logFilePath: logFilePath));
 }

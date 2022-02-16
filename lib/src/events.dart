@@ -13,8 +13,9 @@ final _commandCompleteListeners =
     <FutureOr<dynamic> Function(CommandResult result)>[];
 
 class CommandResult {
-  CommandResult(this.args, this.exitCode, this.duration);
+  CommandResult(this.args, this.exitCode, this.duration, {this.log});
   final List<String> args;
   final Duration duration;
   final int exitCode;
+  String log;
 }

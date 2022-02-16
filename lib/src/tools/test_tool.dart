@@ -123,7 +123,7 @@ class TestTool extends DevTool {
   }
 
   @override
-  Command<Object> toCommand(String name) => TestToolCommand(name, this);
+  Command<int> toCommand(String name) => TestToolCommand(name, this);
 }
 
 class TestToolCommand extends DevToolCommand {
@@ -187,6 +187,7 @@ List<String> buildArgs({
   List<String> configuredTestArgs,
   bool useBuildRunner,
   bool verbose,
+  String logFilePath,
 }) {
   useBuildRunner ??= false;
   verbose ??= false;
@@ -237,7 +238,7 @@ List<String> buildArgs({
       'run',
       'dart_dev:tweaked_build_runner',
       'test',
-      '--'
+      if (useBuildRunner && (logFilePath != null)) '--logFile=$logFilePath',
     ] else
       'test',
 
@@ -316,10 +317,11 @@ TestExecution buildExecution(
       configuredBuildArgs: configuredBuildArgs,
       configuredTestArgs: configuredTestArgs,
       useBuildRunner: useBuildRunner,
-      verbose: context.verbose);
+      verbose: context.verbose,
+      logFilePath: context.logFilePath);
   logSubprocessHeader(_log, 'pub ${args.join(' ')}'.trim());
   return TestExecution.process(
-      ProcessDeclaration('pub', args, mode: ProcessStartMode.inheritStdio));
+      ProcessDeclaration('dart', args, mode: ProcessStartMode.inheritStdio));
 }
 
 // NOTE: This currently depends on https://github.com/dart-lang/build/pull/2445
