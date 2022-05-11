@@ -6,6 +6,7 @@ import 'package:args/command_runner.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/utils/format_tool_builder.dart';
+import 'package:dart_dev/src/utils/get_dart_version_comment.dart';
 import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
@@ -117,15 +118,12 @@ bool get shouldWriteRunScript =>
 /// Whether dart_dev itself has opted into null-safety.
 const _isDartDevNullSafe = false;
 
-String _getDartVersionComment(String source) =>
-    RegExp(r'^//\s*@dart\s*=.+$', multiLine: true).firstMatch(source)?.group(0);
-
 String buildDartDevRunScriptContents() {
   final hasCustomToolDevDart = File(_configPath).existsSync();
   // If the config has a dart version comment (e.g., if it opts out of null safety),
   // copy it over to the entrypoint so the program is run in that language version.
   var dartVersionComment = hasCustomToolDevDart
-      ? _getDartVersionComment(File(_configPath).readAsStringSync())
+      ? getDartVersionComment(File(_configPath).readAsStringSync())
       : null;
   // If dart_dev itself is not null-safe, opt the entrypoint out of null-safety
   // so the entrypoint doesn't fail to run in packages that have opted into null-safety.
