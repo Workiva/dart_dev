@@ -4,6 +4,12 @@
 
 - Fix errors when running in mixed-version packages that have opted into null safety via pubspec.yaml.
 
+## [3.8.4](https://github.com/Workiva/dart_dev/compare/3.8.3...3.8.4)
+- Replace deprecated CLI command.
+
+## [3.8.3](https://github.com/Workiva/dart_dev/compare/3.8.2...3.8.3)
+- CI improvement.
+
 ## [3.8.2](https://github.com/Workiva/dart_dev/compare/3.8.1...3.8.2)
 
 - Update `TestTool` to allow arguments after a separator (`--`). These arguments
