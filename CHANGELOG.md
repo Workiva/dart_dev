@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.8.5](https://github.com/Workiva/dart_dev/compare/3.8.4...3.8.5)
+
+- Fix errors when running in mixed-version packages that have opted into null safety via pubspec.yaml.
+
 ## [3.8.4](https://github.com/Workiva/dart_dev/compare/3.8.3...3.8.4)
 - Replace deprecated CLI command.
 

@@ -1,0 +1,10 @@
+name: dart_dev_test_functional_null_safety_opted_in_no_config
+version: 0.0.0
+environment:
+ sdk: ">=2.12.0"
+dev_dependencies:
+  dart_dev:
+    path: ../../../../..
+
+workiva:
+  disable_core_checks: true
