@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.8.8](https://github.com/Workiva/dart_dev/compare/3.8.7...3.8.8)
+
+- CI tweaks.
+
 ## [3.8.7](https://github.com/Workiva/dart_dev/compare/3.8.6...3.8.7)
 
 - Allow analyzer v2.
