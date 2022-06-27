@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.8.7](https://github.com/Workiva/dart_dev/compare/3.8.6...3.8.7)
+
+- Allow analyzer v2.
+
+## [3.8.6](https://github.com/Workiva/dart_dev/compare/3.8.5...3.8.6)
+
+- Widen dependency ranges.
+
 ## [3.8.5](https://github.com/Workiva/dart_dev/compare/3.8.4...3.8.5)
 
 - Fix errors when running in mixed-version packages that have opted into null safety via pubspec.yaml.
