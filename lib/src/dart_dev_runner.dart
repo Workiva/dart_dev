@@ -7,8 +7,6 @@ import 'dart_dev_tool.dart';
 import 'events.dart' as events;
 import 'utils/version.dart';
 
-// import 'package:completion/completion.dart' as completion;
-
 class DartDevRunner extends CommandRunner<int> {
   DartDevRunner(Map<String, DevTool> commands)
       : super('dart_dev', 'Dart tool runner.') {
