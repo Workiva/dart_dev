@@ -9,7 +9,6 @@ import 'package:logging/logging.dart';
 
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
-import '../utils/assert_no_args_after_separator.dart';
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';

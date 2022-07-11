@@ -11,7 +11,6 @@ dependencies:
   args: ^2.0.0
   async: ^2.3.0
   build_runner: '>=1.0.0 <3.0.0'
-  completion: ^1.0.0
   glob: ^2.0.0
   io: '>=0.3.5 <2.0.0'
   logging: ^1.0.0
