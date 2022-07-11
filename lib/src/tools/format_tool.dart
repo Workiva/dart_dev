@@ -97,7 +97,7 @@ class FormatTool extends DevTool {
   String description = 'Format dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) {
+  FutureOr<int> run([DevToolExecutionContext context]) async {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(
       context,
@@ -106,8 +106,17 @@ class FormatTool extends DevTool {
       exclude: exclude,
       formatter: formatter,
     );
-    return execution.exitCode ??
-        runProcessAndEnsureExit(execution.process, log: _log);
+    if (execution.exitCode != null) {
+      return execution.exitCode;
+    }
+
+    for (final process in execution.processes) {
+      final exitCode = await runProcessAndEnsureExit(process, log: _log);
+      if (exitCode != 0) {
+        return exitCode;
+      }
+    }
+    return 0;
   }
 
   /// Builds and returns the object that contains:
@@ -283,14 +292,14 @@ class FormatterInputs {
 /// A declarative representation of an execution of the [FormatTool].
 ///
 /// This class allows the [FormatTool] to break its execution up into two steps:
-/// 1. Validation of confg/inputs and creation of this class.
+/// 1. Validation of config/inputs and creation of this class.
 /// 2. Execution of expensive or hard-to-test logic based on step 1.
 ///
 /// As a result, nearly all of the logic in [FormatTool] can be tested via the
 /// output of step 1 (an instance of this class) with very simple unit tests.
 class FormatExecution {
-  FormatExecution.exitEarly(this.exitCode) : process = null;
-  FormatExecution.process(this.process) : exitCode = null;
+  FormatExecution.exitEarly(this.exitCode) : processes = null;
+  FormatExecution.process(this.processes) : exitCode = null;
 
   /// If non-null, the execution is already complete and the [FormatTool] should
   /// exit with this code.
@@ -298,10 +307,11 @@ class FormatExecution {
   /// If null, there is more work to do.
   final int exitCode;
 
-  /// A declarative representation of the formatter process that should be run.
+  /// A declarative representation of the formatter processes that should be run.
   ///
-  /// This process' result should become the final result of the [FormatTool].
-  final ProcessDeclaration process;
+  /// If all processes result in exit code 0, [FormatTool] will return with exit code 0.
+  /// Otherwise, the first non-zero exit code will become the final result of the [FormatTool].
+  final Iterable<ProcessDeclaration> processes;
 }
 
 /// Modes supported by the dart formatter.
@@ -469,9 +479,12 @@ FormatExecution buildExecution(
       configuredFormatterArgs: configuredFormatterArgs);
   logCommand(dartfmt.executable, inputs.includedFiles, args,
       verbose: context.verbose);
-  return FormatExecution.process(ProcessDeclaration(
-      dartfmt.executable, [...args, ...inputs.includedFiles],
-      mode: ProcessStartMode.inheritStdio));
+  final formatProcess = ProcessDeclaration(
+    dartfmt.executable,
+    [...args, ...inputs.includedFiles],
+    mode: ProcessStartMode.inheritStdio,
+  );
+  return FormatExecution.process([formatProcess]);
 }
 
 /// Returns a representation of the process that will be run by [FormatTool]
