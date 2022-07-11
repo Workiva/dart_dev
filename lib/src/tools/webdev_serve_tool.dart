@@ -91,7 +91,7 @@ class WebdevServeTool extends DevTool {
 ///
 /// This class allows the [WebdevServeTool] to break its execution up into two
 /// steps:
-/// 1. Validation of confg/inputs and creation of this class.
+/// 1. Validation of config/inputs and creation of this class.
 /// 2. Execution of expensive or hard-to-test logic based on step 1.
 ///
 /// As a result, nearly all of the logic in [WebdevServeTool] can be tested via
