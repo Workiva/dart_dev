@@ -514,7 +514,7 @@ FormatExecution buildExecution(
         '${inputs.hiddenDirectories.join('\n  ')}');
   }
 
-  final dartFormatter = buildProcess(formatter);
+  final dartFormatter = buildFormatProcess(formatter);
   Iterable<String> args;
   if (formatter == Formatter.dartFormat) {
     args = buildArgsForDartFormat(dartFormatter.args, mode,
@@ -541,7 +541,7 @@ FormatExecution buildExecution(
 /// - [Formatter.dartfmt] -> `dartfmt`
 /// - [Formatter.dartFormat] -> `dart format`
 /// - [Formatter.dartStyle] -> `dart run dart_style:format`
-ProcessDeclaration buildProcess([Formatter formatter]) {
+ProcessDeclaration buildFormatProcess([Formatter formatter]) {
   switch (formatter) {
     case Formatter.dartStyle:
       return ProcessDeclaration('dart', ['run', 'dart_style:format']);

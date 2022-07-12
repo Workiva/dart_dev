@@ -437,27 +437,27 @@ void main() {
     });
   });
 
-  group('buildProcess', () {
+  group('buildFormatProcess', () {
     test('dartfmt', () {
-      final process = buildProcess(Formatter.dartfmt);
+      final process = buildFormatProcess(Formatter.dartfmt);
       expect(process.executable, 'dartfmt');
       expect(process.args, isEmpty);
     });
 
     test('dart format', () {
-      final process = buildProcess(Formatter.dartFormat);
+      final process = buildFormatProcess(Formatter.dartFormat);
       expect(process.executable, 'dart');
       expect(process.args, orderedEquals(['format']));
     });
 
     test('dart_style', () {
-      final process = buildProcess(Formatter.dartStyle);
+      final process = buildFormatProcess(Formatter.dartStyle);
       expect(process.executable, 'dart');
       expect(process.args, orderedEquals(['run', 'dart_style:format']));
     });
 
     test('default', () {
-      final process = buildProcess(Formatter.dartfmt);
+      final process = buildFormatProcess(Formatter.dartfmt);
       expect(process.executable, 'dartfmt');
       expect(process.args, isEmpty);
     });
