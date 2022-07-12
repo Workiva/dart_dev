@@ -367,21 +367,21 @@ void main() {
     });
   });
 
-  group('buildProcess', () {
+  group('buildFormatProcess', () {
     test('dartfmt', () {
-      final process = buildProcess(Formatter.dartfmt);
+      final process = buildFormatProcess(Formatter.dartfmt);
       expect(process.executable, 'dartfmt');
       expect(process.args, isEmpty);
     });
 
     test('dart_style', () {
-      final process = buildProcess(Formatter.dartStyle);
+      final process = buildFormatProcess(Formatter.dartStyle);
       expect(process.executable, 'pub');
       expect(process.args, orderedEquals(['run', 'dart_style:format']));
     });
 
     test('default', () {
-      final process = buildProcess(Formatter.dartfmt);
+      final process = buildFormatProcess(Formatter.dartfmt);
       expect(process.executable, 'dartfmt');
       expect(process.args, isEmpty);
     });
