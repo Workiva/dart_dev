@@ -16,7 +16,7 @@ String cleanImports(String sourceFileContents) {
 
   _assignCommentsInFileToImport(sourceFileContents, imports);
 
-  final firstImportStartIdx = imports.first.charOffset();
+  final firstImportStartIdx = imports.first.start();
   final lastImportEndIdx = imports.last.end();
   imports.sort(_importComparator);
   final sortedImportString =
@@ -98,10 +98,17 @@ String _getSortedImportString(String sourceFileContents, List<Import> imports) {
             importIndex == firstPkgImportIdx)) {
       sortedReplacement.write('\n');
     }
+    final importDirectiveWithQuotesReplaced = sourceFileContents
+        .substring(import.statementStart, import.statementEnd)
+        .replaceAll('"', "'");
 
     final source = sourceFileContents
-        .substring(import.charOffset(), import.end())
-        .replaceAll('"', "'");
+        .replaceRange(
+          import.statementStart,
+          import.statementEnd,
+          importDirectiveWithQuotesReplaced,
+        )
+        .substring(import.start(), import.end());
     sortedReplacement..write(source)..write('\n');
   }
   return sortedReplacement.toString();

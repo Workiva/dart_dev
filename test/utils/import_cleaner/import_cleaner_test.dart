@@ -51,6 +51,8 @@ void main() {
     _TestCase('22. empty file', uncleanImports22, cleanImports22),
     _TestCase('23. no imports', uncleanImports23, cleanImports23),
     _TestCase('24. comments between imports', uncleanImports24, cleanImports24),
+    _TestCase(
+        '25. comments contains double quotes', uncleanImports25, cleanImports25)
   ];
 
   group('cleanImports', () {
