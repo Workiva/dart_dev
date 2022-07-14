@@ -3,6 +3,7 @@ export 'src/utils/assert_no_positional_args_nor_args_after_separator.dart';
 export 'src/utils/cached_pubspec.dart';
 export 'src/utils/ensure_process_exit.dart';
 export 'src/utils/global_package_is_active_and_compatible.dart';
+export 'src/utils/import_cleaner/import_cleaner.dart' show cleanImports;
 export 'src/utils/logging.dart'
     show humanReadable, logSubprocessHeader, logTimedAsync, logTimedSync;
 export 'src/utils/package_is_immediate_dependency.dart';
