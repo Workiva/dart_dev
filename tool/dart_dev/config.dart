@@ -3,5 +3,7 @@ import 'package:glob/glob.dart';
 
 final config = {
   ...coreConfig,
-  'format': FormatTool()..exclude = [Glob('test/**/fixtures/**.dart')],
+  'format': FormatTool()
+    ..organizeImports = true
+    ..exclude = [Glob('test/**/fixtures/**.dart')],
 };
