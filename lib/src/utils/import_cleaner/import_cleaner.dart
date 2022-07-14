@@ -7,10 +7,9 @@ import 'import_collector.dart';
 /// Takes in a file as a string and cleans up the imports. Sorts imports and removes double quotes.
 ///
 /// Throws an ArgumentError if [sourceFileContents] cannot be parsed.
-String cleanImports(String sourceFileContents, {String currentPackageName}) {
-  final imports = parseString(content: sourceFileContents)
-      .unit
-      .accept(ImportCollector(currentPackageName: currentPackageName));
+String cleanImports(String sourceFileContents) {
+  final imports =
+      parseString(content: sourceFileContents).unit.accept(ImportCollector());
   if (imports.isEmpty) {
     return sourceFileContents;
   }
@@ -92,14 +91,11 @@ String _getSortedImportString(String sourceFileContents, List<Import> imports) {
       imports.indexWhere((import) => import.isRelativeImport);
   final firstPkgImportIdx =
       imports.indexWhere((import) => import.isExternalPkgImport);
-  final firstCurrentPkgImportIdx =
-      imports.indexWhere((import) => import.isCurrentPackageImport);
   for (var importIndex = 0; importIndex < imports.length; importIndex++) {
     final import = imports[importIndex];
     if (importIndex != 0 &&
         (importIndex == firstRelativeImportIdx ||
-            importIndex == firstPkgImportIdx ||
-            importIndex == firstCurrentPkgImportIdx)) {
+            importIndex == firstPkgImportIdx)) {
       sortedReplacement.write('\n');
     }
 
@@ -137,21 +133,6 @@ int _importComparator(Import first, Import second) {
   }
 
   if (!firstIsPkg && secondIsPkg) {
-    return 1;
-  }
-
-  // Check for name
-  final firstIsCurrent = first.isCurrentPackageImport;
-  final secondIsCurrent = second.isCurrentPackageImport;
-  if (firstIsCurrent && secondIsCurrent) {
-    return first.target.compareTo(second.target);
-  }
-
-  if (firstIsCurrent && !secondIsCurrent) {
-    return -1;
-  }
-
-  if (!firstIsCurrent && secondIsCurrent) {
     return 1;
   }
 

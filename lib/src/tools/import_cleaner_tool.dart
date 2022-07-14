@@ -11,7 +11,6 @@ import '../utils/import_cleaner/import_cleaner.dart';
 class ImportCleanerTool extends DevTool {
   List<Glob> directoriesToInclude = [];
   int _exitCode = 0;
-  String packageName;
 
   @override
   final ArgParser argParser = ArgParser(allowTrailingOptions: true)
@@ -133,7 +132,7 @@ class ImportCleanerTool extends DevTool {
 
   String _safelyCleanImports(String fileContents) {
     try {
-      return cleanImports(fileContents, currentPackageName: this.packageName);
+      return cleanImports(fileContents);
     } on ArgumentError {
       return null;
     }
