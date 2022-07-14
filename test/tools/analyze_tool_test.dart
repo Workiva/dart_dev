@@ -1,12 +1,11 @@
 @TestOn('vm')
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:dart_dev/src/dart_dev_tool.dart';
+import 'package:dart_dev/src/tools/analyze_tool.dart';
 import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
-
-import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/tools/analyze_tool.dart';
 
 import '../log_matchers.dart';
 import 'shared_tool_tests.dart';

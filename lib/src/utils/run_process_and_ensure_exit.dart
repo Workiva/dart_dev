@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:logging/logging.dart';
 
-import 'process_declaration.dart';
 import 'ensure_process_exit.dart';
+import 'process_declaration.dart';
 
 Future<int> runProcessAndEnsureExit(ProcessDeclaration processDeclaration,
     {Logger log}) async {
