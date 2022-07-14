@@ -9,9 +9,6 @@ class Import {
   /// The AST node that represents an import in a file.
   final ImportDirective directive;
 
-  /// The library running the cleaner
-  final String package_name;
-
   /// Comments that appear before the import that should stay with the import when sorted.
   List<Token> beforeComments = [];
 
@@ -32,32 +29,16 @@ class Import {
   /// If the import is an external package import. Memoized for performance.
   bool _isExternalPkgImport;
   bool get isExternalPkgImport {
-    return _isExternalPkgImport ??=
-        target.startsWith('package:') && !_checkIfCurrentImport(target);
+    return _isExternalPkgImport ??= target.startsWith('package:');
   }
 
   /// If the import is a relative import. Memoized for performance.
   bool _isRelativeImport;
   bool get isRelativeImport {
-    return _isRelativeImport ??=
-        !isExternalPkgImport && !isDartImport && !isCurrentPackageImport;
+    return _isRelativeImport ??= !isExternalPkgImport && !isDartImport;
   }
 
-  bool _checkIfCurrentImport(String target) {
-    if (package_name == null) {
-      return false;
-    }
-
-    return target.contains('package:$package_name');
-  }
-
-  /// If the import is a current package import. Memoized for performance.
-  bool _isCurrentPackageImport;
-  bool get isCurrentPackageImport {
-    return _isCurrentPackageImport ??= _checkIfCurrentImport(target);
-  }
-
-  Import(this.directive, {this.package_name});
+  Import(this.directive);
 
   /// The character offset of the end of this import in source text (includes comments associated with this import).
   int end() {

@@ -49,18 +49,15 @@ void main() {
     _TestCase('22. empty file', uncleanImports22, cleanImports22),
     _TestCase('23. no imports', uncleanImports23, cleanImports23),
     _TestCase('24. comments between imports', uncleanImports24, cleanImports24),
-    _TestCase('25. sorts current package imports correctly', uncleanImports25,
-        cleanImports25,
-        packageName: 'current_package'),
   ];
 
   group('cleanImports', () {
     for (final testCase in testCases) {
       test(testCase.description, () {
         expect(
-            cleanImports(testCase.unclean,
-                currentPackageName: testCase.packageName),
-            equals(testCase.clean));
+          cleanImports(testCase.unclean),
+          equals(testCase.clean),
+        );
       });
     }
   });
@@ -70,10 +67,8 @@ class _TestCase {
   final String description;
   final String unclean;
   final String clean;
-  final String packageName;
 
-  const _TestCase(this.description, this.unclean, this.clean,
-      {this.packageName});
+  const _TestCase(this.description, this.unclean, this.clean);
 }
 
 const uncleanImports1 = '''
@@ -770,40 +765,5 @@ import 'b.dart'; /* comment 2 */ /* comment 3 */
 
 void main() {
    // content
-}
-''';
-
-const uncleanImports25 = '''
-import 'package_things_b.dart';
-import 'package:args/dart_stuff.dart';
-import 'dart:b.dart';
-import 'package_things_a.dart';
-import 'package:current_package/a.dart';
-import 'dart_sync_mocks.dart';
-import 'dart:a.dart';
-import 'package:glob/dart_stuff.dart';
-import 'dart_async_mocks.dart';
-
-void main() {
-  // content
-}
-''';
-
-const cleanImports25 = '''
-import 'dart:a.dart';
-import 'dart:b.dart';
-
-import 'package:args/dart_stuff.dart';
-import 'package:glob/dart_stuff.dart';
-
-import 'package:current_package/a.dart';
-
-import 'dart_async_mocks.dart';
-import 'dart_sync_mocks.dart';
-import 'package_things_a.dart';
-import 'package_things_b.dart';
-
-void main() {
-  // content
 }
 ''';
