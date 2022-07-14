@@ -3,13 +3,11 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:dart_dev/dart_dev.dart';
-import 'package:glob/glob.dart';
 import 'package:io/ansi.dart';
 
 import '../utils/import_cleaner/import_cleaner.dart';
 
 class ImportCleanerTool extends DevTool {
-  List<Glob> directoriesToInclude = [];
   int _exitCode = 0;
 
   @override
