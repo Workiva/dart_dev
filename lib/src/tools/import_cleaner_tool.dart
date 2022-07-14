@@ -5,12 +5,11 @@ import 'package:args/args.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:io/ansi.dart';
 import 'package:glob/glob.dart';
-import 'package:glob/list_local_fs.dart';
 
 import '../utils/import_cleaner/import_cleaner.dart';
 
 class ImportCleanerTool extends DevTool {
-  List<Glob> directoriesToInclude;
+  List<Glob> directoriesToInclude = [];
   int _exitCode = 0;
   String packageName;
 
@@ -23,6 +22,11 @@ class ImportCleanerTool extends DevTool {
       negatable: false,
       help: 'Provide verbose output',
     )
+    ..addMultiOption(
+      'files',
+      abbr: 'f',
+      help: 'Files to sort imports on',
+    )
     ..addFlag(
       'check',
       abbr: 'c',
@@ -34,34 +38,62 @@ class ImportCleanerTool extends DevTool {
   FutureOr<int> run([DevToolExecutionContext context]) async {
     final parsed = context.argResults;
 
-    final globs = directoriesToInclude
-        .map((glob) => glob.listSync())
-        .expand((i) => i)
-        .toList();
+    final targetFiles = parsed['files'] as List<String>;
+    final filesToSort = _getSortableFiles(targetFiles);
 
-    final targetFiles = <String>[];
-    for (final glob in globs) {
-      targetFiles.add(glob.path);
-    }
-
-    _sortImports(targetFiles,
-        verbose: parsed['verbose'] as bool, check: parsed['check'] as bool);
+    _sortImports(
+      filesToSort,
+      verbose: parsed['verbose'] as bool,
+      check: parsed['check'] as bool,
+    );
     return _exitCode;
   }
 
-  void _sortImports(List<String> paths,
+  Iterable<String> _getSortableFiles(Iterable<String> filePaths) {
+    final sortableFiles = Set<String>();
+
+    for (final path in filePaths) {
+      switch (FileSystemEntity.typeSync(path)) {
+        case FileSystemEntityType.directory:
+          // skip hidden directories
+          if (path.startsWith('.')) {
+            continue;
+          }
+          final children = Directory(path).listSync().map((e) => e.path);
+          sortableFiles.addAll(_getSortableFiles(children));
+          break;
+        case FileSystemEntityType.file:
+          if (File(path).path.endsWith('.dart')) {
+            sortableFiles.add(path);
+          }
+          break;
+        case FileSystemEntityType.link:
+          // skip links
+          break;
+        default:
+          throw Exception('Unknown FileSystemEntity type encountered');
+      }
+    }
+
+    return sortableFiles;
+  }
+
+  void _sortImports(Iterable<String> paths,
       {bool verbose = false, bool check = false}) {
     for (final path in paths) {
       _sortImportsInFile(path, verbose: verbose, check: check);
     }
   }
 
-  void _sortImportsInFile(String filePath,
-      {bool verbose = false, bool check = false}) {
+  void _sortImportsInFile(
+    String filePath, {
+    bool verbose = false,
+    bool check = false,
+  }) {
     final file = File(filePath);
     final fileContents = _safelyReadFileContents(file);
     if (fileContents == null) {
-      _fail('$filePath not found. Skipping format for file.');
+      _fail('$filePath not found. Skipping import sort for file.');
       return;
     }
 

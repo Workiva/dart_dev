@@ -70,6 +70,11 @@ class FormatTool extends DevTool {
   /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
   List<String> formatterArgs;
 
+  /// If the formatter should also organize imports.
+  ///
+  /// By default, this is disabled.
+  bool organizeImports = false;
+
   // ---------------------------------------------------------------------------
   // DevTool Overrides
   // ---------------------------------------------------------------------------
@@ -107,6 +112,7 @@ class FormatTool extends DevTool {
       defaultMode: defaultMode,
       exclude: exclude,
       formatter: formatter,
+      organizeImports: organizeImports,
     );
     if (execution.exitCode != null) {
       return execution.exitCode;
@@ -435,6 +441,8 @@ Iterable<String> buildArgsForDartFormat(
 ///
 /// [include] will be populated from [FormatTool.include].
 ///
+/// [organizeImports] will be populated from [FormatTool.organizeImports].
+///
 /// If non-null, [path] will override the current working directory for any
 /// operations that require it. This is intended for use by tests.
 ///
@@ -447,6 +455,7 @@ FormatExecution buildExecution(
   FormatMode defaultMode,
   List<Glob> exclude,
   Formatter formatter,
+  bool organizeImports = false,
   String path,
 }) {
   FormatMode mode;
@@ -514,6 +523,11 @@ FormatExecution buildExecution(
         '${inputs.hiddenDirectories.join('\n  ')}');
   }
 
+  final sortImportProcess = buildSortImportProcess(
+    inputs.includedFiles,
+    mode,
+    organizeImports: organizeImports,
+  );
   final dartFormatter = buildFormatProcess(formatter);
   Iterable<String> args;
   if (formatter == Formatter.dartFormat) {
@@ -527,12 +541,16 @@ FormatExecution buildExecution(
   }
   logCommand(dartFormatter.executable, inputs.includedFiles, args,
       verbose: context.verbose);
+
   final formatProcess = ProcessDeclaration(
     dartFormatter.executable,
     [...args, ...inputs.includedFiles],
     mode: ProcessStartMode.inheritStdio,
   );
-  return FormatExecution.process([formatProcess]);
+  return FormatExecution.process([
+    if (sortImportProcess != null) sortImportProcess,
+    formatProcess,
+  ]);
 }
 
 /// Returns a representation of the process that will be run by [FormatTool]
@@ -551,6 +569,29 @@ ProcessDeclaration buildFormatProcess([Formatter formatter]) {
     default:
       return ProcessDeclaration('dartfmt', []);
   }
+}
+
+ProcessDeclaration buildSortImportProcess(
+  Iterable<String> includedFiles,
+  FormatMode mode, {
+  bool organizeImports = false,
+}) {
+  if (!organizeImports) {
+    return null;
+  }
+
+  return ProcessDeclaration(
+    'dart',
+    [
+      'run',
+      'dart_dev',
+      'sort_imports',
+      if (mode == FormatMode.check) '--check',
+      '--files',
+      includedFiles.join(','),
+    ],
+    mode: ProcessStartMode.inheritStdio,
+  );
 }
 
 /// Logs the dart formatter command that will be run by [FormatTool] so that

@@ -434,6 +434,38 @@ void main() {
         buildExecution(DevToolExecutionContext(),
             formatter: Formatter.dartFormat);
       });
+
+      test('sorts imports when organizeImports is true', () {
+        final context = DevToolExecutionContext();
+        final execution = buildExecution(context, organizeImports: true);
+        expect(execution.exitCode, isNull);
+        expect(execution.processes.length, equals(2));
+        expect(execution.processes.first.executable, 'dart');
+        expect(
+          execution.processes.first.args,
+          orderedEquals(['run', 'dart_dev', 'sort_imports', '--files', '.']),
+        );
+        expect(execution.processes.first.mode, ProcessStartMode.inheritStdio);
+      });
+
+      test('sorts imports in check mode when organizeImports is true', () {
+        final context = DevToolExecutionContext();
+        final execution = buildExecution(
+          context,
+          organizeImports: true,
+          defaultMode: FormatMode.check,
+        );
+        expect(execution.exitCode, isNull);
+        expect(execution.processes.length, equals(2));
+        expect(execution.processes.first.executable, 'dart');
+        expect(
+          execution.processes.first.args,
+          orderedEquals(
+            ['run', 'dart_dev', 'sort_imports', '--check', '--files', '.'],
+          ),
+        );
+        expect(execution.processes.first.mode, ProcessStartMode.inheritStdio);
+      });
     });
   });
 
