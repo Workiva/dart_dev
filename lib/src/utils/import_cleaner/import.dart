@@ -40,7 +40,16 @@ class Import {
 
   Import(this.directive);
 
-  /// The character offset of the end of this import in source text (includes comments associated with this import).
+  /// The character offset of the start of the import statement in source text.
+  /// Excludes comments associated with this import.
+  int get statementStart => directive.beginToken.charOffset;
+
+  /// The character offset of the end of the import statement in source text.
+  /// Excludes comments associated with this import.
+  int get statementEnd => directive.endToken.end;
+
+  /// The character offset of the end of this import in source text.
+  /// Includes comments associated with this import.
   int end() {
     var end = directive.endToken.end;
     for (final afterComment in afterComments) {
@@ -51,8 +60,9 @@ class Import {
     return end;
   }
 
-  /// The character offset of the start of this import in source text (includes comments associated with this import).
-  int charOffset() {
+  /// The character offset of the start of this import in source text.
+  /// Includes comments associated with this import.
+  int start() {
     var charOffset = directive.beginToken.charOffset;
     for (final beforeComment in beforeComments) {
       if (beforeComment.charOffset < charOffset) {
