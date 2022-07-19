@@ -5,7 +5,6 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
-import 'package:dart_dev/src/tools/import_cleaner_tool.dart';
 import 'package:dart_dev/src/utils/format_tool_builder.dart';
 import 'package:dart_dev/src/utils/parse_flag_from_args.dart';
 import 'package:io/ansi.dart';
@@ -58,11 +57,6 @@ Future<void> run(List<String> args) async {
     return;
   }
 
-  if (args.contains('sort_imports')) {
-    await handleSortImports(args);
-    return;
-  }
-
   generateRunScript();
   final process = await Process.start(
       Platform.executable, [_runScriptPath, ...args],
@@ -97,22 +91,6 @@ Future<void> handleFastFormat(List<String> args) async {
 
   try {
     exitCode = await DartDevRunner({'hackFastFormat': formatTool}).run(args);
-  } catch (error, stack) {
-    log.severe('Uncaught Exception:', error, stack);
-    if (!parseFlagFromArgs(args, 'verbose', abbr: 'v')) {
-      // Always print the stack trace for an uncaught exception.
-      stderr.writeln(stack);
-    }
-    exitCode = ExitCode.unavailable.code;
-  }
-}
-
-Future<void> handleSortImports(List<String> args) async {
-  assertDirIsDartPackage();
-
-  try {
-    exitCode =
-        await DartDevRunner({'sort_imports': ImportCleanerTool()}).run(args);
   } catch (error, stack) {
     log.severe('Uncaught Exception:', error, stack);
     if (!parseFlagFromArgs(args, 'verbose', abbr: 'v')) {

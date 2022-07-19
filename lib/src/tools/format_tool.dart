@@ -16,6 +16,7 @@ import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
+import 'import_organizer.dart' as import_organizer;
 
 final _log = Logger('Format');
 
@@ -104,7 +105,7 @@ class FormatTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) async {
     context ??= DevToolExecutionContext();
-    final execution = buildExecution(
+    final formatExecution = buildExecution(
       context,
       configuredFormatterArgs: formatterArgs,
       defaultMode: defaultMode,
@@ -112,17 +113,24 @@ class FormatTool extends DevTool {
       formatter: formatter,
       organizeImports: organizeImports,
     );
-    if (execution.exitCode != null) {
-      return execution.exitCode;
+    if (formatExecution.exitCode != null) {
+      return formatExecution.exitCode;
     }
-
-    for (final process in execution.processes) {
-      final exitCode = await runProcessAndEnsureExit(process, log: _log);
-      if (exitCode != 0) {
-        return exitCode;
-      }
+    var exitCode = await runProcessAndEnsureExit(
+      formatExecution.formatProcess,
+      log: _log,
+    );
+    if (exitCode != 0) {
+      return exitCode;
     }
-    return 0;
+    if (formatExecution.importOrganization != null) {
+      exitCode = import_organizer.organizeImports(
+        formatExecution.importOrganization.inputs,
+        check: formatExecution.importOrganization.check,
+        verbose: context.verbose,
+      );
+    }
+    return exitCode;
   }
 
   /// Builds and returns the object that contains:
@@ -304,8 +312,11 @@ class FormatterInputs {
 /// As a result, nearly all of the logic in [FormatTool] can be tested via the
 /// output of step 1 (an instance of this class) with very simple unit tests.
 class FormatExecution {
-  FormatExecution.exitEarly(this.exitCode) : processes = null;
-  FormatExecution.process(this.processes) : exitCode = null;
+  FormatExecution.exitEarly(this.exitCode)
+      : formatProcess = null,
+        importOrganization = null;
+  FormatExecution.process(this.formatProcess, [this.importOrganization])
+      : exitCode = null;
 
   /// If non-null, the execution is already complete and the [FormatTool] should
   /// exit with this code.
@@ -317,7 +328,19 @@ class FormatExecution {
   ///
   /// If all processes result in exit code 0, [FormatTool] will return with exit code 0.
   /// Otherwise, the first non-zero exit code will become the final result of the [FormatTool].
-  final Iterable<ProcessDeclaration> processes;
+  final ProcessDeclaration formatProcess;
+
+  /// A declarative representation of the import organization work to be done
+  /// (if enabled) after running the formatter.
+  final ImportOrganization importOrganization;
+}
+
+/// A declarative representation of the import organization work.
+class ImportOrganization {
+  ImportOrganization(this.inputs, {this.check});
+
+  final bool check;
+  final Set<String> inputs;
 }
 
 /// Modes supported by the dart formatter.
@@ -482,11 +505,6 @@ FormatExecution buildExecution(
         '${inputs.hiddenDirectories.join('\n  ')}');
   }
 
-  final sortImportProcess = buildSortImportProcess(
-    inputs.includedFiles,
-    mode,
-    organizeImports: organizeImports,
-  );
   final dartfmt = buildFormatProcess(formatter);
   final args = buildArgs(dartfmt.args, mode,
       argResults: context.argResults,
@@ -499,10 +517,17 @@ FormatExecution buildExecution(
     [...args, ...inputs.includedFiles],
     mode: ProcessStartMode.inheritStdio,
   );
-  return FormatExecution.process([
-    if (sortImportProcess != null) sortImportProcess,
+  ImportOrganization importOrganization;
+  if (organizeImports) {
+    importOrganization = ImportOrganization(
+      inputs.includedFiles,
+      check: mode == FormatMode.check,
+    );
+  }
+  return FormatExecution.process(
     formatProcess,
-  ]);
+    importOrganization,
+  );
 }
 
 /// Returns a representation of the process that will be run by [FormatTool]
@@ -518,29 +543,6 @@ ProcessDeclaration buildFormatProcess([Formatter formatter]) {
     default:
       return ProcessDeclaration('dartfmt', []);
   }
-}
-
-ProcessDeclaration buildSortImportProcess(
-  Iterable<String> includedFiles,
-  FormatMode mode, {
-  bool organizeImports = false,
-}) {
-  if (!organizeImports) {
-    return null;
-  }
-
-  return ProcessDeclaration(
-    'dart',
-    [
-      'run',
-      'dart_dev',
-      'sort_imports',
-      if (mode == FormatMode.check) '--check',
-      '--files',
-      includedFiles.join(','),
-    ],
-    mode: ProcessStartMode.inheritStdio,
-  );
 }
 
 /// Logs the dart formatter command that will be run by [FormatTool] so that
