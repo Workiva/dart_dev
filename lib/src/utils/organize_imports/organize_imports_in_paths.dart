@@ -50,14 +50,15 @@ int _organizeImportsInFiles(
   bool verbose = false,
   bool check = false,
 }) {
+  var exitCode = 0;
   for (final path in paths) {
-    final exitCode =
+    final codeForFile =
         _organizeImportsInFile(path, verbose: verbose, check: check);
-    if (exitCode != 0) {
-      return exitCode;
+    if (codeForFile != 0) {
+      exitCode = codeForFile;
     }
   }
-  return 0;
+  return exitCode;
 }
 
 /// Organizes imports in a file.
