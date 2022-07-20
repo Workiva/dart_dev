@@ -31,6 +31,6 @@ dev_dependencies:
 
 dependency_validator:
  exclude:
-  - test/tools/fixtures/sort_imports/imports.dart
+  - test/tools/fixtures/organize_imports/imports.dart
  ignore:
   - meta

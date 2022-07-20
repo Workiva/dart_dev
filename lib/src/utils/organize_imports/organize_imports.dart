@@ -4,10 +4,11 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'import.dart';
 import 'import_collector.dart';
 
-/// Takes in a file as a string and cleans up the imports. Sorts imports and removes double quotes.
+/// Takes in a file as a string and organizes the imports.
+/// Sorts imports and removes double quotes.
 ///
 /// Throws an ArgumentError if [sourceFileContents] cannot be parsed.
-String cleanImports(String sourceFileContents) {
+String organizeImports(String sourceFileContents) {
   final imports =
       parseString(content: sourceFileContents).unit.accept(ImportCollector());
   if (imports.isEmpty) {
@@ -25,14 +26,17 @@ String cleanImports(String sourceFileContents) {
       firstImportStartIdx, lastImportEndIdx + 1, sortedImportString);
 }
 
-/// Puts comments in a source file with the correct import so they can be moved with the import when sorted.
+/// Puts comments in a source file with the correct import so they can be moved
+/// with the import when sorted.
 ///
-/// The parser puts "precedingComments" on each token. However, an import's precedingComments shouldn't
-/// necessarily be the comments that move with the import during a sort. If an import has a trailing comment on
-/// the same line as an import, it will be attached to the next Token's "precedingComments".
+/// The parser puts "precedingComments" on each token. However, an import's
+/// precedingComments shouldn't necessarily be the comments that move with the
+/// import during a sort. If an import has a trailing comment on the same line
+/// as an import, it will be attached to the next Token's "precedingComments".
 ///
-/// For this reason, we go thru all imports (and the first token after the last import), look at their
-/// precedingComments, and determine which import they belong to.
+/// For this reason, we go thru all imports (and the first token after the last
+/// import), look at their precedingComments, and determine which import they
+/// belong to.
 void _assignCommentsInFileToImport(
     String sourceFileContents, List<Import> imports) {
   Import prevImport;
@@ -49,20 +53,22 @@ void _assignCommentsInFileToImport(
     prevImport = currImport;
   }
 
-  /// Assign comments after the last import to the last import if they are on the same line.
+  /// Assign comments after the last import to the last import if they are on
+  /// the same line.
   _assignCommentsBeforeTokenToImport(
       prevImport.directive.endToken.next, sourceFileContents, prevImport);
 }
 
-/// Assigns comments before [token] to [prevImport] if on the same line as [prevImport]. Else it assigns the comment
-/// to [currImport], if it exists.
+/// Assigns comments before [token] to [prevImport] if on the same line as
+/// [prevImport]. Else it assigns the comment to [currImport], if it exists.
 void _assignCommentsBeforeTokenToImport(
   Token token,
   String sourceFileContents,
   Import prevImport, {
   Import currImport,
 }) {
-  // `precedingComments` returns the first comment before token. Calling `comment.next` returns the next comment.
+  // `precedingComments` returns the first comment before token.
+  // Calling `comment.next` returns the next comment.
   // Returns null when there are no more comments left.
   for (Token comment = token.precedingComments;
       comment != null;
@@ -75,7 +81,8 @@ void _assignCommentsBeforeTokenToImport(
   }
 }
 
-/// Checks if a given comment is on the same line as an import. It's expected that import end is before comment start.
+/// Checks if a given comment is on the same line as an import.
+/// It's expected that import end is before comment start.
 bool _commentIsOnSameLineAsImport(
     Token comment, Import import, String sourceFileContents) {
   return import != null &&
@@ -114,7 +121,8 @@ String _getSortedImportString(String sourceFileContents, List<Import> imports) {
   return sortedReplacement.toString();
 }
 
-/// A comparator that will sort dart imports first, then package imports, then relative imports.
+/// A comparator that will sort dart imports first, then package imports, then
+/// relative imports.
 int _importComparator(Import first, Import second) {
   if (first.isDartImport && second.isDartImport) {
     return first.target.compareTo(second.target);

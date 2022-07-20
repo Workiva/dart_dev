@@ -13,10 +13,10 @@ import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
+import '../utils/organize_imports/organize_imports_in_paths.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
-import 'import_organizer.dart' as import_organizer;
 
 final _log = Logger('Format');
 
@@ -124,7 +124,7 @@ class FormatTool extends DevTool {
       return exitCode;
     }
     if (formatExecution.importOrganization != null) {
-      exitCode = import_organizer.organizeImports(
+      exitCode = organizeImportsInPaths(
         formatExecution.importOrganization.inputs,
         check: formatExecution.importOrganization.check,
         verbose: context.verbose,

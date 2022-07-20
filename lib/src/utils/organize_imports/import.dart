@@ -3,16 +3,18 @@ import 'package:analyzer/dart/ast/token.dart';
 
 /// A representation of an import.
 ///
-/// Capable of tracking comments that should be associated with an import during a sort (which cannot be
-/// represented by the AST)
+/// Capable of tracking comments that should be associated with an import during
+/// organization (which cannot be represented by the AST)
 class Import {
   /// The AST node that represents an import in a file.
   final ImportDirective directive;
 
-  /// Comments that appear before the import that should stay with the import when sorted.
+  /// Comments that appear before the import that should stay with the import
+  /// when organized.
   List<Token> beforeComments = [];
 
-  /// Comments that appear after the import that should stay with the import when sorted.
+  /// Comments that appear after the import that should stay with the import
+  /// when organized.
   List<Token> afterComments = [];
 
   /// The file being imported.
