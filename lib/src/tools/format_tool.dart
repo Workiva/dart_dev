@@ -326,10 +326,9 @@ class FormatExecution {
   /// If null, there is more work to do.
   final int exitCode;
 
-  /// A declarative representation of the formatter processes that should be run.
+  /// A declarative representation of the formatter process that should be run.
   ///
-  /// If all processes result in exit code 0, [FormatTool] will return with exit code 0.
-  /// Otherwise, the first non-zero exit code will become the final result of the [FormatTool].
+  /// If this process results in a non-zero exit code, [FormatTool] should return it.
   final ProcessDeclaration formatProcess;
 
   /// A declarative representation of the import organization work to be done
