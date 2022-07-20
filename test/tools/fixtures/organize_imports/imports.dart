@@ -1,4 +1,4 @@
-const uncleanImports1 = '''
+const unorganizedImports1 = '''
 import 'dart:html';
 import 'dart:typed_data';
 import 'dart:async';
@@ -8,7 +8,7 @@ void main() {
 }
 ''';
 
-const cleanImports1 = '''
+const organizedImports1 = '''
 import 'dart:async';
 import 'dart:html';
 import 'dart:typed_data';
@@ -18,7 +18,7 @@ void main() {
 }
 ''';
 
-const uncleanImports2 = '''
+const unorganizedImports2 = '''
 import 'package:over_react_format/a.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
@@ -29,7 +29,7 @@ void main() {
 }
 ''';
 
-const cleanImports2 = '''
+const organizedImports2 = '''
 import 'package:meta/meta.dart';
 import 'package:over_react_format/a.dart';
 import 'package:over_react_format/b.dart';
@@ -40,7 +40,7 @@ void main() {
 }
 ''';
 
-const uncleanImports3 = '''
+const unorganizedImports3 = '''
 import '../../test_utils/mocks/review_bar/review_bar.dart';
 import '../../test_utils/mocks/network/skaar_client.dart';
 import '../../test_utils/helpers/document_events.dart';
@@ -51,7 +51,7 @@ void main() {
 }
 ''';
 
-const cleanImports3 = '''
+const organizedImports3 = '''
 import '../../test_utils/helpers/document_events.dart';
 import '../../test_utils/mocks/html/html.dart';
 import '../../test_utils/mocks/network/skaar_client.dart';
@@ -62,7 +62,7 @@ void main() {
 }
 ''';
 
-const uncleanImports4 = '''
+const unorganizedImports4 = '''
 import '../../test_utils/mocks/review_bar/review_bar.dart';
 import 'dart:typed_data';
 import 'dart:async';
@@ -80,7 +80,7 @@ void main() {
 }
 ''';
 
-const cleanImports4 = '''
+const organizedImports4 = '''
 import 'dart:async';
 import 'dart:html';
 import 'dart:typed_data';
@@ -100,7 +100,7 @@ void main() {
 }
 ''';
 
-const uncleanImports5 = '''
+const unorganizedImports5 = '''
 import 'dart:html';
 import "../b.dart";
 import "package:over_react_format/a.dart";
@@ -113,7 +113,7 @@ void main() {
 }
 ''';
 
-const cleanImports5 = '''
+const organizedImports5 = '''
 import 'dart:async';
 import 'dart:html';
 
@@ -128,7 +128,7 @@ void main() {
 }
 ''';
 
-const uncleanImports6 = '''
+const unorganizedImports6 = '''
 import '../b.dart';
 import '../a.dart';
 
@@ -137,7 +137,7 @@ void main() {
 }
 ''';
 
-const cleanImports6 = '''
+const organizedImports6 = '''
 import '../a.dart';
 import '../b.dart';
 
@@ -146,7 +146,7 @@ void main() {
 }
 ''';
 
-const uncleanImports7 = '''
+const unorganizedImports7 = '''
 import 'dart:html';
 import 'package:glob/your_really_really_really_really_really_really_really_long_import.dart'
     as shorty2;
@@ -159,7 +159,7 @@ void main() {
 }
 ''';
 
-const cleanImports7 = '''
+const organizedImports7 = '''
 import 'dart:html';
 
 import 'package:args/my_really_really_really_really_really_really_really_long_import.dart'
@@ -174,7 +174,7 @@ void main() {
 }
 ''';
 
-const uncleanImports8 = '''
+const unorganizedImports8 = '''
 import 'package:glob/your_really_really_really_really_really_really_really_long_import.dart'
     as shorty2;
 import 'package:args/my_really_really_really_really_really_really_really_long_import.dart'
@@ -185,7 +185,7 @@ void main() {
 }
 ''';
 
-const cleanImports8 = '''
+const organizedImports8 = '''
 import 'package:args/my_really_really_really_really_really_really_really_long_import.dart'
     as shorty;
 import 'package:glob/your_really_really_really_really_really_really_really_long_import.dart'
@@ -196,7 +196,7 @@ void main() {
 }
 ''';
 
-const uncleanImports9 = '''
+const unorganizedImports9 = '''
 @TestOn('browser')
 library my_cool_lib;
 
@@ -209,7 +209,7 @@ void main() {
 }
 ''';
 
-const cleanImports9 = '''
+const organizedImports9 = '''
 @TestOn('browser')
 library my_cool_lib;
 
@@ -224,7 +224,7 @@ void main() {
 }
 ''';
 
-const uncleanImports10 = '''
+const unorganizedImports10 = '''
 import 'package:glob/your_really_really_really_really_really_really_really_long_import.dart'
     show first, second, third;
 import 'package:args/my_really_really_really_really_really_really_really_long_import.dart'
@@ -241,7 +241,7 @@ void main() {
 }
 ''';
 
-const cleanImports10 = '''
+const organizedImports10 = '''
 import 'package:args/my_really_really_really_really_really_really_really_long_import.dart'
     hide cat, dog, fish;
 import 'package:args/your_really_really_really_really_really_really_really_long_import_2.dart'
@@ -258,7 +258,7 @@ void main() {
 }
 ''';
 
-const uncleanImports11 = '''
+const unorganizedImports11 = '''
 import 'dart:b.dart';
 import 'dart:a.dart';
 
@@ -273,7 +273,7 @@ void main() {
 }
 ''';
 
-const cleanImports11 = '''
+const organizedImports11 = '''
 import 'dart:a.dart';
 import 'dart:b.dart';
 
@@ -288,7 +288,7 @@ void main() {
 }
 ''';
 
-const uncleanImports12 = '''
+const unorganizedImports12 = '''
 import 'package_things_b.dart';
 import 'package:args/dart_stuff.dart';
 import 'dart:b.dart';
@@ -303,7 +303,7 @@ void main() {
 }
 ''';
 
-const cleanImports12 = '''
+const organizedImports12 = '''
 import 'dart:a.dart';
 import 'dart:b.dart';
 
@@ -320,7 +320,7 @@ void main() {
 }
 ''';
 
-const uncleanImports13 = '''
+const unorganizedImports13 = '''
 import 'package:args/src/datatable/import_event.dart' //ignore: implementation_imports
     show
         DatatableImportEventV1ActionType,
@@ -338,7 +338,7 @@ void main() {
 }
 ''';
 
-const cleanImports13 = '''
+const organizedImports13 = '''
 import 'dart:async'; // a comment here about async
 
 import 'package:args/src/datatable/import_event.dart' //ignore: implementation_imports
@@ -357,7 +357,7 @@ void main() {
 }
 ''';
 
-const uncleanImports14 = '''
+const unorganizedImports14 = '''
 import 'package:args/src/datatable/import_event.dart'
     show
         DatatableImportEventV1ActionType,
@@ -375,7 +375,7 @@ void main() {
 }
 ''';
 
-const cleanImports14 = '''
+const organizedImports14 = '''
 import 'dart:async'; // trailing comment 1
 
 import 'package:args/src/datatable/import_event.dart'
@@ -394,7 +394,7 @@ void main() {
 }
 ''';
 
-const uncleanImports15 = '''
+const unorganizedImports15 = '''
 // a: comment 3
 import 'package:args/src/datatable/import_event.dart'
     show
@@ -426,7 +426,7 @@ void main() {
 }
 ''';
 
-const cleanImports15 = '''
+const organizedImports15 = '''
 // e: comment 1
 import 'dart:async';
 // c: comment 2
@@ -456,7 +456,7 @@ void main() {
 }
 ''';
 
-const uncleanImports16 = '''
+const unorganizedImports16 = '''
 // comment 1
 
 @TestOn('browser')
@@ -489,7 +489,7 @@ void main() {
 }
 ''';
 
-const cleanImports16 = '''
+const organizedImports16 = '''
 // comment 1
 
 @TestOn('browser')
@@ -522,7 +522,7 @@ void main() {
 }
 ''';
 
-const uncleanImports17 = '''
+const unorganizedImports17 = '''
 import 'dart:html';
 import 'dart:typed_data';
 import 'dart:async';
@@ -533,7 +533,7 @@ void main() {
 }
 ''';
 
-const cleanImports17 = '''
+const organizedImports17 = '''
 import 'dart:async';
 import 'dart:html';
 import 'dart:typed_data';
@@ -544,7 +544,7 @@ void main() {
 }
 ''';
 
-const uncleanImports18 = '''
+const unorganizedImports18 = '''
 import 'package:args/src/datatable/import_event.dart'; //ignore: implementation_imports
 import 'dart:async';
 import 'package:workiva_dart_dev/dart_dev_workiva.dart';
@@ -554,7 +554,7 @@ void main() {
 }
 ''';
 
-const cleanImports18 = '''
+const organizedImports18 = '''
 import 'dart:async';
 
 import 'package:args/src/datatable/import_event.dart'; //ignore: implementation_imports
@@ -565,7 +565,7 @@ void main() {
 }
 ''';
 
-const uncleanImports19 = '''
+const unorganizedImports19 = '''
 /* Multi-line comment 3 */
 import 'dart:html';
 /* Multi-line comment 4 */
@@ -584,7 +584,7 @@ void main() {
 }
 ''';
 
-const cleanImports19 = '''
+const organizedImports19 = '''
 /* 
  Multi-line comment 1
 */
@@ -603,7 +603,7 @@ void main() {
 }
 ''';
 
-const uncleanImports20 = '''
+const unorganizedImports20 = '''
 import 'dart:typed_data'; /* why 3 */ /* why 4 */
 import 'dart:html'; /* why 1 */ /* why 2 */
 import 'dart:async'; /* why would anyone do this? */
@@ -613,7 +613,7 @@ void main() {
 }
 ''';
 
-const cleanImports20 = '''
+const organizedImports20 = '''
 import 'dart:async'; /* why would anyone do this? */
 import 'dart:html'; /* why 1 */ /* why 2 */
 import 'dart:typed_data'; /* why 3 */ /* why 4 */
@@ -623,7 +623,7 @@ void main() {
 }
 ''';
 
-const uncleanImports21 = '''
+const unorganizedImports21 = '''
 import 'b.dart'; import 'a.dart'; /* comment 1 */ /* comment 2 */
 import 'package:meta/meta.dart'; import 'package:over_react_format/a.dart';
 import 'dart:html'; import 'dart:async'; /* single comment */
@@ -633,7 +633,7 @@ void main() {
 }
 ''';
 
-const cleanImports21 = '''
+const organizedImports21 = '''
 import 'dart:async'; /* single comment */
 import 'dart:html';
 
@@ -648,23 +648,23 @@ void main() {
 }
 ''';
 
-const uncleanImports22 = '';
+const unorganizedImports22 = '';
 
-const cleanImports22 = '';
+const organizedImports22 = '';
 
-const uncleanImports23 = '''
+const unorganizedImports23 = '''
 void main() {
   print('hello world');
 }
 ''';
 
-const cleanImports23 = '''
+const organizedImports23 = '''
 void main() {
   print('hello world');
 }
 ''';
 
-const uncleanImports24 = '''
+const unorganizedImports24 = '''
 // comment 0
 // comment 1
 import 'b.dart'; /* comment 2 */ /* comment 3 */ import 'a.dart'; /* comment 4 */ // comment 5
@@ -677,7 +677,7 @@ void main() {
 }
 ''';
 
-const cleanImports24 = '''
+const organizedImports24 = '''
 import 'dart:async';
 import 'dart:html';
 
@@ -696,7 +696,7 @@ void main() {
 ''';
 
 
-const uncleanImports25 = '''
+const unorganizedImports25 = '''
 // Copyright 2019 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -719,7 +719,7 @@ import 'dart:io' as io;
 import 'dart:convert' as convert;
 ''';
 
-const cleanImports25 = '''
+const organizedImports25 = '''
 // Copyright 2019 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

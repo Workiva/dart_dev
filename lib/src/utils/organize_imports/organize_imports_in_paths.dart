@@ -2,21 +2,23 @@ import 'dart:io';
 
 import 'package:io/ansi.dart';
 
-import '../utils/import_cleaner/import_cleaner.dart';
+import 'organize_imports.dart';
 
-int organizeImports(
-  Iterable<String> targetFiles, {
+/// Organizes imports in a list of files and directories.
+int organizeImportsInPaths(
+  Iterable<String> paths, {
   bool check = false,
   bool verbose = false,
 }) {
-  final filesToSort = _getSortableFiles(targetFiles);
-  return _sortImports(filesToSort, verbose: verbose, check: check);
+  final allFiles = _getAllFiles(paths);
+  return _organizeImportsInFiles(allFiles, verbose: verbose, check: check);
 }
 
-Iterable<String> _getSortableFiles(Iterable<String> filePaths) {
-  final sortableFiles = Set<String>();
+/// Returns all file paths from a given set of files and directories.
+Iterable<String> _getAllFiles(Iterable<String> paths) {
+  final allFiles = Set<String>();
 
-  for (final path in filePaths) {
+  for (final path in paths) {
     switch (FileSystemEntity.typeSync(path)) {
       case FileSystemEntityType.directory:
         // skip hidden directories
@@ -24,11 +26,11 @@ Iterable<String> _getSortableFiles(Iterable<String> filePaths) {
           continue;
         }
         final children = Directory(path).listSync().map((e) => e.path);
-        sortableFiles.addAll(_getSortableFiles(children));
+        allFiles.addAll(_getAllFiles(children));
         break;
       case FileSystemEntityType.file:
         if (File(path).path.endsWith('.dart')) {
-          sortableFiles.add(path);
+          allFiles.add(path);
         }
         break;
       case FileSystemEntityType.link:
@@ -39,16 +41,18 @@ Iterable<String> _getSortableFiles(Iterable<String> filePaths) {
     }
   }
 
-  return sortableFiles;
+  return allFiles;
 }
 
-int _sortImports(
+/// Organizes imports in a list of files.
+int _organizeImportsInFiles(
   Iterable<String> paths, {
   bool verbose = false,
   bool check = false,
 }) {
   for (final path in paths) {
-    final exitCode = _sortImportsInFile(path, verbose: verbose, check: check);
+    final exitCode =
+        _organizeImportsInFile(path, verbose: verbose, check: check);
     if (exitCode != 0) {
       return exitCode;
     }
@@ -56,7 +60,8 @@ int _sortImports(
   return 0;
 }
 
-int _sortImportsInFile(
+/// Organizes imports in a file.
+int _organizeImportsInFile(
   String filePath, {
   bool verbose = false,
   bool check = false,
@@ -64,27 +69,27 @@ int _sortImportsInFile(
   final file = File(filePath);
   final fileContents = _safelyReadFileContents(file);
   if (fileContents == null) {
-    return _fail('$filePath not found. Skipping import sort for file.');
+    return _fail('$filePath not found. Skipping import organization for file.');
   }
 
-  final fileWithSortedImports = _safelyCleanImports(fileContents);
-  if (fileWithSortedImports == null) {
+  final fileWithOrganizedImports = _safelyOrganizeImports(fileContents);
+  if (fileWithOrganizedImports == null) {
     return _fail(
       '$filePath has syntax errors. Please fix syntax errors and try again.',
     );
   }
 
-  final fileChanged = fileWithSortedImports != fileContents;
+  final fileChanged = fileWithOrganizedImports != fileContents;
   if (fileChanged && check) {
-    return _fail('$filePath has imports that need to be sorted.');
-  } else if (fileChanged && !_safelyWriteFile(file, fileWithSortedImports)) {
+    return _fail('$filePath has imports that need to be organized.');
+  } else if (fileChanged && !_safelyWriteFile(file, fileWithOrganizedImports)) {
     return _fail(
       '$filePath encountered a FileSystemException while writing output.',
     );
   }
 
   if (verbose && !check) {
-    print(green.wrap('$filePath successfully sorted imports'));
+    print(green.wrap('$filePath successfully organized imports'));
   }
 
   return 0;
@@ -103,9 +108,9 @@ String _safelyReadFileContents(File file) {
   }
 }
 
-String _safelyCleanImports(String fileContents) {
+String _safelyOrganizeImports(String fileContents) {
   try {
-    return cleanImports(fileContents);
+    return organizeImports(fileContents);
   } on ArgumentError {
     return null;
   }
