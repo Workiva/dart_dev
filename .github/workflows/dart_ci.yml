@@ -60,6 +60,9 @@ jobs:
         run: dart run dart_dev format --check
         if: always() && steps.install.outcome == 'success'
 
-      - name: Publish dry run
-        run: dart pub publish --dry-run
-        if: always() && steps.install.outcome == 'success'
+# Disabled for backpatch releases since pubspec contains dependency_validator
+# key and cannot update to dependency_validator ^3.0.0
+#
+#      - name: Publish dry run
+#        run: dart pub publish --dry-run
+#        if: always() && steps.install.outcome == 'success'
