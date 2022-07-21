@@ -70,7 +70,9 @@ int _organizeDirectivesInFile(
   final file = File(filePath);
   final fileContents = _safelyReadFileContents(file);
   if (fileContents == null) {
-    return _fail('$filePath not found. Skipping import organization for file.');
+    return _fail(
+      '$filePath not found. Skipping import/export organization for file.',
+    );
   }
 
   final fileWithOrganizedDirectives = _safelyOrganizeDirectives(fileContents);
@@ -82,7 +84,7 @@ int _organizeDirectivesInFile(
 
   final fileChanged = fileWithOrganizedDirectives != fileContents;
   if (fileChanged && check) {
-    return _fail('$filePath has imports that need to be organized.');
+    return _fail('$filePath has imports/exports that need to be organized.');
   } else if (fileChanged &&
       !_safelyWriteFile(file, fileWithOrganizedDirectives)) {
     return _fail(
@@ -91,7 +93,7 @@ int _organizeDirectivesInFile(
   }
 
   if (verbose && !check) {
-    print(green.wrap('$filePath successfully organized imports'));
+    print(green.wrap('$filePath successfully organized imports/exports'));
   }
 
   return 0;
