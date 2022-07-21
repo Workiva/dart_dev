@@ -1,0 +1,10 @@
+name: dart_dev_test_functional_format_organize_imports_on
+version: 0.0.0
+environment:
+ sdk: ">=2.7.0 <3.0.0"
+dev_dependencies:
+  dart_dev:
+    path: ../../../../../../
+
+workiva:
+  disable_core_checks: true
