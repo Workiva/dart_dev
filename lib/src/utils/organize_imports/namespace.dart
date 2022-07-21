@@ -5,9 +5,9 @@ import 'package:analyzer/dart/ast/token.dart';
 ///
 /// Capable of tracking comments that should be associated with an import during
 /// organization (which cannot be represented by the AST)
-class Import {
+class Namespace {
   /// The AST node that represents an import in a file.
-  final ImportDirective directive;
+  final NamespaceDirective directive;
 
   /// Comments that appear before the import that should stay with the import
   /// when organized.
@@ -40,7 +40,7 @@ class Import {
     return _isRelativeImport ??= !isExternalPkgImport && !isDartImport;
   }
 
-  Import(this.directive);
+  Namespace(this.directive);
 
   /// The character offset of the start of the import statement in source text.
   /// Excludes comments associated with this import.

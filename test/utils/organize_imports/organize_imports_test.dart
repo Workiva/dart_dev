@@ -121,7 +121,33 @@ void main() {
       '25. comments contains double quotes',
       unorganizedImports25,
       organizedImports25,
-    )
+    ),
+    _TestCase('26. exports', unorganizedImports26, organizedImports26),
+    _TestCase(
+      '27. exports using show/hide',
+      unorganizedImports27,
+      organizedImports27,
+    ),
+    _TestCase(
+      '28. mixed imports and exports',
+      unorganizedImports28,
+      organizedImports28,
+    ),
+    _TestCase(
+      '29. unnecessary new lines between imports and exports',
+      unorganizedImports29,
+      organizedImports29,
+    ),
+    _TestCase(
+      '30. unnecessary new lines between all imports and exports',
+      unorganizedImports30,
+      organizedImports30,
+    ),
+    _TestCase(
+      '31. comments with exports',
+      unorganizedImports31,
+      organizedImports31,
+    ),
   ];
 
   group('organizeImports', () {

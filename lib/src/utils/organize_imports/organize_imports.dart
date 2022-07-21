@@ -1,33 +1,52 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 
-import 'import.dart';
-import 'import_collector.dart';
+import 'namespace.dart';
+import 'namespace_collector.dart';
 
-/// Takes in a file as a string and organizes the imports.
-/// Sorts imports and removes double quotes.
+/// Takes in a file as a string and organizes the imports and exports.
+/// Sorts imports/exports and removes double quotes.
 ///
 /// Throws an ArgumentError if [sourceFileContents] cannot be parsed.
 String organizeImports(String sourceFileContents) {
-  final imports =
-      parseString(content: sourceFileContents).unit.accept(ImportCollector());
-  if (imports.isEmpty) {
+  final namespaces = parseString(content: sourceFileContents)
+      .unit
+      .accept(NamespaceCollector());
+
+  if (namespaces.isEmpty) {
     return sourceFileContents;
   }
 
-  _assignCommentsInFileToImport(sourceFileContents, imports);
+  _assignCommentsInFileToNamespaceDirective(sourceFileContents, namespaces);
 
-  final firstImportStartIdx = imports.first.start();
-  final lastImportEndIdx = imports.last.end();
-  imports.sort(_importComparator);
+  final firstNamespaceStartIdx = namespaces.first.start();
+  final lastNamespaceEndIdx = namespaces.last.end();
+  final imports = namespaces
+      .where((element) => element.directive is ImportDirective)
+      .toList();
+  final exports = namespaces
+      .where((element) => element.directive is ExportDirective)
+      .toList();
+  imports.sort(_namespaceComparator);
+  exports.sort(_namespaceComparator);
   final sortedImportString =
-      _getSortedImportString(sourceFileContents, imports);
+      _getSortedNamespaceString(sourceFileContents, imports);
+  final sortedExportString =
+      _getSortedNamespaceString(sourceFileContents, exports);
+  final sortedDirectives = [
+    if (sortedImportString.isNotEmpty) sortedImportString,
+    if (sortedExportString.isNotEmpty) sortedExportString
+  ].join('\n');
   return sourceFileContents.replaceRange(
-      firstImportStartIdx, lastImportEndIdx + 1, sortedImportString);
+    firstNamespaceStartIdx,
+    lastNamespaceEndIdx + 1,
+    sortedDirectives,
+  );
 }
 
-/// Puts comments in a source file with the correct import so they can be moved
-/// with the import when sorted.
+/// Puts comments in a source file with the correct namespace directive so they
+/// can be moved with the directive when sorted.
 ///
 /// The parser puts "precedingComments" on each token. However, an import's
 /// precedingComments shouldn't necessarily be the comments that move with the
@@ -37,35 +56,40 @@ String organizeImports(String sourceFileContents) {
 /// For this reason, we go thru all imports (and the first token after the last
 /// import), look at their precedingComments, and determine which import they
 /// belong to.
-void _assignCommentsInFileToImport(
-    String sourceFileContents, List<Import> imports) {
-  Import prevImport;
-  for (var importIndex = 0; importIndex < imports.length; importIndex++) {
-    final currImport = imports[importIndex];
+void _assignCommentsInFileToNamespaceDirective(
+  String sourceFileContents,
+  List<Namespace> namespaces,
+) {
+  Namespace prevNamespace;
+  for (var namespace in namespaces) {
+    final currNamespace = namespace;
 
-    _assignCommentsBeforeTokenToImport(
-      currImport.directive.beginToken,
+    _assignCommentsBeforeTokenToNamespace(
+      currNamespace.directive.beginToken,
       sourceFileContents,
-      prevImport,
-      currImport: currImport,
+      prevNamespace,
+      currNamespace: currNamespace,
     );
 
-    prevImport = currImport;
+    prevNamespace = currNamespace;
   }
 
   /// Assign comments after the last import to the last import if they are on
   /// the same line.
-  _assignCommentsBeforeTokenToImport(
-      prevImport.directive.endToken.next, sourceFileContents, prevImport);
+  _assignCommentsBeforeTokenToNamespace(
+    prevNamespace.directive.endToken.next,
+    sourceFileContents,
+    prevNamespace,
+  );
 }
 
-/// Assigns comments before [token] to [prevImport] if on the same line as
-/// [prevImport]. Else it assigns the comment to [currImport], if it exists.
-void _assignCommentsBeforeTokenToImport(
+/// Assigns comments before [token] to [prevNamespace] if on the same line as
+/// [prevNamespace]. Else it assigns the comment to [currNamespace], if it exists.
+void _assignCommentsBeforeTokenToNamespace(
   Token token,
   String sourceFileContents,
-  Import prevImport, {
-  Import currImport,
+  Namespace prevNamespace, {
+  Namespace currNamespace,
 }) {
   // `precedingComments` returns the first comment before token.
   // Calling `comment.next` returns the next comment.
@@ -73,33 +97,37 @@ void _assignCommentsBeforeTokenToImport(
   for (Token comment = token.precedingComments;
       comment != null;
       comment = comment.next) {
-    if (_commentIsOnSameLineAsImport(comment, prevImport, sourceFileContents)) {
-      prevImport.afterComments.add(comment);
-    } else if (currImport != null) {
-      currImport.beforeComments.add(comment);
+    if (_commentIsOnSameLineAsNamespace(
+        comment, prevNamespace, sourceFileContents)) {
+      prevNamespace.afterComments.add(comment);
+    } else if (currNamespace != null) {
+      currNamespace.beforeComments.add(comment);
     }
   }
 }
 
 /// Checks if a given comment is on the same line as an import.
 /// It's expected that import end is before comment start.
-bool _commentIsOnSameLineAsImport(
-    Token comment, Import import, String sourceFileContents) {
-  return import != null &&
+bool _commentIsOnSameLineAsNamespace(
+    Token comment, Namespace namespace, String sourceFileContents) {
+  return namespace != null &&
       !sourceFileContents
-          .substring(import.directive.endToken.end, comment.charOffset)
+          .substring(namespace.directive.endToken.end, comment.charOffset)
           .contains('\n');
 }
 
-/// Converts a list of sorted imports into a plain text string.
-String _getSortedImportString(String sourceFileContents, List<Import> imports) {
+/// Converts a list of sorted namespaces into a plain text string.
+String _getSortedNamespaceString(
+  String sourceFileContents,
+  List<Namespace> namespaces,
+) {
   final sortedReplacement = StringBuffer();
   final firstRelativeImportIdx =
-      imports.indexWhere((import) => import.isRelativeImport);
+      namespaces.indexWhere((import) => import.isRelativeImport);
   final firstPkgImportIdx =
-      imports.indexWhere((import) => import.isExternalPkgImport);
-  for (var importIndex = 0; importIndex < imports.length; importIndex++) {
-    final import = imports[importIndex];
+      namespaces.indexWhere((import) => import.isExternalPkgImport);
+  for (var importIndex = 0; importIndex < namespaces.length; importIndex++) {
+    final import = namespaces[importIndex];
     if (importIndex != 0 &&
         (importIndex == firstRelativeImportIdx ||
             importIndex == firstPkgImportIdx)) {
@@ -123,7 +151,7 @@ String _getSortedImportString(String sourceFileContents, List<Import> imports) {
 
 /// A comparator that will sort dart imports first, then package imports, then
 /// relative imports.
-int _importComparator(Import first, Import second) {
+int _namespaceComparator(Namespace first, Namespace second) {
   if (first.isDartImport && second.isDartImport) {
     return first.target.compareTo(second.target);
   }
