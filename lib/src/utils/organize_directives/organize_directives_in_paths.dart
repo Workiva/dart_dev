@@ -2,16 +2,16 @@ import 'dart:io';
 
 import 'package:io/ansi.dart';
 
-import 'organize_imports.dart';
+import 'organize_directives.dart';
 
-/// Organizes imports in a list of files and directories.
-int organizeImportsInPaths(
+/// Organizes imports/exports in a list of files and directories.
+int organizeDirectivesInPaths(
   Iterable<String> paths, {
   bool check = false,
   bool verbose = false,
 }) {
   final allFiles = _getAllFiles(paths);
-  return _organizeImportsInFiles(allFiles, verbose: verbose, check: check);
+  return _organizeDirectivesInFiles(allFiles, verbose: verbose, check: check);
 }
 
 /// Returns all file paths from a given set of files and directories.
@@ -44,8 +44,8 @@ Iterable<String> _getAllFiles(Iterable<String> paths) {
   return allFiles;
 }
 
-/// Organizes imports in a list of files.
-int _organizeImportsInFiles(
+/// Organizes imports/exports in a list of files.
+int _organizeDirectivesInFiles(
   Iterable<String> paths, {
   bool verbose = false,
   bool check = false,
@@ -53,7 +53,7 @@ int _organizeImportsInFiles(
   var exitCode = 0;
   for (final path in paths) {
     final codeForFile =
-        _organizeImportsInFile(path, verbose: verbose, check: check);
+        _organizeDirectivesInFile(path, verbose: verbose, check: check);
     if (codeForFile != 0) {
       exitCode = codeForFile;
     }
@@ -61,8 +61,8 @@ int _organizeImportsInFiles(
   return exitCode;
 }
 
-/// Organizes imports in a file.
-int _organizeImportsInFile(
+/// Organizes imports/exports in a file.
+int _organizeDirectivesInFile(
   String filePath, {
   bool verbose = false,
   bool check = false,
@@ -73,17 +73,18 @@ int _organizeImportsInFile(
     return _fail('$filePath not found. Skipping import organization for file.');
   }
 
-  final fileWithOrganizedImports = _safelyOrganizeImports(fileContents);
-  if (fileWithOrganizedImports == null) {
+  final fileWithOrganizedDirectives = _safelyOrganizeDirectives(fileContents);
+  if (fileWithOrganizedDirectives == null) {
     return _fail(
       '$filePath has syntax errors. Please fix syntax errors and try again.',
     );
   }
 
-  final fileChanged = fileWithOrganizedImports != fileContents;
+  final fileChanged = fileWithOrganizedDirectives != fileContents;
   if (fileChanged && check) {
     return _fail('$filePath has imports that need to be organized.');
-  } else if (fileChanged && !_safelyWriteFile(file, fileWithOrganizedImports)) {
+  } else if (fileChanged &&
+      !_safelyWriteFile(file, fileWithOrganizedDirectives)) {
     return _fail(
       '$filePath encountered a FileSystemException while writing output.',
     );
@@ -109,9 +110,9 @@ String _safelyReadFileContents(File file) {
   }
 }
 
-String _safelyOrganizeImports(String fileContents) {
+String _safelyOrganizeDirectives(String fileContents) {
   try {
-    return organizeImports(fileContents);
+    return organizeDirectives(fileContents);
   } on ArgumentError {
     return null;
   }

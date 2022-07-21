@@ -233,7 +233,7 @@ void main() {
       expect(execution.formatProcess.executable, 'dartfmt');
       expect(execution.formatProcess.args, orderedEquals(['a/random/path']));
       expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
-      expect(execution.importOrganization, isNull);
+      expect(execution.directiveOrganization, isNull);
     });
 
     test('requires positional arguments when the command is hackFastFormat',
@@ -336,7 +336,7 @@ void main() {
         expect(execution.formatProcess.executable, 'dartfmt');
         expect(execution.formatProcess.args, orderedEquals(['.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
-        expect(execution.importOrganization, isNull);
+        expect(execution.directiveOrganization, isNull);
       });
 
       test('that uses defaultMode if no mode flag is given', () {
@@ -347,7 +347,7 @@ void main() {
         expect(execution.formatProcess.executable, 'dartfmt');
         expect(execution.formatProcess.args, orderedEquals(['-n', '.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
-        expect(execution.importOrganization, isNull);
+        expect(execution.directiveOrganization, isNull);
       });
 
       test('with dartfmt', () {
@@ -357,7 +357,7 @@ void main() {
         expect(execution.formatProcess.executable, 'dartfmt');
         expect(execution.formatProcess.args, orderedEquals(['.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
-        expect(execution.importOrganization, isNull);
+        expect(execution.directiveOrganization, isNull);
       });
 
       test('with dartFormat', () {
@@ -380,7 +380,7 @@ void main() {
         expect(execution.formatProcess.args,
             orderedEquals(['run', 'dart_style:format', '.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
-        expect(execution.importOrganization, isNull);
+        expect(execution.directiveOrganization, isNull);
       });
 
       test('dartfmt with args', () {
@@ -398,7 +398,7 @@ void main() {
             orderedEquals(
                 ['-w', '--fix', '--follow-links', '--indent', '2', '.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
-        expect(execution.importOrganization, isNull);
+        expect(execution.directiveOrganization, isNull);
       });
 
       test('dartFormat with args', () {
@@ -434,26 +434,26 @@ void main() {
 
       test('sorts imports when organizeImports is true', () {
         final context = DevToolExecutionContext();
-        final execution = buildExecution(context, organizeImports: true);
+        final execution = buildExecution(context, organizeDirectives: true);
         expect(execution.exitCode, isNull);
         expect(execution.formatProcess, isNotNull);
-        expect(execution.importOrganization, isNotNull);
-        expect(execution.importOrganization.inputs, equals(['.']));
-        expect(execution.importOrganization.check, isFalse);
+        expect(execution.directiveOrganization, isNotNull);
+        expect(execution.directiveOrganization.inputs, equals(['.']));
+        expect(execution.directiveOrganization.check, isFalse);
       });
 
       test('sorts imports in check mode when organizeImports is true', () {
         final context = DevToolExecutionContext();
         final execution = buildExecution(
           context,
-          organizeImports: true,
+          organizeDirectives: true,
           defaultMode: FormatMode.check,
         );
         expect(execution.exitCode, isNull);
         expect(execution.formatProcess, isNotNull);
-        expect(execution.importOrganization, isNotNull);
-        expect(execution.importOrganization.inputs, equals(['.']));
-        expect(execution.importOrganization.check, isTrue);
+        expect(execution.directiveOrganization, isNotNull);
+        expect(execution.directiveOrganization.inputs, equals(['.']));
+        expect(execution.directiveOrganization.check, isTrue);
       });
     });
   });

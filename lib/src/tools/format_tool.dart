@@ -14,7 +14,7 @@ import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
-import '../utils/organize_imports/organize_imports_in_paths.dart';
+import '../utils/organize_directives/organize_directives_in_paths.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
@@ -71,10 +71,10 @@ class FormatTool extends DevTool {
   /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
   List<String> formatterArgs;
 
-  /// If the formatter should also organize imports.
+  /// If the formatter should also organize imports and exports.
   ///
   /// By default, this is disabled.
-  bool organizeImports = false;
+  bool organizeDirectives = false;
 
   // ---------------------------------------------------------------------------
   // DevTool Overrides
@@ -113,7 +113,7 @@ class FormatTool extends DevTool {
       defaultMode: defaultMode,
       exclude: exclude,
       formatter: formatter,
-      organizeImports: organizeImports,
+      organizeDirectives: organizeDirectives,
     );
     if (formatExecution.exitCode != null) {
       return formatExecution.exitCode;
@@ -125,10 +125,10 @@ class FormatTool extends DevTool {
     if (exitCode != 0) {
       return exitCode;
     }
-    if (formatExecution.importOrganization != null) {
-      exitCode = organizeImportsInPaths(
-        formatExecution.importOrganization.inputs,
-        check: formatExecution.importOrganization.check,
+    if (formatExecution.directiveOrganization != null) {
+      exitCode = organizeDirectivesInPaths(
+        formatExecution.directiveOrganization.inputs,
+        check: formatExecution.directiveOrganization.check,
         verbose: context.verbose,
       );
     }
@@ -316,8 +316,8 @@ class FormatterInputs {
 class FormatExecution {
   FormatExecution.exitEarly(this.exitCode)
       : formatProcess = null,
-        importOrganization = null;
-  FormatExecution.process(this.formatProcess, [this.importOrganization])
+        directiveOrganization = null;
+  FormatExecution.process(this.formatProcess, [this.directiveOrganization])
       : exitCode = null;
 
   /// If non-null, the execution is already complete and the [FormatTool] should
@@ -331,14 +331,14 @@ class FormatExecution {
   /// If this process results in a non-zero exit code, [FormatTool] should return it.
   final ProcessDeclaration formatProcess;
 
-  /// A declarative representation of the import organization work to be done
+  /// A declarative representation of the directive organization work to be done
   /// (if enabled) after running the formatter.
-  final ImportOrganization importOrganization;
+  final DirectiveOrganization directiveOrganization;
 }
 
-/// A declarative representation of the import organization work.
-class ImportOrganization {
-  ImportOrganization(this.inputs, {this.check});
+/// A declarative representation of the directive organization work.
+class DirectiveOrganization {
+  DirectiveOrganization(this.inputs, {this.check});
 
   final bool check;
   final Set<String> inputs;
@@ -463,7 +463,7 @@ Iterable<String> buildArgsForDartFormat(
 ///
 /// [include] will be populated from [FormatTool.include].
 ///
-/// [organizeImports] will be populated from [FormatTool.organizeImports].
+/// [organizeDirectives] will be populated from [FormatTool.organizeDirectives].
 ///
 /// If non-null, [path] will override the current working directory for any
 /// operations that require it. This is intended for use by tests.
@@ -477,7 +477,7 @@ FormatExecution buildExecution(
   FormatMode defaultMode,
   List<Glob> exclude,
   Formatter formatter,
-  bool organizeImports = false,
+  bool organizeDirectives = false,
   String path,
 }) {
   FormatMode mode;
@@ -564,16 +564,16 @@ FormatExecution buildExecution(
     [...args, ...inputs.includedFiles],
     mode: ProcessStartMode.inheritStdio,
   );
-  ImportOrganization importOrganization;
-  if (organizeImports) {
-    importOrganization = ImportOrganization(
+  DirectiveOrganization directiveOrganization;
+  if (organizeDirectives) {
+    directiveOrganization = DirectiveOrganization(
       inputs.includedFiles,
       check: mode == FormatMode.check,
     );
   }
   return FormatExecution.process(
     formatProcess,
-    importOrganization,
+    directiveOrganization,
   );
 }
 

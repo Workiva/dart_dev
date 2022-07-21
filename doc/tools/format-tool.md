@@ -92,10 +92,10 @@ final config = {
 };
 ```
 
-### Organizing imports
+### Organizing directives
 
-By default, the format tool will not sort imports. Imports can be automatically
-sorted by setting `organizeImports`. 
+By default, the format tool will not sort imports/export. They can be automatically
+sorted by setting `organizeDirectives`. 
 
 ```dart
 // tool/dart_dev/config.dart
@@ -103,7 +103,7 @@ import 'package:dart_dev/dart_dev.dart';
 
 final config = {
   'format': FormatTool()
-    ..organizeImports = true
+    ..organizeDirectives = true
 };
 ```
 

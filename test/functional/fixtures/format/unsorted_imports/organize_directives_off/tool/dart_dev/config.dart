@@ -3,6 +3,6 @@ import 'package:glob/glob.dart';
 
 final config = {
   'format': FormatTool()
-    ..organizeImports = true
+    ..organizeDirectives = false
     ..exclude = [Glob('tool/**')],
 };
