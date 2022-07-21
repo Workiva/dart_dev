@@ -10,15 +10,18 @@ import 'namespace_collector.dart';
 ///
 /// Throws an ArgumentError if [sourceFileContents] cannot be parsed.
 String organizeImports(String sourceFileContents) {
-  final namespaces = parseString(content: sourceFileContents)
+  final directives = parseString(content: sourceFileContents)
       .unit
       .accept(NamespaceCollector());
 
-  if (namespaces.isEmpty) {
+  if (directives.isEmpty) {
     return sourceFileContents;
   }
 
-  _assignCommentsInFileToNamespaceDirective(sourceFileContents, namespaces);
+  final namespaces = _assignCommentsInFileToNamespaceDirective(
+    sourceFileContents,
+    directives,
+  );
   final sortedDirectives = _organizeDirectives(sourceFileContents, namespaces);
   return _replaceDirectives(sourceFileContents, namespaces, sortedDirectives);
 }
@@ -84,13 +87,16 @@ String _organizeDirectivesOfType<T>(
 /// For this reason, we go thru all imports (and the first token after the last
 /// import), look at their precedingComments, and determine which import they
 /// belong to.
-void _assignCommentsInFileToNamespaceDirective(
+List<Namespace> _assignCommentsInFileToNamespaceDirective(
   String sourceFileContents,
-  List<Namespace> namespaces,
+  List<NamespaceDirective> directives,
 ) {
+  final namespaces = <Namespace>[];
+
   Namespace prevNamespace;
-  for (var namespace in namespaces) {
-    final currNamespace = namespace;
+  for (var directive in directives) {
+    final currNamespace = Namespace(directive);
+    namespaces.add(currNamespace);
 
     _assignCommentsBeforeTokenToNamespace(
       currNamespace.directive.beginToken,
@@ -102,13 +108,14 @@ void _assignCommentsInFileToNamespaceDirective(
     prevNamespace = currNamespace;
   }
 
-  /// Assign comments after the last import to the last import if they are on
-  /// the same line.
+  // Assign comments after the last import to the last import if they are on
+  // the same line.
   _assignCommentsBeforeTokenToNamespace(
     prevNamespace.directive.endToken.next,
     sourceFileContents,
     prevNamespace,
   );
+  return namespaces;
 }
 
 /// Assigns comments before [token] to [prevNamespace] if on the same line as
