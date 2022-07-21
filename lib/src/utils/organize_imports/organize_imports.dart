@@ -19,30 +19,58 @@ String organizeImports(String sourceFileContents) {
   }
 
   _assignCommentsInFileToNamespaceDirective(sourceFileContents, namespaces);
+  final sortedDirectives = _organizeDirectives(sourceFileContents, namespaces);
+  return _replaceDirectives(sourceFileContents, namespaces, sortedDirectives);
+}
 
+/// Replaces the namespace directives in a source file with a given string.
+///
+/// Namespaces should be sorted in the order they appear in the source file.
+String _replaceDirectives(
+  String sourceFileContents,
+  List<Namespace> namespaces,
+  String replaceString,
+) {
   final firstNamespaceStartIdx = namespaces.first.start();
   final lastNamespaceEndIdx = namespaces.last.end();
-  final imports = namespaces
-      .where((element) => element.directive is ImportDirective)
-      .toList();
-  final exports = namespaces
-      .where((element) => element.directive is ExportDirective)
-      .toList();
-  imports.sort(_namespaceComparator);
-  exports.sort(_namespaceComparator);
-  final sortedImportString =
-      _getSortedNamespaceString(sourceFileContents, imports);
-  final sortedExportString =
-      _getSortedNamespaceString(sourceFileContents, exports);
-  final sortedDirectives = [
-    if (sortedImportString.isNotEmpty) sortedImportString,
-    if (sortedExportString.isNotEmpty) sortedExportString
-  ].join('\n');
   return sourceFileContents.replaceRange(
     firstNamespaceStartIdx,
     lastNamespaceEndIdx + 1,
-    sortedDirectives,
+    replaceString,
   );
+}
+
+/// Returns a sorted string of namespace directives.
+String _organizeDirectives(
+  String sourceFileContents,
+  List<Namespace> namespaces,
+) {
+  final sortedImports = _organizeDirectivesOfType<ImportDirective>(
+    sourceFileContents,
+    namespaces,
+  );
+  final sortedExports = _organizeDirectivesOfType<ExportDirective>(
+    sourceFileContents,
+    namespaces,
+  );
+
+  return [
+    if (sortedImports.isNotEmpty) sortedImports,
+    if (sortedExports.isNotEmpty) sortedExports
+  ].join('\n');
+}
+
+/// Returns a sorted string of namespace directives of a given type.
+String _organizeDirectivesOfType<T>(
+  String sourceFileContents,
+  List<Namespace> namespaces,
+) {
+  final directives =
+      namespaces.where((element) => element.directive is T).toList();
+
+  directives.sort(_namespaceComparator);
+
+  return _getSortedNamespaceString(sourceFileContents, directives);
 }
 
 /// Puts comments in a source file with the correct namespace directive so they
