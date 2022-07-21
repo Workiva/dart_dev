@@ -1,4 +1,3 @@
-
 const unorganizedImports1 = '''
 import 'dart:html';
 import 'dart:typed_data';
@@ -741,4 +740,132 @@ const organizedImports25 = '''
 import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:io' as io;
+''';
+
+const unorganizedImports26 = '''
+export 'package:my_package/src/provider/foo_provider.dart';
+export 'package:my_package/src/provider/foo_panel.dart';
+''';
+
+const organizedImports26 = '''
+export 'package:my_package/src/provider/foo_panel.dart';
+export 'package:my_package/src/provider/foo_provider.dart';
+''';
+
+const unorganizedImports27 = '''
+export 'package:my_package/src/provider/my_module_types.dart' show MyModuleType1, MyModuleType2, MyModuleType3, MyModuleType4, MyModuleType5;
+export 'package:my_package/src/module.dart' show MyModule;
+export 'package:my_package/src/events.dart' hide MySecretType;
+export 'package:my_package/src/api.dart' show MyApi;
+''';
+
+const organizedImports27 = '''
+export 'package:my_package/src/api.dart' show MyApi;
+export 'package:my_package/src/events.dart' hide MySecretType;
+export 'package:my_package/src/module.dart' show MyModule;
+export 'package:my_package/src/provider/my_module_types.dart' show MyModuleType1, MyModuleType2, MyModuleType3, MyModuleType4, MyModuleType5;
+''';
+
+const unorganizedImports28 = '''
+export 'package:my_package/src/foo/baz.dart';
+import 'package:other_package/hello_world.dart';
+import 'package:my_package/src/foo.dart';
+import 'file.dart';
+import '../other_file.dart';
+export 'package:my_package/src/foo/bar.dart';
+import 'package:w_module/w_module.dart';
+import 'dart:html';
+''';
+
+const organizedImports28 = '''
+import 'dart:html';
+
+import 'package:my_package/src/foo.dart';
+import 'package:other_package/hello_world.dart';
+import 'package:w_module/w_module.dart';
+
+import '../other_file.dart';
+import 'file.dart';
+
+export 'package:my_package/src/foo/bar.dart';
+export 'package:my_package/src/foo/baz.dart';
+''';
+
+
+const unorganizedImports29 = '''
+import 'package:my_package/file.dart';
+
+
+export 'package:my_package/src/file2.dart' show MyClass;
+''';
+
+const organizedImports29 = '''
+import 'package:my_package/file.dart';
+
+export 'package:my_package/src/file2.dart' show MyClass;
+''';
+
+const unorganizedImports30 = '''
+import 'dart:async';
+
+
+import 'dart:html';
+
+
+import 'package:my_package/src/foo1.dart';
+
+
+import 'package:my_package/src/foo2.dart';
+
+
+import 'file1.dart';
+
+
+import 'file2.dart';
+
+
+export 'file3.dart';
+
+
+export 'file4.dart';
+''';
+
+const organizedImports30 = '''
+import 'dart:async';
+import 'dart:html';
+
+import 'package:my_package/src/foo1.dart';
+import 'package:my_package/src/foo2.dart';
+
+import 'file1.dart';
+import 'file2.dart';
+
+export 'file3.dart';
+export 'file4.dart';
+''';
+
+const unorganizedImports31 = '''
+import 'dart:async'; // a comment here about async
+// keep this comment with export
+export 'package:dart_dev/dart_dev.dart'
+    show // comment
+        Type1,
+        Type2, // comment
+        Type3, // comment
+        Type4;
+import 'file7.dart'; // comments are cool
+''';
+
+const organizedImports31 = '''
+import 'dart:async'; // a comment here about async
+
+import 'file7.dart'; // comments are cool
+
+// keep this comment with export
+export 'package:dart_dev/dart_dev.dart'
+    show // comment
+        Type1,
+        Type2, // comment
+        Type3, // comment
+        Type4;
 ''';
