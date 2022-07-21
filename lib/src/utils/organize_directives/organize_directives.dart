@@ -9,7 +9,7 @@ import 'namespace_collector.dart';
 /// Sorts imports/exports and removes double quotes.
 ///
 /// Throws an ArgumentError if [sourceFileContents] cannot be parsed.
-String organizeImports(String sourceFileContents) {
+String organizeDirectives(String sourceFileContents) {
   final directives = parseString(content: sourceFileContents)
       .unit
       .accept(NamespaceCollector());
@@ -79,14 +79,15 @@ String _organizeDirectivesOfType<T>(
 /// Puts comments in a source file with the correct namespace directive so they
 /// can be moved with the directive when sorted.
 ///
-/// The parser puts "precedingComments" on each token. However, an import's
+/// The parser puts "precedingComments" on each token. However, a directive's
 /// precedingComments shouldn't necessarily be the comments that move with the
-/// import during a sort. If an import has a trailing comment on the same line
-/// as an import, it will be attached to the next Token's "precedingComments".
+/// directive during a sort. If a directive has a trailing comment on the same
+/// line as a directive, it will be attached to the next Token's
+/// "precedingComments".
 ///
-/// For this reason, we go thru all imports (and the first token after the last
-/// import), look at their precedingComments, and determine which import they
-/// belong to.
+/// For this reason, we go thru all directives (and the first token after the
+/// last directive), look at their precedingComments, and determine which
+/// directive they belong to.
 List<Namespace> _assignCommentsInFileToNamespaceDirective(
   String sourceFileContents,
   List<NamespaceDirective> directives,
@@ -108,8 +109,8 @@ List<Namespace> _assignCommentsInFileToNamespaceDirective(
     prevNamespace = currNamespace;
   }
 
-  // Assign comments after the last import to the last import if they are on
-  // the same line.
+  // Assign comments after the last directive to the last directive if they are
+  // on the same line.
   _assignCommentsBeforeTokenToNamespace(
     prevNamespace.directive.endToken.next,
     sourceFileContents,
@@ -141,8 +142,8 @@ void _assignCommentsBeforeTokenToNamespace(
   }
 }
 
-/// Checks if a given comment is on the same line as an import.
-/// It's expected that import end is before comment start.
+/// Checks if a given comment is on the same line as a directive.
+/// It's expected that directive end is before comment start.
 bool _commentIsOnSameLineAsNamespace(
     Token comment, Namespace namespace, String sourceFileContents) {
   return namespace != null &&
@@ -157,51 +158,51 @@ String _getSortedNamespaceString(
   List<Namespace> namespaces,
 ) {
   final sortedReplacement = StringBuffer();
-  final firstRelativeImportIdx =
-      namespaces.indexWhere((import) => import.isRelativeImport);
-  final firstPkgImportIdx =
-      namespaces.indexWhere((import) => import.isExternalPkgImport);
-  for (var importIndex = 0; importIndex < namespaces.length; importIndex++) {
-    final import = namespaces[importIndex];
-    if (importIndex != 0 &&
-        (importIndex == firstRelativeImportIdx ||
-            importIndex == firstPkgImportIdx)) {
+  final firstRelativeNamespaceIdx =
+      namespaces.indexWhere((namespace) => namespace.isRelative);
+  final firstPkgDirectiveIdx =
+      namespaces.indexWhere((namespace) => namespace.isExternalPkg);
+  for (var nsIndex = 0; nsIndex < namespaces.length; nsIndex++) {
+    final namespace = namespaces[nsIndex];
+    if (nsIndex != 0 &&
+        (nsIndex == firstRelativeNamespaceIdx ||
+            nsIndex == firstPkgDirectiveIdx)) {
       sortedReplacement.write('\n');
     }
-    final importDirectiveWithQuotesReplaced = sourceFileContents
-        .substring(import.statementStart, import.statementEnd)
+    final namespaceWithQuotesReplaced = sourceFileContents
+        .substring(namespace.statementStart, namespace.statementEnd)
         .replaceAll('"', "'");
 
     final source = sourceFileContents
         .replaceRange(
-          import.statementStart,
-          import.statementEnd,
-          importDirectiveWithQuotesReplaced,
+          namespace.statementStart,
+          namespace.statementEnd,
+          namespaceWithQuotesReplaced,
         )
-        .substring(import.start(), import.end());
+        .substring(namespace.start(), namespace.end());
     sortedReplacement..write(source)..write('\n');
   }
   return sortedReplacement.toString();
 }
 
-/// A comparator that will sort dart imports first, then package imports, then
-/// relative imports.
+/// A comparator that will sort dart directives first, then package directives,
+/// then relative directives.
 int _namespaceComparator(Namespace first, Namespace second) {
-  if (first.isDartImport && second.isDartImport) {
+  if (first.isDart && second.isDart) {
     return first.target.compareTo(second.target);
   }
 
-  if (first.isDartImport && !second.isDartImport) {
+  if (first.isDart && !second.isDart) {
     return -1;
   }
 
-  if (!first.isDartImport && second.isDartImport) {
+  if (!first.isDart && second.isDart) {
     return 1;
   }
 
-  // Neither are dart imports
-  final firstIsPkg = first.isExternalPkgImport;
-  final secondIsPkg = second.isExternalPkgImport;
+  // Neither are dart directives
+  final firstIsPkg = first.isExternalPkg;
+  final secondIsPkg = second.isExternalPkg;
   if (firstIsPkg && secondIsPkg) {
     return first.target.compareTo(second.target);
   }
@@ -214,6 +215,6 @@ int _namespaceComparator(Namespace first, Namespace second) {
     return 1;
   }
 
-  // Neither are dart imports or pkg imports. Must be relative path imports...
+  // Neither are dart directives or pkg directives. Must be relative path directives...
   return first.target.compareTo(second.target);
 }

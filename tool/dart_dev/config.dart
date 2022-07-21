@@ -4,6 +4,6 @@ import 'package:glob/glob.dart';
 final config = {
   ...coreConfig,
   'format': FormatTool()
-    ..organizeImports = true
+    ..organizeDirectives = true
     ..exclude = [Glob('test/**/fixtures/**.dart')],
 };

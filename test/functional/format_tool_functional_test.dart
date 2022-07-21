@@ -20,9 +20,9 @@ void main() {
       return _SourceFile(contentsBefore, contentsAfter);
     }
 
-    test('organize imports off', () async {
+    test('organize directives off', () async {
       const projectPath =
-          'test/functional/fixtures/format/unsorted_imports/organize_imports_off/';
+          'test/functional/fixtures/format/unsorted_imports/organize_directives_off/';
       final sourceFile = await _format(projectPath);
       expect(
         sourceFile.contentsBefore,
@@ -30,9 +30,9 @@ void main() {
       );
     });
 
-    test('organize imports on', () async {
+    test('organize directives on', () async {
       const projectPath =
-          'test/functional/fixtures/format/unsorted_imports/organize_imports_on/';
+          'test/functional/fixtures/format/unsorted_imports/organize_directives_on/';
       final sourceFile = await _format(projectPath);
       expect(
         sourceFile.contentsBefore,
