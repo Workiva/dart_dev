@@ -27,9 +27,3 @@ dev_dependencies:
   test: ^1.15.7
   test_descriptor: ^2.0.0
   test_process: ^2.0.0
-
-dependency_validator:
- exclude:
-  - test/tools/fixtures/organize_directives/directives.dart
- ignore:
-  - meta

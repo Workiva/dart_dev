@@ -1,2 +1,2 @@
 exclude:
-  - test/tools/fixtures/sort_imports/imports.dart
+  - test/tools/fixtures/organize_directives/directives.dart
