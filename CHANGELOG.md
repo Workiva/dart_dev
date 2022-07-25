@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.9.0](https://github.com/Workiva/dart_dev/compare/3.8.8...3.9.0)
+
+- Add an `organizeDirectives` option to the `FormatTool` (default false). When
+  true, the formatter will also sort a file's imports and exports.
+
 ## [3.8.8](https://github.com/Workiva/dart_dev/compare/3.8.7...3.8.8)
 
 - CI tweaks.
