@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';

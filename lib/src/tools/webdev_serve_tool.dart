@@ -10,8 +10,8 @@ import 'package:pub_semver/pub_semver.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
-import '../utils/logging.dart';
 import '../utils/global_package_is_active_and_compatible.dart';
+import '../utils/logging.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
 
@@ -91,7 +91,7 @@ class WebdevServeTool extends DevTool {
 ///
 /// This class allows the [WebdevServeTool] to break its execution up into two
 /// steps:
-/// 1. Validation of confg/inputs and creation of this class.
+/// 1. Validation of config/inputs and creation of this class.
 /// 2. Execution of expensive or hard-to-test logic based on step 1.
 ///
 /// As a result, nearly all of the logic in [WebdevServeTool] can be tested via

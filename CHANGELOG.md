@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.7.2](https://github.com/Workiva/dart_dev/compare/3.7.1...3.7.2)
+
+- Added an `organizeDirectives` option to the `FormatTool` (default false). When
+true, the formatter will also sort a file's imports and exports.
+
 ## [3.7.1](https://github.com/Workiva/dart_dev/compare/3.7.0...3.7.1)
 
 - Update `TestTool` to allow arguments after a separator (`--`). These arguments

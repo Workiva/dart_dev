@@ -5,6 +5,7 @@ environment:
 dev_dependencies:
   dart_dev:
     path: ../../../../..
+  meta: ">=1.2.2 <1.7.0" # Workaround to avoid https://github.com/dart-lang/sdk/issues/46142
 
 workiva:
   disable_core_checks: true

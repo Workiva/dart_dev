@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.7.2, 2.13.4, stable, dev ]
+        sdk: [ 2.7.2, 2.13.4 ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v0.2
@@ -30,7 +30,7 @@ jobs:
         run: pub get
 
       - name: Validate dependencies
-        run: pub run dependency_validator -i pedantic,over_react_format,meta
+        run: pub run dependency_validator
         if: always() && steps.install.outcome == 'success'
 
       - name: Analyze project source
@@ -60,6 +60,9 @@ jobs:
         run: dart run dart_dev format --check
         if: always() && steps.install.outcome == 'success'
 
-      - name: Publish dry run
-        run: dart pub publish --dry-run
-        if: always() && steps.install.outcome == 'success'
+# Disabled for backpatch releases since pubspec contains dependency_validator
+# key and cannot update to dependency_validator ^3.0.0
+#
+#      - name: Publish dry run
+#        run: dart pub publish --dry-run
+#        if: always() && steps.install.outcome == 'success'

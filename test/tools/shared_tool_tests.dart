@@ -1,6 +1,5 @@
-import 'package:test/test.dart';
-
 import 'package:dart_dev/src/dart_dev_tool.dart';
+import 'package:test/test.dart';
 
 void sharedDevToolTests(DevTool factory()) {
   group('toCommand', () {

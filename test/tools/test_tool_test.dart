@@ -2,13 +2,12 @@
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
+import 'package:dart_dev/src/tools/test_tool.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
-
-import 'package:dart_dev/src/tools/test_tool.dart';
 
 import '../log_matchers.dart';
 import 'shared_tool_tests.dart';

@@ -92,6 +92,21 @@ final config = {
 };
 ```
 
+### Organizing directives
+
+By default, the format tool will not sort imports/export. They can be automatically
+sorted by setting `organizeDirectives`. 
+
+```dart
+// tool/dart_dev/config.dart
+import 'package:dart_dev/dart_dev.dart';
+
+final config = {
+  'format': FormatTool()
+    ..organizeDirectives = true
+};
+```
+
 ## Command-line options
 
 ```bash
