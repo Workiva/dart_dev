@@ -14,6 +14,7 @@ import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 import '../utils/logging.dart';
+import '../utils/organize_directives/organize_directives_in_paths.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
@@ -70,6 +71,11 @@ class FormatTool extends DevTool {
   /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
   List<String> formatterArgs;
 
+  /// If the formatter should also organize imports and exports.
+  ///
+  /// By default, this is disabled.
+  bool organizeDirectives = false;
+
   // ---------------------------------------------------------------------------
   // DevTool Overrides
   // ---------------------------------------------------------------------------
@@ -99,17 +105,34 @@ class FormatTool extends DevTool {
   String description = 'Format dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) {
+  FutureOr<int> run([DevToolExecutionContext context]) async {
     context ??= DevToolExecutionContext();
-    final execution = buildExecution(
+    final formatExecution = buildExecution(
       context,
       configuredFormatterArgs: formatterArgs,
       defaultMode: defaultMode,
       exclude: exclude,
       formatter: formatter,
+      organizeDirectives: organizeDirectives,
     );
-    return execution.exitCode ??
-        runProcessAndEnsureExit(execution.process, log: _log);
+    if (formatExecution.exitCode != null) {
+      return formatExecution.exitCode;
+    }
+    var exitCode = await runProcessAndEnsureExit(
+      formatExecution.formatProcess,
+      log: _log,
+    );
+    if (exitCode != 0) {
+      return exitCode;
+    }
+    if (formatExecution.directiveOrganization != null) {
+      exitCode = organizeDirectivesInPaths(
+        formatExecution.directiveOrganization.inputs,
+        check: formatExecution.directiveOrganization.check,
+        verbose: context.verbose,
+      );
+    }
+    return exitCode;
   }
 
   /// Builds and returns the object that contains:
@@ -285,14 +308,17 @@ class FormatterInputs {
 /// A declarative representation of an execution of the [FormatTool].
 ///
 /// This class allows the [FormatTool] to break its execution up into two steps:
-/// 1. Validation of confg/inputs and creation of this class.
+/// 1. Validation of config/inputs and creation of this class.
 /// 2. Execution of expensive or hard-to-test logic based on step 1.
 ///
 /// As a result, nearly all of the logic in [FormatTool] can be tested via the
 /// output of step 1 (an instance of this class) with very simple unit tests.
 class FormatExecution {
-  FormatExecution.exitEarly(this.exitCode) : process = null;
-  FormatExecution.process(this.process) : exitCode = null;
+  FormatExecution.exitEarly(this.exitCode)
+      : formatProcess = null,
+        directiveOrganization = null;
+  FormatExecution.process(this.formatProcess, [this.directiveOrganization])
+      : exitCode = null;
 
   /// If non-null, the execution is already complete and the [FormatTool] should
   /// exit with this code.
@@ -302,8 +328,20 @@ class FormatExecution {
 
   /// A declarative representation of the formatter process that should be run.
   ///
-  /// This process' result should become the final result of the [FormatTool].
-  final ProcessDeclaration process;
+  /// If this process results in a non-zero exit code, [FormatTool] should return it.
+  final ProcessDeclaration formatProcess;
+
+  /// A declarative representation of the directive organization work to be done
+  /// (if enabled) after running the formatter.
+  final DirectiveOrganization directiveOrganization;
+}
+
+/// A declarative representation of the directive organization work.
+class DirectiveOrganization {
+  DirectiveOrganization(this.inputs, {this.check});
+
+  final bool check;
+  final Set<String> inputs;
 }
 
 /// Modes supported by the dart formatter.
@@ -425,6 +463,8 @@ Iterable<String> buildArgsForDartFormat(
 ///
 /// [include] will be populated from [FormatTool.include].
 ///
+/// [organizeDirectives] will be populated from [FormatTool.organizeDirectives].
+///
 /// If non-null, [path] will override the current working directory for any
 /// operations that require it. This is intended for use by tests.
 ///
@@ -437,6 +477,7 @@ FormatExecution buildExecution(
   FormatMode defaultMode,
   List<Glob> exclude,
   Formatter formatter,
+  bool organizeDirectives = false,
   String path,
 }) {
   FormatMode mode;
@@ -504,7 +545,7 @@ FormatExecution buildExecution(
         '${inputs.hiddenDirectories.join('\n  ')}');
   }
 
-  final dartFormatter = buildProcess(formatter);
+  final dartFormatter = buildFormatProcess(formatter);
   Iterable<String> args;
   if (formatter == Formatter.dartFormat) {
     args = buildArgsForDartFormat(dartFormatter.args, mode,
@@ -517,9 +558,23 @@ FormatExecution buildExecution(
   }
   logCommand(dartFormatter.executable, inputs.includedFiles, args,
       verbose: context.verbose);
-  return FormatExecution.process(ProcessDeclaration(
-      dartFormatter.executable, [...args, ...inputs.includedFiles],
-      mode: ProcessStartMode.inheritStdio));
+
+  final formatProcess = ProcessDeclaration(
+    dartFormatter.executable,
+    [...args, ...inputs.includedFiles],
+    mode: ProcessStartMode.inheritStdio,
+  );
+  DirectiveOrganization directiveOrganization;
+  if (organizeDirectives) {
+    directiveOrganization = DirectiveOrganization(
+      inputs.includedFiles,
+      check: mode == FormatMode.check,
+    );
+  }
+  return FormatExecution.process(
+    formatProcess,
+    directiveOrganization,
+  );
 }
 
 /// Returns a representation of the process that will be run by [FormatTool]
@@ -528,7 +583,7 @@ FormatExecution buildExecution(
 /// - [Formatter.dartfmt] -> `dartfmt`
 /// - [Formatter.dartFormat] -> `dart format`
 /// - [Formatter.dartStyle] -> `dart run dart_style:format`
-ProcessDeclaration buildProcess([Formatter formatter]) {
+ProcessDeclaration buildFormatProcess([Formatter formatter]) {
   switch (formatter) {
     case Formatter.dartStyle:
       return ProcessDeclaration('dart', ['run', 'dart_style:format']);

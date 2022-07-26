@@ -1,0 +1,2 @@
+exclude:
+  - test/tools/fixtures/organize_directives/directives.dart

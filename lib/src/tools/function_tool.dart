@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:args/args.dart';
-import 'package:dart_dev/src/utils/assert_no_args_after_separator.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 

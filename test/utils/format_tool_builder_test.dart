@@ -3,9 +3,8 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/tools/over_react_format_tool.dart';
-import 'package:test/test.dart';
-
 import 'package:dart_dev/src/utils/format_tool_builder.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('FormatToolBuilder', () {
