@@ -1,5 +1,5 @@
 name: dart_dev
-version: 3.7.1
+version: 3.7.2
 description: Centralized tooling for Dart projects. Consistent interface across projects. Easily configurable.
 homepage: https://github.com/Workiva/dart_dev
 
