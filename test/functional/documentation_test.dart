@@ -33,8 +33,8 @@ void main() {
       printOnFailure('PUBSPEC:\n$pubspecSource\n');
       await pubGet.shouldExit(0);
 
-      final analysis = await TestProcess.start('dartanalyzer',
-          ['.', '--fatal-lints', '--fatal-infos', '--fatal-warnings'],
+      final analysis = await TestProcess.start(
+          'dart', ['analyze', '--fatal-infos'],
           workingDirectory: '${d.sandbox}/project');
       printOnFailure('SOURCE:\n${dartBlock.source}\n');
       await analysis.shouldExit(0);
