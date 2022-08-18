@@ -26,9 +26,9 @@ final _runScriptPath = p.join(cacheDirPath, 'run.dart');
 
 final _runScript = File(_runScriptPath);
 
-const _configPath = 'tool/dart_dev/config.dart';
+final _configPath = p.join('tool', 'dart_dev', 'config.dart');
 
-const _oldDevDartPath = 'tool/dev.dart';
+final _oldDevDartPath = p.join('tool', 'dev.dart');
 
 final _relativeDevDartPath = p.relative(
   p.absolute(_configPath),
@@ -41,7 +41,7 @@ Future<void> run(List<String> args) async {
   final oldDevDartExists = File(_oldDevDartPath).existsSync();
 
   if (!configExists) {
-    log.fine('No custom `tool/dart_dev/config.dart` file found; '
+    log.fine('No custom `$_configPath` file found; '
         'using default config.');
   }
   if (oldDevDartExists) {
@@ -146,8 +146,7 @@ Future<void> runWithConfig(
     config = configGetter();
   } catch (error) {
     stderr
-      ..writeln(
-          'Invalid "tool/dart_dev/config.dart" in ${p.absolute(p.current)}')
+      ..writeln('Invalid "$_configPath" in ${p.absolute(p.current)}')
       ..writeln()
       ..writeln('It should provide a `Map<String, DevTool> config;` getter,'
           ' but it either does not exist or threw unexpectedly:')
