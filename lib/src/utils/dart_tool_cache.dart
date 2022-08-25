@@ -1,15 +1,9 @@
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
-
-const cacheDirPath = '.dart_tool/dart_dev';
+import 'package:dart_dev/src/utils/dart_dev_paths.dart';
 
 void createCacheDir({String subPath}) {
-  var path = cacheDirPath;
-  if (subPath != null) {
-    path = p.join(path, subPath);
-  }
-  final dir = Directory(path);
+  final dir = Directory(DartDevPaths().cache(subPath));
   if (!dir.existsSync()) {
     dir.createSync(recursive: true);
   }
