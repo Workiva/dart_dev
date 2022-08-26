@@ -3,6 +3,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/tools/webdev_serve_tool.dart';
+import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
@@ -194,7 +195,7 @@ void main() {
         final execution = buildExecution(DevToolExecutionContext(),
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
+        expect(execution.process.executable, exe.dart);
         expect(execution.process.args,
             orderedEquals(['pub', 'global', 'run', 'webdev', 'serve']));
       });
@@ -209,7 +210,7 @@ void main() {
             configuredWebdevArgs: ['web:9000', 'example:9001'],
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
+        expect(execution.process.executable, exe.dart);
         expect(
             execution.process.args,
             orderedEquals([
@@ -241,7 +242,7 @@ void main() {
             configuredWebdevArgs: ['web:9000', 'example:9001'],
             environment: pubCacheWithWebdev.envOverride);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
+        expect(execution.process.executable, exe.dart);
         expect(
             execution.process.args,
             orderedEquals([

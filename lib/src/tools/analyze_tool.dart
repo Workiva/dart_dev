@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
@@ -176,7 +177,7 @@ ProcessDeclaration buildProcess(
             'Arguments can be passed to the "${analyzerUsed}" process via '
             'the --analyzer-args option.');
   }
-  final executable = useDartAnalyze ? 'dart' : 'dartanalyzer';
+  var executable = useDartAnalyze ? exe.dart : exe.dartanalyzer;
   final args = buildArgs(
       argResults: context.argResults,
       configuredAnalyzerArgs: configuredAnalyzerArgs,

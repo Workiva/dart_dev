@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:dart_dev/utils.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:test/test.dart';
@@ -19,7 +20,7 @@ class TempPubCache {
 void globalActivate(String packageName, String constraint,
     {Map<String, String> environment}) {
   final result = Process.runSync(
-    'dart',
+    exe.dart,
     ['pub', 'global', 'activate', packageName, constraint],
     environment: environment,
     stderrEncoding: utf8,

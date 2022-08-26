@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
+import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
@@ -315,7 +316,7 @@ TestExecution buildExecution(
       verbose: context.verbose);
   logSubprocessHeader(_log, 'dart ${args.join(' ')}'.trim());
   return TestExecution.process(
-      ProcessDeclaration('dart', args, mode: ProcessStartMode.inheritStdio));
+      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
 }
 
 // NOTE: This currently depends on https://github.com/dart-lang/build/pull/2445

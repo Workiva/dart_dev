@@ -12,6 +12,7 @@ library test.functional.documentation_test;
 
 import 'dart:io';
 
+import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
@@ -28,13 +29,13 @@ void main() {
         d.file('pubspec.yaml', pubspecSource),
       ]).create();
 
-      final pubGet = await TestProcess.start('dart', ['pub', 'get'],
+      final pubGet = await TestProcess.start(exe.dart, ['pub', 'get'],
           workingDirectory: '${d.sandbox}/project');
       printOnFailure('PUBSPEC:\n$pubspecSource\n');
       await pubGet.shouldExit(0);
 
       final analysis = await TestProcess.start(
-          'dart', ['analyze', '--fatal-infos'],
+          exe.dart, ['analyze', '--fatal-infos'],
           workingDirectory: '${d.sandbox}/project');
       printOnFailure('SOURCE:\n${dartBlock.source}\n');
       await analysis.shouldExit(0);
@@ -44,7 +45,7 @@ void main() {
 
 Iterable<DartBlock> getDartBlocks() sync* {
   final dartBlockPattern =
-      RegExp(r'^```dart *([^\n]*)([^`]*)^```', multiLine: true);
+      RegExp(r'^```dart *([^\r\n]*)([^`]*)^```', multiLine: true);
   for (final file in Glob('**.md').listSync().whereType<File>()) {
     final source = file.readAsStringSync();
     var i = 1;

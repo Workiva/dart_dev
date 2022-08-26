@@ -5,6 +5,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/tools/format_tool.dart';
+import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:glob/glob.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
@@ -57,18 +58,20 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'file.dart',
-              'links/not_link.dart',
-              'lib/sub/file.dart',
+              p.join('links', 'not_link.dart'),
+              p.join('lib', 'sub', 'file.dart'),
               'linked.dart',
-              'other/file.dart',
+              p.join('other', 'file.dart'),
             }));
 
         expect(formatterInputs.excludedFiles,
             unorderedEquals({'should_exclude.dart'}));
         expect(formatterInputs.hiddenDirectories,
             unorderedEquals({'.dart_tool_test'}));
-        expect(formatterInputs.skippedLinks,
-            unorderedEquals({'links/lib-link', 'links/link.dart'}));
+        expect(
+            formatterInputs.skippedLinks,
+            unorderedEquals(
+                {p.join('links', 'lib-link'), p.join('links', 'link.dart')}));
       });
 
       test('custom excludes with collapseDirectories', () {
@@ -114,10 +117,10 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'file.dart',
-              'links/not_link.dart',
-              'lib/sub/file.dart',
+              p.join('links', 'not_link.dart'),
+              p.join('lib', 'sub', 'file.dart'),
               'linked.dart',
-              'other/file.dart',
+              p.join('other', 'file.dart'),
               'should_exclude.dart',
             }));
         expect(formatterInputs.excludedFiles, isEmpty);
@@ -129,7 +132,7 @@ void main() {
         expect(
             formatterInputs.includedFiles,
             unorderedEquals({
-              'lib-link/sub/file.dart',
+              p.join('lib-link', 'sub', 'file.dart'),
               'not_link.dart',
               'link.dart',
             }));
@@ -230,7 +233,7 @@ void main() {
           argResults: argResults, commandName: 'hackFastFormat');
       final execution = buildExecution(context);
       expect(execution.exitCode, isNull);
-      expect(execution.formatProcess.executable, 'dartfmt');
+      expect(execution.formatProcess.executable, exe.dartfmt);
       expect(execution.formatProcess.args, orderedEquals(['a/random/path']));
       expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
       expect(execution.directiveOrganization, isNull);
@@ -333,7 +336,7 @@ void main() {
         final context = DevToolExecutionContext();
         final execution = buildExecution(context);
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess.executable, 'dartfmt');
+        expect(execution.formatProcess.executable, exe.dartfmt);
         expect(execution.formatProcess.args, orderedEquals(['.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
         expect(execution.directiveOrganization, isNull);
@@ -344,7 +347,7 @@ void main() {
         final execution =
             buildExecution(context, defaultMode: FormatMode.dryRun);
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess.executable, 'dartfmt');
+        expect(execution.formatProcess.executable, exe.dartfmt);
         expect(execution.formatProcess.args, orderedEquals(['-n', '.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
         expect(execution.directiveOrganization, isNull);
@@ -354,7 +357,7 @@ void main() {
         final context = DevToolExecutionContext();
         final execution = buildExecution(context, formatter: Formatter.dartfmt);
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess.executable, 'dartfmt');
+        expect(execution.formatProcess.executable, exe.dartfmt);
         expect(execution.formatProcess.args, orderedEquals(['.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
         expect(execution.directiveOrganization, isNull);
@@ -365,7 +368,7 @@ void main() {
         final execution =
             buildExecution(context, formatter: Formatter.dartFormat);
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess.executable, 'dart');
+        expect(execution.formatProcess.executable, exe.dart);
         expect(execution.formatProcess.args, orderedEquals(['format', '.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
       });
@@ -376,7 +379,7 @@ void main() {
             formatter: Formatter.dartStyle,
             path: 'test/tools/fixtures/format/has_dart_style');
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess.executable, 'dart');
+        expect(execution.formatProcess.executable, exe.dart);
         expect(execution.formatProcess.args,
             orderedEquals(['run', 'dart_style:format', '.']));
         expect(execution.formatProcess.mode, ProcessStartMode.inheritStdio);
@@ -392,7 +395,7 @@ void main() {
             configuredFormatterArgs: ['--fix', '--follow-links'],
             formatter: Formatter.dartfmt);
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess.executable, 'dartfmt');
+        expect(execution.formatProcess.executable, exe.dartfmt);
         expect(
             execution.formatProcess.args,
             orderedEquals(
@@ -409,7 +412,7 @@ void main() {
             configuredFormatterArgs: ['--fix', '--follow-links'],
             formatter: Formatter.dartFormat);
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess.executable, 'dart');
+        expect(execution.formatProcess.executable, exe.dart);
         expect(
             execution.formatProcess.args,
             orderedEquals(
@@ -419,14 +422,14 @@ void main() {
 
       test('and logs the test subprocess by default', () {
         expect(Logger.root.onRecord,
-            emitsThrough(infoLogOf(contains('dartfmt .'))));
+            emitsThrough(infoLogOf(contains('${exe.dartfmt} .'))));
 
         buildExecution(DevToolExecutionContext());
       });
 
       test('and logs the test subprocess for dart format', () {
         expect(Logger.root.onRecord,
-            emitsThrough(infoLogOf(contains('dart format .'))));
+            emitsThrough(infoLogOf(contains('${exe.dart} format .'))));
 
         buildExecution(DevToolExecutionContext(),
             formatter: Formatter.dartFormat);
@@ -461,25 +464,25 @@ void main() {
   group('buildFormatProcess', () {
     test('dartfmt', () {
       final process = buildFormatProcess(Formatter.dartfmt);
-      expect(process.executable, 'dartfmt');
+      expect(process.executable, exe.dartfmt);
       expect(process.args, isEmpty);
     });
 
     test('dart format', () {
       final process = buildFormatProcess(Formatter.dartFormat);
-      expect(process.executable, 'dart');
+      expect(process.executable, exe.dart);
       expect(process.args, orderedEquals(['format']));
     });
 
     test('dart_style', () {
       final process = buildFormatProcess(Formatter.dartStyle);
-      expect(process.executable, 'dart');
+      expect(process.executable, exe.dart);
       expect(process.args, orderedEquals(['run', 'dart_style:format']));
     });
 
     test('default', () {
       final process = buildFormatProcess(Formatter.dartfmt);
-      expect(process.executable, 'dartfmt');
+      expect(process.executable, exe.dartfmt);
       expect(process.args, isEmpty);
     });
   });

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:path/path.dart' as p;
 import 'package:test_descriptor/test_descriptor.dart' as d;
 import 'package:test_process/test_process.dart';
@@ -44,7 +45,7 @@ Future<TestProcess> runDevToolFunctionalTest(
     });
     pubspec.writeAsStringSync(updated);
 
-    final result = Process.runSync('dart', ['pub', 'get'],
+    final result = Process.runSync(exe.dart, ['pub', 'get'],
         workingDirectory: pubspec.parent.path);
     if (result.exitCode != 0) {
       final origPath = p.join(p.relative(templateDir.absolute.path),
@@ -56,5 +57,5 @@ Future<TestProcess> runDevToolFunctionalTest(
   }
 
   final allArgs = <String>['run', 'dart_dev', command, ...?args];
-  return TestProcess.start('dart', allArgs, workingDirectory: d.sandbox);
+  return TestProcess.start(exe.dart, allArgs, workingDirectory: d.sandbox);
 }

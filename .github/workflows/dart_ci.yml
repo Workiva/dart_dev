@@ -18,7 +18,7 @@ jobs:
         sdk: [ 2.13.4, stable, beta, dev ]
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: ${{ matrix.sdk }}
 
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: 2.13.4
 
@@ -56,4 +56,20 @@ jobs:
 
       - name: Publish dry run
         run: dart pub publish --dry-run
+        if: always() && steps.install.outcome == 'success'
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: stable
+
+      - id: install
+        name: Install dependencies
+        run: dart pub get
+
+      - name: Run tests
+        run: dart run dart_dev test
         if: always() && steps.install.outcome == 'success'

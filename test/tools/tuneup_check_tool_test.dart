@@ -5,6 +5,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/tools/tuneup_check_tool.dart';
+import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
@@ -73,7 +74,7 @@ void main() {
       test('(default)', () {
         final execution = buildExecution(DevToolExecutionContext(), path: path);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
+        expect(execution.process.executable, exe.dart);
         expect(
             execution.process.args, orderedEquals(['run', 'tuneup', 'check']));
         expect(execution.process.mode, ProcessStartMode.inheritStdio);
@@ -86,7 +87,7 @@ void main() {
             DevToolExecutionContext(argResults: argResults, verbose: true);
         final execution = buildExecution(context, path: path);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, 'dart');
+        expect(execution.process.executable, exe.dart);
         expect(
             execution.process.args,
             orderedEquals(
