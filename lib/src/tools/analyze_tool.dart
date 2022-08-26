@@ -8,6 +8,7 @@ import 'package:logging/logging.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
@@ -161,7 +162,7 @@ ProcessDeclaration buildProcess(
       verbose: context.verbose);
   final entrypoints = buildEntrypoints(include: include, root: path);
   logCommand(args, entrypoints, verbose: context.verbose);
-  return ProcessDeclaration('dartanalyzer', [...args, ...entrypoints],
+  return ProcessDeclaration(exe.dartanalyzer, [...args, ...entrypoints],
       mode: ProcessStartMode.inheritStdio);
 }
 

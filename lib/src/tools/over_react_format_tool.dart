@@ -5,6 +5,7 @@ import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/utils.dart';
 
 import '../tools/format_tool.dart';
+import '../utils/executables.dart' as exe;
 
 class OverReactFormatTool extends DevTool {
   /// Wrap lines longer than this.
@@ -31,9 +32,9 @@ class OverReactFormatTool extends DevTool {
       'over_react_format',
       if (lineLength != null) '--line-length=$lineLength'
     ];
-    final process = ProcessDeclaration('pub', [...args, ...paths],
+    final process = ProcessDeclaration(exe.pub, [...args, ...paths],
         mode: ProcessStartMode.inheritStdio);
-    logCommand('pub', paths, args, verbose: context?.verbose);
+    logCommand(exe.pub, paths, args, verbose: context?.verbose);
     return runProcessAndEnsureExit(process);
   }
 }
