@@ -10,6 +10,7 @@ import 'package:pub_semver/pub_semver.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/executables.dart' as exe;
 import '../utils/global_package_is_active_and_compatible.dart';
 import '../utils/logging.dart';
 import '../utils/process_declaration.dart';
@@ -227,5 +228,5 @@ WebdevServeExecution buildExecution(
       verbose: context.verbose);
   logSubprocessHeader(_log, 'dart ${args.join(' ')}'.trim());
   return WebdevServeExecution.process(
-      ProcessDeclaration('dart', args, mode: ProcessStartMode.inheritStdio));
+      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
 }

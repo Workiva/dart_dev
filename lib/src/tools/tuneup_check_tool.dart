@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
@@ -152,5 +153,5 @@ TuneupExecution buildExecution(
       verbose: context.verbose);
   logSubprocessHeader(_log, 'dart ${args.join(' ')}');
   return TuneupExecution.process(
-      ProcessDeclaration('dart', args, mode: ProcessStartMode.inheritStdio));
+      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
 }

@@ -16,6 +16,7 @@ import 'utils/cached_pubspec.dart';
 import 'utils/dart_dev_paths.dart';
 import 'utils/dart_tool_cache.dart';
 import 'utils/ensure_process_exit.dart';
+import 'utils/executables.dart' as exe;
 import 'utils/format_tool_builder.dart';
 import 'utils/get_dart_version_comment.dart';
 import 'utils/logging.dart';
@@ -51,8 +52,7 @@ Future<void> run(List<String> args) async {
   }
 
   generateRunScript();
-  final process = await Process.start(
-      Platform.executable, [paths.runScript, ...args],
+  final process = await Process.start(exe.dart, [paths.runScript, ...args],
       mode: ProcessStartMode.inheritStdio);
   ensureProcessExit(process);
   exitCode = await process.exitCode;

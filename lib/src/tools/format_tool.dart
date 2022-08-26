@@ -13,6 +13,7 @@ import '../../utils.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/organize_directives/organize_directives_in_paths.dart';
 import '../utils/package_is_immediate_dependency.dart';
@@ -586,12 +587,12 @@ FormatExecution buildExecution(
 ProcessDeclaration buildFormatProcess([Formatter formatter]) {
   switch (formatter) {
     case Formatter.dartStyle:
-      return ProcessDeclaration('dart', ['run', 'dart_style:format']);
+      return ProcessDeclaration(exe.dart, ['run', 'dart_style:format']);
     case Formatter.dartFormat:
-      return ProcessDeclaration('dart', ['format']);
+      return ProcessDeclaration(exe.dart, ['format']);
     case Formatter.dartfmt:
     default:
-      return ProcessDeclaration('dartfmt', []);
+      return ProcessDeclaration(exe.dartfmt, []);
   }
 }
 

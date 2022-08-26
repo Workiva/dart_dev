@@ -1,8 +1,11 @@
 @TestOn('vm')
+import 'dart:io';
+
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/tools/analyze_tool.dart';
+import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:glob/glob.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
@@ -120,14 +123,14 @@ void main() {
     test('returns a ProcessDeclaration (default)', () {
       final context = DevToolExecutionContext();
       final process = buildProcess(context);
-      expect(process.executable, 'dartanalyzer');
+      expect(process.executable, exe.dartanalyzer);
       expect(process.args, orderedEquals(['.']));
     });
 
     test('returns a ProcessDeclaration with useDartAnalyze (default)', () {
       final context = DevToolExecutionContext();
       final process = buildProcess(context, useDartAnalyze: true);
-      expect(process.executable, 'dart');
+      expect(process.executable, exe.dart);
       expect(process.args, orderedEquals(['analyze', '.']));
     });
 
@@ -140,7 +143,7 @@ void main() {
           configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
           include: [Glob('*.dart'), Glob('*.txt')],
           path: globRoot);
-      expect(process.executable, 'dartanalyzer');
+      expect(process.executable, exe.dartanalyzer);
       expect(
           process.args,
           orderedEquals([
@@ -163,7 +166,7 @@ void main() {
           include: [Glob('*.dart')],
           path: globRoot,
           useDartAnalyze: true);
-      expect(process.executable, 'dart');
+      expect(process.executable, exe.dart);
       expect(
           process.args,
           orderedEquals([
@@ -186,7 +189,7 @@ void main() {
           configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
           include: [Glob('*.dart'), Glob('*.txt')],
           path: globRoot);
-      expect(process.executable, 'dartanalyzer');
+      expect(process.executable, exe.dartanalyzer);
       expect(
           process.args,
           orderedEquals([
