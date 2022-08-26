@@ -58,18 +58,20 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'file.dart',
-              'links/not_link.dart',
-              'lib/sub/file.dart',
+              p.join('links', 'not_link.dart'),
+              p.join('lib', 'sub', 'file.dart'),
               'linked.dart',
-              'other/file.dart',
+              p.join('other', 'file.dart'),
             }));
 
         expect(formatterInputs.excludedFiles,
             unorderedEquals({'should_exclude.dart'}));
         expect(formatterInputs.hiddenDirectories,
             unorderedEquals({'.dart_tool_test'}));
-        expect(formatterInputs.skippedLinks,
-            unorderedEquals({'links/lib-link', 'links/link.dart'}));
+        expect(
+            formatterInputs.skippedLinks,
+            unorderedEquals(
+                {p.join('links', 'lib-link'), p.join('links', 'link.dart')}));
       });
 
       test('custom excludes with collapseDirectories', () {
@@ -115,10 +117,10 @@ void main() {
             formatterInputs.includedFiles,
             unorderedEquals({
               'file.dart',
-              'links/not_link.dart',
-              'lib/sub/file.dart',
+              p.join('links', 'not_link.dart'),
+              p.join('lib', 'sub', 'file.dart'),
               'linked.dart',
-              'other/file.dart',
+              p.join('other', 'file.dart'),
               'should_exclude.dart',
             }));
         expect(formatterInputs.excludedFiles, isEmpty);
@@ -130,7 +132,7 @@ void main() {
         expect(
             formatterInputs.includedFiles,
             unorderedEquals({
-              'lib-link/sub/file.dart',
+              p.join('lib-link', 'sub', 'file.dart'),
               'not_link.dart',
               'link.dart',
             }));
@@ -420,14 +422,14 @@ void main() {
 
       test('and logs the test subprocess by default', () {
         expect(Logger.root.onRecord,
-            emitsThrough(infoLogOf(contains('dartfmt .'))));
+            emitsThrough(infoLogOf(contains('${exe.dartfmt} .'))));
 
         buildExecution(DevToolExecutionContext());
       });
 
       test('and logs the test subprocess for dart format', () {
         expect(Logger.root.onRecord,
-            emitsThrough(infoLogOf(contains('dart format .'))));
+            emitsThrough(infoLogOf(contains('${exe.dart} format .'))));
 
         buildExecution(DevToolExecutionContext(),
             formatter: Formatter.dartFormat);
