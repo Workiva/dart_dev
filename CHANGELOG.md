@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.9.1](https://github.com/Workiva/dart_dev/compare/3.9.0...3.9.1)
+
+- Fixes to be compatible with Windows.
+
 ## [3.9.0](https://github.com/Workiva/dart_dev/compare/3.8.8...3.9.0)
 
 - Add an `organizeDirectives` option to the `FormatTool` (default false). When
