@@ -45,7 +45,7 @@ void main() {
 
 Iterable<DartBlock> getDartBlocks() sync* {
   final dartBlockPattern =
-      RegExp(r'^```dart *([^\n]*)([^`]*)^```', multiLine: true);
+      RegExp(r'^```dart *([^\r\n]*)([^`]*)^```', multiLine: true);
   for (final file in Glob('**.md').listSync().whereType<File>()) {
     final source = file.readAsStringSync();
     var i = 1;
