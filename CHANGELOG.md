@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.7.4](https://github.com/Workiva/dart_dev/compare/3.7.3...3.7.4)
+
+- Address glob 1 -> 2 breaking changes and widen the dependency range to allow glob 2
+
 ## [3.7.3](https://github.com/Workiva/dart_dev/compare/3.7.2...3.7.3)
 
 - Fixes to be compatible with Windows.
