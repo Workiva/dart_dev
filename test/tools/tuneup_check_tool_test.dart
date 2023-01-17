@@ -20,7 +20,7 @@ void main() {
     test('provides an argParser', () {
       final argParser = TuneupCheckTool().argParser;
       expect(argParser.options, contains('ignore-infos'));
-      expect(argParser.options['ignore-infos'].type, OptionType.flag);
+      expect(argParser.options['ignore-infos']!.type, OptionType.flag);
     });
   });
 
@@ -74,10 +74,10 @@ void main() {
       test('(default)', () {
         final execution = buildExecution(DevToolExecutionContext(), path: path);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, exe.dart);
+        expect(execution.process!.executable, exe.dart);
         expect(
-            execution.process.args, orderedEquals(['run', 'tuneup', 'check']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+            execution.process!.args, orderedEquals(['run', 'tuneup', 'check']));
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('with args', () {
@@ -87,12 +87,12 @@ void main() {
             DevToolExecutionContext(argResults: argResults, verbose: true);
         final execution = buildExecution(context, path: path);
         expect(execution.exitCode, isNull);
-        expect(execution.process.executable, exe.dart);
+        expect(execution.process!.executable, exe.dart);
         expect(
-            execution.process.args,
+            execution.process!.args,
             orderedEquals(
                 ['run', 'tuneup', 'check', '--ignore-infos', '--verbose']));
-        expect(execution.process.mode, ProcessStartMode.inheritStdio);
+        expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('and logs the subprocess header', () {

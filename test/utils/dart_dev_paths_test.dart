@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   group('DartDevPaths', () {
     group('posix', () {
-      DartDevPaths paths;
+      late DartDevPaths paths;
 
       setUp(() {
         paths = DartDevPaths(context: p.posix);
@@ -38,7 +38,7 @@ void main() {
     });
 
     group('windows', () {
-      DartDevPaths paths;
+      late DartDevPaths paths;
 
       setUp(() {
         paths = DartDevPaths(context: p.windows);

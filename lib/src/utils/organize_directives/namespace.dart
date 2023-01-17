@@ -18,24 +18,24 @@ class Namespace {
   List<Token> afterComments = [];
 
   /// The file being imported/exported.
-  String get target {
+  String? get target {
     return directive.uri.stringValue;
   }
 
   /// If the namespace is a dart namespace. Memoized for performance.
-  bool _isDart;
+  bool? _isDart;
   bool get isDart {
-    return _isDart ??= target.startsWith('dart:');
+    return _isDart ??= target!.startsWith('dart:');
   }
 
   /// If the namespace is an external package namespace. Memoized for performance.
-  bool _isExternalPkg;
+  bool? _isExternalPkg;
   bool get isExternalPkg {
-    return _isExternalPkg ??= target.startsWith('package:');
+    return _isExternalPkg ??= target!.startsWith('package:');
   }
 
   /// If the namespace is a relative namespace. Memoized for performance.
-  bool _isRelative;
+  bool? _isRelative;
   bool get isRelative {
     return _isRelative ??= !isExternalPkg && !isDart;
   }

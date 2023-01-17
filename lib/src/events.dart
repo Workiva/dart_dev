@@ -2,7 +2,7 @@ import 'dart:async';
 
 Future<void> commandComplete(CommandResult result) async {
   await Future.wait(
-      _commandCompleteListeners.map((listener) => listener(result)));
+      _commandCompleteListeners.map((listener) => listener(result) as Future<void>));
 }
 
 void onCommandComplete(FutureOr<dynamic> callback(CommandResult result)) {

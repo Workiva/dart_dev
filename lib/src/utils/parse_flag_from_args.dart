@@ -1,5 +1,5 @@
 bool parseFlagFromArgs(List<String> args, String name,
-    {String abbr, bool defaultsTo, bool negatable}) {
+    {String? abbr, bool? defaultsTo, bool? negatable}) {
   defaultsTo ??= false;
   negatable ??= false;
 

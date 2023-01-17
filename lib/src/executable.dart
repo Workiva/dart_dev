@@ -61,7 +61,7 @@ Future<void> run(List<String> args) async {
 Future<void> handleFastFormat(List<String> args) async {
   assertDirIsDartPackage();
 
-  DevTool formatTool;
+  DevTool? formatTool;
   final configFile = File(paths.config);
   if (configFile.existsSync()) {
     final toolBuilder = FormatToolBuilder();
@@ -146,7 +146,8 @@ Future<void> runWithConfig(
     assertDirIsDartPackage();
   } on DirectoryIsNotPubPackage catch (error) {
     log.severe(error);
-    return ExitCode.usage.code;
+    exitCode = ExitCode.usage.code;
+    return;
   }
 
   Map<String, DevTool> config;
@@ -161,7 +162,8 @@ Future<void> runWithConfig(
       ..writeln('  $error')
       ..writeln()
       ..writeln('For more info: http://github.com/Workiva/dart_dev#TODO');
-    return ExitCode.config.code;
+    exitCode = ExitCode.config.code;
+    return;
   }
 
   try {
@@ -181,8 +183,8 @@ Future<void> runWithConfig(
 
 /// Returns [OverReactFormatTool] if `over_react_format` is a direct dependency,
 /// and the default [FormatTool] otherwise.
-DevTool chooseDefaultFormatTool({String path}) {
-  final pubspec = cachedPubspec(path: path);
+DevTool chooseDefaultFormatTool({String? path}) {
+  final pubspec = cachedPubspec(path: path)!;
   const orf = 'over_react_format';
   final hasOverReactFormat = pubspec.dependencies.containsKey(orf) ||
       pubspec.devDependencies.containsKey(orf) ||

@@ -30,23 +30,23 @@ void main() {
             'build-args',
           ]));
 
-      expect(argParser.options['name'].type, OptionType.multiple);
-      expect(argParser.options['name'].abbr, 'n');
-      expect(argParser.options['name'].splitCommas, isFalse);
+      expect(argParser.options['name']!.type, OptionType.multiple);
+      expect(argParser.options['name']!.abbr, 'n');
+      expect(argParser.options['name']!.splitCommas, isFalse);
 
-      expect(argParser.options['plain-name'].type, OptionType.multiple);
-      expect(argParser.options['plain-name'].abbr, 'N');
-      expect(argParser.options['plain-name'].splitCommas, isFalse);
+      expect(argParser.options['plain-name']!.type, OptionType.multiple);
+      expect(argParser.options['plain-name']!.abbr, 'N');
+      expect(argParser.options['plain-name']!.splitCommas, isFalse);
 
-      expect(argParser.options['preset'].type, OptionType.multiple);
-      expect(argParser.options['preset'].abbr, 'P');
-      expect(argParser.options['preset'].splitCommas, isTrue);
+      expect(argParser.options['preset']!.type, OptionType.multiple);
+      expect(argParser.options['preset']!.abbr, 'P');
+      expect(argParser.options['preset']!.splitCommas, isTrue);
 
-      expect(argParser.options['release'].type, OptionType.flag);
-      expect(argParser.options['release'].abbr, isNull);
+      expect(argParser.options['release']!.type, OptionType.flag);
+      expect(argParser.options['release']!.abbr, isNull);
 
-      expect(argParser.options['test-args'].type, OptionType.single);
-      expect(argParser.options['build-args'].type, OptionType.single);
+      expect(argParser.options['test-args']!.type, OptionType.single);
+      expect(argParser.options['build-args']!.type, OptionType.single);
     });
   });
 
@@ -231,7 +231,7 @@ void main() {
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_test: any
   test: any
@@ -253,7 +253,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_runner: any
   test: any
@@ -278,7 +278,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 ''').create();
       final context = DevToolExecutionContext();
       expect(buildExecution(context, path: d.sandbox).exitCode,
@@ -299,7 +299,7 @@ environment:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_test: any
   test: any
@@ -326,7 +326,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_runner: any
   test: any
@@ -346,7 +346,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_test: any
   test: any
@@ -357,8 +357,8 @@ dev_dependencies:
           final context = DevToolExecutionContext();
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
-          expect(execution.process.args, orderedEquals(['test']));
+          expect(execution.process!.executable, exe.dart);
+          expect(execution.process!.args, orderedEquals(['test']));
         });
 
         test('with args', () {
@@ -368,8 +368,8 @@ dev_dependencies:
           final execution = buildExecution(context,
               configuredTestArgs: ['-P', 'unit'], path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
-          expect(execution.process.args,
+          expect(execution.process!.executable, exe.dart);
+          expect(execution.process!.args,
               orderedEquals(['test', '-P', 'unit', '-n', 'foo']));
         });
 
@@ -379,8 +379,8 @@ dev_dependencies:
           final context = DevToolExecutionContext(argResults: argResults);
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
-          expect(execution.process.args, orderedEquals(['test', '-j1']));
+          expect(execution.process!.executable, exe.dart);
+          expect(execution.process!.args, orderedEquals(['test', '-j1']));
         });
 
         test(
@@ -416,7 +416,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_runner: any
   test: any
@@ -427,8 +427,8 @@ dev_dependencies:
           final context = DevToolExecutionContext();
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
-          expect(execution.process.args, orderedEquals(['test']));
+          expect(execution.process!.executable, exe.dart);
+          expect(execution.process!.args, orderedEquals(['test']));
         });
 
         test('with args', () {
@@ -438,8 +438,8 @@ dev_dependencies:
           final execution = buildExecution(context,
               configuredTestArgs: ['-P', 'unit'], path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
-          expect(execution.process.args,
+          expect(execution.process!.executable, exe.dart);
+          expect(execution.process!.args,
               orderedEquals(['test', '-P', 'unit', '-n', 'foo']));
         });
 
@@ -449,8 +449,8 @@ dev_dependencies:
           final context = DevToolExecutionContext(argResults: argResults);
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
-          expect(execution.process.args, orderedEquals(['test', '-j1']));
+          expect(execution.process!.executable, exe.dart);
+          expect(execution.process!.args, orderedEquals(['test', '-j1']));
         });
 
         test(
@@ -486,7 +486,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_runner: any
   build_test: any
@@ -498,8 +498,8 @@ dev_dependencies:
           final context = DevToolExecutionContext();
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
-          expect(execution.process.args,
+          expect(execution.process!.executable, exe.dart);
+          expect(execution.process!.args,
               orderedEquals(['run', 'build_runner', 'test']));
         });
 
@@ -513,9 +513,9 @@ dev_dependencies:
               configuredTestArgs: ['-P', 'unit'],
               path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
+          expect(execution.process!.executable, exe.dart);
           expect(
-              execution.process.args,
+              execution.process!.args,
               orderedEquals([
                 'run',
                 'build_runner',
@@ -537,9 +537,9 @@ dev_dependencies:
           final context = DevToolExecutionContext(argResults: argResults);
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
+          expect(execution.process!.executable, exe.dart);
           expect(
-              execution.process.args,
+              execution.process!.args,
               orderedEquals([
                 'run',
                 'build_runner',
@@ -560,9 +560,9 @@ dev_dependencies:
               configuredTestArgs: ['-P', 'unit'],
               path: d.sandbox);
           expect(execution.exitCode, isNull);
-          expect(execution.process.executable, exe.dart);
+          expect(execution.process!.executable, exe.dart);
           expect(
-              execution.process.args,
+              execution.process!.args,
               orderedEquals([
                 'run',
                 'build_runner',

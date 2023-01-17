@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('restArgsWithSeparator', () {
-    ArgParser parser;
+    late ArgParser parser;
 
     setUp(() {
       parser = ArgParser()

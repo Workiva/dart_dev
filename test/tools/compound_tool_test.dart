@@ -10,14 +10,14 @@ void main() {
   group('CompoundTool', () {
     sharedDevToolTests(() => CompoundTool());
 
-    int currentTool;
-    List<int> toolsRan;
+    late int currentTool;
+    late List<int> toolsRan;
     setUp(() {
       currentTool = 0;
       toolsRan = [];
     });
 
-    DevTool tool({ArgParser argParser, Function callback, int exitCode}) {
+    DevTool tool({ArgParser? argParser, Function? callback, int? exitCode}) {
       final toolNum = currentTool++;
       return DevTool.fromFunction((_) {
         if (callback != null) {
@@ -61,15 +61,15 @@ void main() {
 
     test('runs tools with their own ArgResults by default', () async {
       final tool1 = DevTool.fromFunction((context) {
-        expect(context.argResults['foo'], isTrue);
-        expect(() => context.argResults['bar'], throwsArgumentError);
-        expect(context.argResults.rest, isEmpty);
+        expect(context.argResults!['foo'], isTrue);
+        expect(() => context.argResults!['bar'], throwsArgumentError);
+        expect(context.argResults!.rest, isEmpty);
         return 0;
       }, argParser: ArgParser()..addFlag('foo'));
       final tool2 = DevTool.fromFunction((context) {
-        expect(context.argResults['bar'], isTrue);
-        expect(() => context.argResults['foo'], throwsArgumentError);
-        expect(context.argResults.rest, isEmpty);
+        expect(context.argResults!['bar'], isTrue);
+        expect(() => context.argResults!['foo'], throwsArgumentError);
+        expect(context.argResults!.rest, isEmpty);
         return 0;
       }, argParser: ArgParser()..addFlag('bar'));
 
@@ -80,8 +80,8 @@ void main() {
 
     test('runs tools with a custom ArgMapper, if provided', () async {
       final tool = DevTool.fromFunction((context) {
-        expect(context.argResults['foo'], isTrue);
-        expect(context.argResults.rest, orderedEquals(['bar', 'baz']));
+        expect(context.argResults!['foo'], isTrue);
+        expect(context.argResults!.rest, orderedEquals(['bar', 'baz']));
         return 0;
       }, argParser: ArgParser()..addFlag('foo'));
 
@@ -99,8 +99,8 @@ void main() {
           ..addCommand('has-parser', ArgParser()..addFlag('foo'));
         final cap = CompoundArgParser()..addParser(parser);
         expect(cap.commands.keys, containsAll(['no-parser', 'has-parser']));
-        expect(cap.commands['no-parser'].options, isEmpty);
-        expect(cap.commands['has-parser'].options.keys, contains('foo'));
+        expect(cap.commands['no-parser']!.options, isEmpty);
+        expect(cap.commands['has-parser']!.options.keys, contains('foo'));
       });
 
       test('adds all options', () {
@@ -185,7 +185,7 @@ void main() {
       final spec = DevToolSpec(RunWhen.passing, fooTool);
       final result = contextForTool(baseContext, spec);
       expect(result, isNot(same(baseContext)));
-      expect(result.argResults.options, unorderedEquals(['foo']));
+      expect(result.argResults!.options, unorderedEquals(['foo']));
     });
   });
 

@@ -43,7 +43,7 @@ final _log = Logger('TuneupCheck');
 ///     TuneupCheckTool().run();
 class TuneupCheckTool extends DevTool {
   /// Whether `--ignore-infos` should be passed to `tuneup check`.
-  bool ignoreInfos;
+  bool? ignoreInfos;
 
   // ---------------------------------------------------------------------------
   // DevTool Overrides
@@ -54,15 +54,15 @@ class TuneupCheckTool extends DevTool {
     ..addFlag('ignore-infos', help: 'Ignore any info level issues.');
 
   @override
-  String description = 'Run static analysis on dart files in this package '
+  String? description = 'Run static analysis on dart files in this package '
       'using the tuneup tool.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) {
+  FutureOr<int> run([DevToolExecutionContext? context]) {
     final execution = buildExecution(context ?? DevToolExecutionContext(),
         configuredIgnoreInfos: ignoreInfos);
-    return execution.exitCode ??
-        runProcessAndEnsureExit(execution.process, log: _log);
+    return (execution.exitCode ??
+        runProcessAndEnsureExit(execution.process!, log: _log)) as FutureOr<int>;
   }
 }
 
@@ -83,13 +83,13 @@ class TuneupExecution {
   /// [TuneupCheckTool] should exit with this code.
   ///
   /// If null, there is more work to do.
-  final int exitCode;
+  final int? exitCode;
 
   /// A declarative representation of the test process that should be run.
   ///
   /// This process' result should become the final result of the
   /// [TuneupCheckTool].
-  final ProcessDeclaration process;
+  final ProcessDeclaration? process;
 }
 
 /// Returns a combined list of args for the `tuneup` process.
@@ -97,9 +97,9 @@ class TuneupExecution {
 /// If [verbose] is true and the verbose flag (`-v`) is not already included, it
 /// will be added.
 Iterable<String> buildArgs({
-  ArgResults argResults,
-  bool configuredIgnoreInfos,
-  bool verbose,
+  ArgResults? argResults,
+  bool? configuredIgnoreInfos,
+  bool? verbose,
 }) {
   verbose ??= false;
   var ignoreInfos = (configuredIgnoreInfos ?? false) ||
@@ -109,7 +109,7 @@ Iterable<String> buildArgs({
     'tuneup',
     'check',
     if (ignoreInfos) '--ignore-infos',
-    if (verbose ?? false) '--verbose',
+    if (verbose) '--verbose',
   ];
 }
 
@@ -131,19 +131,19 @@ Iterable<String> buildArgs({
 /// assertions on the declarative output.
 TuneupExecution buildExecution(
   DevToolExecutionContext context, {
-  bool configuredIgnoreInfos,
-  String path,
+  bool? configuredIgnoreInfos,
+  String? path,
 }) {
   if (context.argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults, context.usageException,
+        context.argResults!, context.usageException,
         commandName: context.commandName);
   }
 
   if (!packageIsImmediateDependency('tuneup', path: path)) {
-    _log.severe(red.wrap('Cannot run "tuneup check".\n') +
+    _log.severe(red.wrap('Cannot run "tuneup check".\n')! +
         yellow
-            .wrap('You must have a dependency on "tuneup" in pubspec.yaml.\n'));
+            .wrap('You must have a dependency on "tuneup" in pubspec.yaml.\n')!);
     return TuneupExecution.exitEarly(ExitCode.config.code);
   }
 
@@ -153,5 +153,5 @@ TuneupExecution buildExecution(
       verbose: context.verbose);
   logSubprocessHeader(_log, 'dart ${args.join(' ')}');
   return TuneupExecution.process(
-      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
+      ProcessDeclaration(exe.dart, args as List<String?>, mode: ProcessStartMode.inheritStdio));
 }

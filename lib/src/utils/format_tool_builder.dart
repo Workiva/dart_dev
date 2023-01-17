@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dart_dev/src/tools/over_react_format_tool.dart';
 
 import '../../dart_dev.dart';
@@ -22,7 +23,7 @@ import 'logging.dart';
 /// };
 /// ```
 class FormatToolBuilder extends GeneralizingAstVisitor<void> {
-  DevTool formatDevTool;
+  DevTool? formatDevTool;
 
   bool failedToDetectAKnownFormatter = false;
 
@@ -43,23 +44,23 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
     }
 
     if (formatterInvocation is CascadeExpression) {
-      AssignmentExpression getCascadeByProperty(String property) {
+      AssignmentExpression? getCascadeByProperty(String property) {
         return formatterInvocation.cascadeSections
             .whereType<AssignmentExpression>()
-            .firstWhere((assignment) {
+            .firstWhereOrNull((assignment) {
           final lhs = assignment.leftHandSide;
           return lhs is PropertyAccess && lhs.propertyName.name == property;
-        }, orElse: () => null);
+        });
       }
 
       if (formatDevTool is FormatTool) {
-        FormatTool typedFormatDevTool = formatDevTool;
+        FormatTool? typedFormatDevTool = formatDevTool as FormatTool?;
 
         final formatter = getCascadeByProperty('formatter');
         if (formatter != null) {
           final formatterType = formatter.rightHandSide;
           if (formatterType is PrefixedIdentifier) {
-            typedFormatDevTool.formatter =
+            typedFormatDevTool!.formatter =
                 detectFormatterForFormatTool(formatterType.identifier);
           } else {
             logWarningMessageFor(KnownErrorOutcome.failedToParseFormatter);
@@ -74,7 +75,7 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
                 .whereType<StringLiteral>()
                 .map((e) => e.stringValue)
                 .toList();
-            typedFormatDevTool.formatterArgs = stringArgs;
+            typedFormatDevTool!.formatterArgs = stringArgs;
 
             if (stringArgs.length < argList.elements.length) {
               logWarningMessageFor(
@@ -85,12 +86,12 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
           }
         }
       } else if (formatDevTool is OverReactFormatTool) {
-        OverReactFormatTool typedFormatDevTool = formatDevTool;
+        OverReactFormatTool? typedFormatDevTool = formatDevTool as OverReactFormatTool?;
         final lineLengthAssignment = getCascadeByProperty('lineLength');
         if (lineLengthAssignment != null) {
           final lengthExpression = lineLengthAssignment.rightHandSide;
           if (lengthExpression is IntegerLiteral) {
-            typedFormatDevTool.lineLength = lengthExpression.value;
+            typedFormatDevTool!.lineLength = lengthExpression.value;
           } else {
             logWarningMessageFor(KnownErrorOutcome.failedToParseLineLength);
           }
@@ -108,7 +109,7 @@ enum KnownErrorOutcome {
 }
 
 void logWarningMessageFor(KnownErrorOutcome outcome) {
-  String errorMessage;
+  String? errorMessage;
 
   switch (outcome) {
     case KnownErrorOutcome.failedToParseFormatter:
@@ -141,8 +142,8 @@ This is likely because assignment does not use an IntegerLiteral.
   log.warning(errorMessage);
 }
 
-Formatter detectFormatterForFormatTool(SimpleIdentifier formatterIdentifier) {
-  Formatter formatter;
+Formatter? detectFormatterForFormatTool(SimpleIdentifier formatterIdentifier) {
+  Formatter? formatter;
 
   switch (formatterIdentifier.name) {
     case 'dartfmt':
@@ -161,9 +162,9 @@ Formatter detectFormatterForFormatTool(SimpleIdentifier formatterIdentifier) {
   return formatter;
 }
 
-DevTool detectFormatter(AstNode formatterNode) {
-  String detectedFormatterName;
-  DevTool tool;
+DevTool? detectFormatter(AstNode formatterNode) {
+  String? detectedFormatterName;
+  DevTool? tool;
 
   if (formatterNode is MethodInvocation) {
     detectedFormatterName = formatterNode.methodName.name;

@@ -6,9 +6,9 @@ import 'ensure_process_exit.dart';
 import 'process_declaration.dart';
 
 Future<Process> startProcessAndEnsureExit(ProcessDeclaration processDeclaration,
-    {Logger log}) async {
+    {Logger? log}) async {
   final process = await Process.start(
-      processDeclaration.executable, processDeclaration.args,
+      processDeclaration.executable, processDeclaration.args as List<String>,
       mode: processDeclaration.mode ?? ProcessStartMode.normal,
       workingDirectory: processDeclaration.workingDirectory);
   ensureProcessExit(process, log: log);

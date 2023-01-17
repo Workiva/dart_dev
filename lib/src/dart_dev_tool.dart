@@ -12,12 +12,12 @@ abstract class DevTool {
   DevTool();
 
   factory DevTool.fromFunction(
-          FutureOr<int> Function(DevToolExecutionContext context) function,
-          {ArgParser argParser}) =>
+          FutureOr<int>? Function(DevToolExecutionContext context) function,
+          {ArgParser? argParser}) =>
       FunctionTool(function, argParser: argParser);
 
   factory DevTool.fromProcess(String executable, List<String> args,
-          {ProcessStartMode mode, String workingDirectory}) =>
+          {ProcessStartMode? mode, String? workingDirectory}) =>
       ProcessTool(executable, args,
           mode: mode, workingDirectory: workingDirectory);
 
@@ -26,11 +26,11 @@ abstract class DevTool {
   /// When this tool is run from the command-line, this will be used to parse
   /// the arguments. The results will be available via the
   /// [DevToolExecutionContext] provided when calling [run].
-  ArgParser get argParser => null;
+  ArgParser? get argParser => null;
 
   /// This tool's description (which is included in the help/usage output) can
   /// be overridden by setting this field to a non-null value.
-  String description;
+  String? description;
 
   /// This field determines whether or not this tool is hidden from the
   /// help/usage output when running as a part of a command-line app.
@@ -47,7 +47,7 @@ abstract class DevTool {
   /// will provide a fully-populated [DevToolExecutionContext] here.
   ///
   /// This is the one API member that subclasses need to implement.
-  FutureOr<int> run([DevToolExecutionContext context]);
+  FutureOr<int?> run([DevToolExecutionContext? context]);
 
   /// Converts this tool to a [Command] that can be added directly to a
   /// [CommandRunner], therefore making it executable from the command-line.
@@ -82,24 +82,24 @@ class DevToolExecutionContext {
   DevToolExecutionContext(
       {this.argResults,
       this.commandName,
-      void Function(String message) usageException,
-      bool verbose})
+      void Function(String message)? usageException,
+      bool? verbose})
       : _usageException = usageException,
         verbose = verbose ?? false;
 
-  final void Function(String message) _usageException;
+  final void Function(String message)? _usageException;
 
   /// The results from parsing the arguments passed to a [Command] if this tool
   /// was executed via a command-line app.
   ///
   /// This may be null.
-  final ArgResults argResults;
+  final ArgResults? argResults;
 
   /// The name of the [Command] that executed this tool if it was executed via a
   /// command-line app.
   ///
   /// This may be null.
-  final String commandName;
+  final String? commandName;
 
   /// Whether the `-v|--verbose` flag was enabled when running the [Command]
   /// that executed this tool if it was executed via a command-line app.
@@ -110,10 +110,10 @@ class DevToolExecutionContext {
   /// Return a copy of this instance with optional updates; any field that does
   /// not have an updated value will remain the same.
   DevToolExecutionContext update({
-    ArgResults argResults,
-    String commandName,
-    void Function(String message) usageException,
-    bool verbose,
+    ArgResults? argResults,
+    String? commandName,
+    void Function(String message)? usageException,
+    bool? verbose,
   }) =>
       DevToolExecutionContext(
         argResults: argResults ?? this.argResults,
@@ -127,7 +127,7 @@ class DevToolExecutionContext {
   /// print out usage information.
   void usageException(String message) {
     if (_usageException != null) {
-      _usageException(message);
+      _usageException!(message);
     }
     throw UsageException(message, '');
   }
@@ -145,7 +145,7 @@ class DevToolCommand extends Command<int> {
   final DevTool devTool;
 
   @override
-  bool get hidden => devTool.hidden ?? '';
+  bool get hidden => devTool.hidden;
 
   @override
   final String name;
@@ -155,5 +155,5 @@ class DevToolCommand extends Command<int> {
       argResults: argResults,
       commandName: name,
       usageException: usageException,
-      verbose: verboseEnabled(this)));
+      verbose: verboseEnabled(this))) as FutureOr<int>;
 }

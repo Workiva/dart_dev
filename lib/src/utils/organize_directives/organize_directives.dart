@@ -12,7 +12,7 @@ import 'namespace_collector.dart';
 String organizeDirectives(String sourceFileContents) {
   final directives = parseString(content: sourceFileContents)
       .unit
-      .accept(NamespaceCollector());
+      .accept(NamespaceCollector())!;
 
   if (directives.isEmpty) {
     return sourceFileContents;
@@ -94,7 +94,7 @@ List<Namespace> _assignCommentsInFileToNamespaceDirective(
 ) {
   final namespaces = <Namespace>[];
 
-  Namespace prevNamespace;
+  Namespace? prevNamespace;
   for (var directive in directives) {
     final currNamespace = Namespace(directive);
     namespaces.add(currNamespace);
@@ -112,7 +112,7 @@ List<Namespace> _assignCommentsInFileToNamespaceDirective(
   // Assign comments after the last directive to the last directive if they are
   // on the same line.
   _assignCommentsBeforeTokenToNamespace(
-    prevNamespace.directive.endToken.next,
+    prevNamespace!.directive.endToken.next!,
     sourceFileContents,
     prevNamespace,
   );
@@ -124,18 +124,18 @@ List<Namespace> _assignCommentsInFileToNamespaceDirective(
 void _assignCommentsBeforeTokenToNamespace(
   Token token,
   String sourceFileContents,
-  Namespace prevNamespace, {
-  Namespace currNamespace,
+  Namespace? prevNamespace, {
+  Namespace? currNamespace,
 }) {
   // `precedingComments` returns the first comment before token.
   // Calling `comment.next` returns the next comment.
   // Returns null when there are no more comments left.
-  for (Token comment = token.precedingComments;
+  for (Token? comment = token.precedingComments;
       comment != null;
       comment = comment.next) {
     if (_commentIsOnSameLineAsNamespace(
         comment, prevNamespace, sourceFileContents)) {
-      prevNamespace.afterComments.add(comment);
+      prevNamespace!.afterComments.add(comment);
     } else if (currNamespace != null) {
       currNamespace.beforeComments.add(comment);
     }
@@ -145,7 +145,7 @@ void _assignCommentsBeforeTokenToNamespace(
 /// Checks if a given comment is on the same line as a directive.
 /// It's expected that directive end is before comment start.
 bool _commentIsOnSameLineAsNamespace(
-    Token comment, Namespace namespace, String sourceFileContents) {
+    Token comment, Namespace? namespace, String sourceFileContents) {
   return namespace != null &&
       !sourceFileContents
           .substring(namespace.directive.endToken.end, comment.charOffset)
@@ -189,7 +189,7 @@ String _getSortedNamespaceString(
 /// then relative directives.
 int _namespaceComparator(Namespace first, Namespace second) {
   if (first.isDart && second.isDart) {
-    return first.target.compareTo(second.target);
+    return first.target!.compareTo(second.target!);
   }
 
   if (first.isDart && !second.isDart) {
@@ -204,7 +204,7 @@ int _namespaceComparator(Namespace first, Namespace second) {
   final firstIsPkg = first.isExternalPkg;
   final secondIsPkg = second.isExternalPkg;
   if (firstIsPkg && secondIsPkg) {
-    return first.target.compareTo(second.target);
+    return first.target!.compareTo(second.target!);
   }
 
   if (firstIsPkg && !secondIsPkg) {
@@ -216,5 +216,5 @@ int _namespaceComparator(Namespace first, Namespace second) {
   }
 
   // Neither are dart directives or pkg directives. Must be relative path directives...
-  return first.target.compareTo(second.target);
+  return first.target!.compareTo(second.target!);
 }

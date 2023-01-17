@@ -14,8 +14,8 @@ import 'cached_pubspec.dart';
 /// - [packageName] is a dependency
 /// - [packageName] is a dev dependency
 /// - [packageName] is a dependency override
-bool packageIsImmediateDependency(String packageName, {String path}) {
-  final pubspec = cachedPubspec(path: path);
+bool packageIsImmediateDependency(String packageName, {String? path}) {
+  final pubspec = cachedPubspec(path: path)!;
   return pubspec.name == packageName ||
       pubspec.devDependencies.keys.any((d) => d == packageName) ||
       pubspec.dependencies.keys.any((d) => d == packageName) ||

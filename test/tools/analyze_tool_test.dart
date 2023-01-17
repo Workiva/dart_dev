@@ -22,7 +22,7 @@ void main() {
     test('provides an argParser', () {
       final argParser = AnalyzeTool().argParser;
       expect(argParser.options, contains('analyzer-args'));
-      expect(argParser.options['analyzer-args'].type, OptionType.single);
+      expect(argParser.options['analyzer-args']!.type, OptionType.single);
     });
   });
 
