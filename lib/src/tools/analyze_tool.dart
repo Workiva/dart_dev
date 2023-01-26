@@ -74,7 +74,7 @@ class AnalyzeTool extends DevTool {
 
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
-    useDartAnalyze ??= false;
+    useDartAnalyze ??= true;
     return runProcessAndEnsureExit(
         buildProcess(context ?? DevToolExecutionContext(),
             configuredAnalyzerArgs: analyzerArgs,

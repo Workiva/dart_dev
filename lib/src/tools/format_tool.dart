@@ -65,7 +65,7 @@ class FormatTool extends DevTool {
   /// - `dartfmt` (provided by the SDK)
   /// - `dart run dart_style:format` (provided by the `dart_style` package)
   /// - `dart format` (added in Dart SDK 2.10.0)
-  Formatter formatter = Formatter.dartfmt;
+  Formatter formatter = Formatter.dartFormat;
 
   /// The args to pass to the formatter process run by this command.
   ///
