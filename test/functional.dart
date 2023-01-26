@@ -41,6 +41,8 @@ Future<TestProcess> runDevToolFunctionalTest(
       final relPubspecPath = p.relative(pubspec.path, from: d.sandbox);
       var absPath = p.absolute(p.normalize(
           p.join(templateDir.path, relPubspecPath, relDepPath, '..')));
+      // Since pubspec paths should always be posix style or dart analyze 
+      // complains, switch to forward slashes on windows
       if (Platform.isWindows) {
         absPath = absPath.replaceAll('\\', '/');
       }
