@@ -17,7 +17,7 @@ import '../utils/run_process_and_ensure_exit.dart';
 final _log = Logger('Analyze');
 
 /// A dart_dev tool that runs the `dartanalyzer` or `dart analyze` on the current project.
-/// If the `useDartAnalyze` flag is not specified it will default to `dartanalyzer`.
+/// If the `useDartAnalyze` flag is not specified it will default to `dart analyze`.
 ///
 /// To use this tool in your project, include it in the dart_dev config in
 /// `tool/dart_dev/config.dart`:
@@ -51,12 +51,11 @@ class AnalyzeTool extends DevTool {
 
   /// The globs to include as entry points to run static analysis on.
   ///
-  /// The default is `.` (e.g. `dartanalyzer .`) which runs analysis on all Dart
+  /// The default is `.` (e.g. `dart analyze .`) which runs analysis on all Dart
   /// files in the current working directory.
   List<Glob> include;
 
-  /// The default tool for analysis will be `dartanalyzer` unless opted in here
-  /// to utilize `dart analyze`.
+  /// The default tool for analysis will be `dart analyze`
   bool useDartAnalyze;
 
   // ---------------------------------------------------------------------------
@@ -99,7 +98,7 @@ Iterable<String> buildArgs(
     List<String> configuredAnalyzerArgs,
     bool useDartAnalyze,
     bool verbose}) {
-  useDartAnalyze ??= false;
+  useDartAnalyze ??= true;
   verbose ??= false;
   final args = <String>[
     // Combine all args that should be passed through to the analyzer in
@@ -155,7 +154,7 @@ Iterable<String> buildEntrypoints({List<Glob> include, String root}) {
 /// operations that require it. This is intended for use by tests.
 ///
 /// If true, [useDartAnalyze] will utilize `dart analyze` for analysis.
-/// If null, it will default to utilze `dartanalyzer`.
+/// If null, it will default to utilze `dart analyze`.
 ///
 /// The [AnalyzeTool] can be tested almost completely via this function by
 /// enumerating all of the possible parameter variations and making assertions
@@ -167,7 +166,7 @@ ProcessDeclaration buildProcess(
   String path,
   bool useDartAnalyze,
 }) {
-  useDartAnalyze ??= false;
+  useDartAnalyze ??= true;
   if (context.argResults != null) {
     final analyzerUsed = useDartAnalyze ? 'dart analyze' : 'dartanalyzer';
     assertNoPositionalArgsNorArgsAfterSeparator(

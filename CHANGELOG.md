@@ -1,4 +1,7 @@
 # Changelog
+## [3.9.2](https://github.com/Workiva/dart_dev/compare/3.9.1...3.9.2)
+
+- Change format and analyze defaults to `dart format` and `dart analyze`
 
 ## [3.9.1](https://github.com/Workiva/dart_dev/compare/3.9.0...3.9.1)
 

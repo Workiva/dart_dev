@@ -108,7 +108,7 @@ variance across projects becomes a configuration detail that need not be
 memorized or referenced in order to run said task.
 
 Consider formatting as an example. The default approach to formatting files is
-to run `dartfmt -w .`. But, some projects may want to exclude certain files that
+to run `dart format`. But, some projects may want to exclude certain files that
 would otherwise be formatted by this command. Or, some projects may want to use
 `pub run dart_style:format` instead of `dart format`. Currently, there is no
 project-level configuration supported by the formatter, so these sorts of things
