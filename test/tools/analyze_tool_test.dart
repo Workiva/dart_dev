@@ -147,7 +147,7 @@ void main() {
       expect(
           process.args,
           orderedEquals([
-            'analyze', 
+            'analyze',
             '--fatal-infos',
             '--fatal-warnings',
             '--dart-sdk',
@@ -194,7 +194,7 @@ void main() {
       expect(
           process.args,
           orderedEquals([
-            'analyze', 
+            'analyze',
             '--fatal-infos',
             '--fatal-warnings',
             '--dart-sdk',
