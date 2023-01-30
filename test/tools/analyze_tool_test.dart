@@ -28,7 +28,7 @@ void main() {
 
   group('buildArgs', () {
     test('defaults to an empty list', () {
-      expect(buildArgs(), isEmpty);
+      expect(buildArgs(), ['analyze']);
     });
 
     test('combines configured args and cli args (in that order)', () {
@@ -36,7 +36,7 @@ void main() {
       final argResults = argParser.parse(['--analyzer-args', 'c d']);
       expect(
           buildArgs(argResults: argResults, configuredAnalyzerArgs: ['a', 'b']),
-          orderedEquals(['a', 'b', 'c', 'd']));
+          orderedEquals(['analyze', 'a', 'b', 'c', 'd']));
     });
 
     test(
@@ -60,17 +60,17 @@ void main() {
               argResults: argResults,
               configuredAnalyzerArgs: ['a', 'b'],
               verbose: true),
-          orderedEquals(['a', 'b', 'c', 'd', '-v']));
+          orderedEquals(['analyze', 'a', 'b', 'c', 'd', '-v']));
     });
 
     test('does not insert a duplicate verbose flag (-v)', () {
       expect(buildArgs(configuredAnalyzerArgs: ['-v'], verbose: true),
-          orderedEquals(['-v']));
+          orderedEquals(['analyze', '-v']));
     });
 
     test('does not insert a duplicate verbose flag (--verbose)', () {
       expect(buildArgs(configuredAnalyzerArgs: ['--verbose'], verbose: true),
-          orderedEquals(['--verbose']));
+          orderedEquals(['analyze', '--verbose']));
     });
   });
 
@@ -123,8 +123,8 @@ void main() {
     test('returns a ProcessDeclaration (default)', () {
       final context = DevToolExecutionContext();
       final process = buildProcess(context);
-      expect(process.executable, exe.dartanalyzer);
-      expect(process.args, orderedEquals(['.']));
+      expect(process.executable, exe.dart);
+      expect(process.args, orderedEquals(['analyze', '.']));
     });
 
     test('returns a ProcessDeclaration with useDartAnalyze (default)', () {
@@ -143,10 +143,11 @@ void main() {
           configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
           include: [Glob('*.dart'), Glob('*.txt')],
           path: globRoot);
-      expect(process.executable, exe.dartanalyzer);
+      expect(process.executable, exe.dart);
       expect(
           process.args,
           orderedEquals([
+            'analyze', 
             '--fatal-infos',
             '--fatal-warnings',
             '--dart-sdk',
@@ -189,10 +190,11 @@ void main() {
           configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
           include: [Glob('*.dart'), Glob('*.txt')],
           path: globRoot);
-      expect(process.executable, exe.dartanalyzer);
+      expect(process.executable, exe.dart);
       expect(
           process.args,
           orderedEquals([
+            'analyze', 
             '--fatal-infos',
             '--fatal-warnings',
             '--dart-sdk',
