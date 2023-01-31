@@ -13,6 +13,7 @@ import '../../utils.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/dart_semver_version.dart';
 import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/organize_directives/organize_directives_in_paths.dart';
@@ -108,6 +109,9 @@ class FormatTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) async {
     context ??= DevToolExecutionContext();
+    if (formatter == Formatter.dartfmt && !dartVersionHasDartfmt) {
+      formatter = Formatter.dartFormat;
+    }
     final formatExecution = buildExecution(
       context,
       configuredFormatterArgs: formatterArgs,
