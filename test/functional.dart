@@ -34,13 +34,19 @@ Future<TestProcess> runDevToolFunctionalTest(
       .where((f) => p.basename(f.path) == 'pubspec.yaml')
       .map((f) => f.absolute);
   final pathDepPattern = RegExp(r'path: (.*)');
+
   for (final pubspec in pubspecs) {
     final updated =
         pubspec.readAsStringSync().replaceAllMapped(pathDepPattern, (match) {
       final relDepPath = match.group(1);
       final relPubspecPath = p.relative(pubspec.path, from: d.sandbox);
-      final absPath = p.absolute(p.normalize(
+      var absPath = p.absolute(p.normalize(
           p.join(templateDir.path, relPubspecPath, relDepPath, '..')));
+      // Since pubspec paths should always be posix style or dart analyze
+      // complains, switch to forward slashes on windows
+      if (Platform.isWindows) {
+        absPath = absPath.replaceAll('\\', '/');
+      }
       return 'path: $absPath';
     });
     pubspec.writeAsStringSync(updated);

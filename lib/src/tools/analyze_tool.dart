@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/dart_semver_version.dart';
 import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/process_declaration.dart';
@@ -75,6 +76,9 @@ class AnalyzeTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext context]) {
     useDartAnalyze ??= false;
+    if (!dartVersionHasDartanalyzer) {
+      useDartAnalyze = true;
+    }
     return runProcessAndEnsureExit(
         buildProcess(context ?? DevToolExecutionContext(),
             configuredAnalyzerArgs: analyzerArgs,
