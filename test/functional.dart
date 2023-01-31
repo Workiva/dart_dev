@@ -34,13 +34,14 @@ Future<TestProcess> runDevToolFunctionalTest(
       .where((f) => p.basename(f.path) == 'pubspec.yaml')
       .map((f) => f.absolute);
   final pathDepPattern = RegExp(r'path: (.*)');
+  final posix = p.Context(style: p.Style.posix);
   for (final pubspec in pubspecs) {
     final updated =
         pubspec.readAsStringSync().replaceAllMapped(pathDepPattern, (match) {
       final relDepPath = match.group(1);
-      final relPubspecPath = p.relative(pubspec.path, from: d.sandbox);
-      final absPath = p.absolute(p.normalize(
-          p.join(templateDir.path, relPubspecPath, relDepPath, '..')));
+      final relPubspecPath = posix.relative(pubspec.path, from: d.sandbox);
+      final absPath = posix.absolute(posix.normalize(
+          posix.join(templateDir.path, relPubspecPath, relDepPath, '..')));
       return 'path: $absPath';
     });
     pubspec.writeAsStringSync(updated);
