@@ -1,7 +1,7 @@
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:test/test.dart';
 
-void sharedDevToolTests(DevTool factory()) {
+void sharedDevToolTests(DevTool Function() factory) {
   group('toCommand', () {
     test('should return a command with the given name', () {
       expect(factory().toCommand('custom_command').name, 'custom_command');

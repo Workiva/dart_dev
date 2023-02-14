@@ -12,7 +12,7 @@ void main() {
       test('when the tool is a MethodInvocation', () {
         final visitor = FormatToolBuilder();
 
-        parseString(content: orf_noCascadeSrc).unit.accept(visitor);
+        parseString(content: orfNoCascadeSrc).unit.accept(visitor);
 
         expect(visitor.formatDevTool, isNotNull);
         expect(visitor.formatDevTool, isA<OverReactFormatTool>());
@@ -22,7 +22,7 @@ void main() {
         test('detects line-length', () {
           final visitor = FormatToolBuilder();
 
-          parseString(content: orf_cascadeSrc).unit.accept(visitor);
+          parseString(content: orfCascadeSrc).unit.accept(visitor);
 
           expect(visitor.formatDevTool, isNotNull);
           expect(visitor.formatDevTool, isA<OverReactFormatTool>());
@@ -36,7 +36,7 @@ void main() {
       test('when the tool is a MethodInvocation', () {
         final visitor = FormatToolBuilder();
 
-        parseString(content: formatTool_noCascadeSrc).unit.accept(visitor);
+        parseString(content: formatToolNoCascadeSrc).unit.accept(visitor);
 
         expect(visitor.formatDevTool, isNotNull);
         expect(visitor.formatDevTool, isA<FormatTool>());
@@ -47,7 +47,7 @@ void main() {
           test('darfmt', () {
             final visitor = FormatToolBuilder();
 
-            parseString(content: formatTool_cascadeSrc()).unit.accept(visitor);
+            parseString(content: formatToolCascadeSrc()).unit.accept(visitor);
 
             expect(visitor.formatDevTool, isNotNull);
             expect(visitor.formatDevTool, isA<FormatTool>());
@@ -58,7 +58,7 @@ void main() {
           test('dartFormat', () {
             final visitor = FormatToolBuilder();
 
-            parseString(content: formatTool_cascadeSrc(formatter: 'dartFormat'))
+            parseString(content: formatToolCascadeSrc(formatter: 'dartFormat'))
                 .unit
                 .accept(visitor);
 
@@ -71,7 +71,7 @@ void main() {
           test('dartStyle', () {
             final visitor = FormatToolBuilder();
 
-            parseString(content: formatTool_cascadeSrc(formatter: 'dartStyle'))
+            parseString(content: formatToolCascadeSrc(formatter: 'dartStyle'))
                 .unit
                 .accept(visitor);
 
@@ -85,7 +85,7 @@ void main() {
         test('detects formatterArgs', () {
           final visitor = FormatToolBuilder();
 
-          parseString(content: formatTool_cascadeSrc()).unit.accept(visitor);
+          parseString(content: formatToolCascadeSrc()).unit.accept(visitor);
 
           expect(visitor.formatDevTool, isNotNull);
           expect(visitor.formatDevTool, isA<FormatTool>());
@@ -108,7 +108,7 @@ void main() {
   });
 }
 
-const orf_noCascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
+const orfNoCascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 
 final config = {
@@ -117,7 +117,7 @@ final config = {
 };
 ''';
 
-const orf_cascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
+const orfCascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 
 final config = {
@@ -127,7 +127,7 @@ final config = {
 };
 ''';
 
-const formatTool_noCascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
+const formatToolNoCascadeSrc = '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 
 final config = {
@@ -136,7 +136,7 @@ final config = {
 };
 ''';
 
-String formatTool_cascadeSrc({String formatter = 'dartfmt'}) =>
+String formatToolCascadeSrc({String formatter = 'dartfmt'}) =>
     '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 

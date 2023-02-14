@@ -139,7 +139,9 @@ void main(List<String> args) async {
 }
 
 Future<void> runWithConfig(
-    List<String> args, _ConfigGetter configGetter) async {
+    // ignore: library_private_types_in_public_api
+    List<String> args,
+    _ConfigGetter configGetter) async {
   attachLoggerToStdio(args);
 
   try {

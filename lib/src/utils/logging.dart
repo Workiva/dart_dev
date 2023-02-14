@@ -104,13 +104,9 @@ String humanReadable(Duration duration) {
 
 void logSubprocessHeader(Logger logger, String command, {Level level}) {
   level ??= Level.INFO;
-  logger.log(
-      level,
-      'Running subprocess:\n' +
-          magenta.wrap(command) +
-          '\n' +
-          '-' * (io.stdout.hasTerminal ? io.stdout.terminalColumns : 79) +
-          '\n');
+  final numColumns = io.stdout.hasTerminal ? io.stdout.terminalColumns : 79;
+  logger.log(level,
+      'Running subprocess:\n${magenta.wrap(command)}\n${'-' * numColumns}\n');
 }
 
 /// Logs an asynchronous [action] with [description] before and after.
@@ -119,7 +115,7 @@ void logSubprocessHeader(Logger logger, String command, {Level level}) {
 Future<T> logTimedAsync<T>(
   Logger logger,
   String description,
-  Future<T> action(), {
+  Future<T> Function() action, {
   Level level,
 }) async {
   level ??= Level.INFO;
@@ -138,7 +134,7 @@ Future<T> logTimedAsync<T>(
 T logTimedSync<T>(
   Logger logger,
   String description,
-  T action(), {
+  T Function() action, {
   Level level = Level.INFO,
 }) {
   final watch = Stopwatch()..start();

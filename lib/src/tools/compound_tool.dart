@@ -60,6 +60,7 @@ mixin CompoundToolMixin on DevTool {
   String get description => _description ??= _specs
       .map((s) => s.tool.description)
       .firstWhere((desc) => desc != null, orElse: () => null);
+  @override
   set description(String value) => _description = value;
   String _description;
 

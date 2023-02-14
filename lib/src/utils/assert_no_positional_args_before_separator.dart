@@ -5,7 +5,7 @@ import 'has_any_positional_args_before_separator.dart';
 void assertNoPositionalArgs(
   String name,
   ArgResults argResults,
-  void usageException(String message), {
+  void Function(String message) usageException, {
   bool beforeSeparator,
 }) {
   beforeSeparator ??= false;

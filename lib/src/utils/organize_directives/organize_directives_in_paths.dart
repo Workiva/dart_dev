@@ -16,7 +16,7 @@ int organizeDirectivesInPaths(
 
 /// Returns all file paths from a given set of files and directories.
 Iterable<String> _getAllFiles(Iterable<String> paths) {
-  final allFiles = Set<String>();
+  final allFiles = <String>{};
 
   for (final path in paths) {
     switch (FileSystemEntity.typeSync(path)) {

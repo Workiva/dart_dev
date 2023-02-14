@@ -1,4 +1,4 @@
-include: package:pedantic/analysis_options.1.8.0.yaml
+include: package:lints/recommended.yaml
 
 analyzer:
   exclude:
@@ -12,6 +12,9 @@ analyzer:
 
 linter:
   rules:
-    - avoid_types_on_closure_parameters
-    - prefer_void_to_null
-    - void_checks
+    include:
+      - avoid_types_on_closure_parameters
+      - prefer_void_to_null
+      - void_checks
+    exclude:
+      - overridden_fields
