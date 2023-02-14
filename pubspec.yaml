@@ -15,6 +15,7 @@ dependencies:
   io: '>=0.3.5 <2.0.0'
   logging: ^1.0.0
   path: ^1.6.2
+  pedantic: ^1.7.0
   pub_semver: ^2.0.0
   pubspec_parse: '>=0.1.8 <2.0.0'
   stack_trace: ^1.9.3
