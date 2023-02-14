@@ -13,9 +13,9 @@ dependencies:
   build_runner: '>=1.0.0 <3.0.0'
   glob: ^2.0.0
   io: '>=0.3.5 <2.0.0'
+  lints: ^1.0.1
   logging: ^1.0.0
   path: ^1.6.2
-  pedantic: ^1.7.0
   pub_semver: ^2.0.0
   pubspec_parse: '>=0.1.8 <2.0.0'
   stack_trace: ^1.9.3

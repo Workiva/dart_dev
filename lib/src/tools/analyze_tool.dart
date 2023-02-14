@@ -178,7 +178,7 @@ ProcessDeclaration buildProcess(
         context.argResults, context.usageException,
         commandName: context.commandName,
         usageFooter:
-            'Arguments can be passed to the "${analyzerUsed}" process via '
+            'Arguments can be passed to the "$analyzerUsed" process via '
             'the --analyzer-args option.');
   }
   var executable = useDartAnalyze ? exe.dart : exe.dartanalyzer;

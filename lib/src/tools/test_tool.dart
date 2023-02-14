@@ -214,7 +214,7 @@ List<String> buildArgs({
     ...?configuredTestArgs,
     // 2. The --reporter option.
     if (argResults?.wasParsed('reporter') ?? false)
-      '--reporter=' + singleOptionValue(argResults, 'reporter'),
+      '--reporter=${singleOptionValue(argResults, 'reporter')}',
     // 3. The -n|--name, -N|--plain-name, and -P|--preset options
     ...?multiOptionValue(argResults, 'name')?.map((v) => '--name=$v'),
     ...?multiOptionValue(argResults, 'plain-name')

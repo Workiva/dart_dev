@@ -1,11 +1,11 @@
 @TestOn('vm')
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:logging/logging.dart';
-import 'package:pedantic/pedantic.dart';
 import 'package:test/test.dart';
 
 import '../log_matchers.dart';

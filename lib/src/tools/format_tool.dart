@@ -178,7 +178,7 @@ class FormatTool extends DevTool {
     final dir = Directory(root ?? '.');
 
     // Use Glob.listSync to get all directories which might include a matching file.
-    var directoriesWithExcludes = Set<String>();
+    var directoriesWithExcludes = <String>{};
 
     if (collapseDirectories) {
       for (var g in exclude) {
