@@ -222,8 +222,9 @@ void main() {
       expect(
           () => buildExecution(context),
           throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'command name', contains('test_format'))
-            ..having((e) => e.message, 'usage', contains('--formatter-args'))));
+              .having((e) => e.message, 'command name', contains('test_format'))
+              .having(
+                  (e) => e.message, 'usage', contains('--formatter-args'))));
     });
 
     test('allows positional arguments when the command is hackFastFormat', () {
@@ -248,10 +249,10 @@ void main() {
       expect(
           () => buildExecution(context),
           throwsA(isA<UsageException>()
-            ..having(
-                (e) => e.message, 'command name', contains('hackFastFormat'))
-            ..having(
-                (e) => e.message, 'usage', contains('must specify targets'))));
+              .having(
+                  (e) => e.message, 'command name', contains('hackFastFormat'))
+              .having((e) => e.message, 'usage',
+                  contains('must specify targets'))));
     });
 
     test('throws UsageException if args are given after a separator', () {
@@ -261,8 +262,9 @@ void main() {
       expect(
           () => buildExecution(context),
           throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'command name', contains('test_format'))
-            ..having((e) => e.message, 'usage', contains('--formatter-args'))));
+              .having((e) => e.message, 'command name', contains('test_format'))
+              .having(
+                  (e) => e.message, 'usage', contains('--formatter-args'))));
     });
 
     test(
@@ -524,9 +526,9 @@ void main() {
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'command name', 'test_format')
-            ..having((e) => e.message, 'usage footer',
-                contains('--check and --dry-run and --overwrite'))));
+              .having((e) => e.message, 'command name', 'test_format')
+              .having((e) => e.message, 'usage footer',
+                  contains('--check and --dry-run and --overwrite'))));
     });
 
     test('--check and --dry-run throws UsageException', () {
@@ -534,9 +536,9 @@ void main() {
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'command name', 'test_format')
-            ..having((e) => e.message, 'usage footer',
-                contains('--check and --dry-run'))));
+              .having((e) => e.message, 'command name', 'test_format')
+              .having((e) => e.message, 'usage footer',
+                  contains('--check and --dry-run'))));
     });
 
     test('--check and --overwrite throws UsageException', () {
@@ -544,9 +546,9 @@ void main() {
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'command name', 'test_format')
-            ..having((e) => e.message, 'usage footer',
-                contains('--check and --overwrite'))));
+              .having((e) => e.message, 'command name', 'test_format')
+              .having((e) => e.message, 'usage footer',
+                  contains('--check and --overwrite'))));
     });
 
     test('--dry-run and --overwrite throws UsageException', () {
@@ -554,9 +556,9 @@ void main() {
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'command name', 'test_format')
-            ..having((e) => e.message, 'usage footer',
-                contains('--dry-run and --overwrite'))));
+              .having((e) => e.message, 'command name', 'test_format')
+              .having((e) => e.message, 'usage footer',
+                  contains('--dry-run and --overwrite'))));
     });
 
     test('--check', () {
