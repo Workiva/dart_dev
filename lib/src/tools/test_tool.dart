@@ -328,7 +328,9 @@ Iterable<String> buildFiltersForTestArgs(List<String> testArgs) {
   final filters = <String>[];
   for (final input in testInputs) {
     if (input.endsWith('.dart')) {
-      filters..add('$input.*_test.dart.js*')..add(dartExtToHtml(input));
+      filters
+        ..add('$input.*_test.dart.js*')
+        ..add(dartExtToHtml(input));
     } else {
       filters.add('$input**');
     }

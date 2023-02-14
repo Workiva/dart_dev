@@ -45,7 +45,9 @@ void main() {
     });
 
     test('runs tools in order', () async {
-      final ct = CompoundTool()..addTool(tool())..addTool(tool());
+      final ct = CompoundTool()
+        ..addTool(tool())
+        ..addTool(tool());
       expect(await ct.run(), 0);
       expect(toolsRan, orderedEquals([0, 1]));
     });
@@ -73,7 +75,9 @@ void main() {
         return 0;
       }, argParser: ArgParser()..addFlag('bar'));
 
-      final ct = CompoundTool()..addTool(tool1)..addTool(tool2);
+      final ct = CompoundTool()
+        ..addTool(tool1)
+        ..addTool(tool2);
       await ct.run(DevToolExecutionContext(
           argResults: ct.argParser.parse(['--foo', '--bar', 'baz'])));
     });
@@ -130,7 +134,9 @@ void main() {
     test('parses all options', () {
       final parser1 = ArgParser()..addFlag('flag');
       final parser2 = ArgParser()..addOption('option');
-      final cap = CompoundArgParser()..addParser(parser1)..addParser(parser2);
+      final cap = CompoundArgParser()
+        ..addParser(parser1)
+        ..addParser(parser2);
       final args = ['--flag', '--option=foo', 'bar'];
       final argResults = cap.parse(args);
       expect(argResults['flag'], isTrue);
@@ -141,7 +147,9 @@ void main() {
     test('provides a combined usage output', () {
       final parser1 = ArgParser()..addFlag('flag');
       final parser2 = ArgParser()..addOption('option');
-      final cap = CompoundArgParser()..addParser(parser1)..addParser(parser2);
+      final cap = CompoundArgParser()
+        ..addParser(parser1)
+        ..addParser(parser2);
       expect(
           cap.usage, allOf(contains(parser1.usage), contains(parser2.usage)));
     });
@@ -178,7 +186,9 @@ void main() {
       final barParser = ArgParser()..addFlag('bar');
       final barTool = DevTool.fromFunction((_) => 0, argParser: barParser);
 
-      final compoundTool = CompoundTool()..addTool(fooTool)..addTool(barTool);
+      final compoundTool = CompoundTool()
+        ..addTool(fooTool)
+        ..addTool(barTool);
       final baseContext = DevToolExecutionContext(
           argResults: compoundTool.argParser.parse(['--foo', '--bar']));
 
