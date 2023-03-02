@@ -242,8 +242,8 @@ dev_dependencies:
       expect(
           () => buildExecution(context, path: d.sandbox),
           throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'help', contains('--build-args'))
-            ..having((e) => e.message, 'help', contains('build_runner'))));
+              .having((e) => e.message, 'help', contains('--build-args'))
+              .having((e) => e.message, 'help', contains('build_runner'))));
     });
 
     test(
@@ -264,8 +264,8 @@ dev_dependencies:
       expect(
           () => buildExecution(context, path: d.sandbox),
           throwsA(isA<UsageException>()
-            ..having((e) => e.message, 'help', contains('--build-args'))
-            ..having((e) => e.message, 'help', contains('build_test'))));
+              .having((e) => e.message, 'help', contains('--build-args'))
+              .having((e) => e.message, 'help', contains('build_test'))));
     });
 
     test('returns config exit code and logs if test is not a direct dependency',

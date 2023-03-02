@@ -1,6 +1,6 @@
+@TestOn('vm')
 import 'dart:convert';
 
-@TestOn('vm')
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/dart_dev.dart';

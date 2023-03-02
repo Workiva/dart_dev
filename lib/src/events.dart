@@ -5,7 +5,8 @@ Future<void> commandComplete(CommandResult result) async {
       _commandCompleteListeners.map((listener) => listener(result) as Future<void>));
 }
 
-void onCommandComplete(FutureOr<dynamic> callback(CommandResult result)) {
+void onCommandComplete(
+    FutureOr<dynamic> Function(CommandResult result) callback) {
   _commandCompleteListeners.add(callback);
 }
 

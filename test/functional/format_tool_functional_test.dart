@@ -9,7 +9,7 @@ import '../functional.dart';
 
 void main() {
   group('Format Tool', () {
-    Future<_SourceFile> _format(String projectPath) async {
+    Future<_SourceFile> format(String projectPath) async {
       const filePath = 'lib/main.dart';
 
       final process = await runDevToolFunctionalTest('format', projectPath);
@@ -23,7 +23,7 @@ void main() {
     test('organize directives off', () async {
       const projectPath =
           'test/functional/fixtures/format/unsorted_imports/organize_directives_off/';
-      final sourceFile = await _format(projectPath);
+      final sourceFile = await format(projectPath);
       expect(
         sourceFile.contentsBefore,
         equals(sourceFile.contentsAfter),
@@ -33,7 +33,7 @@ void main() {
     test('organize directives on', () async {
       const projectPath =
           'test/functional/fixtures/format/unsorted_imports/organize_directives_on/';
-      final sourceFile = await _format(projectPath);
+      final sourceFile = await format(projectPath);
       expect(
         sourceFile.contentsBefore,
         isNot(equals(sourceFile.contentsAfter)),

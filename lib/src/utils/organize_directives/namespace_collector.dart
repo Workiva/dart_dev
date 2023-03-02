@@ -6,7 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 /// Imports and exports are returned in the order they appear in a file when
 /// passed to `CompilationUnit.accept`.
 class NamespaceCollector extends SimpleAstVisitor<List<NamespaceDirective>> {
-  List<NamespaceDirective> _namespaces = [];
+  final List<NamespaceDirective> _namespaces = [];
 
   @override
   List<NamespaceDirective>? visitExportDirective(ExportDirective node) {

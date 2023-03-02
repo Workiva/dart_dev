@@ -9,10 +9,10 @@ import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
-import '../../utils.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/dart_semver_version.dart';
 import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/organize_directives/organize_directives_in_paths.dart';
@@ -108,6 +108,9 @@ class FormatTool extends DevTool {
   @override
   FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
+    if (formatter == Formatter.dartfmt && !dartVersionHasDartfmt) {
+      formatter = Formatter.dartFormat;
+    }
     final formatExecution = buildExecution(
       context,
       configuredFormatterArgs: formatterArgs,
@@ -175,7 +178,7 @@ class FormatTool extends DevTool {
     final dir = Directory(root ?? '.');
 
     // Use Glob.listSync to get all directories which might include a matching file.
-    var directoriesWithExcludes = Set<String>();
+    var directoriesWithExcludes = <String>{};
 
     if (collapseDirectories) {
       for (var g in exclude) {

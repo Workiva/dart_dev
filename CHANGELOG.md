@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.9.3-dev
+
+- Fixes lints on Dart 2.18
+- Formatting changes on Dart 2.18
+- Replace deprecated pedantic package with lints package
+
+## [3.9.2](https://github.com/Workiva/dart_dev/compare/3.9.1...3.9.2)
+
+- Automatically use `dart analyze` instead of `dartanalyzer` when on Dart SDK
+v2.18 or higher (`dartanalyzer` was removed in this version).
+- Automatically use `dart format` instead of `dartfmt` when on Dart SDK v2.15 or
+higher (`dartfmt` was removed in this version).
+
 ## [3.9.1](https://github.com/Workiva/dart_dev/compare/3.9.0...3.9.1)
 
 - Fixes to be compatible with Windows.

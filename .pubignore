@@ -1,0 +1,11 @@
+Dockerfile
+skynet.yaml
+.dart_tool/
+.idea/
+.packages
+.pub/
+build/
+/doc/api/
+/pubspec.lock
+test/
+tool/

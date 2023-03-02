@@ -61,6 +61,7 @@ class WebdevServeTool extends DevTool {
   // DevTool Overrides
   // ---------------------------------------------------------------------------
 
+  @override
   final ArgParser argParser = ArgParser()
     ..addFlag('release',
         abbr: 'r', help: 'Build with release mode defaults for builders.')
@@ -215,8 +216,8 @@ WebdevServeExecution buildExecution(
   if (!globalPackageIsActiveAndCompatible(
       'webdev', VersionConstraint.parse('^2.0.0'),
       environment: environment)) {
-    _log.severe(red.wrap(styleBold.wrap('webdev serve')! +
-            ' could not run for this project.\n')! +
+    _log.severe(red.wrap(
+            '${styleBold.wrap('webdev serve')} could not run for this project.\n')! +
         yellow.wrap('You must have `webdev` globally activated:\n'
             '  dart pub global activate webdev ^2.0.0')!);
     return WebdevServeExecution.exitEarly(ExitCode.config.code);

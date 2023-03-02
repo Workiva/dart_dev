@@ -180,7 +180,9 @@ String _getSortedNamespaceString(
           namespaceWithQuotesReplaced,
         )
         .substring(namespace.start(), namespace.end());
-    sortedReplacement..write(source)..write('\n');
+    sortedReplacement
+      ..write(source)
+      ..write('\n');
   }
   return sortedReplacement.toString();
 }

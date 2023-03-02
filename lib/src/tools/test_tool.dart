@@ -214,7 +214,7 @@ List<String> buildArgs({
     ...?configuredTestArgs,
     // 2. The --reporter option.
     if (argResults?.wasParsed('reporter') ?? false)
-      '--reporter=' + singleOptionValue(argResults, 'reporter')!,
+      '--reporter=${singleOptionValue(argResults, 'reporter')!}',
     // 3. The -n|--name, -N|--plain-name, and -P|--preset options
     ...?multiOptionValue(argResults, 'name')?.map((v) => '--name=$v'),
     ...?multiOptionValue(argResults, 'plain-name')
@@ -328,7 +328,9 @@ Iterable<String> buildFiltersForTestArgs(List<String>? testArgs) {
   final filters = <String>[];
   for (final input in testInputs) {
     if (input.endsWith('.dart')) {
-      filters..add('$input.*_test.dart.js*')..add(dartExtToHtml(input));
+      filters
+        ..add('$input.*_test.dart.js*')
+        ..add(dartExtToHtml(input));
     } else {
       filters.add('$input**');
     }
