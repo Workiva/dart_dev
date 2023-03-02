@@ -12,7 +12,8 @@ import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 ///
 /// Use [DevTool.fromFunction] to create [FunctionTool] instances.
 class FunctionTool extends DevTool {
-  FunctionTool(FutureOr<int>? Function(DevToolExecutionContext context) function,
+  FunctionTool(
+      FutureOr<int>? Function(DevToolExecutionContext context) function,
       {ArgParser? argParser})
       : _argParser = argParser,
         _function = function;
@@ -37,7 +38,7 @@ class FunctionTool extends DevTool {
             commandName: context.commandName);
       }
     }
-    final exitCode = await _function(context)!;
+    final exitCode = await _function(context);
     if (exitCode != null) {
       return exitCode;
     }

@@ -120,7 +120,8 @@ class TestTool extends DevTool {
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredTestArgs: testArgs);
     return (execution.exitCode ??
-        runProcessAndEnsureExit(execution.process!, log: _log)) as FutureOr<int>;
+            runProcessAndEnsureExit(execution.process!, log: _log))
+        as FutureOr<int>;
   }
 
   @override
@@ -293,7 +294,8 @@ TestExecution buildExecution(
 
   if (!packageIsImmediateDependency('test', path: path)) {
     _log.severe(red.wrap('Cannot run tests.\n')! +
-        yellow.wrap('You must have a dependency on "test" in pubspec.yaml.\n')!);
+        yellow
+            .wrap('You must have a dependency on "test" in pubspec.yaml.\n')!);
     return TestExecution.exitEarly(ExitCode.config.code);
   }
 

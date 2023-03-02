@@ -85,7 +85,8 @@ class WebdevServeTool extends DevTool {
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredWebdevArgs: webdevArgs);
     return (execution.exitCode ??
-        runProcessAndEnsureExit(execution.process!, log: _log)) as FutureOr<int>;
+            runProcessAndEnsureExit(execution.process!, log: _log))
+        as FutureOr<int>;
   }
 }
 

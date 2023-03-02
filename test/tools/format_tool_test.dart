@@ -250,7 +250,7 @@ void main() {
           () => buildExecution(context),
           throwsA(isA<UsageException>()
               .having(
-                (e) => e.message, 'command name', contains('hackFastFormat'))
+                  (e) => e.message, 'command name', contains('hackFastFormat'))
               .having((e) => e.message, 'usage',
                   contains('must specify targets'))));
     });
@@ -526,7 +526,7 @@ void main() {
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>().having((e) => e.message, 'usage footer',
-                contains('--check and --dry-run and --overwrite'))));
+              contains('--check and --dry-run and --overwrite'))));
     });
 
     test('--check and --dry-run throws UsageException', () {
@@ -534,7 +534,7 @@ void main() {
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>().having((e) => e.message, 'usage footer',
-                contains('--check and --dry-run'))));
+              contains('--check and --dry-run'))));
     });
 
     test('--check and --overwrite throws UsageException', () {
@@ -542,7 +542,7 @@ void main() {
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>().having((e) => e.message, 'usage footer',
-                contains('--check and --overwrite'))));
+              contains('--check and --overwrite'))));
     });
 
     test('--dry-run and --overwrite throws UsageException', () {
@@ -550,7 +550,7 @@ void main() {
       expect(
           () => validateAndParseMode(argResults, usageException),
           throwsA(isA<UsageException>().having((e) => e.message, 'usage footer',
-                contains('--dry-run and --overwrite'))));
+              contains('--dry-run and --overwrite'))));
     });
 
     test('--check', () {
