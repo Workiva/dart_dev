@@ -126,8 +126,6 @@ bool shouldRunTool(RunWhen runWhen, int? currentExitCode) {
       return true;
     case RunWhen.passing:
       return currentExitCode == 0;
-    default:
-      throw FallThroughError();
   }
 }
 
