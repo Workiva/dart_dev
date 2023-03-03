@@ -115,8 +115,7 @@ DevToolExecutionContext contextForTool(
   if (baseContext.argResults == null) return baseContext;
 
   final parser = spec!.tool.argParser ?? ArgParser();
-  final argMapper = spec.argMapper ??
-      takeOptionArgs;
+  final argMapper = spec.argMapper ?? takeOptionArgs;
   return baseContext.update(
       argResults: argMapper(parser, baseContext.argResults!));
 }
