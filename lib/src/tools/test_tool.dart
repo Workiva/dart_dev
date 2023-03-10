@@ -115,14 +115,12 @@ class TestTool extends DevTool {
   List<String>? testArgs;
 
   @override
-  FutureOr<int?> run([DevToolExecutionContext? context]) {
+  FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredTestArgs: testArgs);
-    if (execution.exitCode != null) {
-      return execution.exitCode;
-    }
-    return runProcessAndEnsureExit(execution.process!, log: _log);
+    return execution.exitCode ??
+        await runProcessAndEnsureExit(execution.process!, log: _log);
   }
 
   @override
