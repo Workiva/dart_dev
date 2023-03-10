@@ -73,7 +73,8 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
           if (argList is ListLiteral) {
             final stringArgs = argList.elements
                 .whereType<StringLiteral>()
-                .map((e) => e.stringValue)
+                .where((e) => e.stringValue != null)
+                .map((e) => e.stringValue!)
                 .toList();
             typedFormatDevTool!.formatterArgs = stringArgs;
 

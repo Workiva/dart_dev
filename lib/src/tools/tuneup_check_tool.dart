@@ -149,11 +149,11 @@ TuneupExecution buildExecution(
   }
 
   final args = buildArgs(
-      argResults: context.argResults,
-      configuredIgnoreInfos: configuredIgnoreInfos,
-      verbose: context.verbose);
+    argResults: context.argResults,
+    configuredIgnoreInfos: configuredIgnoreInfos,
+    verbose: context.verbose,
+  ).toList();
   logSubprocessHeader(_log, 'dart ${args.join(' ')}');
-  return TuneupExecution.process(ProcessDeclaration(
-      exe.dart, args as List<String?>,
-      mode: ProcessStartMode.inheritStdio));
+  return TuneupExecution.process(
+      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
 }

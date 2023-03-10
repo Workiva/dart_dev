@@ -70,7 +70,7 @@ class FormatTool extends DevTool {
   /// The args to pass to the formatter process run by this command.
   ///
   /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
-  List<String?>? formatterArgs;
+  List<String>? formatterArgs;
 
   /// If the formatter should also organize imports and exports.
   ///
@@ -384,13 +384,13 @@ enum Formatter {
 ///
 /// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
 /// included, it will be added.
-Iterable<String?> buildArgs(
-  Iterable<String?> executableArgs,
+Iterable<String> buildArgs(
+  Iterable<String> executableArgs,
   FormatMode? mode, {
   ArgResults? argResults,
-  List<String?>? configuredFormatterArgs,
+  List<String>? configuredFormatterArgs,
 }) {
-  final args = <String?>[
+  final args = <String>[
     ...executableArgs,
 
     // Combine all args that should be passed through to the dartfmt in this
@@ -427,10 +427,10 @@ Iterable<String?> buildArgs(
 ///
 /// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
 /// included, it will be added.
-Iterable<String?> buildArgsForDartFormat(
-    Iterable<String?> executableArgs, FormatMode? mode,
-    {ArgResults? argResults, List<String?>? configuredFormatterArgs}) {
-  final args = <String?>[
+Iterable<String> buildArgsForDartFormat(
+    Iterable<String> executableArgs, FormatMode? mode,
+    {ArgResults? argResults, List<String>? configuredFormatterArgs}) {
+  final args = <String>[
     ...executableArgs,
 
     // Combine all args that should be passed through to the dart format in this
@@ -477,7 +477,7 @@ Iterable<String?> buildArgsForDartFormat(
 /// on the declarative output.
 FormatExecution buildExecution(
   DevToolExecutionContext context, {
-  List<String?>? configuredFormatterArgs,
+  List<String>? configuredFormatterArgs,
   FormatMode? defaultMode,
   List<Glob>? exclude,
   Formatter? formatter,
@@ -550,7 +550,7 @@ FormatExecution buildExecution(
   }
 
   final dartFormatter = buildFormatProcess(formatter);
-  Iterable<String?> args;
+  Iterable<String> args;
   if (formatter == Formatter.dartFormat) {
     args = buildArgsForDartFormat(dartFormatter.args, mode,
         argResults: context.argResults,
