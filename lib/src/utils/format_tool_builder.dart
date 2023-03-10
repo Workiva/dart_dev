@@ -59,8 +59,11 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         if (formatter != null) {
           final formatterType = formatter.rightHandSide;
           if (formatterType is PrefixedIdentifier) {
-            typedFormatDevTool.formatter =
+            final detectedFormatter =
                 detectFormatterForFormatTool(formatterType.identifier);
+            if (detectedFormatter != null) {
+              typedFormatDevTool.formatter = detectedFormatter;
+            }
           } else {
             logWarningMessageFor(KnownErrorOutcome.failedToParseFormatter);
           }
