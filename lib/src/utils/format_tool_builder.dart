@@ -53,14 +53,13 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         });
       }
 
-      if (formatDevTool is FormatTool) {
-        FormatTool? typedFormatDevTool = formatDevTool as FormatTool?;
-
+      final typedFormatDevTool = formatDevTool;
+      if (typedFormatDevTool is FormatTool) {
         final formatter = getCascadeByProperty('formatter');
         if (formatter != null) {
           final formatterType = formatter.rightHandSide;
           if (formatterType is PrefixedIdentifier) {
-            typedFormatDevTool!.formatter =
+            typedFormatDevTool.formatter =
                 detectFormatterForFormatTool(formatterType.identifier);
           } else {
             logWarningMessageFor(KnownErrorOutcome.failedToParseFormatter);
@@ -76,7 +75,7 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
                 .where((e) => e.stringValue != null)
                 .map((e) => e.stringValue!)
                 .toList();
-            typedFormatDevTool!.formatterArgs = stringArgs;
+            typedFormatDevTool.formatterArgs = stringArgs;
 
             if (stringArgs.length < argList.elements.length) {
               logWarningMessageFor(
@@ -86,14 +85,12 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
             logWarningMessageFor(KnownErrorOutcome.failedToParseFormatterArgs);
           }
         }
-      } else if (formatDevTool is OverReactFormatTool) {
-        OverReactFormatTool? typedFormatDevTool =
-            formatDevTool as OverReactFormatTool?;
+      } else if (typedFormatDevTool is OverReactFormatTool) {
         final lineLengthAssignment = getCascadeByProperty('lineLength');
         if (lineLengthAssignment != null) {
           final lengthExpression = lineLengthAssignment.rightHandSide;
           if (lengthExpression is IntegerLiteral) {
-            typedFormatDevTool!.lineLength = lengthExpression.value;
+            typedFormatDevTool.lineLength = lengthExpression.value;
           } else {
             logWarningMessageFor(KnownErrorOutcome.failedToParseLineLength);
           }
