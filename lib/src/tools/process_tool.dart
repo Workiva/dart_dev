@@ -46,9 +46,10 @@ class ProcessTool extends DevTool {
   @override
   FutureOr<int> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
-    if (context.argResults != null) {
+    final argResults = context.argResults;
+    if (argResults != null) {
       assertNoPositionalArgsNorArgsAfterSeparator(
-          context.argResults!, context.usageException,
+          argResults, context.usageException,
           commandName: context.commandName);
     }
     logSubprocessHeader(_log, '$_executable ${_args.join(' ')}');
@@ -87,9 +88,10 @@ class BackgroundProcessTool {
   bool _processHasExited = false;
 
   Future<int> _start(DevToolExecutionContext context) async {
-    if (context.argResults != null) {
+    final argResults = context.argResults;
+    if (argResults != null) {
       assertNoPositionalArgsNorArgsAfterSeparator(
-          context.argResults!, context.usageException,
+          argResults, context.usageException,
           commandName: context.commandName);
     }
     logSubprocessHeader(_log, '$_executable ${_args.join(' ')}');
@@ -117,14 +119,15 @@ class BackgroundProcessTool {
   }
 
   Future<int> _stop(DevToolExecutionContext context) async {
-    if (context.argResults != null) {
+    final argResults = context.argResults;
+    if (argResults != null) {
       assertNoPositionalArgsNorArgsAfterSeparator(
-          context.argResults!, context.usageException,
+          argResults, context.usageException,
           commandName: context.commandName);
     }
     _log.info('Stopping: $_executable ${_args.join(' ')}');
     _process?.kill();
-    await _process!.exitCode;
+    await _process?.exitCode;
     return ExitCode.success.code;
   }
 }
