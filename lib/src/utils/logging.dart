@@ -47,12 +47,12 @@ StringBuffer colorLog(LogRecord record, {bool verbose = false}) {
   }
   final level = color.wrap('[${record.level}]');
   final eraseLine = ansiOutputEnabled && !verbose ? '\x1b[2K\r' : '';
-  final lines = <Object?>[
+  final lines = <Object>[
     '$eraseLine$level ${_loggerName(record, verbose)}${record.message}'
   ];
 
   if (record.error != null) {
-    lines.add(record.error);
+    lines.add(record.error!);
   }
 
   if (record.stackTrace != null && verbose) {
