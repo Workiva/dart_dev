@@ -10,7 +10,7 @@ import '../utils/rest_args_with_separator.dart';
 
 final _log = Logger('CompoundTool');
 
-typedef ArgMapper = ArgResults Function(ArgParser parser, ArgResults? results);
+typedef ArgMapper = ArgResults Function(ArgParser parser, ArgResults results);
 
 /// Return a parsed [ArgResults] that only includes the option args (flags,
 /// single options, and multi options) supported by [parser].
@@ -111,13 +111,13 @@ List<String> optionArgsOnly(ArgResults results,
 }
 
 DevToolExecutionContext contextForTool(
-    DevToolExecutionContext baseContext, DevToolSpec? spec) {
-  if (baseContext.argResults == null) return baseContext;
+    DevToolExecutionContext baseContext, DevToolSpec spec) {
+  final argResults = baseContext.argResults;
+  if (argResults == null) return baseContext;
 
-  final parser = spec!.tool.argParser ?? ArgParser();
+  final parser = spec.tool.argParser ?? ArgParser();
   final argMapper = spec.argMapper ?? takeOptionArgs;
-  return baseContext.update(
-      argResults: argMapper(parser, baseContext.argResults!));
+  return baseContext.update(argResults: argMapper(parser, argResults));
 }
 
 bool shouldRunTool(RunWhen runWhen, int? currentExitCode) {
@@ -157,7 +157,7 @@ class CompoundArgParser implements ArgParser {
             help: option.help,
             defaultsTo: option.defaultsTo,
             negatable: option.negatable!,
-            callback: option.callback as void Function(bool)?,
+            callback: (bool value) => option.callback?.call(value),
             hide: option.hide);
       } else if (option.isMultiple) {
         _compoundParser.addMultiOption(option.name,
@@ -167,7 +167,7 @@ class CompoundArgParser implements ArgParser {
             allowed: option.allowed,
             allowedHelp: option.allowedHelp,
             defaultsTo: option.defaultsTo,
-            callback: option.callback as void Function(List<String>)?,
+            callback: (List<String> values) => option.callback?.call(values),
             splitCommas: option.splitCommas,
             hide: option.hide);
       } else if (option.isSingle) {
@@ -178,7 +178,7 @@ class CompoundArgParser implements ArgParser {
             allowed: option.allowed,
             allowedHelp: option.allowedHelp,
             defaultsTo: option.defaultsTo,
-            callback: option.callback as void Function(String?)?,
+            callback: (String? value) => option.callback?.call(value),
             hide: option.hide);
       }
     }
@@ -308,7 +308,7 @@ class CompoundArgParser implements ArgParser {
           Iterable<String>? allowed,
           Map<String, String>? allowedHelp,
           String? defaultsTo,
-          Function? callback,
+          void Function(String?)? callback,
           bool mandatory = false,
           bool hide = false,
           List<String> aliases = const []}) =>
@@ -319,7 +319,7 @@ class CompoundArgParser implements ArgParser {
           allowed: allowed,
           allowedHelp: allowedHelp,
           defaultsTo: defaultsTo,
-          callback: callback as void Function(String?)?,
+          callback: callback,
           mandatory: mandatory,
           hide: hide,
           aliases: aliases);

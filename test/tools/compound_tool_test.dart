@@ -176,7 +176,8 @@ void main() {
   group('contextForTool', () {
     test('with null argResults', () {
       final context = DevToolExecutionContext();
-      expect(context, same(contextForTool(context, null)));
+      final spec = DevToolSpec(RunWhen.passing, DevTool.fromFunction((_) => 0));
+      expect(context, same(contextForTool(context, spec)));
     });
 
     test('maps the argResults', () {
