@@ -6,9 +6,8 @@ void assertNoPositionalArgs(
   String name,
   ArgResults argResults,
   void Function(String message) usageException, {
-  bool? beforeSeparator,
+  bool beforeSeparator = false,
 }) {
-  beforeSeparator ??= false;
   if (hasAnyPositionalArgsBeforeSeparator(argResults)) {
     usageException('The "$name" command does not support positional args'
         '${beforeSeparator ? ' before the `--` separator' : ''}.\n');

@@ -58,12 +58,11 @@ class TuneupCheckTool extends DevTool {
       'using the tuneup tool.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext? context]) {
+  FutureOr<int?> run([DevToolExecutionContext? context]) async {
     final execution = buildExecution(context ?? DevToolExecutionContext(),
         configuredIgnoreInfos: ignoreInfos);
-    return (execution.exitCode ??
-            runProcessAndEnsureExit(execution.process!, log: _log))
-        as FutureOr<int>;
+    return execution.exitCode ??
+        await runProcessAndEnsureExit(execution.process!, log: _log);
   }
 }
 
@@ -100,9 +99,8 @@ class TuneupExecution {
 Iterable<String> buildArgs({
   ArgResults? argResults,
   bool? configuredIgnoreInfos,
-  bool? verbose,
+  bool verbose = false,
 }) {
-  verbose ??= false;
   var ignoreInfos = (configuredIgnoreInfos ?? false) ||
       (flagValue(argResults, 'ignore-infos') ?? false);
   return [
@@ -135,9 +133,10 @@ TuneupExecution buildExecution(
   bool? configuredIgnoreInfos,
   String? path,
 }) {
-  if (context.argResults != null) {
+  final argResults = context.argResults;
+  if (argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults!, context.usageException,
+        argResults, context.usageException,
         commandName: context.commandName);
   }
 
@@ -149,11 +148,11 @@ TuneupExecution buildExecution(
   }
 
   final args = buildArgs(
-      argResults: context.argResults,
-      configuredIgnoreInfos: configuredIgnoreInfos,
-      verbose: context.verbose);
+    argResults: argResults,
+    configuredIgnoreInfos: configuredIgnoreInfos,
+    verbose: context.verbose,
+  ).toList();
   logSubprocessHeader(_log, 'dart ${args.join(' ')}');
-  return TuneupExecution.process(ProcessDeclaration(
-      exe.dart, args as List<String?>,
-      mode: ProcessStartMode.inheritStdio));
+  return TuneupExecution.process(
+      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
 }

@@ -1,8 +1,5 @@
 bool parseFlagFromArgs(List<String> args, String name,
-    {String? abbr, bool? defaultsTo, bool? negatable}) {
-  defaultsTo ??= false;
-  negatable ??= false;
-
+    {String? abbr, bool defaultsTo = false, bool negatable = false}) {
   // Ignore all args after a separator.
   final argsBeforeSep = args.takeWhile((arg) => arg != '--').toList();
 

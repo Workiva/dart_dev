@@ -65,12 +65,12 @@ class FormatTool extends DevTool {
   /// - `dartfmt` (provided by the SDK)
   /// - `dart run dart_style:format` (provided by the `dart_style` package)
   /// - `dart format` (added in Dart SDK 2.10.0)
-  Formatter? formatter = Formatter.dartfmt;
+  Formatter formatter = Formatter.dartfmt;
 
   /// The args to pass to the formatter process run by this command.
   ///
   /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
-  List<String?>? formatterArgs;
+  List<String>? formatterArgs;
 
   /// If the formatter should also organize imports and exports.
   ///
@@ -129,10 +129,11 @@ class FormatTool extends DevTool {
     if (exitCode != 0) {
       return exitCode;
     }
-    if (formatExecution.directiveOrganization != null) {
+    final directiveOrganization = formatExecution.directiveOrganization;
+    if (directiveOrganization != null) {
       exitCode = organizeDirectivesInPaths(
-        formatExecution.directiveOrganization!.inputs,
-        check: formatExecution.directiveOrganization!.check,
+        directiveOrganization.inputs,
+        check: directiveOrganization.check,
         verbose: context.verbose,
       );
     }
@@ -342,9 +343,9 @@ class FormatExecution {
 
 /// A declarative representation of the directive organization work.
 class DirectiveOrganization {
-  DirectiveOrganization(this.inputs, {this.check});
+  DirectiveOrganization(this.inputs, {this.check = false});
 
-  final bool? check;
+  final bool check;
   final Set<String> inputs;
 }
 
@@ -384,13 +385,13 @@ enum Formatter {
 ///
 /// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
 /// included, it will be added.
-Iterable<String?> buildArgs(
-  Iterable<String?> executableArgs,
+Iterable<String> buildArgs(
+  Iterable<String> executableArgs,
   FormatMode? mode, {
   ArgResults? argResults,
-  List<String?>? configuredFormatterArgs,
+  List<String>? configuredFormatterArgs,
 }) {
-  final args = <String?>[
+  final args = <String>[
     ...executableArgs,
 
     // Combine all args that should be passed through to the dartfmt in this
@@ -427,10 +428,10 @@ Iterable<String?> buildArgs(
 ///
 /// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
 /// included, it will be added.
-Iterable<String?> buildArgsForDartFormat(
-    Iterable<String?> executableArgs, FormatMode? mode,
-    {ArgResults? argResults, List<String?>? configuredFormatterArgs}) {
-  final args = <String?>[
+Iterable<String> buildArgsForDartFormat(
+    Iterable<String> executableArgs, FormatMode? mode,
+    {ArgResults? argResults, List<String>? configuredFormatterArgs}) {
+  final args = <String>[
     ...executableArgs,
 
     // Combine all args that should be passed through to the dart format in this
@@ -477,7 +478,7 @@ Iterable<String?> buildArgsForDartFormat(
 /// on the declarative output.
 FormatExecution buildExecution(
   DevToolExecutionContext context, {
-  List<String?>? configuredFormatterArgs,
+  List<String>? configuredFormatterArgs,
   FormatMode? defaultMode,
   List<Glob>? exclude,
   Formatter? formatter,
@@ -489,15 +490,16 @@ FormatExecution buildExecution(
   final useRestForInputs = (context.argResults?.rest.isNotEmpty ?? false) &&
       context.commandName == 'hackFastFormat';
 
-  if (context.argResults != null) {
+  final argResults = context.argResults;
+  if (argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults!, context.usageException,
+        argResults, context.usageException,
         allowRest: useRestForInputs,
         commandName: context.commandName,
         usageFooter:
             'Arguments can be passed to the "dartfmt" or "dart format" process via the '
             '--formatter-args option.');
-    mode = validateAndParseMode(context.argResults!, context.usageException);
+    mode = validateAndParseMode(argResults, context.usageException);
   }
   mode ??= defaultMode;
 
@@ -520,7 +522,7 @@ FormatExecution buildExecution(
   }
 
   final inputs = useRestForInputs
-      ? FormatterInputs({...context.argResults!.rest})
+      ? FormatterInputs({...?context.argResults?.rest})
       : FormatTool.getInputs(
           exclude: exclude,
           root: path,
@@ -550,7 +552,7 @@ FormatExecution buildExecution(
   }
 
   final dartFormatter = buildFormatProcess(formatter);
-  Iterable<String?> args;
+  Iterable<String> args;
   if (formatter == Formatter.dartFormat) {
     args = buildArgsForDartFormat(dartFormatter.args, mode,
         argResults: context.argResults,
@@ -606,8 +608,7 @@ ProcessDeclaration buildFormatProcess([Formatter? formatter]) {
 /// unnecessarily long log.
 void logCommand(
     String executable, Iterable<String> inputs, Iterable<String?> args,
-    {bool? verbose}) {
-  verbose ??= false;
+    {bool verbose = false}) {
   final exeAndArgs = '$executable ${args.join(' ')}'.trim();
   if (inputs.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${inputs.join(' ')}');
