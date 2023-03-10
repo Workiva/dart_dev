@@ -1,7 +1,7 @@
 import 'dart:io';
 
 class ProcessDeclaration {
-  final List<String?> args;
+  final List<String> args;
   final String executable;
   final ProcessStartMode? mode;
   final String? workingDirectory;

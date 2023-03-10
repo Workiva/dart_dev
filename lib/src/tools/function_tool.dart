@@ -29,12 +29,13 @@ class FunctionTool extends DevTool {
   final ArgParser? _argParser;
 
   @override
-  FutureOr<int> run([DevToolExecutionContext? context]) async {
+  FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
-    if (context.argResults != null) {
+    final argResults = context.argResults;
+    if (argResults != null) {
       if (argParser == null) {
         assertNoPositionalArgsNorArgsAfterSeparator(
-            context.argResults!, context.usageException,
+            argResults, context.usageException,
             commandName: context.commandName);
       }
     }

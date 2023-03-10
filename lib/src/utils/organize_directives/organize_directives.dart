@@ -191,7 +191,7 @@ String _getSortedNamespaceString(
 /// then relative directives.
 int _namespaceComparator(Namespace first, Namespace second) {
   if (first.isDart && second.isDart) {
-    return first.target!.compareTo(second.target!);
+    return first.target.compareTo(second.target);
   }
 
   if (first.isDart && !second.isDart) {
@@ -206,7 +206,7 @@ int _namespaceComparator(Namespace first, Namespace second) {
   final firstIsPkg = first.isExternalPkg;
   final secondIsPkg = second.isExternalPkg;
   if (firstIsPkg && secondIsPkg) {
-    return first.target!.compareTo(second.target!);
+    return first.target.compareTo(second.target);
   }
 
   if (firstIsPkg && !secondIsPkg) {
@@ -218,5 +218,5 @@ int _namespaceComparator(Namespace first, Namespace second) {
   }
 
   // Neither are dart directives or pkg directives. Must be relative path directives...
-  return first.target!.compareTo(second.target!);
+  return first.target.compareTo(second.target);
 }

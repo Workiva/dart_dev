@@ -74,16 +74,15 @@ class AnalyzeTool extends DevTool {
   String? description = 'Run static analysis on dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext? context]) {
-    useDartAnalyze ??= false;
-    if (!dartVersionHasDartanalyzer) {
-      useDartAnalyze = true;
-    }
+  FutureOr<int?> run([DevToolExecutionContext? context]) {
     return runProcessAndEnsureExit(
-        buildProcess(context ?? DevToolExecutionContext(),
-            configuredAnalyzerArgs: analyzerArgs,
-            include: include,
-            useDartAnalyze: useDartAnalyze),
+        buildProcess(
+          context ?? DevToolExecutionContext(),
+          configuredAnalyzerArgs: analyzerArgs,
+          include: include,
+          useDartAnalyze:
+              !dartVersionHasDartanalyzer ? true : useDartAnalyze ?? false,
+        ),
         log: _log);
   }
 }
@@ -101,10 +100,8 @@ class AnalyzeTool extends DevTool {
 Iterable<String> buildArgs(
     {ArgResults? argResults,
     List<String>? configuredAnalyzerArgs,
-    bool? useDartAnalyze,
-    bool? verbose}) {
-  useDartAnalyze ??= false;
-  verbose ??= false;
+    bool useDartAnalyze = false,
+    bool verbose = false}) {
   final args = <String>[
     // Combine all args that should be passed through to the analyzer in
     // this order:
@@ -169,13 +166,13 @@ ProcessDeclaration buildProcess(
   List<String>? configuredAnalyzerArgs,
   List<Glob>? include,
   String? path,
-  bool? useDartAnalyze,
+  bool useDartAnalyze = false,
 }) {
-  useDartAnalyze ??= false;
-  if (context.argResults != null) {
+  final argResults = context.argResults;
+  if (argResults != null) {
     final analyzerUsed = useDartAnalyze ? 'dart analyze' : 'dartanalyzer';
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults!, context.usageException,
+        argResults, context.usageException,
         commandName: context.commandName,
         usageFooter:
             'Arguments can be passed to the "$analyzerUsed" process via '
@@ -202,11 +199,9 @@ ProcessDeclaration buildProcess(
 void logCommand(
   Iterable<String> args,
   Iterable<String> entrypoints, {
-  bool? useDartAnalyzer,
-  bool? verbose,
+  bool useDartAnalyzer = false,
+  bool verbose = false,
 }) {
-  useDartAnalyzer ??= false;
-  verbose ??= false;
   final exeAndArgs =
       '${useDartAnalyzer ? "dart" : "dartanalyzer"} ${args.join(' ')}'.trim();
 
