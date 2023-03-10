@@ -115,13 +115,14 @@ class TestTool extends DevTool {
   List<String>? testArgs;
 
   @override
-  FutureOr<int> run([DevToolExecutionContext? context]) {
+  FutureOr<int?> run([DevToolExecutionContext? context]) {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredTestArgs: testArgs);
-    return (execution.exitCode ??
-            runProcessAndEnsureExit(execution.process!, log: _log))
-        as FutureOr<int>;
+    if (execution.exitCode != null) {
+      return execution.exitCode;
+    }
+    return runProcessAndEnsureExit(execution.process!, log: _log);
   }
 
   @override
@@ -187,12 +188,9 @@ List<String> buildArgs({
   ArgResults? argResults,
   List<String>? configuredBuildArgs,
   List<String>? configuredTestArgs,
-  bool? useBuildRunner,
-  bool? verbose,
+  bool useBuildRunner = false,
+  bool verbose = false,
 }) {
-  useBuildRunner ??= false;
-  verbose ??= false;
-
   final buildArgs = <String>[
     // Combine all args that should be passed through to the build_runner
     // process in this order:
@@ -274,19 +272,20 @@ TestExecution buildExecution(
   List<String>? configuredTestArgs,
   String? path,
 }) {
+  final argResults = context.argResults;
   final hasBuildRunner =
       packageIsImmediateDependency('build_runner', path: path);
   final hasBuildTest = packageIsImmediateDependency('build_test', path: path);
   final useBuildRunner = hasBuildRunner && hasBuildTest;
   if (!useBuildRunner &&
-      context.argResults != null &&
-      context.argResults!['build-args'] != null) {
+      argResults != null &&
+      argResults['build-args'] != null) {
     context.usageException('Can only use --build-args in a project that has a '
         'direct dependency on both "build_runner" and "build_test" in the '
         'pubspec.yaml.');
   }
 
-  if (!useBuildRunner && (flagValue(context.argResults, 'release') ?? false)) {
+  if (!useBuildRunner && (flagValue(argResults, 'release') ?? false)) {
     _log.warning(yellow.wrap('The --release flag is only applicable in '
         'projects that run tests with build_runner, and this project does not.\n'
         'It will have no effect.'));
@@ -311,7 +310,7 @@ TestExecution buildExecution(
   }
 
   final args = buildArgs(
-      argResults: context.argResults,
+      argResults: argResults,
       configuredBuildArgs: configuredBuildArgs,
       configuredTestArgs: configuredTestArgs,
       useBuildRunner: useBuildRunner,
