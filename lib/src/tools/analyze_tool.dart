@@ -100,10 +100,8 @@ class AnalyzeTool extends DevTool {
 Iterable<String> buildArgs(
     {ArgResults? argResults,
     List<String>? configuredAnalyzerArgs,
-    bool? useDartAnalyze,
-    bool? verbose}) {
-  useDartAnalyze ??= false;
-  verbose ??= false;
+    bool useDartAnalyze = false,
+    bool verbose = false}) {
   final args = <String>[
     // Combine all args that should be passed through to the analyzer in
     // this order:
@@ -170,10 +168,11 @@ ProcessDeclaration buildProcess(
   String? path,
   bool useDartAnalyze = false,
 }) {
-  if (context.argResults != null) {
+  final argResults = context.argResults;
+  if (argResults != null) {
     final analyzerUsed = useDartAnalyze ? 'dart analyze' : 'dartanalyzer';
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults!, context.usageException,
+        argResults, context.usageException,
         commandName: context.commandName,
         usageFooter:
             'Arguments can be passed to the "$analyzerUsed" process via '
