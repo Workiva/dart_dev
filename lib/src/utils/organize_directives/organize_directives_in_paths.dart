@@ -7,7 +7,7 @@ import 'organize_directives.dart';
 /// Organizes imports/exports in a list of files and directories.
 int organizeDirectivesInPaths(
   Iterable<String> paths, {
-  bool? check = false,
+  bool check = false,
   bool verbose = false,
 }) {
   final allFiles = _getAllFiles(paths);
@@ -48,7 +48,7 @@ Iterable<String> _getAllFiles(Iterable<String> paths) {
 int _organizeDirectivesInFiles(
   Iterable<String> paths, {
   bool verbose = false,
-  bool? check = false,
+  bool check = false,
 }) {
   var exitCode = 0;
   for (final path in paths) {
@@ -65,7 +65,7 @@ int _organizeDirectivesInFiles(
 int _organizeDirectivesInFile(
   String filePath, {
   bool verbose = false,
-  bool? check = false,
+  bool check = false,
 }) {
   final file = File(filePath);
   final fileContents = _safelyReadFileContents(file);
@@ -83,7 +83,7 @@ int _organizeDirectivesInFile(
   }
 
   final fileChanged = fileWithOrganizedDirectives != fileContents;
-  if (fileChanged && check!) {
+  if (fileChanged && check) {
     return _fail('$filePath has imports/exports that need to be organized.');
   } else if (fileChanged &&
       !_safelyWriteFile(file, fileWithOrganizedDirectives)) {
@@ -92,7 +92,7 @@ int _organizeDirectivesInFile(
     );
   }
 
-  if (verbose && !check!) {
+  if (verbose && !check) {
     print(green.wrap('$filePath successfully organized imports/exports'));
   }
 
