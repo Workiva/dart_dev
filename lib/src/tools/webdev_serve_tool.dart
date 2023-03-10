@@ -80,13 +80,12 @@ class WebdevServeTool extends DevTool {
       'watcher that rebuilds on changes.';
 
   @override
-  FutureOr<int?> run([DevToolExecutionContext? context]) {
+  FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredWebdevArgs: webdevArgs);
-    return (execution.exitCode ??
-            runProcessAndEnsureExit(execution.process!, log: _log))
-        as FutureOr<int>;
+    return execution.exitCode ??
+        await runProcessAndEnsureExit(execution.process!, log: _log);
   }
 }
 
@@ -137,8 +136,7 @@ List<String> buildArgs(
     {ArgResults? argResults,
     List<String>? configuredBuildArgs,
     List<String>? configuredWebdevArgs,
-    bool? verbose}) {
-  verbose ??= false;
+    bool verbose = false}) {
   final webdevArgs = <String>[
     // Combine all args that should be passed through to the webdev serve
     // process in this order:
@@ -205,9 +203,10 @@ WebdevServeExecution buildExecution(
   List<String>? configuredWebdevArgs,
   Map<String, String>? environment,
 }) {
-  if (context.argResults != null) {
+  final argResults = context.argResults;
+  if (argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults!, context.usageException,
+        argResults, context.usageException,
         commandName: context.commandName,
         usageFooter: 'Arguments can be passed to the webdev process via the '
             '--webdev-args option.\n'
@@ -224,7 +223,7 @@ WebdevServeExecution buildExecution(
     return WebdevServeExecution.exitEarly(ExitCode.config.code);
   }
   final args = buildArgs(
-      argResults: context.argResults,
+      argResults: argResults,
       configuredBuildArgs: configuredBuildArgs,
       configuredWebdevArgs: configuredWebdevArgs,
       verbose: context.verbose);
