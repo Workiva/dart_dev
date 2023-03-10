@@ -606,8 +606,7 @@ ProcessDeclaration buildFormatProcess([Formatter? formatter]) {
 /// unnecessarily long log.
 void logCommand(
     String executable, Iterable<String> inputs, Iterable<String?> args,
-    {bool? verbose}) {
-  verbose ??= false;
+    {bool verbose = false}) {
   final exeAndArgs = '$executable ${args.join(' ')}'.trim();
   if (inputs.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${inputs.join(' ')}');

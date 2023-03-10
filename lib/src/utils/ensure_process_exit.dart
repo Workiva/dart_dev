@@ -17,12 +17,11 @@ import 'exit_process_signals.dart';
 /// given [process] was started in either the [ProcessStartMode.detached] or
 /// [ProcessStartMode.detachedWithStdio] modes.
 void ensureProcessExit(Process process,
-    {bool? forwardExitSignals, Logger? log}) {
-  forwardExitSignals ??= false;
+    {bool forwardExitSignals = false, Logger? log}) {
   StreamSubscription<ProcessSignal>? signalsSub =
       exitProcessSignals.listen((signal) async {
     log?.info('Waiting for subprocess to exit...');
-    if (forwardExitSignals!) {
+    if (forwardExitSignals) {
       process.kill(signal);
     }
   });

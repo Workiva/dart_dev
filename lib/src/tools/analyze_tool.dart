@@ -75,15 +75,14 @@ class AnalyzeTool extends DevTool {
 
   @override
   FutureOr<int> run([DevToolExecutionContext? context]) {
-    useDartAnalyze ??= false;
-    if (!dartVersionHasDartanalyzer) {
-      useDartAnalyze = true;
-    }
     return runProcessAndEnsureExit(
-        buildProcess(context ?? DevToolExecutionContext(),
-            configuredAnalyzerArgs: analyzerArgs,
-            include: include,
-            useDartAnalyze: useDartAnalyze),
+        buildProcess(
+          context ?? DevToolExecutionContext(),
+          configuredAnalyzerArgs: analyzerArgs,
+          include: include,
+          useDartAnalyze:
+              !dartVersionHasDartanalyzer ? true : useDartAnalyze ?? false,
+        ),
         log: _log);
   }
 }
@@ -169,9 +168,8 @@ ProcessDeclaration buildProcess(
   List<String>? configuredAnalyzerArgs,
   List<Glob>? include,
   String? path,
-  bool? useDartAnalyze,
+  bool useDartAnalyze = false,
 }) {
-  useDartAnalyze ??= false;
   if (context.argResults != null) {
     final analyzerUsed = useDartAnalyze ? 'dart analyze' : 'dartanalyzer';
     assertNoPositionalArgsNorArgsAfterSeparator(
@@ -202,11 +200,9 @@ ProcessDeclaration buildProcess(
 void logCommand(
   Iterable<String> args,
   Iterable<String> entrypoints, {
-  bool? useDartAnalyzer,
-  bool? verbose,
+  bool useDartAnalyzer = false,
+  bool verbose = false,
 }) {
-  useDartAnalyzer ??= false;
-  verbose ??= false;
   final exeAndArgs =
       '${useDartAnalyzer ? "dart" : "dartanalyzer"} ${args.join(' ')}'.trim();
 

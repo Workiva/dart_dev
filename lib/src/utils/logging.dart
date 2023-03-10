@@ -36,9 +36,7 @@ void attachLoggerToStdio(List<String> args) {
   Logger.root.onRecord.listen(stdIOLogListener(verbose: verbose));
 }
 
-StringBuffer colorLog(LogRecord record, {bool? verbose}) {
-  verbose ??= false;
-
+StringBuffer colorLog(LogRecord record, {bool verbose = false}) {
   AnsiCode color;
   if (record.level < Level.WARNING) {
     color = cyan;
@@ -102,8 +100,8 @@ String humanReadable(Duration duration) {
   return '${hours}h ${remaining.inMinutes}m';
 }
 
-void logSubprocessHeader(Logger logger, String command, {Level? level}) {
-  level ??= Level.INFO;
+void logSubprocessHeader(Logger logger, String command,
+    {Level level = Level.INFO}) {
   final numColumns = io.stdout.hasTerminal ? io.stdout.terminalColumns : 79;
   logger.log(level,
       'Running subprocess:\n${magenta.wrap(command)}\n${'-' * numColumns}\n');
@@ -116,9 +114,8 @@ Future<T> logTimedAsync<T>(
   Logger logger,
   String description,
   Future<T> Function() action, {
-  Level? level,
+  Level level = Level.INFO,
 }) async {
-  level ??= Level.INFO;
   final watch = Stopwatch()..start();
   logger.log(level, '$description...');
   final result = await action();
@@ -146,7 +143,7 @@ T logTimedSync<T>(
   return result;
 }
 
-void Function(LogRecord) stdIOLogListener({bool? verbose}) =>
+void Function(LogRecord) stdIOLogListener({bool verbose = false}) =>
     (record) => io.stdout.write(record.message.trim().isEmpty
         ? '\n' * (record.message.split('\n').length - 1)
         : colorLog(record, verbose: verbose));
