@@ -5,7 +5,7 @@ import 'package:pub_semver/pub_semver.dart';
 final versionPattern = RegExp(r'(\d+.\d+.\d+)');
 
 Version get dartSemverVersion =>
-    Version.parse(versionPattern.firstMatch(Platform.version).group(1));
+    Version.parse(versionPattern.firstMatch(Platform.version)!.group(1)!);
 
 bool get dartVersionHasDartanalyzer =>
     dartSemverVersion < Version.parse('2.18.0');

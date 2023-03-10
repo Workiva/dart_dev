@@ -59,7 +59,7 @@ class FormatTool extends DevTool {
   /// The globs to exclude from the inputs to the dart formatter.
   ///
   /// By default, nothing is excluded.
-  List<Glob> exclude;
+  List<Glob>? exclude;
 
   /// The formatter to run, one of:
   /// - `dartfmt` (provided by the SDK)
@@ -70,7 +70,7 @@ class FormatTool extends DevTool {
   /// The args to pass to the formatter process run by this command.
   ///
   /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
-  List<String> formatterArgs;
+  List<String>? formatterArgs;
 
   /// If the formatter should also organize imports and exports.
   ///
@@ -103,10 +103,10 @@ class FormatTool extends DevTool {
             'Run "dartfmt -h -v" or "dart format -h -v" to see all available options.');
 
   @override
-  String description = 'Format dart files in this package.';
+  String? description = 'Format dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) async {
+  FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
     if (formatter == Formatter.dartfmt && !dartVersionHasDartfmt) {
       formatter = Formatter.dartFormat;
@@ -123,16 +123,17 @@ class FormatTool extends DevTool {
       return formatExecution.exitCode;
     }
     var exitCode = await runProcessAndEnsureExit(
-      formatExecution.formatProcess,
+      formatExecution.formatProcess!,
       log: _log,
     );
     if (exitCode != 0) {
       return exitCode;
     }
-    if (formatExecution.directiveOrganization != null) {
+    final directiveOrganization = formatExecution.directiveOrganization;
+    if (directiveOrganization != null) {
       exitCode = organizeDirectivesInPaths(
-        formatExecution.directiveOrganization.inputs,
-        check: formatExecution.directiveOrganization.check,
+        directiveOrganization.inputs,
+        check: directiveOrganization.check,
         verbose: context.verbose,
       );
     }
@@ -154,11 +155,11 @@ class FormatTool extends DevTool {
   /// If collapseDirectories is true, directories that contain no exclusions will wind up in the [FormatterInputs],
   /// rather than each file in that tree.  You may get unexpected results if this and followLinks are both true.
   static FormatterInputs getInputs({
-    List<Glob> exclude,
-    bool expandCwd,
-    bool followLinks,
-    String root,
-    bool collapseDirectories,
+    List<Glob>? exclude,
+    bool? expandCwd,
+    bool? followLinks,
+    String? root,
+    bool? collapseDirectories,
   }) {
     expandCwd ??= false;
     followLinks ??= false;
@@ -182,7 +183,7 @@ class FormatTool extends DevTool {
 
     if (collapseDirectories) {
       for (var g in exclude) {
-        List<FileSystemEntity> matchingPaths;
+        List<FileSystemEntity>? matchingPaths;
         try {
           matchingPaths = g.listSync(followLinks: followLinks);
         } on FileSystemException catch (_) {
@@ -238,7 +239,7 @@ class FormatTool extends DevTool {
 
       // If the path is in a subdirectory starting with ".", ignore it.
       final parts = p.split(relative);
-      int hiddenIndex;
+      int? hiddenIndex;
       for (var i = 0; i < parts.length; i++) {
         if (parts[i].startsWith(".")) {
           hiddenIndex = i;
@@ -300,13 +301,13 @@ class FormatterInputs {
   FormatterInputs(this.includedFiles,
       {this.excludedFiles, this.hiddenDirectories, this.skippedLinks});
 
-  final Set<String> excludedFiles;
+  final Set<String>? excludedFiles;
 
-  final Set<String> hiddenDirectories;
+  final Set<String>? hiddenDirectories;
 
   final Set<String> includedFiles;
 
-  final Set<String> skippedLinks;
+  final Set<String>? skippedLinks;
 }
 
 /// A declarative representation of an execution of the [FormatTool].
@@ -328,21 +329,21 @@ class FormatExecution {
   /// exit with this code.
   ///
   /// If null, there is more work to do.
-  final int exitCode;
+  final int? exitCode;
 
   /// A declarative representation of the formatter process that should be run.
   ///
   /// If this process results in a non-zero exit code, [FormatTool] should return it.
-  final ProcessDeclaration formatProcess;
+  final ProcessDeclaration? formatProcess;
 
   /// A declarative representation of the directive organization work to be done
   /// (if enabled) after running the formatter.
-  final DirectiveOrganization directiveOrganization;
+  final DirectiveOrganization? directiveOrganization;
 }
 
 /// A declarative representation of the directive organization work.
 class DirectiveOrganization {
-  DirectiveOrganization(this.inputs, {this.check});
+  DirectiveOrganization(this.inputs, {this.check = false});
 
   final bool check;
   final Set<String> inputs;
@@ -386,9 +387,9 @@ enum Formatter {
 /// included, it will be added.
 Iterable<String> buildArgs(
   Iterable<String> executableArgs,
-  FormatMode mode, {
-  ArgResults argResults,
-  List<String> configuredFormatterArgs,
+  FormatMode? mode, {
+  ArgResults? argResults,
+  List<String>? configuredFormatterArgs,
 }) {
   final args = <String>[
     ...executableArgs,
@@ -428,8 +429,8 @@ Iterable<String> buildArgs(
 /// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
 /// included, it will be added.
 Iterable<String> buildArgsForDartFormat(
-    Iterable<String> executableArgs, FormatMode mode,
-    {ArgResults argResults, List<String> configuredFormatterArgs}) {
+    Iterable<String> executableArgs, FormatMode? mode,
+    {ArgResults? argResults, List<String>? configuredFormatterArgs}) {
   final args = <String>[
     ...executableArgs,
 
@@ -477,38 +478,39 @@ Iterable<String> buildArgsForDartFormat(
 /// on the declarative output.
 FormatExecution buildExecution(
   DevToolExecutionContext context, {
-  List<String> configuredFormatterArgs,
-  FormatMode defaultMode,
-  List<Glob> exclude,
-  Formatter formatter,
+  List<String>? configuredFormatterArgs,
+  FormatMode? defaultMode,
+  List<Glob>? exclude,
+  Formatter? formatter,
   bool organizeDirectives = false,
-  String path,
+  String? path,
 }) {
-  FormatMode mode;
+  FormatMode? mode;
 
-  final useRestForInputs = (context?.argResults?.rest?.isNotEmpty ?? false) &&
+  final useRestForInputs = (context.argResults?.rest.isNotEmpty ?? false) &&
       context.commandName == 'hackFastFormat';
 
-  if (context.argResults != null) {
+  final argResults = context.argResults;
+  if (argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults, context.usageException,
+        argResults, context.usageException,
         allowRest: useRestForInputs,
         commandName: context.commandName,
         usageFooter:
             'Arguments can be passed to the "dartfmt" or "dart format" process via the '
             '--formatter-args option.');
-    mode = validateAndParseMode(context.argResults, context.usageException);
+    mode = validateAndParseMode(argResults, context.usageException);
   }
   mode ??= defaultMode;
 
   if (formatter == Formatter.dartStyle &&
       !packageIsImmediateDependency('dart_style', path: path)) {
-    _log.severe(red.wrap('Cannot run "dart_style:format".\n') +
+    _log.severe(red.wrap('Cannot run "dart_style:format".\n')! +
         yellow.wrap('You must either have a dependency on "dart_style" in '
             'pubspec.yaml or configure the format tool to use "dartfmt" '
             'instead.\n'
             'Either add "dart_style" to your pubspec.yaml or configure the '
-            'format tool to use "dartfmt" instead.'));
+            'format tool to use "dartfmt" instead.')!);
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
@@ -520,7 +522,7 @@ FormatExecution buildExecution(
   }
 
   final inputs = useRestForInputs
-      ? FormatterInputs({...context.argResults.rest})
+      ? FormatterInputs({...?context.argResults?.rest})
       : FormatTool.getInputs(
           exclude: exclude,
           root: path,
@@ -536,17 +538,17 @@ FormatExecution buildExecution(
 
   if (inputs.excludedFiles?.isNotEmpty ?? false) {
     _log.fine('Excluding these paths from formatting:\n  '
-        '${inputs.excludedFiles.join('\n  ')}');
+        '${inputs.excludedFiles!.join('\n  ')}');
   }
 
   if (inputs.skippedLinks?.isNotEmpty ?? false) {
     _log.fine('Excluding these links from formatting:\n  '
-        '${inputs.skippedLinks.join('\n  ')}');
+        '${inputs.skippedLinks!.join('\n  ')}');
   }
 
   if (inputs.hiddenDirectories?.isNotEmpty ?? false) {
     _log.fine('Excluding these hidden directories from formatting:\n  '
-        '${inputs.hiddenDirectories.join('\n  ')}');
+        '${inputs.hiddenDirectories!.join('\n  ')}');
   }
 
   final dartFormatter = buildFormatProcess(formatter);
@@ -568,7 +570,7 @@ FormatExecution buildExecution(
     [...args, ...inputs.includedFiles],
     mode: ProcessStartMode.inheritStdio,
   );
-  DirectiveOrganization directiveOrganization;
+  DirectiveOrganization? directiveOrganization;
   if (organizeDirectives) {
     directiveOrganization = DirectiveOrganization(
       inputs.includedFiles,
@@ -587,7 +589,7 @@ FormatExecution buildExecution(
 /// - [Formatter.dartfmt] -> `dartfmt`
 /// - [Formatter.dartFormat] -> `dart format`
 /// - [Formatter.dartStyle] -> `dart run dart_style:format`
-ProcessDeclaration buildFormatProcess([Formatter formatter]) {
+ProcessDeclaration buildFormatProcess([Formatter? formatter]) {
   switch (formatter) {
     case Formatter.dartStyle:
       return ProcessDeclaration(exe.dart, ['run', 'dart_style:format']);
@@ -605,9 +607,8 @@ ProcessDeclaration buildFormatProcess([Formatter formatter]) {
 /// Unless [verbose] is true, the list of inputs will be abbreviated to avoid an
 /// unnecessarily long log.
 void logCommand(
-    String executable, Iterable<String> inputs, Iterable<String> args,
-    {bool verbose}) {
-  verbose ??= false;
+    String executable, Iterable<String> inputs, Iterable<String?> args,
+    {bool verbose = false}) {
   final exeAndArgs = '$executable ${args.join(' ')}'.trim();
   if (inputs.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${inputs.join(' ')}');
@@ -624,7 +625,7 @@ void logCommand(
 /// will be called with a message explaining that only one mode can be used.
 ///
 /// If none of the mode flags were enabled, this returns `null`.
-FormatMode validateAndParseMode(
+FormatMode? validateAndParseMode(
     ArgResults argResults, void Function(String message) usageException) {
   final check = argResults['check'] ?? false;
   final dryRun = argResults['dry-run'] ?? false;

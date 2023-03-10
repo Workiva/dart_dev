@@ -97,10 +97,10 @@ class TestTool extends DevTool {
   /// run by this command when the current project depends on `build_test`.
   ///
   /// Run `dart run build_runner test -h` to see all available args.
-  List<String> buildArgs;
+  List<String>? buildArgs;
 
   @override
-  String description = 'Run dart tests in this package.';
+  String? description = 'Run dart tests in this package.';
 
   /// The args to pass to the `dart test` process (either directly or
   /// through the `dart run build_runner test` process if applicable).
@@ -112,15 +112,15 @@ class TestTool extends DevTool {
   /// configuring this field, it is preferred that the project be configured via
   /// `dart_test.yaml` so that the configuration is used even when running tests
   /// through some means other than `ddev`.
-  List<String> testArgs;
+  List<String>? testArgs;
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) {
+  FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredTestArgs: testArgs);
     return execution.exitCode ??
-        runProcessAndEnsureExit(execution.process, log: _log);
+        await runProcessAndEnsureExit(execution.process!, log: _log);
   }
 
   @override
@@ -151,12 +151,12 @@ class TestExecution {
   /// exit with this code.
   ///
   /// If null, there is more work to do.
-  final int exitCode;
+  final int? exitCode;
 
   /// A declarative representation of the test process that should be run.
   ///
   /// This process' result should become the final result of the [TestTool].
-  final ProcessDeclaration process;
+  final ProcessDeclaration? process;
 }
 
 /// Builds and returns the full list of args for the test process that
@@ -183,15 +183,12 @@ class TestExecution {
 /// If [verbose] is true, both the build args and the test args portions of the
 /// returned list will include the `-v` verbose flag.
 List<String> buildArgs({
-  ArgResults argResults,
-  List<String> configuredBuildArgs,
-  List<String> configuredTestArgs,
-  bool useBuildRunner,
-  bool verbose,
+  ArgResults? argResults,
+  List<String>? configuredBuildArgs,
+  List<String>? configuredTestArgs,
+  bool useBuildRunner = false,
+  bool verbose = false,
 }) {
-  useBuildRunner ??= false;
-  verbose ??= false;
-
   final buildArgs = <String>[
     // Combine all args that should be passed through to the build_runner
     // process in this order:
@@ -214,7 +211,7 @@ List<String> buildArgs({
     ...?configuredTestArgs,
     // 2. The --reporter option.
     if (argResults?.wasParsed('reporter') ?? false)
-      '--reporter=${singleOptionValue(argResults, 'reporter')}',
+      '--reporter=${singleOptionValue(argResults, 'reporter')!}',
     // 3. The -n|--name, -N|--plain-name, and -P|--preset options
     ...?multiOptionValue(argResults, 'name')?.map((v) => '--name=$v'),
     ...?multiOptionValue(argResults, 'plain-name')
@@ -269,31 +266,33 @@ List<String> buildArgs({
 /// on the declarative output.
 TestExecution buildExecution(
   DevToolExecutionContext context, {
-  List<String> configuredBuildArgs,
-  List<String> configuredTestArgs,
-  String path,
+  List<String>? configuredBuildArgs,
+  List<String>? configuredTestArgs,
+  String? path,
 }) {
+  final argResults = context.argResults;
   final hasBuildRunner =
       packageIsImmediateDependency('build_runner', path: path);
   final hasBuildTest = packageIsImmediateDependency('build_test', path: path);
   final useBuildRunner = hasBuildRunner && hasBuildTest;
   if (!useBuildRunner &&
-      context.argResults != null &&
-      context.argResults['build-args'] != null) {
+      argResults != null &&
+      argResults['build-args'] != null) {
     context.usageException('Can only use --build-args in a project that has a '
         'direct dependency on both "build_runner" and "build_test" in the '
         'pubspec.yaml.');
   }
 
-  if (!useBuildRunner && (flagValue(context.argResults, 'release') ?? false)) {
+  if (!useBuildRunner && (flagValue(argResults, 'release') ?? false)) {
     _log.warning(yellow.wrap('The --release flag is only applicable in '
         'projects that run tests with build_runner, and this project does not.\n'
         'It will have no effect.'));
   }
 
   if (!packageIsImmediateDependency('test', path: path)) {
-    _log.severe(red.wrap('Cannot run tests.\n') +
-        yellow.wrap('You must have a dependency on "test" in pubspec.yaml.\n'));
+    _log.severe(red.wrap('Cannot run tests.\n')! +
+        yellow
+            .wrap('You must have a dependency on "test" in pubspec.yaml.\n')!);
     return TestExecution.exitEarly(ExitCode.config.code);
   }
 
@@ -309,7 +308,7 @@ TestExecution buildExecution(
   }
 
   final args = buildArgs(
-      argResults: context.argResults,
+      argResults: argResults,
       configuredBuildArgs: configuredBuildArgs,
       configuredTestArgs: configuredTestArgs,
       useBuildRunner: useBuildRunner,
@@ -323,7 +322,7 @@ TestExecution buildExecution(
 // Additionally, consumers need to depend on build_web_compilers AND build_vm_compilers
 // We should add some guard-rails (don't use filters if either of those deps are
 // missing, and ensure adequate version of build_runner).
-Iterable<String> buildFiltersForTestArgs(List<String> testArgs) {
+Iterable<String> buildFiltersForTestArgs(List<String>? testArgs) {
   final testInputs = (testArgs ?? []).where((arg) => arg.startsWith('test'));
   final filters = <String>[];
   for (final input in testInputs) {

@@ -1,6 +1,6 @@
 import 'package:args/args.dart';
 
-bool flagValue(ArgResults argResults, String name) {
+bool? flagValue(ArgResults? argResults, String name) {
   if (argResults == null || argResults[name] == null) {
     return null;
   }
@@ -10,7 +10,7 @@ bool flagValue(ArgResults argResults, String name) {
   return argResults[name];
 }
 
-Iterable<String> multiOptionValue(ArgResults argResults, String name) {
+Iterable<String>? multiOptionValue(ArgResults? argResults, String name) {
   if (argResults == null || argResults[name] == null) {
     return null;
   }
@@ -20,7 +20,7 @@ Iterable<String> multiOptionValue(ArgResults argResults, String name) {
   return List<String>.from(argResults[name]);
 }
 
-String singleOptionValue(ArgResults argResults, String name) {
+String? singleOptionValue(ArgResults? argResults, String name) {
   if (argResults == null || argResults[name] == null) {
     return null;
   }
@@ -30,5 +30,5 @@ String singleOptionValue(ArgResults argResults, String name) {
   return argResults[name];
 }
 
-Iterable<String> splitSingleOptionValue(ArgResults argResults, String name) =>
+Iterable<String>? splitSingleOptionValue(ArgResults? argResults, String name) =>
     singleOptionValue(argResults, name)?.split(' ');

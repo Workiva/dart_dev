@@ -9,13 +9,13 @@ class NamespaceCollector extends SimpleAstVisitor<List<NamespaceDirective>> {
   final List<NamespaceDirective> _namespaces = [];
 
   @override
-  List<NamespaceDirective> visitExportDirective(ExportDirective node) {
+  List<NamespaceDirective>? visitExportDirective(ExportDirective node) {
     _namespaces.add(node);
     return null;
   }
 
   @override
-  List<NamespaceDirective> visitImportDirective(ImportDirective node) {
+  List<NamespaceDirective>? visitImportDirective(ImportDirective node) {
     _namespaces.add(node);
     return null;
   }

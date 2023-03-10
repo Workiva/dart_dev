@@ -46,7 +46,7 @@ class DartDevRunner extends CommandRunner<int> {
     final exitCode = (await super.run(args)) ?? 0;
     stopwatch.stop();
     await events.commandComplete(
-        events.CommandResult(args, exitCode, stopwatch.elapsed));
+        events.CommandResult(args.toList(), exitCode, stopwatch.elapsed));
     return exitCode;
   }
 }

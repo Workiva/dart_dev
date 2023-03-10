@@ -17,7 +17,7 @@ import 'executables.dart' as exe;
 /// passed to the [Process] that is run by this function.
 bool globalPackageIsActiveAndCompatible(
     String packageName, VersionConstraint constraint,
-    {Map<String, String> environment}) {
+    {Map<String, String>? environment}) {
   final args = ['pub', 'global', 'list'];
   final result = Process.runSync(exe.dart, args,
       environment: environment, stderrEncoding: utf8, stdoutEncoding: utf8);

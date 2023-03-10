@@ -12,28 +12,30 @@ import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 ///
 /// Use [DevTool.fromFunction] to create [FunctionTool] instances.
 class FunctionTool extends DevTool {
-  FunctionTool(FutureOr<int> Function(DevToolExecutionContext context) function,
-      {ArgParser argParser})
+  FunctionTool(
+      FutureOr<int>? Function(DevToolExecutionContext context) function,
+      {ArgParser? argParser})
       : _argParser = argParser,
         _function = function;
 
-  final FutureOr<int> Function(DevToolExecutionContext context) _function;
+  final FutureOr<int>? Function(DevToolExecutionContext context) _function;
 
   // ---------------------------------------------------------------------------
   // DevTool Overrides
   // ---------------------------------------------------------------------------
 
   @override
-  ArgParser get argParser => _argParser;
-  final ArgParser _argParser;
+  ArgParser? get argParser => _argParser;
+  final ArgParser? _argParser;
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) async {
+  FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
-    if (context.argResults != null) {
+    final argResults = context.argResults;
+    if (argResults != null) {
       if (argParser == null) {
         assertNoPositionalArgsNorArgsAfterSeparator(
-            context.argResults, context.usageException,
+            argResults, context.usageException,
             commandName: context.commandName);
       }
     }

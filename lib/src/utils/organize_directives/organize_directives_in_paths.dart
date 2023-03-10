@@ -104,7 +104,7 @@ int _fail(String message) {
   return 1;
 }
 
-String _safelyReadFileContents(File file) {
+String? _safelyReadFileContents(File file) {
   try {
     return file.readAsStringSync();
   } on FileSystemException {
@@ -112,7 +112,7 @@ String _safelyReadFileContents(File file) {
   }
 }
 
-String _safelyOrganizeDirectives(String fileContents) {
+String? _safelyOrganizeDirectives(String fileContents) {
   try {
     return organizeDirectives(fileContents);
   } on ArgumentError {

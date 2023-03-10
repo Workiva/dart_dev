@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   final commandName = 'test';
   bool beforeSeparator = false;
-  bool usageExceptionCalled;
+  late bool usageExceptionCalled;
   void usageException(String msg) {
     usageExceptionCalled = true;
     expect(msg, contains('The "$commandName" command'));

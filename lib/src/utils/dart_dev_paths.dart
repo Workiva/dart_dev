@@ -5,9 +5,9 @@ import 'package:path/path.dart' as p;
 class DartDevPaths {
   final p.Context _context;
 
-  DartDevPaths({p.Context context}) : _context = context ?? p.context;
+  DartDevPaths({p.Context? context}) : _context = context ?? p.context;
 
-  String cache([String subPath]) => _context.normalize(
+  String cache([String? subPath]) => _context.normalize(
       _context.joinAll([..._cacheParts, if (subPath != null) subPath]));
 
   String get _cacheForDart => p.url.joinAll(_cacheParts);

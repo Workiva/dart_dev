@@ -29,7 +29,7 @@ void main() {
     test('accepts a custom ArgParser', () async {
       final parser = ArgParser()..addFlag('flag');
       final tool = DevTool.fromFunction((context) {
-        expect(context.argResults['flag'], isTrue);
+        expect(context.argResults!['flag'], isTrue);
         return 0;
       }, argParser: parser);
       await tool

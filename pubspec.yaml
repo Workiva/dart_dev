@@ -4,26 +4,26 @@ description: Centralized tooling for Dart projects. Consistent interface across 
 homepage: https://github.com/Workiva/dart_dev
 
 environment:
- sdk: ">=2.11.0 <3.0.0"
+ sdk: '>=2.18.0 <3.0.0'
 
 dependencies:
   analyzer: '>=1.7.2 <6.0.0'
   args: ^2.0.0
-  async: ^2.3.0
-  build_runner: '>=1.0.0 <3.0.0'
+  async: ^2.5.0
+  build_runner: ^2.0.0
   glob: ^2.0.0
-  io: '>=0.3.5 <2.0.0'
+  io: ^1.0.0
   logging: ^1.0.0
-  path: ^1.6.2
-  pedantic: ^1.7.0
+  path: ^1.8.0
   pub_semver: ^2.0.0
-  pubspec_parse: '>=0.1.8 <2.0.0'
-  stack_trace: ^1.9.3
+  pubspec_parse: ^1.0.0
+  stack_trace: ^1.10.0
   yaml: ^3.0.0
+  collection: ^1.15.0
 
 dev_dependencies:
   dependency_validator: ^3.0.0
-  lints: ^1.0.1
+  lints: '>=1.0.1 <3.0.0'
   matcher: ^0.12.5
   test: ^1.15.7
   test_descriptor: ^2.0.0

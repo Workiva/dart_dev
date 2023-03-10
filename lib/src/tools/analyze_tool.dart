@@ -48,17 +48,17 @@ class AnalyzeTool extends DevTool {
   /// The args to pass to the `dartanalyzer`  or `dart analyze` process run by this tool.
   ///
   /// Run `dartanalyzer -h -v` or `dart analyze -h -v` to see all available args.
-  List<String> analyzerArgs;
+  List<String>? analyzerArgs;
 
   /// The globs to include as entry points to run static analysis on.
   ///
   /// The default is `.` (e.g. `dartanalyzer .`) which runs analysis on all Dart
   /// files in the current working directory.
-  List<Glob> include;
+  List<Glob>? include;
 
   /// The default tool for analysis will be `dartanalyzer` unless opted in here
   /// to utilize `dart analyze`.
-  bool useDartAnalyze;
+  bool? useDartAnalyze;
 
   // ---------------------------------------------------------------------------
   // DevTool Overrides
@@ -71,19 +71,18 @@ class AnalyzeTool extends DevTool {
             'Run "dartanalyzer -h -v" or `dart analyze -h -v" to see all available options.');
 
   @override
-  String description = 'Run static analysis on dart files in this package.';
+  String? description = 'Run static analysis on dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext context]) {
-    useDartAnalyze ??= false;
-    if (!dartVersionHasDartanalyzer) {
-      useDartAnalyze = true;
-    }
+  FutureOr<int?> run([DevToolExecutionContext? context]) {
     return runProcessAndEnsureExit(
-        buildProcess(context ?? DevToolExecutionContext(),
-            configuredAnalyzerArgs: analyzerArgs,
-            include: include,
-            useDartAnalyze: useDartAnalyze),
+        buildProcess(
+          context ?? DevToolExecutionContext(),
+          configuredAnalyzerArgs: analyzerArgs,
+          include: include,
+          useDartAnalyze:
+              !dartVersionHasDartanalyzer ? true : useDartAnalyze ?? false,
+        ),
         log: _log);
   }
 }
@@ -99,12 +98,10 @@ class AnalyzeTool extends DevTool {
 /// If [verbose] is true and the verbose flag (`-v`) is not already included, it
 /// will be added.
 Iterable<String> buildArgs(
-    {ArgResults argResults,
-    List<String> configuredAnalyzerArgs,
-    bool useDartAnalyze,
-    bool verbose}) {
-  useDartAnalyze ??= false;
-  verbose ??= false;
+    {ArgResults? argResults,
+    List<String>? configuredAnalyzerArgs,
+    bool useDartAnalyze = false,
+    bool verbose = false}) {
   final args = <String>[
     // Combine all args that should be passed through to the analyzer in
     // this order:
@@ -126,7 +123,7 @@ Iterable<String> buildArgs(
 ///
 /// By default these globs are assumed to be relative to the current working
 /// directory, but that can be overridden via [root] for testing purposes.
-Iterable<String> buildEntrypoints({List<Glob> include, String root}) {
+Iterable<String> buildEntrypoints({List<Glob>? include, String? root}) {
   include ??= <Glob>[];
   final entrypoints = <String>{
     for (final glob in include)
@@ -166,16 +163,16 @@ Iterable<String> buildEntrypoints({List<Glob> include, String root}) {
 /// on the declarative output.
 ProcessDeclaration buildProcess(
   DevToolExecutionContext context, {
-  List<String> configuredAnalyzerArgs,
-  List<Glob> include,
-  String path,
-  bool useDartAnalyze,
+  List<String>? configuredAnalyzerArgs,
+  List<Glob>? include,
+  String? path,
+  bool useDartAnalyze = false,
 }) {
-  useDartAnalyze ??= false;
-  if (context.argResults != null) {
+  final argResults = context.argResults;
+  if (argResults != null) {
     final analyzerUsed = useDartAnalyze ? 'dart analyze' : 'dartanalyzer';
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults, context.usageException,
+        argResults, context.usageException,
         commandName: context.commandName,
         usageFooter:
             'Arguments can be passed to the "$analyzerUsed" process via '
@@ -202,11 +199,9 @@ ProcessDeclaration buildProcess(
 void logCommand(
   Iterable<String> args,
   Iterable<String> entrypoints, {
-  bool useDartAnalyzer,
-  bool verbose,
+  bool useDartAnalyzer = false,
+  bool verbose = false,
 }) {
-  useDartAnalyzer ??= false;
-  verbose ??= false;
   final exeAndArgs =
       '${useDartAnalyzer ? "dart" : "dartanalyzer"} ${args.join(' ')}'.trim();
 
