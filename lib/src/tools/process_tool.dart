@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
-import 'package:pedantic/pedantic.dart';
 
 import '../dart_dev_tool.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
