@@ -1,7 +1,8 @@
 # Changelog
 
-## 3.9.3-dev
+## 4.0.0
 
+- Migrated to null safety. The new SDK minimum is 2.18
 - Fixes lints on Dart 2.18
 - Formatting changes on Dart 2.18
 - Replace deprecated pedantic package with lints package

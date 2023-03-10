@@ -42,8 +42,8 @@ ArgResults takeOptionArgs(ArgParser parser, ArgResults results) =>
 ///         // any positional args given to `ddev test`.
 ///         ..addTool(TestTool(), argMapper: takeAllArgs)
 ///     };
-ArgResults takeAllArgs(ArgParser parser, ArgResults? results) => parser.parse([
-      ...optionArgsOnly(results!, allowedOptions: parser.options.keys),
+ArgResults takeAllArgs(ArgParser parser, ArgResults results) => parser.parse([
+      ...optionArgsOnly(results, allowedOptions: parser.options.keys),
       ...restArgsWithSeparator(results),
     ]);
 
