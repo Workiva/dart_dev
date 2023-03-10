@@ -186,7 +186,7 @@ Future<void> runWithConfig(
 /// Returns [OverReactFormatTool] if `over_react_format` is a direct dependency,
 /// and the default [FormatTool] otherwise.
 DevTool chooseDefaultFormatTool({String? path}) {
-  final pubspec = cachedPubspec(path: path)!;
+  final pubspec = cachedPubspec(path: path);
   const orf = 'over_react_format';
   final hasOverReactFormat = pubspec.dependencies.containsKey(orf) ||
       pubspec.devDependencies.containsKey(orf) ||
