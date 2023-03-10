@@ -83,9 +83,8 @@ class DevToolExecutionContext {
       {this.argResults,
       this.commandName,
       void Function(String message)? usageException,
-      bool? verbose})
-      : _usageException = usageException,
-        verbose = verbose ?? false;
+      this.verbose = false})
+      : _usageException = usageException;
 
   final void Function(String message)? _usageException;
 
@@ -151,9 +150,14 @@ class DevToolCommand extends Command<int> {
   final String name;
 
   @override
-  Future<int> run() async => devTool.run(DevToolExecutionContext(
-      argResults: argResults,
-      commandName: name,
-      usageException: usageException,
-      verbose: verboseEnabled(this))) as FutureOr<int>;
+  FutureOr<int>? run() async =>
+      (await devTool.run(
+        DevToolExecutionContext(
+          argResults: argResults,
+          commandName: name,
+          usageException: usageException,
+          verbose: verboseEnabled(this),
+        ),
+      )) ??
+      0;
 }
