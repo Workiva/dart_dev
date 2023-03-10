@@ -65,7 +65,7 @@ class FormatTool extends DevTool {
   /// - `dartfmt` (provided by the SDK)
   /// - `dart run dart_style:format` (provided by the `dart_style` package)
   /// - `dart format` (added in Dart SDK 2.10.0)
-  Formatter? formatter = Formatter.dartfmt;
+  Formatter formatter = Formatter.dartfmt;
 
   /// The args to pass to the formatter process run by this command.
   ///
@@ -129,10 +129,11 @@ class FormatTool extends DevTool {
     if (exitCode != 0) {
       return exitCode;
     }
-    if (formatExecution.directiveOrganization != null) {
+    final directiveOrganization = formatExecution.directiveOrganization;
+    if (directiveOrganization != null) {
       exitCode = organizeDirectivesInPaths(
-        formatExecution.directiveOrganization!.inputs,
-        check: formatExecution.directiveOrganization!.check,
+        directiveOrganization.inputs,
+        check: directiveOrganization.check,
         verbose: context.verbose,
       );
     }
@@ -342,9 +343,9 @@ class FormatExecution {
 
 /// A declarative representation of the directive organization work.
 class DirectiveOrganization {
-  DirectiveOrganization(this.inputs, {this.check});
+  DirectiveOrganization(this.inputs, {this.check = false});
 
-  final bool? check;
+  final bool check;
   final Set<String> inputs;
 }
 
@@ -489,15 +490,16 @@ FormatExecution buildExecution(
   final useRestForInputs = (context.argResults?.rest.isNotEmpty ?? false) &&
       context.commandName == 'hackFastFormat';
 
-  if (context.argResults != null) {
+  final argResults = context.argResults;
+  if (argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        context.argResults!, context.usageException,
+        argResults, context.usageException,
         allowRest: useRestForInputs,
         commandName: context.commandName,
         usageFooter:
             'Arguments can be passed to the "dartfmt" or "dart format" process via the '
             '--formatter-args option.');
-    mode = validateAndParseMode(context.argResults!, context.usageException);
+    mode = validateAndParseMode(argResults, context.usageException);
   }
   mode ??= defaultMode;
 
@@ -520,7 +522,7 @@ FormatExecution buildExecution(
   }
 
   final inputs = useRestForInputs
-      ? FormatterInputs({...context.argResults!.rest})
+      ? FormatterInputs({...?context.argResults?.rest})
       : FormatTool.getInputs(
           exclude: exclude,
           root: path,
