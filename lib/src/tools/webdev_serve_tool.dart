@@ -80,7 +80,7 @@ class WebdevServeTool extends DevTool {
       'watcher that rebuilds on changes.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext? context]) {
+  FutureOr<int?> run([DevToolExecutionContext? context]) {
     context ??= DevToolExecutionContext();
     final execution = buildExecution(context,
         configuredBuildArgs: buildArgs, configuredWebdevArgs: webdevArgs);

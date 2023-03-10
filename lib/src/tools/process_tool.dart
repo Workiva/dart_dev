@@ -44,7 +44,7 @@ class ProcessTool extends DevTool {
   Process? _process;
 
   @override
-  FutureOr<int> run([DevToolExecutionContext? context]) async {
+  FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
     final argResults = context.argResults;
     if (argResults != null) {

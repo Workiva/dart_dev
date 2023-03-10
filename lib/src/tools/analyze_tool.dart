@@ -74,7 +74,7 @@ class AnalyzeTool extends DevTool {
   String? description = 'Run static analysis on dart files in this package.';
 
   @override
-  FutureOr<int> run([DevToolExecutionContext? context]) {
+  FutureOr<int?> run([DevToolExecutionContext? context]) {
     return runProcessAndEnsureExit(
         buildProcess(
           context ?? DevToolExecutionContext(),
