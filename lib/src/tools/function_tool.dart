@@ -29,7 +29,7 @@ class FunctionTool extends DevTool {
   final ArgParser? _argParser;
 
   @override
-  FutureOr<int?> run([DevToolExecutionContext? context]) async {
+  FutureOr<int> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
     final argResults = context.argResults;
     if (argResults != null) {

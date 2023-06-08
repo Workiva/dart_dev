@@ -74,10 +74,10 @@ mixin CompoundToolMixin on DevTool {
   }
 
   @override
-  FutureOr<int?> run([DevToolExecutionContext? context]) async {
+  FutureOr<int> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
 
-    int? code = 0;
+    int code = 0;
     for (var i = 0; i < _specs.length; i++) {
       if (!shouldRunTool(_specs[i].when, code)) continue;
       final newCode =

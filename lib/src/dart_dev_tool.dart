@@ -47,7 +47,7 @@ abstract class DevTool {
   /// will provide a fully-populated [DevToolExecutionContext] here.
   ///
   /// This is the one API member that subclasses need to implement.
-  FutureOr<int?> run([DevToolExecutionContext? context]);
+  FutureOr<int> run([DevToolExecutionContext? context]);
 
   /// Converts this tool to a [Command] that can be added directly to a
   /// [CommandRunner], therefore making it executable from the command-line.
@@ -150,7 +150,7 @@ class DevToolCommand extends Command<int> {
   final String name;
 
   @override
-  FutureOr<int>? run() async =>
+  FutureOr<int> run() async =>
       (await devTool.run(
         DevToolExecutionContext(
           argResults: argResults,
@@ -158,6 +158,5 @@ class DevToolCommand extends Command<int> {
           usageException: usageException,
           verbose: verboseEnabled(this),
         ),
-      )) ??
-      0;
+      ));
 }

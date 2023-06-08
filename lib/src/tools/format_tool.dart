@@ -106,7 +106,7 @@ class FormatTool extends DevTool {
   String? description = 'Format dart files in this package.';
 
   @override
-  FutureOr<int?> run([DevToolExecutionContext? context]) async {
+  FutureOr<int> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
     if (formatter == Formatter.dartfmt && !dartVersionHasDartfmt) {
       formatter = Formatter.dartFormat;
@@ -120,7 +120,7 @@ class FormatTool extends DevTool {
       organizeDirectives: organizeDirectives,
     );
     if (formatExecution.exitCode != null) {
-      return formatExecution.exitCode;
+      return formatExecution.exitCode!;
     }
     var exitCode = await runProcessAndEnsureExit(
       formatExecution.formatProcess!,

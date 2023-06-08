@@ -18,7 +18,7 @@ class OverReactFormatTool extends DevTool {
       'Format dart files in this package with over_react_format.';
 
   @override
-  FutureOr<int?> run([DevToolExecutionContext? context]) async {
+  FutureOr<int> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
     Iterable<String> paths = context.argResults?.rest ?? [];
     if (paths.isEmpty) {

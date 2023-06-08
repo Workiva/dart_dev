@@ -58,7 +58,7 @@ class TuneupCheckTool extends DevTool {
       'using the tuneup tool.';
 
   @override
-  FutureOr<int?> run([DevToolExecutionContext? context]) async {
+  FutureOr<int> run([DevToolExecutionContext? context]) async {
     final execution = buildExecution(context ?? DevToolExecutionContext(),
         configuredIgnoreInfos: ignoreInfos);
     return execution.exitCode ??
