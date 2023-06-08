@@ -150,8 +150,7 @@ class DevToolCommand extends Command<int> {
   final String name;
 
   @override
-  FutureOr<int> run() async =>
-      (await devTool.run(
+  FutureOr<int> run() async => (await devTool.run(
         DevToolExecutionContext(
           argResults: argResults,
           commandName: name,
