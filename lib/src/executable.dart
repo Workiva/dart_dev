@@ -117,6 +117,11 @@ String buildDartDevRunScriptContents() {
   var dartVersionComment = hasCustomToolDevDart
       ? getDartVersionComment(File(paths.config).readAsStringSync())
       : null;
+  // If dart_dev itself is not null-safe, opt the entrypoint out of null-safety
+  // so the entrypoint doesn't fail to run in packages that have opted into null-safety.
+  if (!_isDartDevNullSafe && dartVersionComment == null) {
+    dartVersionComment = '// @dart=2.9';
+  }
 
   return '''
 ${dartVersionComment ?? ''}
