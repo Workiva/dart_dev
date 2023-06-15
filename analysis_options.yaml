@@ -4,11 +4,9 @@ analyzer:
   exclude:
     - test/**/fixtures/**
   language:
+    strict-casts: true
     strict-inference: true
     strict-raw-types: true
-  strong-mode:
-    implicit-casts: true
-    implicit-dynamic: true
 
 linter:
   rules:
