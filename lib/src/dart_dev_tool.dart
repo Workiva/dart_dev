@@ -12,7 +12,7 @@ abstract class DevTool {
   DevTool();
 
   factory DevTool.fromFunction(
-          FutureOr<int>? Function(DevToolExecutionContext context) function,
+          FutureOr<int?> Function(DevToolExecutionContext context) function,
           {ArgParser? argParser}) =>
       FunctionTool(function, argParser: argParser);
 

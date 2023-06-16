@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.1
+
+- Fix type mismatch between the expected return type of the function passed to
+`DevTool.fromFunction()` and the `DevTool.run()` method. The updated type is
+more permissive and so should not be breaking.
+
 ## 4.0.0
 
 - Migrated to null safety. The new SDK minimum is 2.18
