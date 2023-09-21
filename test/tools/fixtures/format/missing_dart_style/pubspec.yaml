@@ -2,7 +2,7 @@ name: missing_dart_style
 environment:
  sdk: ">=2.12.0 <3.0.0"
 dev_dependencies:
-  test: any
+  test: ^1.21.1
 
 workiva:
   disable_core_checks: true
