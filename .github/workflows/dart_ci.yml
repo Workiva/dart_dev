@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: 2.18.7
+          sdk: 2.19.6
       - run: dart pub get
       - run: dart run dart_dev format --check
       # TODO: uncomment once https://github.com/dart-lang/sdk/issues/51398 is fixed
@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: 2.18.7
+          sdk: 2.19.6
 
       - id: install
         name: Install dependencies
