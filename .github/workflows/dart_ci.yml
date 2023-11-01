@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.18.7 ] # TODO: re-add stable when compatible
+        sdk: [ 2.18.7, 2.19.6 ] # TODO: re-add stable when compatible
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
