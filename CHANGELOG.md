@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.0
+
+- Raise maximum SDK to include Dart 3.
+
 ## 4.0.3
 
 - Fix generation of the run script that the `dart_dev` CLI uses so that it can
