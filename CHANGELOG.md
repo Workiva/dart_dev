@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.0.3
+
+- Fix generation of the run script that the `dart_dev` CLI uses so that it can
+run with sound null safety (and thus run on Dart 3).
+
 ## 4.0.1
 
 - Fix type mismatch between the expected return type of the function passed to
