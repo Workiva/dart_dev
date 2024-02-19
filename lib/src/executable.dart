@@ -155,7 +155,7 @@ Future<void> runWithConfig(
           ' but it either does not exist or threw unexpectedly:')
       ..writeln('  $error')
       ..writeln()
-      ..writeln('For more info: http://github.com/Workiva/dart_dev#TODO');
+      ..writeln('For more info: https://github.com/Workiva/dart_dev');
     exitCode = ExitCode.config.code;
     return;
   }

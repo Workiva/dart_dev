@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:glob/glob.dart';
-import 'package:glob/list_local_fs.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
@@ -140,6 +139,23 @@ class FormatTool extends DevTool {
     return exitCode;
   }
 
+  // Similar to listSync() but does not recurse into hidden directories.
+  static List<FileSystemEntity> _listSyncWithoutHidden(Directory dir,
+      {required bool recursive, required bool followLinks}) {
+    var allEntries = <FileSystemEntity>[];
+    dir.listSync(recursive: false, followLinks: followLinks).forEach((element) {
+      final basename = p.basename(element.path);
+      if (basename.length > 1 && basename.startsWith(".")) return;
+
+      allEntries.add(element);
+      if (element is Directory) {
+        allEntries.addAll(_listSyncWithoutHidden(element,
+            recursive: recursive, followLinks: followLinks));
+      }
+    });
+    return allEntries;
+  }
+
   /// Builds and returns the object that contains:
   /// - The file paths
   /// - The paths that were excluded by an exclude glob
@@ -151,25 +167,23 @@ class FormatTool extends DevTool {
   ///
   /// By default these globs are assumed to be relative to the current working
   /// directory, but that can be overridden via [root] for testing purposes.
-  ///
-  /// If collapseDirectories is true, directories that contain no exclusions will wind up in the [FormatterInputs],
-  /// rather than each file in that tree.  You may get unexpected results if this and followLinks are both true.
   static FormatterInputs getInputs({
     List<Glob>? exclude,
     bool? expandCwd,
     bool? followLinks,
     String? root,
-    bool? collapseDirectories,
+    @deprecated bool? collapseDirectories,
   }) {
+    if (collapseDirectories != null) {
+      _log.warning(
+          'ignoring deprecated option "collapseDirectories": argv limitations are now solved by parallel invocations');
+    }
+
     expandCwd ??= false;
     followLinks ??= false;
-    collapseDirectories ??= false;
 
     final includedFiles = <String>{};
-    final excludedFiles = <String>{};
     final skippedLinks = <String>{};
-    final hiddenDirectories = <String>{};
-
     exclude ??= <Glob>[];
 
     if (exclude.isEmpty && !expandCwd) {
@@ -178,135 +192,37 @@ class FormatTool extends DevTool {
 
     final dir = Directory(root ?? '.');
 
-    // Use Glob.listSync to get all directories which might include a matching file.
-    var directoriesWithExcludes = <String>{};
-
-    if (collapseDirectories) {
-      for (var g in exclude) {
-        List<FileSystemEntity>? matchingPaths;
-        try {
-          matchingPaths = g.listSync(followLinks: followLinks);
-        } on FileSystemException catch (_) {
-          _log.finer("Glob '$g' did not match any paths.\n");
-        }
-        if (matchingPaths != null) {
-          for (var path in matchingPaths) {
-            if (path is Directory) {
-              directoriesWithExcludes.add(path.path);
-            } else {
-              directoriesWithExcludes.add(path.parent.path);
-            }
-          }
-        }
-      }
-
-      // This is all the directories that contain a match within them.
-      _log.finer("Directories with excludes:\n");
-      for (var dir in directoriesWithExcludes) {
-        _log.finer("  $dir\n");
-      }
-      _log.finer(
-          "${directoriesWithExcludes.length} directories contain excludes\n");
-    }
-
-    String currentDirectory = p.relative(dir.path, from: dir.path);
-    bool skipFilesInDirectory = false;
-    for (final entry
-        in dir.listSync(recursive: true, followLinks: followLinks)) {
-      final relative = p.relative(entry.path, from: dir.path);
-      _log.finest('== Processing relative $relative ==\n');
-
-      if (p.isWithin(currentDirectory, relative)) {
-        if (skipFilesInDirectory) {
-          _log.finest('skipping child $entry\n');
-          continue;
-        }
-      } else {
-        // the file/dir in not inside, cancel skipping.
-        skipFilesInDirectory = false;
-      }
+    for (final entry in _listSyncWithoutHidden(dir,
+        recursive: true, followLinks: followLinks)) {
+      final filename = p.relative(entry.path, from: dir.path);
+      _log.finest('== Processing relative $filename ==\n');
 
       if (entry is Link) {
-        _log.finer('skipping link $relative\n');
-        skippedLinks.add(relative);
+        _log.finer('skipping link $filename\n');
+        skippedLinks.add(filename);
         continue;
       }
 
       if (entry is File && !entry.path.endsWith('.dart')) {
-        _log.finest('skipping non-dart file $relative\n');
+        _log.finest('skipping non-dart file $filename\n');
         continue;
       }
 
-      // If the path is in a subdirectory starting with ".", ignore it.
-      final parts = p.split(relative);
-      int? hiddenIndex;
-      for (var i = 0; i < parts.length; i++) {
-        if (parts[i].startsWith(".")) {
-          hiddenIndex = i;
-          break;
-        }
-      }
-
-      if (hiddenIndex != null) {
-        final hiddenDirectory = p.joinAll(parts.take(hiddenIndex + 1));
-        hiddenDirectories.add(hiddenDirectory);
-        _log.finest('skipping file $relative in hidden dir $hiddenDirectory\n');
-        if (collapseDirectories) {
-          currentDirectory = hiddenDirectory;
-          skipFilesInDirectory = true;
-        }
-        continue;
-      }
-
-      if (exclude.any((glob) => glob.matches(relative))) {
-        _log.finer('excluding $relative\n');
-        excludedFiles.add(relative);
-      } else {
-        if (collapseDirectories && entry is Directory) {
-          _log.finest('directory: $entry\n');
-          currentDirectory = relative;
-          // It seems we can rely on the order of files coming from Directory.listSync.
-          // If the entry does not contain an excluded file,
-          // we skip adding any of its children files or directories.
-          if (directoriesWithExcludes.any(
-            (directoryWithExclude) =>
-                p.isWithin(entry.path, directoryWithExclude) ||
-                p.equals(entry.path, directoryWithExclude),
-          )) {
-            _log.finer('$relative has excludes\n');
-          } else {
-            skipFilesInDirectory = true;
-            _log.finer("$relative does not have excludes, skipping children\n");
-            includedFiles.add(relative);
-          }
-        }
-
-        if (entry is File && !skipFilesInDirectory) {
-          _log.finest("adding $relative\n");
-          includedFiles.add(relative);
-        }
+      if (exclude.any((glob) => glob.matches(filename))) {
+        _log.finer('excluding $filename\n');
+      } else if (entry is File) {
+        _log.finest("adding $filename\n");
+        includedFiles.add(filename);
       }
     }
 
-    _log.finer("excluded ${excludedFiles.length} files\n");
-
-    return FormatterInputs(includedFiles,
-        excludedFiles: excludedFiles,
-        skippedLinks: skippedLinks,
-        hiddenDirectories: hiddenDirectories);
+    return FormatterInputs(includedFiles, skippedLinks: skippedLinks);
   }
 }
 
 class FormatterInputs {
-  FormatterInputs(this.includedFiles,
-      {this.excludedFiles, this.hiddenDirectories, this.skippedLinks});
-
-  final Set<String>? excludedFiles;
-
-  final Set<String>? hiddenDirectories;
-
+  FormatterInputs(this.includedFiles, {this.skippedLinks});
   final Set<String> includedFiles;
-
   final Set<String>? skippedLinks;
 }
 
@@ -322,6 +238,7 @@ class FormatExecution {
   FormatExecution.exitEarly(this.exitCode)
       : formatProcess = null,
         directiveOrganization = null;
+
   FormatExecution.process(this.formatProcess, [this.directiveOrganization])
       : exitCode = null;
 
@@ -526,7 +443,6 @@ FormatExecution buildExecution(
       : FormatTool.getInputs(
           exclude: exclude,
           root: path,
-          collapseDirectories: true,
         );
 
   if (inputs.includedFiles.isEmpty) {
@@ -536,19 +452,9 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
-  if (inputs.excludedFiles?.isNotEmpty ?? false) {
-    _log.fine('Excluding these paths from formatting:\n  '
-        '${inputs.excludedFiles!.join('\n  ')}');
-  }
-
   if (inputs.skippedLinks?.isNotEmpty ?? false) {
     _log.fine('Excluding these links from formatting:\n  '
         '${inputs.skippedLinks!.join('\n  ')}');
-  }
-
-  if (inputs.hiddenDirectories?.isNotEmpty ?? false) {
-    _log.fine('Excluding these hidden directories from formatting:\n  '
-        '${inputs.hiddenDirectories!.join('\n  ')}');
   }
 
   final dartFormatter = buildFormatProcess(formatter);

@@ -45,8 +45,6 @@ void main() {
       test('no excludes', () {
         final formatterInputs = FormatTool.getInputs(root: root);
         expect(formatterInputs.includedFiles, unorderedEquals({'.'}));
-        expect(formatterInputs.excludedFiles, null);
-        expect(formatterInputs.hiddenDirectories, null);
         expect(formatterInputs.skippedLinks, null);
       });
 
@@ -64,43 +62,10 @@ void main() {
               p.join('other', 'file.dart'),
             }));
 
-        expect(formatterInputs.excludedFiles,
-            unorderedEquals({'should_exclude.dart'}));
-        expect(formatterInputs.hiddenDirectories,
-            unorderedEquals({'.dart_tool_test'}));
         expect(
             formatterInputs.skippedLinks,
             unorderedEquals(
                 {p.join('links', 'lib-link'), p.join('links', 'link.dart')}));
-      });
-
-      test('custom excludes with collapseDirectories', () {
-        FormatterInputs formatterInputs = FormatTool.getInputs(
-          exclude: [Glob('*_exclude.dart')],
-          root: root,
-          collapseDirectories: true,
-        );
-
-        expect(
-          formatterInputs.includedFiles,
-          unorderedEquals({
-            'file.dart',
-            'lib',
-            'linked.dart',
-            'other',
-            'links',
-          }),
-        );
-
-        expect(
-          formatterInputs.excludedFiles,
-          unorderedEquals({'should_exclude.dart'}),
-        );
-        expect(
-          formatterInputs.hiddenDirectories,
-          unorderedEquals({'.dart_tool_test'}),
-        );
-        expect(formatterInputs.skippedLinks, isEmpty);
       });
 
       test('empty inputs due to excludes config', () async {
@@ -123,7 +88,6 @@ void main() {
               p.join('other', 'file.dart'),
               'should_exclude.dart',
             }));
-        expect(formatterInputs.excludedFiles, isEmpty);
       });
 
       test('followLinks follows linked files and directories', () async {
@@ -295,25 +259,6 @@ void main() {
       final execution = buildExecution(context,
           exclude: [Glob('**')], path: 'test/tools/fixtures/format/globs');
       expect(execution.exitCode, ExitCode.config.code);
-    });
-
-    test('logs the excluded paths and hidden directories', () async {
-      var currentLevel = Logger.root.level;
-      Logger.root.level = Level.FINE;
-      expect(
-          Logger.root.onRecord,
-          emitsInOrder([
-            fineLogOf(allOf(contains('Excluding these paths'),
-                contains('should_exclude.dart'))),
-            fineLogOf(allOf(contains('Excluding these hidden directories'),
-                contains('.dart_tool_test'))),
-          ]));
-
-      buildExecution(DevToolExecutionContext(),
-          exclude: [Glob('*_exclude.dart')],
-          path: 'test/tools/fixtures/format/globs');
-
-      Logger.root.level = currentLevel;
     });
 
     test('logs the skipped links', () async {
