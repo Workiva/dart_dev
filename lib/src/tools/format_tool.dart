@@ -465,11 +465,6 @@ FormatExecution buildExecution(
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
-  if (inputs.skippedLinks?.isNotEmpty ?? false) {
-    _log.fine('Excluding these links from formatting:\n  '
-        '${inputs.skippedLinks!.join('\n  ')}');
-  }
-
   final dartFormatter = buildFormatProcess(formatter);
   Iterable<String> args;
   if (formatter == Formatter.dartFormat) {
