@@ -183,7 +183,6 @@ class FormatTool extends DevTool {
     followLinks ??= false;
 
     final includedFiles = <String>{};
-    final skippedLinks = <String>{};
     exclude ??= <Glob>[];
 
     if (exclude.isEmpty && !expandCwd) {
@@ -199,7 +198,6 @@ class FormatTool extends DevTool {
 
       if (entry is Link) {
         _log.finer('skipping link $filename\n');
-        skippedLinks.add(filename);
         continue;
       }
 
@@ -211,18 +209,33 @@ class FormatTool extends DevTool {
       if (exclude.any((glob) => glob.matches(filename))) {
         _log.finer('excluding $filename\n');
       } else if (entry is File) {
-        _log.finest("adding $filename\n");
+        _log.finest('adding $filename\n');
         includedFiles.add(filename);
       }
     }
 
-    return FormatterInputs(includedFiles, skippedLinks: skippedLinks);
+    return FormatterInputs(includedFiles);
   }
 }
 
 class FormatterInputs {
-  FormatterInputs(this.includedFiles, {this.skippedLinks});
+  FormatterInputs(this.includedFiles,
+      {@deprecated this.excludedFiles,
+      @deprecated this.hiddenDirectories,
+      @deprecated this.skippedLinks});
+
   final Set<String> includedFiles;
+
+  // These fields are deprecated and are likely to be empty, due to
+  // performance optimizations made in
+  // https://github.com/Workiva/dart_dev/pull/424
+  @deprecated
+  final Set<String>? excludedFiles;
+
+  @deprecated
+  final Set<String>? hiddenDirectories;
+
+  @deprecated
   final Set<String>? skippedLinks;
 }
 
