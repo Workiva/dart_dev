@@ -45,7 +45,6 @@ void main() {
       test('no excludes', () {
         final formatterInputs = FormatTool.getInputs(root: root);
         expect(formatterInputs.includedFiles, unorderedEquals({'.'}));
-        expect(formatterInputs.skippedLinks, null);
       });
 
       test('custom excludes', () {
@@ -61,11 +60,6 @@ void main() {
               'linked.dart',
               p.join('other', 'file.dart'),
             }));
-
-        expect(
-            formatterInputs.skippedLinks,
-            unorderedEquals(
-                {p.join('links', 'lib-link'), p.join('links', 'link.dart')}));
       });
 
       test('empty inputs due to excludes config', () async {
@@ -100,7 +94,6 @@ void main() {
               'not_link.dart',
               'link.dart',
             }));
-        expect(formatterInputs.skippedLinks, isEmpty);
       });
     });
   });
@@ -259,23 +252,6 @@ void main() {
       final execution = buildExecution(context,
           exclude: [Glob('**')], path: 'test/tools/fixtures/format/globs');
       expect(execution.exitCode, ExitCode.config.code);
-    });
-
-    test('logs the skipped links', () async {
-      var currentLevel = Logger.root.level;
-      Logger.root.level = Level.FINE;
-      expect(
-          Logger.root.onRecord,
-          emitsInOrder([
-            fineLogOf(allOf(contains('Excluding these links'),
-                contains('lib-link'), contains('link.dart'))),
-          ]));
-
-      buildExecution(DevToolExecutionContext(),
-          exclude: [Glob('*_exclude.dart')],
-          path: 'test/tools/fixtures/format/globs/links');
-
-      Logger.root.level = currentLevel;
     });
 
     group('returns a FormatExecution', () {
