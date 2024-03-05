@@ -128,9 +128,10 @@ List<String> generateRunScript() {
           RegExp(r'''^import ['"][^:]+$''', multiLine: true).hasMatch(contents);
       final currentPackageName =
           Pubspec.parse(File('pubspec.yaml').readAsStringSync()).name;
-      configHasSamePackageImports =
-          RegExp('''^import ['"]package:$currentPackageName\/''', multiLine: true)
-              .hasMatch(contents);
+      configHasSamePackageImports = RegExp(
+              '''^import ['"]package:$currentPackageName\/''',
+              multiLine: true)
+          .hasMatch(contents);
     }
 
     if (configHasSamePackageImports) {

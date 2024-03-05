@@ -14,7 +14,14 @@ class DartDevRunner extends CommandRunner<int> {
       : super('dart_dev', 'Dart tool runner.') {
     // For backwards-compatibility, only add the `clean` command if it doesn't
     // conflict with any configured command.
-    commands.putIfAbsent('clean', () => CleanTool());
+    if (!commands.containsKey('clean')) {
+      // Construct a new commands map here, to work around a runtime typecheck
+      // failure:
+      // `type 'CleanTool' is not a subtype of type 'FormatTool' of 'value'`
+      // As seen in this CI run:
+      // https://github.com/Workiva/dart_dev/actions/runs/8161855516/job/22311519665?pr=426#step:8:295
+      commands = <String, DevTool>{...commands, 'clean': CleanTool()};
+    }
 
     commands.forEach((name, builder) {
       final command = builder.toCommand(name);
