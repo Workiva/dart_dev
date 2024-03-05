@@ -1,6 +1,6 @@
 # Dart Dev Tools
 
-[![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dartlang.org/packages/dart_dev)
+[![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dev/packages/dart_dev)
 [![Build Status](https://github.com/Workiva/dart_dev/workflows/Dart%20CI/badge.svg?branch=master)](https://github.com/Workiva/dart_dev/actions?query=workflow%3A%22Dart+CI%22+branch%3Amaster)
 
 Centralized tooling for Dart projects. Consistent interface across projects.
@@ -25,10 +25,8 @@ Easily configurable.
 
 Add `dart_dev` as a dev dependency in your project:
 
-```yaml
-# pubspec.yaml
-dev_dependencies:
-  dart_dev: ^3.0.0
+```bash
+dart pub add --dev dart_dev
 ```
 
 By default, this provides three core tasks:
@@ -93,7 +91,7 @@ With `dart_dev`, we attempt to address #1 by providing a way to configure all of
 these common developer tasks at the project level, and #2 by composing
 additional functionality around existing tools.
 
-This package is built with configurability and extensiblity in mind, with the
+This package is built with configurability and extensibility in mind, with the
 hope that you and your teams will find value in creating your own tools and
 shared configurations. Ideally, you or your team can settle on a shared
 configuration that individual projects can consume; projects with unique
@@ -119,7 +117,7 @@ With `dart_dev`, this can be accomplished like so:
 ```dart
 // tool/dart_dev/config.dart
 import 'package:dart_dev/dart_dev.dart';
-import 'pacakge:glob/glob.dart';
+import 'package:glob/glob.dart';
 
 final config = {
   'format': FormatTool()
@@ -307,7 +305,7 @@ For additional reference on how the watcher is set up, see [JetBrains File Watch
   1. __The Name:__ Webstorm treats this like the process name, so it's the identifier that will be used to display any output that the process is running. It can be whatever you like!
   1. __File Type:__ `Dart`, since that's what the formatter was built for.
   1. __Scope:__ `Project Files` will produce the desired effect, but if a different option works better for you then feel free! For more information on scoping, see [the docs](file-watcher-docs).
-  1. __Program:__ The exutable to run. In this case, it can just be `pub`. If there are any issues, providing a full path to the executable may have the desired outcome. For pub, this is most likely `/usr/local/bin/pub`.
+  1. __Program:__ The executable to run. In this case, it can just be `pub`. If there are any issues, providing a full path to the executable may have the desired outcome. For pub, this is most likely `/usr/local/bin/pub`.
   1. __Arguments:__ The rest of the command, and by default should be `run dart_dev hackFastFormat "$FilePathRelativeToProjectRoot$"`. Here's the breakdown:
       - `run dart_dev hackFastFormat`: Simply the process to run. 
       - `"$FilePathRelativeToProjectRoot$"`: The environment variable that will target only the changed file.
