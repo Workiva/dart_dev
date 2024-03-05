@@ -104,14 +104,14 @@ List<String> generateRunScript() {
   // Generate the run script if it doesn't yet exist or regenerate it if the
   // existing script is outdated.
   final runScriptContents = buildDartDevRunScriptContents();
-  final runScriptFile = File(_paths.runScript);
-  final runExecutableFile = File(_paths.runExecutable);
-  final runExecutableDigestFile = File(_paths.runExecutableDigest);
-  if (!runScriptFile.existsSync() ||
-      runScriptFile.readAsStringSync() != runScriptContents) {
+  final runScript = File(_paths.runScript);
+  final runExecutable = File(_paths.runExecutable);
+  final runExecutableDigest = File(_paths.runExecutableDigest);
+  if (!runScript.existsSync() ||
+      runScript.readAsStringSync() != runScriptContents) {
     logTimedSync(log, 'Generating run script', () {
       createCacheDir();
-      runScriptFile.writeAsStringSync(runScriptContents);
+      runScript.writeAsStringSync(runScriptContents);
     }, level: Level.INFO);
   }
 
@@ -140,9 +140,8 @@ List<String> generateRunScript() {
       // If the config imports from its own source files, we don't have a way of
       // efficiently tracking changes that would require recompilation of this
       // executable, so we skip the compilation altogether.
-      if (runExecutableFile.existsSync()) runExecutableFile.deleteSync();
-      if (runExecutableDigestFile.existsSync())
-        runExecutableDigestFile.deleteSync();
+      if (runExecutable.existsSync()) runExecutable.deleteSync();
+      if (runExecutableDigest.existsSync()) runExecutableDigest.deleteSync();
       return;
     }
 
@@ -160,15 +159,14 @@ List<String> generateRunScript() {
   }, level: Level.FINE);
 
   if (encodedDigest != null &&
-      (!runExecutableDigestFile.existsSync() ||
-          runExecutableDigestFile.readAsStringSync() != encodedDigest)) {
-    // Digest either didn't exist or is outdated, so we (re-)compile.
+      (!runExecutableDigest.existsSync() ||
+          runExecutableDigest.readAsStringSync() != encodedDigest)) {
+    // Digest is missing or outdated, so we (re-)compile.
     logTimedSync(log, 'Compiling run script', () {
-      // Delete the previous exectuable and digest so that if we hit a failure
+      // Delete the previous executable and digest so that if we hit a failure
       // trying to compile, we don't leave the outdated one in place.
-      if (runExecutableFile.existsSync()) runExecutableFile.deleteSync();
-      if (runExecutableDigestFile.existsSync())
-        runExecutableDigestFile.deleteSync();
+      if (runExecutable.existsSync()) runExecutable.deleteSync();
+      if (runExecutableDigest.existsSync()) runExecutableDigest.deleteSync();
 
       final args = [
         'compile',
@@ -180,7 +178,7 @@ List<String> generateRunScript() {
       final result = Process.runSync(Platform.executable, args);
       if (result.exitCode == 0) {
         // Compilation succeeded. Write the new digest, as well.
-        runExecutableDigestFile.writeAsStringSync(encodedDigest!);
+        runExecutableDigest.writeAsStringSync(encodedDigest!);
       } else {
         // Compilation failed. Dump some logs for debugging, but note to the
         // user that dart_dev should still work.
@@ -193,8 +191,8 @@ List<String> generateRunScript() {
     });
   }
 
-  return runExecutableFile.existsSync()
-      ? [_paths.runExecutable]
+  return runExecutable.existsSync()
+      ? [runExecutable.path]
       : [Platform.executable, 'run', _paths.runScript];
 }
 
