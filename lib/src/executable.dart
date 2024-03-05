@@ -192,7 +192,8 @@ List<String> generateRunScript() {
   }
 
   return runExecutable.existsSync()
-      ? [runExecutable.path]
+      // Using the absolute path is necessary for Windows to find the executable.
+      ? [runExecutable.absolute.path]
       : [Platform.executable, 'run', _paths.runScript];
 }
 
