@@ -107,9 +107,6 @@ bool get shouldWriteRunScript =>
     !_runScript.existsSync() ||
     _runScript.readAsStringSync() != buildDartDevRunScriptContents();
 
-/// Whether dart_dev itself has opted into null-safety.
-const _isDartDevNullSafe = false;
-
 String buildDartDevRunScriptContents() {
   final hasCustomToolDevDart = File(paths.config).existsSync();
   // If the config has a dart version comment (e.g., if it opts out of null safety),
@@ -117,11 +114,6 @@ String buildDartDevRunScriptContents() {
   var dartVersionComment = hasCustomToolDevDart
       ? getDartVersionComment(File(paths.config).readAsStringSync())
       : null;
-  // If dart_dev itself is not null-safe, opt the entrypoint out of null-safety
-  // so the entrypoint doesn't fail to run in packages that have opted into null-safety.
-  if (!_isDartDevNullSafe && dartVersionComment == null) {
-    dartVersionComment = '// @dart=2.9';
-  }
 
   return '''
 ${dartVersionComment ?? ''}
@@ -163,7 +155,7 @@ Future<void> runWithConfig(
           ' but it either does not exist or threw unexpectedly:')
       ..writeln('  $error')
       ..writeln()
-      ..writeln('For more info: http://github.com/Workiva/dart_dev#TODO');
+      ..writeln('For more info: https://github.com/Workiva/dart_dev');
     exitCode = ExitCode.config.code;
     return;
   }

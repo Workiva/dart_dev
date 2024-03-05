@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'test_consume_*'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  dart:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu, windows ]
+        sdk: [ 2.19.6, stable ]
+    name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+      - name: Install dependencies
+        run: dart pub get
+      - name: Validate dependencies
+        run: dart run dependency_validator
+      - name: Analysis
+        run: dart run dart_dev analyze
+      - name: Formatting
+        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+        run: dart run dart_dev format --check
+      - name: Tests
+        run: dart run dart_dev test ${{ matrix.sdk != '2.19.6' && '--test-args="--exclude-tags dart2"' || '' }}

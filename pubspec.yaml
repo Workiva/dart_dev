@@ -1,5 +1,5 @@
 name: dart_dev
-version: 4.0.1
+version: 4.1.1
 description: >
   Centralized tooling for Dart projects. 
   Consistent interface across projects. 
@@ -7,10 +7,10 @@ description: >
 repository: https://github.com/Workiva/dart_dev
 
 environment:
-  sdk: '>=2.18.0 <3.0.0'
+  sdk: '>=2.18.0 <4.0.0'
 
 dependencies:
-  analyzer: '>=1.7.2 <6.0.0'
+  analyzer: '>=2.0.0 <6.0.0'
   args: ^2.0.0
   async: ^2.5.0
   build_runner: ^2.0.0
