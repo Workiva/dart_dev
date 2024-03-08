@@ -150,7 +150,7 @@ List<String> generateRunScript() {
     final packageConfig = File(_paths.packageConfig);
 
     final digest = md5.convert([
-      ...packageConfig.readAsBytesSync(),
+      if (packageConfig.existsSync()) ...packageConfig.readAsBytesSync(),
       if (configFile.existsSync()) ...configFile.readAsBytesSync(),
       if (configHasRelativeImports)
         for (final file in Glob('tool/**.dart', recursive: true)
