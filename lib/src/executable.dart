@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
+import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
@@ -145,14 +146,19 @@ List<String> generateRunScript() {
       return;
     }
 
+    // Include the packageConfig so that when dependencies change, we recompile.
+    final packageConfig = File(_paths.packageConfig);
+
     final digest = md5.convert([
+      ...packageConfig.readAsBytesSync(),
       if (configFile.existsSync()) ...configFile.readAsBytesSync(),
       if (configHasRelativeImports)
         for (final file in Glob('tool/**.dart', recursive: true)
             .listSync()
             .whereType<File>()
             .where(
-                (f) => p.canonicalize(f.path) != p.canonicalize(_paths.config)))
+                (f) => p.canonicalize(f.path) != p.canonicalize(_paths.config))
+            .sortedBy((f) => f.path))
           ...file.readAsBytesSync(),
     ]);
     encodedDigest = base64.encode(digest.bytes);
@@ -162,7 +168,10 @@ List<String> generateRunScript() {
       (!runExecutableDigest.existsSync() ||
           runExecutableDigest.readAsStringSync() != encodedDigest)) {
     // Digest is missing or outdated, so we (re-)compile.
-    logTimedSync(log, 'Compiling run script', () {
+    final logMessage = runExecutable.existsSync()
+        ? 'Recompiling run script (digest changed)'
+        : 'Compiling run script';
+    logTimedSync(log, logMessage, () {
       // Delete the previous executable and digest so that if we hit a failure
       // trying to compile, we don't leave the outdated one in place.
       if (runExecutable.existsSync()) runExecutable.deleteSync();
