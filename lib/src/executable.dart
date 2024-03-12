@@ -7,6 +7,7 @@ import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dart_dev/dart_dev.dart';
+import 'package:dart_dev/src/utils/parse_imports.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:io/ansi.dart';
@@ -101,19 +102,24 @@ Future<void> handleFastFormat(List<String> args) async {
   }
 }
 
-String? _computeRunScriptDigest() {
-  var configHasRelativeImports = false;
+void _deleteRunExecutableAndDigest() =>
+    [_paths.runExecutable, _paths.runExecutableDigest].forEach((p) {
+      final f = File(p);
+      if (f.existsSync()) f.deleteSync();
+    });
 
+/// Return null iff it is not possible to account for all
+/// recompilation-necessitating factors in the digest.
+String? _computeRunScriptDigest() {
+  final currentPackageName =
+      Pubspec.parse(File('pubspec.yaml').readAsStringSync()).name;
   final configFile = File(_paths.config);
+  var configHasRelativeImports = false;
   if (configFile.existsSync()) {
-    final contents = configFile.readAsStringSync();
-    configHasRelativeImports =
-        RegExp(r'''^import ['"][^:]+$''', multiLine: true).hasMatch(contents);
-    final currentPackageName =
-        Pubspec.parse(File('pubspec.yaml').readAsStringSync()).name;
+    final configImports = parseImports(configFile.readAsStringSync());
+    configHasRelativeImports = configImports.any((i) => !i.contains(':'));
     final configHasSamePackageImports =
-        RegExp('''^import ['"]package:$currentPackageName\/''', multiLine: true)
-            .hasMatch(contents);
+        configImports.any((i) => i.startsWith('package:$currentPackageName'));
 
     if (configHasSamePackageImports) {
       log.fine(
@@ -122,15 +128,13 @@ String? _computeRunScriptDigest() {
       // If the config imports from its own source files, we don't have a way of
       // efficiently tracking changes that would require recompilation of this
       // executable, so we skip the compilation altogether.
-      final runExecutable = File(_paths.runExecutable);
-      final runExecutableDigest = File(_paths.runExecutableDigest);
-      if (runExecutable.existsSync()) runExecutable.deleteSync();
-      if (runExecutableDigest.existsSync()) runExecutableDigest.deleteSync();
+      _deleteRunExecutableAndDigest();
       return null;
     }
   }
 
-  // Include the packageConfig so that when dependencies change, we recompile.
+  // Include the packageConfig in the digest so that when dependencies change,
+  // we recompile.
   final packageConfig = File(_paths.packageConfig);
 
   final digest = md5.convert([
@@ -179,9 +183,7 @@ List<String> generateRunScript() {
     logTimedSync(log, logMessage, () {
       // Delete the previous executable and digest so that if we hit a failure
       // trying to compile, we don't leave the outdated one in place.
-      if (runExecutable.existsSync()) runExecutable.deleteSync();
-      if (runExecutableDigest.existsSync()) runExecutableDigest.deleteSync();
-
+      _deleteRunExecutableAndDigest();
       final args = [
         'compile',
         'exe',
