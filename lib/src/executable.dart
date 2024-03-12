@@ -8,6 +8,7 @@ import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/utils/parse_imports.dart';
+import 'package:dart_dev/src/utils/pubspec_lock.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:io/ansi.dart';
@@ -15,6 +16,7 @@ import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:pubspec_parse/pubspec_parse.dart';
+import 'package:yaml/yaml.dart';
 
 import 'dart_dev_runner.dart';
 import 'tools/over_react_format_tool.dart';
@@ -108,6 +110,17 @@ void _deleteRunExecutableAndDigest() =>
       if (f.existsSync()) f.deleteSync();
     });
 
+/// Return true iff all the provided package names can be traced to 'hosted'
+/// entries in pubspec.lock.
+bool _allPackagesAreImportedImmutably(Iterable<String> packageNames) {
+  File pubspecLockFile = File('pubspec.lock');
+  if (!pubspecLockFile.existsSync()) return false;
+  final pubSpecLock = loadYamlDocument(pubspecLockFile.readAsStringSync());
+  return getDependencySources(pubSpecLock, packageNames)
+      .values
+      .every((source) => source == 'hosted');
+}
+
 /// Return null iff it is not possible to account for all
 /// recompilation-necessitating factors in the digest.
 String? _computeRunScriptDigest() {
@@ -128,6 +141,14 @@ String? _computeRunScriptDigest() {
       // If the config imports from its own source files, we don't have a way of
       // efficiently tracking changes that would require recompilation of this
       // executable, so we skip the compilation altogether.
+      _deleteRunExecutableAndDigest();
+      return null;
+    }
+
+    final packageNames = computePackageNamesFromImports(configImports);
+    if (!_allPackagesAreImportedImmutably(packageNames)) {
+      log.fine(
+          'Skipping compilation because ${_paths.config} imports non-hosted packages.');
       _deleteRunExecutableAndDigest();
       return null;
     }
