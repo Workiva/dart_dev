@@ -1,4 +1,5 @@
 import 'dart:collection';
+
 import 'package:yaml/yaml.dart';
 
 /// Index into the pubspecLock to locate the 'source' field for the given
