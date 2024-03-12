@@ -101,6 +101,52 @@ Future<void> handleFastFormat(List<String> args) async {
   }
 }
 
+String? _computeRunScriptDigest() {
+  var configHasRelativeImports = false;
+
+  final configFile = File(_paths.config);
+  if (configFile.existsSync()) {
+    final contents = configFile.readAsStringSync();
+    configHasRelativeImports =
+        RegExp(r'''^import ['"][^:]+$''', multiLine: true).hasMatch(contents);
+    final currentPackageName =
+        Pubspec.parse(File('pubspec.yaml').readAsStringSync()).name;
+    final configHasSamePackageImports =
+        RegExp('''^import ['"]package:$currentPackageName\/''', multiLine: true)
+            .hasMatch(contents);
+
+    if (configHasSamePackageImports) {
+      log.fine(
+          'Skipping compilation because ${_paths.config} imports from its own package.');
+
+      // If the config imports from its own source files, we don't have a way of
+      // efficiently tracking changes that would require recompilation of this
+      // executable, so we skip the compilation altogether.
+      final runExecutable = File(_paths.runExecutable);
+      final runExecutableDigest = File(_paths.runExecutableDigest);
+      if (runExecutable.existsSync()) runExecutable.deleteSync();
+      if (runExecutableDigest.existsSync()) runExecutableDigest.deleteSync();
+      return null;
+    }
+  }
+
+  // Include the packageConfig so that when dependencies change, we recompile.
+  final packageConfig = File(_paths.packageConfig);
+
+  final digest = md5.convert([
+    if (packageConfig.existsSync()) ...packageConfig.readAsBytesSync(),
+    if (configFile.existsSync()) ...configFile.readAsBytesSync(),
+    if (configHasRelativeImports)
+      for (final file in Glob('tool/**.dart', recursive: true)
+          .listSync()
+          .whereType<File>()
+          .where((f) => p.canonicalize(f.path) != p.canonicalize(_paths.config))
+          .sortedBy((f) => f.path))
+        ...file.readAsBytesSync(),
+  ]);
+  return base64.encode(digest.bytes);
+}
+
 List<String> generateRunScript() {
   // Generate the run script if it doesn't yet exist or regenerate it if the
   // existing script is outdated.
@@ -119,50 +165,9 @@ List<String> generateRunScript() {
   // Generate a digest of inputs to the run script. We use this to determine
   // whether we need to recompile the executable.
   String? encodedDigest;
-  logTimedSync(log, 'Computing run script digest', () {
-    var configHasRelativeImports = false;
-    var configHasSamePackageImports = false;
-    final configFile = File(_paths.config);
-    if (configFile.existsSync()) {
-      final contents = configFile.readAsStringSync();
-      configHasRelativeImports =
-          RegExp(r'''^import ['"][^:]+$''', multiLine: true).hasMatch(contents);
-      final currentPackageName =
-          Pubspec.parse(File('pubspec.yaml').readAsStringSync()).name;
-      configHasSamePackageImports = RegExp(
-              '''^import ['"]package:$currentPackageName\/''',
-              multiLine: true)
-          .hasMatch(contents);
-    }
-
-    if (configHasSamePackageImports) {
-      log.fine(
-          'Skipping compilation because ${_paths.config} imports from its own package.');
-      // If the config imports from its own source files, we don't have a way of
-      // efficiently tracking changes that would require recompilation of this
-      // executable, so we skip the compilation altogether.
-      if (runExecutable.existsSync()) runExecutable.deleteSync();
-      if (runExecutableDigest.existsSync()) runExecutableDigest.deleteSync();
-      return;
-    }
-
-    // Include the packageConfig so that when dependencies change, we recompile.
-    final packageConfig = File(_paths.packageConfig);
-
-    final digest = md5.convert([
-      if (packageConfig.existsSync()) ...packageConfig.readAsBytesSync(),
-      if (configFile.existsSync()) ...configFile.readAsBytesSync(),
-      if (configHasRelativeImports)
-        for (final file in Glob('tool/**.dart', recursive: true)
-            .listSync()
-            .whereType<File>()
-            .where(
-                (f) => p.canonicalize(f.path) != p.canonicalize(_paths.config))
-            .sortedBy((f) => f.path))
-          ...file.readAsBytesSync(),
-    ]);
-    encodedDigest = base64.encode(digest.bytes);
-  }, level: Level.FINE);
+  logTimedSync(log, 'Computing run script digest',
+      () => encodedDigest = _computeRunScriptDigest(),
+      level: Level.FINE);
 
   if (encodedDigest != null &&
       (!runExecutableDigest.existsSync() ||
