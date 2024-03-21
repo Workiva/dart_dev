@@ -118,7 +118,7 @@ bool _allPackagesAreImportedImmutably(Iterable<String> packageNames) {
   final pubSpecLock = loadYamlDocument(pubspecLockFile.readAsStringSync());
   return getDependencySources(pubSpecLock, packageNames)
       .values
-      .every((source) => source == 'hosted');
+      .every((source) => source == 'hosted' || source == 'git');
 }
 
 /// Return null iff it is not possible to account for all
