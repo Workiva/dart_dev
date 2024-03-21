@@ -25,7 +25,14 @@ class DartDevPaths {
         from: p.url.absolute(_cacheForDart),
       );
 
+  String get packageConfig =>
+      _context.join('.dart_tool', 'package_config.json');
+
   String get legacyConfig => _context.join('tool', 'dev.dart');
 
   String get runScript => cache('run.dart');
+
+  String get runExecutable => cache('run');
+
+  String get runExecutableDigest => cache('run.digest');
 }
