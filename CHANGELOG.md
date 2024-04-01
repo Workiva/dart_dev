@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.2.0
+
+- Add a `clean` command by default that removes temporary files used by
+dart_dev, like the compiled version of the run script.
+- Use `dart compile exe` to compile the `.dart_tool/dart_dev/run.dart` script
+for better startup performance on subsequent runs. This compilation step will be
+cached until `tool/dart_dev/config.dart`, the installed packages, or the current
+Dart SDK is changed.
+
+## 4.1.1
+
+- Optimization pass to reduce filesystem iteration.
+
 ## 4.1.0
 
 - Raise maximum SDK to include Dart 3.
