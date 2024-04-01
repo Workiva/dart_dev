@@ -9,6 +9,11 @@ on:
     branches:
       - '**'
 
+permissions:
+  pull-requests: write
+  contents: write
+  id-token: write
+
 jobs:
   dart:
     strategy:
@@ -34,3 +39,9 @@ jobs:
         run: dart run dart_dev format --check
       - name: Tests
         run: dart run dart_dev test ${{ matrix.sdk != '2.19.6' && '--test-args="--exclude-tags dart2"' || '' }}
+      - name: SBOM
+        if: ${{ matrix.sdk == '2.19.6' && matrix.os == 'ubuntu' }}
+        uses: anchore/sbom-action@v0
+        with:
+          path: ./  # Assuming actions/checkout default location
+          format: cyclonedx-json
