@@ -24,15 +24,15 @@ jobs:
     name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - run: ls -la "$HOME/.config/dart" || echo "no dart config dir"
       - uses: actions/checkout@v4
       - run: ls -la "$HOME/.config/dart" || echo "no dart config dir"
+      - run: |
+          [ -z "$PUB_TOKEN" ] && echo "PUB_TOKEN is not set" || echo "PUB_TOKEN is set"
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
       - run: ls -la "$HOME/.config/dart" || echo "no dart config dir"
       - run: dart pub token remove --all
-      - run: dart pub token list
       - name: Install dependencies
         run: dart pub get
       - name: Validate dependencies
