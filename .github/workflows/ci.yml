@@ -29,6 +29,8 @@ jobs:
         with:
           sdk: ${{ matrix.sdk }}
       - run: dart pub token list
+      - run: ls -la "$HOME"
+      - run: ls -la "$HOME/.config"
       - run: dart pub token remove --all
       - run: dart pub token list
       - name: Install dependencies
