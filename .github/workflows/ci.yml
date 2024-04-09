@@ -25,7 +25,6 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - run: |
-          ACTIONS_ID_TOKEN_REQUEST_URL
           [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ] && echo "ACTIONS_ID_TOKEN_REQUEST_URL is not set" || echo "ACTIONS_ID_TOKEN_REQUEST_URL is set"
           [ -z "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ] && echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN is not set" || echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN is set"
       - uses: actions/checkout@v4
