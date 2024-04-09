@@ -29,6 +29,8 @@ jobs:
         with:
           sdk: ${{ matrix.sdk }}
       - run: dart pub token list
+      - run: dart pub token remove --all
+      - run: dart pub token list
       - name: Install dependencies
         run: dart pub get
       - name: Validate dependencies
