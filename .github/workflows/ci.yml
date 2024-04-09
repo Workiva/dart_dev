@@ -24,7 +24,6 @@ jobs:
     name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - run: dart pub token list
       - run: ls -la "$HOME/.config"
       - run: ls -la "$HOME/.config/dart"
       - uses: actions/checkout@v4
