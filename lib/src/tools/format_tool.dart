@@ -541,9 +541,9 @@ void logCommand(
 /// If none of the mode flags were enabled, this returns `null`.
 FormatMode? validateAndParseMode(
     ArgResults argResults, void Function(String message) usageException) {
-  final check = argResults['check'] ?? false;
-  final dryRun = argResults['dry-run'] ?? false;
-  final overwrite = argResults['overwrite'] ?? false;
+  final check = argResults['check'] as bool? ?? false;
+  final dryRun = argResults['dry-run'] as bool? ?? false;
+  final overwrite = argResults['overwrite'] as bool? ?? false;
 
   if (check && dryRun && overwrite) {
     usageException(
