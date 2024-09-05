@@ -29,7 +29,9 @@ bool globalPackageIsActiveAndCompatible(
         result.exitCode);
   }
 
-  for (final line in result.stdout.split('\n')) {
+  final output = result.stdout as String;
+
+  for (final line in output.split('\n')) {
     // Example line: "webdev 2.5.1" or "dart_dev 3.0.0 at path ..."
     final parts = line.split(' ');
     if (parts.length < 2 || parts[0] != packageName) {

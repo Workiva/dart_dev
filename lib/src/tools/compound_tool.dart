@@ -155,7 +155,7 @@ class CompoundArgParser implements ArgParser {
         _compoundParser.addFlag(option.name,
             abbr: option.abbr,
             help: option.help,
-            defaultsTo: option.defaultsTo,
+            defaultsTo: option.defaultsTo as bool?,
             negatable: option.negatable!,
             callback: (bool value) => option.callback?.call(value),
             hide: option.hide);
@@ -166,7 +166,7 @@ class CompoundArgParser implements ArgParser {
             valueHelp: option.valueHelp,
             allowed: option.allowed,
             allowedHelp: option.allowedHelp,
-            defaultsTo: option.defaultsTo,
+            defaultsTo: option.defaultsTo as Iterable<String>?,
             callback: (List<String> values) => option.callback?.call(values),
             splitCommas: option.splitCommas,
             hide: option.hide);
@@ -177,7 +177,7 @@ class CompoundArgParser implements ArgParser {
             valueHelp: option.valueHelp,
             allowed: option.allowed,
             allowedHelp: option.allowedHelp,
-            defaultsTo: option.defaultsTo,
+            defaultsTo: option.defaultsTo as String?,
             callback: (String? value) => option.callback?.call(value),
             hide: option.hide);
       }
