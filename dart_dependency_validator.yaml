@@ -1,2 +1,3 @@
 exclude:
   - test/tools/fixtures/organize_directives/directives.dart
+  - test/tools/fixtures/analyze/failing/failing.dart
