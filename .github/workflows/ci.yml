@@ -1,13 +1,10 @@
 name: CI
 
 on:
+  pull_request:
   push:
     branches:
       - 'master'
-      - 'test_consume_*'
-  pull_request:
-    branches:
-      - '**'
 
 permissions:
   pull-requests: write
@@ -15,33 +12,16 @@ permissions:
   id-token: write
 
 jobs:
-  dart:
+  build:
+    uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.5
+
+  checks:
+    uses: Workiva/gha-dart-oss/.github/workflows/checks.yaml@v0.1.5
+
+  test-unit:
     strategy:
-      fail-fast: false
       matrix:
-        os: [ ubuntu, windows ]
         sdk: [ 2.19.6, stable ]
-    name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: ${{ matrix.sdk }}
-      - name: Install dependencies
-        run: dart pub get
-      - name: Validate dependencies
-        run: dart run dependency_validator
-      - name: Analysis
-        run: dart run dart_dev analyze
-      - name: Formatting
-        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
-        run: dart run dart_dev format --check
-      - name: Tests
-        run: dart run dart_dev test ${{ matrix.sdk != '2.19.6' && '--test-args="--exclude-tags dart2"' || '' }}
-      - name: SBOM
-        if: ${{ matrix.sdk == '2.19.6' && matrix.os == 'ubuntu' }}
-        uses: anchore/sbom-action@v0
-        with:
-          path: ./  # Assuming actions/checkout default location
-          format: cyclonedx-json
+    uses: Workiva/gha-dart-oss/.github/workflows/test-unit.yaml@v0.1.5
+    with:
+      sdk: ${{ matrix.sdk }}
