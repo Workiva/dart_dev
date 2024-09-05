@@ -8,6 +8,8 @@ dart_dev, like the compiled version of the run script.
 for better startup performance on subsequent runs. This compilation step will be
 cached until `tool/dart_dev/config.dart`, the installed packages, or the current
 Dart SDK is changed.
+- Updated dependencies to allow analyzer 6, lints 4
+- Require Dart SDK minimum of 2.19
 
 ## 4.1.1
 
