@@ -695,7 +695,6 @@ void main() {
 }
 ''';
 
-
 const unorganized25 = '''
 // Copyright 2019 Workiva Inc.
 //
@@ -790,7 +789,6 @@ import 'file.dart';
 export 'package:my_package/src/foo/bar.dart';
 export 'package:my_package/src/foo/baz.dart';
 ''';
-
 
 const unorganized29 = '''
 import 'package:my_package/file.dart';
