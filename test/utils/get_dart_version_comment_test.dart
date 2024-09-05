@@ -1,4 +1,5 @@
 @TestOn('vm')
+@Tags(['dart2'])
 import 'package:dart_dev/src/utils/get_dart_version_comment.dart';
 import 'package:test/test.dart';
 
