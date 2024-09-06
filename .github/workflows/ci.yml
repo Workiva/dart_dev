@@ -1,13 +1,11 @@
 name: CI
 
 on:
+  pull_request:
   push:
     branches:
       - 'master'
       - 'test_consume_*'
-  pull_request:
-    branches:
-      - '**'
 
 permissions:
   pull-requests: write
@@ -15,6 +13,9 @@ permissions:
   id-token: write
 
 jobs:
+  build:
+    uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.5
+
   dart:
     strategy:
       fail-fast: false
@@ -39,9 +40,3 @@ jobs:
         run: dart run dart_dev format --check
       - name: Tests
         run: dart run dart_dev test ${{ matrix.sdk != '2.19.6' && '--test-args="--exclude-tags dart2"' || '' }}
-      - name: SBOM
-        if: ${{ matrix.sdk == '2.19.6' && matrix.os == 'ubuntu' }}
-        uses: anchore/sbom-action@v0
-        with:
-          path: ./  # Assuming actions/checkout default location
-          format: cyclonedx-json
