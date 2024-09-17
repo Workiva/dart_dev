@@ -13,6 +13,11 @@ class OverReactFormatTool extends DevTool {
   /// Default is 80.
   int? lineLength;
 
+  /// Whether or not to organize import/export directives.
+  ///
+  /// Default is false.
+  bool? organizeDirectives;
+
   @override
   String? description =
       'Format dart files in this package with over_react_format.';
@@ -31,7 +36,8 @@ class OverReactFormatTool extends DevTool {
     final args = [
       'run',
       'over_react_format',
-      if (lineLength != null) '--line-length=$lineLength'
+      if (lineLength != null) '--line-length=$lineLength',
+      if (organizeDirectives == true) '--organize-directives',
     ];
     final process = ProcessDeclaration(exe.dart, [...args, ...paths],
         mode: ProcessStartMode.inheritStdio);
