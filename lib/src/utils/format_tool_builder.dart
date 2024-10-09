@@ -88,6 +88,17 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
             logWarningMessageFor(KnownErrorOutcome.failedToParseFormatterArgs);
           }
         }
+
+        final organizeDirectives = getCascadeByProperty('organizeDirectives');
+        if (organizeDirectives != null) {
+          final valueExpression = organizeDirectives.rightHandSide;
+          if (valueExpression is BooleanLiteral) {
+            typedFormatDevTool.organizeDirectives = valueExpression.value;
+          } else {
+            logWarningMessageFor(
+                KnownErrorOutcome.failedToParseOrganizeDirective);
+          }
+        }
       } else if (typedFormatDevTool is OverReactFormatTool) {
         final lineLengthAssignment = getCascadeByProperty('lineLength');
         if (lineLengthAssignment != null) {
@@ -96,6 +107,18 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
             typedFormatDevTool.lineLength = lengthExpression.value;
           } else {
             logWarningMessageFor(KnownErrorOutcome.failedToParseLineLength);
+          }
+        }
+
+        final organizeDirectivesAssignment =
+            getCascadeByProperty('organizeDirectives');
+        if (organizeDirectivesAssignment != null) {
+          final valueExpression = organizeDirectivesAssignment.rightHandSide;
+          if (valueExpression is BooleanLiteral) {
+            typedFormatDevTool.organizeDirectives = valueExpression.value;
+          } else {
+            logWarningMessageFor(
+                KnownErrorOutcome.failedToParseOrganizeDirective);
           }
         }
       }
@@ -108,6 +131,7 @@ enum KnownErrorOutcome {
   failedToReconstructFormatterArgs,
   failedToParseFormatterArgs,
   failedToParseLineLength,
+  failedToParseOrganizeDirective,
 }
 
 void logWarningMessageFor(KnownErrorOutcome outcome) {
@@ -137,6 +161,12 @@ This is likely because the list is not a ListLiteral.
       errorMessage = '''Failed to parse the line-length configuration.
 
 This is likely because assignment does not use an IntegerLiteral.
+''';
+      break;
+    case KnownErrorOutcome.failedToParseOrganizeDirective:
+      errorMessage = '''Failed to parse the organizeDirectives configuration.
+
+This is likely because assignment does not use an BooleanLiteral.
 ''';
       break;
   }
