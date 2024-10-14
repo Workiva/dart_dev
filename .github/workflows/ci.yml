@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-    uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.5
+    uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.6
 
   dart:
     strategy:
