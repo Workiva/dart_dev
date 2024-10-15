@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.2.1
+
+- Update `hackFastFormat` to detect and respect the project's
+`organizeDirectives` configuration.
+
 ## 4.2.0
 
 - Add a `clean` command by default that removes temporary files used by
