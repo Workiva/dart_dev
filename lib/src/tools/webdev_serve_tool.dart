@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:dart_dev/src/utils/dart_semver_version.dart';
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
 import 'package:logging/logging.dart';
@@ -11,6 +10,7 @@ import 'package:pub_semver/pub_semver.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/dart_semver_version.dart';
 import '../utils/executables.dart' as exe;
 import '../utils/global_package_is_active_and_compatible.dart';
 import '../utils/logging.dart';
