@@ -10,6 +10,7 @@ import 'package:pub_semver/pub_semver.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
+import '../utils/dart_semver_version.dart';
 import '../utils/executables.dart' as exe;
 import '../utils/global_package_is_active_and_compatible.dart';
 import '../utils/logging.dart';
@@ -213,15 +214,19 @@ WebdevServeExecution buildExecution(
             'Arguments can be passed to the build process via the --build-args '
             'option.');
   }
+
+  final webdevVersion = dartSemverVersion.major == 2 ? '^2.0.0' : '^3.0.0';
+
   if (!globalPackageIsActiveAndCompatible(
-      'webdev', VersionConstraint.parse('^2.0.0'),
+      'webdev', VersionConstraint.parse(webdevVersion),
       environment: environment)) {
     _log.severe(red.wrap(
             '${styleBold.wrap('webdev serve')} could not run for this project.\n')! +
         yellow.wrap('You must have `webdev` globally activated:\n'
-            '  dart pub global activate webdev ^2.0.0')!);
+            '  dart pub global activate webdev ${webdevVersion}')!);
     return WebdevServeExecution.exitEarly(ExitCode.config.code);
   }
+
   final args = buildArgs(
       argResults: argResults,
       configuredBuildArgs: configuredBuildArgs,
