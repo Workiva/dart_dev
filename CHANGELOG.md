@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.2.2
+- For Dart 3x, use webdev ^3 for the serve task
+
 ## 4.2.1
 
 - Update `hackFastFormat` to detect and respect the project's
