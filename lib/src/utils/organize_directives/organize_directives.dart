@@ -133,8 +133,15 @@ void _assignCommentsBeforeTokenToNamespace(
   for (Token? comment = token.precedingComments;
       comment != null;
       comment = comment.next) {
+    // the LanguageVersionToken (`// @dart=2.11`) must stay where it is at
+    // the top of the file. Do not assign this to any namespace
+    if (comment is LanguageVersionToken) continue;
+
     if (_commentIsOnSameLineAsNamespace(
-        comment, prevNamespace, sourceFileContents)) {
+      comment,
+      prevNamespace,
+      sourceFileContents,
+    )) {
       prevNamespace!.afterComments.add(comment);
     } else if (currNamespace != null) {
       currNamespace.beforeComments.add(comment);

@@ -569,11 +569,11 @@ const unorganized19 = '''
 /* Multi-line comment 3 */
 import 'dart:html';
 /* Multi-line comment 4 */
-/* 
-Multi-line comment 5 
+/*
+Multi-line comment 5
 */
 import 'dart:typed_data';
-/* 
+/*
  Multi-line comment 1
 */
 /* Multi-line comment 2 */
@@ -585,7 +585,7 @@ void main() {
 ''';
 
 const organized19 = '''
-/* 
+/*
  Multi-line comment 1
 */
 /* Multi-line comment 2 */
@@ -593,8 +593,8 @@ import 'dart:async';
 /* Multi-line comment 3 */
 import 'dart:html';
 /* Multi-line comment 4 */
-/* 
-Multi-line comment 5 
+/*
+Multi-line comment 5
 */
 import 'dart:typed_data';
 
@@ -868,4 +868,19 @@ export 'package:dart_dev/dart_dev.dart'
         Type2, // comment
         Type3, // comment
         Type4;
+''';
+
+const unorganized32 = '''
+// @dart=2.11
+
+import 'package:c_package/c_package.dart';
+
+import 'package:a_package/a_package.dart';
+''';
+
+const organized32 = '''
+// @dart=2.11
+
+import 'package:a_package/a_package.dart';
+import 'package:c_package/c_package.dart';
 ''';

@@ -108,6 +108,7 @@ void main() {
       organized30,
     ),
     _TestCase('31. comments with exports', unorganized31, organized31),
+    _TestCase('32. with dart version comment', unorganized32, organized32),
   ];
 
   group('organizeDirectives', () {
