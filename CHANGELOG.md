@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.2.3
+
+- Fixed bug where `organizeDirectives` would incorrectly sort directives when `// @dart=x.xx` 
+was at the start of the file
+- Fixed analyzer issues cased by args 2.7.0
+
 ## 4.2.2
 - For Dart 3x, use webdev ^3 for the serve task
 
