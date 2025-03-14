@@ -266,12 +266,15 @@ class CompoundArgParser implements ArgParser {
           bool negatable = true,
           void Function(bool value)? callback,
           bool hide = false,
+          bool hideNegatedUsage = false,
           List<String> aliases = const []}) =>
       _compoundParser.addFlag(name,
           abbr: abbr,
           help: help,
           defaultsTo: defaultsTo,
           negatable: negatable,
+          // TODO once lower bound of args is 2.7.0 (requires Dart SDK 3.3.0), which adds hideNegatedUsage, forward this arg
+          // hideNegatedUsage: hideNegatedUsage,
           callback: callback,
           hide: hide,
           aliases: aliases);
