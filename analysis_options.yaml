@@ -1,5 +1,5 @@
+include: package:workiva_analysis_options/v2.yaml
 include: package:lints/recommended.yaml
-
 analyzer:
   exclude:
     - test/**/fixtures/**
@@ -9,12 +9,3 @@ analyzer:
   strong-mode:
     implicit-casts: true
     implicit-dynamic: true
-
-linter:
-  rules:
-    include:
-      - avoid_types_on_closure_parameters
-      - prefer_void_to_null
-      - void_checks
-    exclude:
-      - overridden_fields
