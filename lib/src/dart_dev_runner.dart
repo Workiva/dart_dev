@@ -52,7 +52,7 @@ class DartDevRunner extends CommandRunner<int> {
   @override
   Future<int> run(Iterable<String> args) async {
     final argResults = parse(args);
-    if (argResults['version'] ?? false) {
+    if (argResults['version'] as bool? ?? false) {
       print(dartDevVersion);
       return 0;
     }
