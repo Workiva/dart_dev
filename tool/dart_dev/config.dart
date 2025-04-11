@@ -8,5 +8,4 @@ final config = {
     ..organizeDirectives = true
     ..exclude = [Glob('test/**/fixtures/**.dart')]
     ..formatter = Formatter.dartFormat,
-  'serve': WebdevServeTool()..webdevArgs = ['example'],
 };
