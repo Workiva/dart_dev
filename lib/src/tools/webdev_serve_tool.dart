@@ -66,6 +66,10 @@ class WebdevServeTool extends DevTool {
   final ArgParser argParser = ArgParser()
     ..addFlag('release',
         abbr: 'r', help: 'Build with release mode defaults for builders.')
+    ..addOption('directory',
+        help: 'The web directory to serve (defaults to "web").')
+    ..addOption('port',
+        abbr: 'p', help: 'Port to serve the web directory on.')
     ..addSeparator('======== Other Options')
     ..addOption('webdev-args',
         help: 'Args to pass to the webdev serve process.\n'
@@ -156,6 +160,12 @@ List<String> buildArgs(
     // 2. Args passed to --build-args
     ...?splitSingleOptionValue(argResults, 'build-args'),
   ];
+
+  // Append directory:port if provided
+  final entryPoint = argResults?['directory'] ?? 'web';
+  final port = argResults?['port'];
+  final serveTarget = port != null ? '$entryPoint:$port' : entryPoint;
+  webdevArgs.insert(0, serveTarget);
 
   if (verbose) {
     if (!buildArgs.contains('-v') && !buildArgs.contains('--verbose')) {
