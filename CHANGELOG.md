@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.4
+
+- Update dependencies to allow analyzer 7
+
 ## 4.2.3
 
 - Fixed bug where `organizeDirectives` would incorrectly sort directives when `// @dart=x.xx` 
