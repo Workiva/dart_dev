@@ -6,7 +6,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
 import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
-import 'package:dart_dev/dart_dev.dart';
+
 import 'package:dart_dev/src/utils/parse_imports.dart';
 import 'package:dart_dev/src/utils/pubspec_lock.dart';
 import 'package:glob/glob.dart';

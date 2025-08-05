@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:args/args.dart';
-import 'package:dart_dev/dart_dev.dart';
+
 import 'package:logging/logging.dart';
 
 import '../dart_dev_tool.dart';
@@ -32,7 +32,7 @@ ArgResults takeOptionArgs(ArgParser parser, ArgResults results) =>
 /// positional args given to the compound target.
 ///
 ///     // tool/dart_dev/config.dart
-///     import 'package:dart_dev/dart_dev.dart';
+///     
 ///
 ///     final config = {
 ///       'test': CompoundTool()

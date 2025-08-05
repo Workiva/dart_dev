@@ -17,7 +17,7 @@ final _log = Logger('Process');
 /// process, waits for it to complete, and forwards its exit code.
 ///
 /// To create a [ProcessTool], all that is needed is an executable and args:
-///     import 'package:dart_dev/dart_dev.dart';
+///     
 ///
 ///     final config = {
 ///       'github': ProcessTool(

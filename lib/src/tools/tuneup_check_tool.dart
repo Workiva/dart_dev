@@ -21,7 +21,7 @@ final _log = Logger('TuneupCheck');
 ///
 /// To use this tool in your project, include it in the dart_dev config in
 /// `tool/dart_dev/config.dart`:
-///     import 'package:dart_dev/dart_dev.dart';
+///     
 ///
 ///     final config = {
 ///       'analyze': TuneupCheckTool(),
@@ -32,7 +32,7 @@ final _log = Logger('TuneupCheck');
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
-///     import 'package:dart_dev/dart_dev.dart';
+///     
 ///
 ///     final config = {
 ///       'analyze': TuneupCheckTool()

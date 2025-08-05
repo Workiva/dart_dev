@@ -25,7 +25,7 @@ final _log = Logger('Format');
 ///
 /// To use this tool in your project, include it in the dart_dev config in
 /// `tool/dart_dev/config.dart`:
-///     import 'package:dart_dev/dart_dev.dart';
+///     
 ///
 ///     final config = {
 ///       'format': FormatTool(),
@@ -36,7 +36,7 @@ final _log = Logger('Format');
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
-///     import 'package:dart_dev/dart_dev.dart';
+///     
 ///
 ///     final config = {
 ///       'format': FormatTool()

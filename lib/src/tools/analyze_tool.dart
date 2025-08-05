@@ -22,7 +22,7 @@ final _log = Logger('Analyze');
 ///
 /// To use this tool in your project, include it in the dart_dev config in
 /// `tool/dart_dev/config.dart`:
-///     import 'package:dart_dev/dart_dev.dart';
+///     
 ///
 ///     final config = {
 ///       'analyze': AnalyzeTool() ..useDartAnalyze = true,
@@ -33,7 +33,7 @@ final _log = Logger('Analyze');
 ///
 /// This tool can be configured by modifying any of its fields:
 ///     // tool/dart_dev/config.dart
-///     import 'package:dart_dev/dart_dev.dart';
+///     
 ///
 ///     final config = {
 ///       'analyze': AnalyzeTool()
