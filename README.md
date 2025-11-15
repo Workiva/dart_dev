@@ -1,7 +1,12 @@
 # Dart Dev Tools
 
+[![Slack Channel](https://img.shields.io/badge/Support_Channel-Slack-purple)](https://slack.com/app_redirect?channel=support-frontend-dx)
+[![Maintainer](https://img.shields.io/badge/maintainer-FEDX-silver)](https://wiki.atl.workiva.net/display/FEF/Frontend+Dev+Experience)
+[![Documentation](https://img.shields.io/badge/Additional_Documentation-blue)](https://frontend.workiva.dev)
+[![CI](https://github.com/Workiva/dart_dev/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Workiva/dart_dev/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Workiva/dart_dev/branch/master/graph/badge.svg?token=7S7VXS0TSJ)](https://codecov.io/gh/Workiva/dart_dev)
+
 [![Pub](https://img.shields.io/pub/v/dart_dev.svg)](https://pub.dev/packages/dart_dev)
-[![Build Status](https://github.com/Workiva/dart_dev/workflows/Dart%20CI/badge.svg?branch=master)](https://github.com/Workiva/dart_dev/actions?query=workflow%3A%22Dart+CI%22+branch%3Amaster)
 
 Centralized tooling for Dart projects. Consistent interface across projects.
 Easily configurable.
