@@ -12,9 +12,7 @@ analyzer:
 
 linter:
   rules:
-    include:
-      - avoid_types_on_closure_parameters
-      - prefer_void_to_null
-      - void_checks
-    exclude:
-      - overridden_fields
+    - avoid_types_on_closure_parameters
+    - prefer_void_to_null
+    - void_checks
+    - overridden_fields: false
