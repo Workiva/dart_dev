@@ -120,8 +120,16 @@ void main() {
       expect(
         buildArgs(['a', 'b'], FormatMode.overwrite,
           passWriteArgForOverwrite: false,
-          passLatestLanguageVersion: true),
+          languageVersion: 'latest'),
         orderedEquals(['a', 'b', '--language-version=latest']));
+    });
+
+    test('adds configured language version flag', () {
+      expect(
+        buildArgs(['a', 'b'], FormatMode.overwrite,
+          passWriteArgForOverwrite: false,
+          languageVersion: '3.0'),
+        orderedEquals(['a', 'b', '--language-version=3.0']));
     });
 
     test('mode=dry-run', () {
@@ -172,8 +180,15 @@ void main() {
     test('adds latest language version flag when configured', () {
       expect(
         buildArgsForDartFormat(['a', 'b'], FormatMode.overwrite,
-          passLatestLanguageVersion: true),
+          languageVersion: 'latest'),
         orderedEquals(['a', 'b', '--language-version=latest']));
+    });
+
+    test('adds configured language version flag', () {
+      expect(
+        buildArgsForDartFormat(['a', 'b'], FormatMode.overwrite,
+          languageVersion: '3.0'),
+        orderedEquals(['a', 'b', '--language-version=3.0']));
     });
 
     test('combines configured args with cli args (in that order)', () {
@@ -389,6 +404,23 @@ void main() {
         expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
       });
 
+      test('dart_style:format uses configured language version for dart_style >=3.0.0',
+          () {
+        final context = DevToolExecutionContext();
+        final execution = buildExecution(
+          context,
+          formatter: Formatter.dartStyle,
+          languageVersion: '3.0',
+          defaultMode: FormatMode.overwrite,
+          path: 'test/tools/fixtures/format/has_dart_style_v3',
+        );
+        expect(execution.exitCode, isNull);
+        expect(execution.formatProcess!.executable, exe.dart);
+        expect(execution.formatProcess!.args,
+            orderedEquals(['run', 'dart_style:format', '--language-version=3.0', '.']));
+        expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
+      });
+
       test('dartFormat with args', () {
         final argParser = FormatTool().toCommand('t').argParser;
         final argResults = argParser.parse(['--formatter-args', '--indent 2']);
@@ -407,6 +439,25 @@ void main() {
               '--follow-links',
               '--indent',
               '2',
+              '.',
+            ]));
+        expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
+      });
+
+      test('with dartFormat and configured language version', () {
+        final context = DevToolExecutionContext();
+        final execution = buildExecution(
+          context,
+          formatter: Formatter.dartFormat,
+          languageVersion: '3.0',
+        );
+        expect(execution.exitCode, isNull);
+        expect(execution.formatProcess!.executable, exe.dart);
+        expect(
+            execution.formatProcess!.args,
+            orderedEquals([
+              'format',
+              if (dartSemverVersion.major >= 3) '--language-version=3.0',
               '.',
             ]));
         expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);

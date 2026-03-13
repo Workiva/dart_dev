@@ -74,6 +74,12 @@ class FormatTool extends DevTool {
   /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
   List<String>? formatterArgs;
 
+  /// The language version to pass to formatters that support
+  /// `--language-version`.
+  ///
+  /// If null, `latest` will be used when dart_dev decides the flag is needed.
+  String? languageVersion;
+
   /// If the formatter should also organize imports and exports.
   ///
   /// By default, this is disabled.
@@ -119,6 +125,7 @@ class FormatTool extends DevTool {
       defaultMode: defaultMode,
       exclude: exclude,
       formatter: formatter,
+      languageVersion: languageVersion,
       organizeDirectives: organizeDirectives,
     );
     if (formatExecution.exitCode != null) {
@@ -324,7 +331,7 @@ Iterable<String> buildArgs(
   ArgResults? argResults,
   List<String>? configuredFormatterArgs,
   bool passWriteArgForOverwrite = true,
-  bool passLatestLanguageVersion = false,
+  String? languageVersion,
 }) {
   final args = <String>[
     ...executableArgs,
@@ -338,7 +345,7 @@ Iterable<String> buildArgs(
     ],
     if (mode == FormatMode.overwrite && passWriteArgForOverwrite) '-w',
     if (mode == FormatMode.dryRun) '-n',
-    if (passLatestLanguageVersion) '--language-version=latest',
+    if (languageVersion != null) '--language-version=$languageVersion',
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,
@@ -368,7 +375,7 @@ Iterable<String> buildArgsForDartFormat(
     Iterable<String> executableArgs, FormatMode? mode,
     {ArgResults? argResults,
     List<String>? configuredFormatterArgs,
-    bool passLatestLanguageVersion = false}) {
+  String? languageVersion}) {
   final args = <String>[
     ...executableArgs,
 
@@ -377,7 +384,7 @@ Iterable<String> buildArgsForDartFormat(
     // 1. Mode flag(s), if configured
     if (mode == FormatMode.check) ...['-o', 'none', '--set-exit-if-changed'],
     if (mode == FormatMode.dryRun) ...['-o', 'none'],
-    if (passLatestLanguageVersion) '--language-version=latest',
+    if (languageVersion != null) '--language-version=$languageVersion',
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,
@@ -421,6 +428,7 @@ FormatExecution buildExecution(
   FormatMode? defaultMode,
   List<Glob>? exclude,
   Formatter? formatter,
+  String? languageVersion,
   bool organizeDirectives = false,
   String? path,
 }) {
@@ -478,19 +486,20 @@ FormatExecution buildExecution(
   Iterable<String> args;
   final dartStyleSupportsWriteArg =
       formatter != Formatter.dartStyle || _dartStyleVersionSupportsWriteArg(path: path);
-  final passLatestLanguageVersion =
-      formatter == Formatter.dartStyle && !dartStyleSupportsWriteArg;
+  final formatterLanguageVersion =
+      _formatterLanguageVersion(formatter, dartStyleSupportsWriteArg,
+          configuredLanguageVersion: languageVersion);
   if (formatter == Formatter.dartFormat) {
     args = buildArgsForDartFormat(dartFormatter.args, mode,
         argResults: context.argResults,
       configuredFormatterArgs: configuredFormatterArgs,
-      passLatestLanguageVersion: dartSemverVersion.major >= 3);
+        languageVersion: formatterLanguageVersion);
   } else {
     args = buildArgs(dartFormatter.args, mode,
         argResults: context.argResults,
         configuredFormatterArgs: configuredFormatterArgs,
         passWriteArgForOverwrite: dartStyleSupportsWriteArg,
-        passLatestLanguageVersion: passLatestLanguageVersion);
+        languageVersion: formatterLanguageVersion);
   }
   logCommand(dartFormatter.executable, inputs.includedFiles, args,
       verbose: context.verbose);
@@ -538,8 +547,31 @@ ProcessDeclaration buildFormatProcess([Formatter? formatter]) {
 /// legacy behavior and continue passing `-w`.
 bool _dartStyleVersionSupportsWriteArg({String? path}) {
   final dartStyleVersion = _resolvedDependencyVersionFromPubspecLock('dart_style', path: path);
-  if (dartStyleVersion == null) return true;
-  return dartStyleVersion < Version.parse('3.0.0');
+  if (dartStyleVersion != null) {
+    return dartStyleVersion < Version.parse('3.0.0');
+  }
+
+  final dartStyleConstraint =
+      _declaredDependencyConstraintFromPubspec('dart_style', path: path);
+  if (dartStyleConstraint != null) {
+    return dartStyleConstraint.allows(Version.parse('2.99.99'));
+  }
+
+  return true;
+}
+
+String? _formatterLanguageVersion(
+  Formatter? formatter,
+  bool dartStyleSupportsWriteArg, {
+  String? configuredLanguageVersion,
+}) {
+  if (formatter == Formatter.dartStyle && !dartStyleSupportsWriteArg) {
+    return configuredLanguageVersion ?? 'latest';
+  }
+  if (formatter == Formatter.dartFormat && dartSemverVersion.major >= 3) {
+    return configuredLanguageVersion ?? 'latest';
+  }
+  return null;
 }
 
 Version? _resolvedDependencyVersionFromPubspecLock(String dependency, {String? path}) {
@@ -551,6 +583,35 @@ Version? _resolvedDependencyVersionFromPubspecLock(String dependency, {String? p
   final dependencyVersion = getDependencyVersion(lockDocument, dependency);
   if (dependencyVersion == null) return null;
   return Version.parse(dependencyVersion);
+}
+
+VersionConstraint? _declaredDependencyConstraintFromPubspec(
+    String dependency, {
+    String? path,
+  }) {
+  final pubspecPath = p.join(path ?? p.current, 'pubspec.yaml');
+  final pubspecFile = File(pubspecPath);
+  if (!pubspecFile.existsSync()) return null;
+
+  final pubspecDocument = loadYamlDocument(pubspecFile.readAsStringSync());
+  final pubspecContents = pubspecDocument.contents;
+  if (pubspecContents is! YamlMap) return null;
+
+  for (final sectionName in [
+    'dependencies',
+    'dev_dependencies',
+    'dependency_overrides',
+  ]) {
+    final section = pubspecContents[sectionName];
+    if (section is! YamlMap) continue;
+
+    final dependencySpec = section[dependency];
+    if (dependencySpec is String) {
+      return VersionConstraint.parse(dependencySpec);
+    }
+  }
+
+  return null;
 }
 
 /// Logs the dart formatter command that will be run by [FormatTool] so that

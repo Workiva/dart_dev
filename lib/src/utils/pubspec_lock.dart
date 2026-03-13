@@ -27,7 +27,7 @@ String? getDependencyVersion(YamlDocument pubSpecLock, String packageName) {
       final specificDependency = packages[packageName];
       if (specificDependency is YamlMap) {
         final version = specificDependency['version'];
-        if (version is String) return version;
+        if (version != null) return version.toString();
       }
     }
   }

@@ -92,6 +92,18 @@ void main() {
           expect((visitor.formatDevTool as FormatTool).formatterArgs,
               orderedEquals(['-l', '120']));
         });
+
+        test('detects languageVersion', () {
+          final visitor = FormatToolBuilder();
+
+          parseString(content: formatToolCascadeSrc(languageVersion: '3.0'))
+              .unit
+              .accept(visitor);
+
+          expect(visitor.formatDevTool, isNotNull);
+          expect(visitor.formatDevTool, isA<FormatTool>());
+          expect((visitor.formatDevTool as FormatTool).languageVersion, '3.0');
+        });
       });
     });
 
@@ -136,7 +148,8 @@ final config = {
 };
 ''';
 
-String formatToolCascadeSrc({String formatter = 'dartfmt'}) =>
+String formatToolCascadeSrc(
+    {String formatter = 'dartfmt', String? languageVersion}) =>
     '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 
@@ -144,7 +157,8 @@ final config = {
   ...coreConfig,
   'format': FormatTool()
     ..formatter = Formatter.$formatter
-    ..formatterArgs = ['-l', '120'],
+    ..formatterArgs = ['-l', '120']
+${languageVersion != null ? "    ..languageVersion = '$languageVersion'" : ''},
 };
 ''';
 

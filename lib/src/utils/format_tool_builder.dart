@@ -99,6 +99,18 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
                 KnownErrorOutcome.failedToParseOrganizeDirective);
           }
         }
+
+        final languageVersion = getCascadeByProperty('languageVersion');
+        if (languageVersion != null) {
+          final valueExpression = languageVersion.rightHandSide;
+          if (valueExpression is StringLiteral &&
+              valueExpression.stringValue != null) {
+            typedFormatDevTool.languageVersion = valueExpression.stringValue;
+          } else {
+            logWarningMessageFor(
+                KnownErrorOutcome.failedToParseLanguageVersion);
+          }
+        }
       } else if (typedFormatDevTool is OverReactFormatTool) {
         final lineLengthAssignment = getCascadeByProperty('lineLength');
         if (lineLengthAssignment != null) {
@@ -131,6 +143,7 @@ enum KnownErrorOutcome {
   failedToReconstructFormatterArgs,
   failedToParseFormatterArgs,
   failedToParseLineLength,
+  failedToParseLanguageVersion,
   failedToParseOrganizeDirective,
 }
 
@@ -161,6 +174,12 @@ This is likely because the list is not a ListLiteral.
       errorMessage = '''Failed to parse the line-length configuration.
 
 This is likely because assignment does not use an IntegerLiteral.
+''';
+      break;
+    case KnownErrorOutcome.failedToParseLanguageVersion:
+      errorMessage = '''Failed to parse the languageVersion configuration.
+
+This is likely because assignment does not use a StringLiteral.
 ''';
       break;
     case KnownErrorOutcome.failedToParseOrganizeDirective:

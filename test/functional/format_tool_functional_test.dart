@@ -2,6 +2,7 @@
 @Timeout(Duration(seconds: 20))
 import 'dart:io';
 
+import 'package:dart_dev/src/utils/dart_semver_version.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
@@ -38,6 +39,26 @@ void main() {
         sourceFile.contentsBefore,
         isNot(equals(sourceFile.contentsAfter)),
       );
+    });
+
+    test('passes configured languageVersion to dart format when supported',
+        () async {
+      const projectPath =
+          'test/functional/fixtures/format/language_version/dart_format_configured/';
+
+      final process = await runDevToolFunctionalTest('format', projectPath);
+      final stdoutFuture = process.stdoutStream().toList();
+
+      await process.shouldExit(0);
+
+      final stdout = (await stdoutFuture).join('\n');
+      final expectedCommand = [
+        'dart format',
+        if (dartSemverVersion.major >= 3) '--language-version=3.0',
+        'lib/main.dart',
+      ].join(' ');
+
+      expect(stdout, contains(expectedCommand));
     });
   });
 }
