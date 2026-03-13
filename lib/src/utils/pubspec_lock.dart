@@ -17,6 +17,23 @@ String? _getPubSpecLockPackageSource(
   return null;
 }
 
+/// Index into the pubspecLock to locate the resolved version for the given
+/// package.
+String? getDependencyVersion(YamlDocument pubSpecLock, String packageName) {
+  final contents = pubSpecLock.contents;
+  if (contents is YamlMap) {
+    final packages = contents['packages'];
+    if (packages is YamlMap) {
+      final specificDependency = packages[packageName];
+      if (specificDependency is YamlMap) {
+        final version = specificDependency['version'];
+        if (version is String) return version;
+      }
+    }
+  }
+  return null;
+}
+
 /// Return a mapping of package name to dependency 'type', using the pubspec
 /// lock document. If a package cannot be located in the pubspec lock document,
 /// it will map to null.

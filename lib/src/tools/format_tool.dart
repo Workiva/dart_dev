@@ -7,6 +7,8 @@ import 'package:io/ansi.dart';
 import 'package:io/io.dart' show ExitCode;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
+import 'package:pub_semver/pub_semver.dart';
+import 'package:yaml/yaml.dart';
 
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
@@ -17,6 +19,7 @@ import '../utils/logging.dart';
 import '../utils/organize_directives/organize_directives_in_paths.dart';
 import '../utils/package_is_immediate_dependency.dart';
 import '../utils/process_declaration.dart';
+import '../utils/pubspec_lock.dart';
 import '../utils/run_process_and_ensure_exit.dart';
 
 final _log = Logger('Format');
@@ -320,6 +323,8 @@ Iterable<String> buildArgs(
   FormatMode? mode, {
   ArgResults? argResults,
   List<String>? configuredFormatterArgs,
+  bool passWriteArgForOverwrite = true,
+  bool passLatestLanguageVersion = false,
 }) {
   final args = <String>[
     ...executableArgs,
@@ -331,8 +336,9 @@ Iterable<String> buildArgs(
       '-n',
       '--set-exit-if-changed',
     ],
-    if (mode == FormatMode.overwrite) '-w',
+    if (mode == FormatMode.overwrite && passWriteArgForOverwrite) '-w',
     if (mode == FormatMode.dryRun) '-n',
+    if (passLatestLanguageVersion) '--language-version=latest',
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,
@@ -360,7 +366,9 @@ Iterable<String> buildArgs(
 /// included, it will be added.
 Iterable<String> buildArgsForDartFormat(
     Iterable<String> executableArgs, FormatMode? mode,
-    {ArgResults? argResults, List<String>? configuredFormatterArgs}) {
+    {ArgResults? argResults,
+    List<String>? configuredFormatterArgs,
+    bool passLatestLanguageVersion = false}) {
   final args = <String>[
     ...executableArgs,
 
@@ -369,6 +377,7 @@ Iterable<String> buildArgsForDartFormat(
     // 1. Mode flag(s), if configured
     if (mode == FormatMode.check) ...['-o', 'none', '--set-exit-if-changed'],
     if (mode == FormatMode.dryRun) ...['-o', 'none'],
+    if (passLatestLanguageVersion) '--language-version=latest',
 
     // 2. Statically configured args from [FormatTool.formatterArgs]
     ...?configuredFormatterArgs,
@@ -467,14 +476,21 @@ FormatExecution buildExecution(
 
   final dartFormatter = buildFormatProcess(formatter);
   Iterable<String> args;
+  final dartStyleSupportsWriteArg =
+      formatter != Formatter.dartStyle || _dartStyleVersionSupportsWriteArg(path: path);
+  final passLatestLanguageVersion =
+      formatter == Formatter.dartStyle && !dartStyleSupportsWriteArg;
   if (formatter == Formatter.dartFormat) {
     args = buildArgsForDartFormat(dartFormatter.args, mode,
         argResults: context.argResults,
-        configuredFormatterArgs: configuredFormatterArgs);
+      configuredFormatterArgs: configuredFormatterArgs,
+      passLatestLanguageVersion: dartSemverVersion.major >= 3);
   } else {
     args = buildArgs(dartFormatter.args, mode,
         argResults: context.argResults,
-        configuredFormatterArgs: configuredFormatterArgs);
+        configuredFormatterArgs: configuredFormatterArgs,
+        passWriteArgForOverwrite: dartStyleSupportsWriteArg,
+        passLatestLanguageVersion: passLatestLanguageVersion);
   }
   logCommand(dartFormatter.executable, inputs.includedFiles, args,
       verbose: context.verbose);
@@ -513,6 +529,28 @@ ProcessDeclaration buildFormatProcess([Formatter? formatter]) {
     default:
       return ProcessDeclaration(exe.dartfmt, []);
   }
+}
+
+/// Returns `true` if the resolved `dart_style` version supports `-w`.
+///
+/// `dart_style` removed support for `-w` starting in version `3.0.0`.
+/// If we cannot determine a resolved version from `pubspec.lock`, we preserve
+/// legacy behavior and continue passing `-w`.
+bool _dartStyleVersionSupportsWriteArg({String? path}) {
+  final dartStyleVersion = _resolvedDependencyVersionFromPubspecLock('dart_style', path: path);
+  if (dartStyleVersion == null) return true;
+  return dartStyleVersion < Version.parse('3.0.0');
+}
+
+Version? _resolvedDependencyVersionFromPubspecLock(String dependency, {String? path}) {
+  final lockFilePath = p.join(path ?? p.current, 'pubspec.lock');
+  final lockFile = File(lockFilePath);
+  if (!lockFile.existsSync()) return null;
+
+  final lockDocument = loadYamlDocument(lockFile.readAsStringSync());
+  final dependencyVersion = getDependencyVersion(lockDocument, dependency);
+  if (dependencyVersion == null) return null;
+  return Version.parse(dependencyVersion);
 }
 
 /// Logs the dart formatter command that will be run by [FormatTool] so that
