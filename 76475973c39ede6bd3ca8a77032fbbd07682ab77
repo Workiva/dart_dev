@@ -1,0 +1,31 @@
+test/tools/format_tool_test.dart
+  5f486cea0a2d0f2a 112-118,359-387,389
+test/tools/fixtures/format/has_dart_style_v3/pubspec.yaml
+  5f486cea0a2d0f2a 2-4
+lib/src/tools/format_tool.dart
+  5f486cea0a2d0f2a 10-11,22,326-327,339,341,479-482,487,491-493,534-553
+test/tools/fixtures/format/has_dart_style_v2/pubspec.yaml
+  5f486cea0a2d0f2a 1-4
+lib/src/utils/pubspec_lock.dart
+  5f486cea0a2d0f2a 20-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "76475973c39ede6bd3ca8a77032fbbd07682ab77",
+  "prompts": {
+    "5f486cea0a2d0f2a": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "8bbbf6c9-1deb-4dc0-aa45-a81358240586",
+        "model": "copilot/auto"
+      },
+      "human_author": "Rob Becker <rob.becker@workiva.com>",
+      "messages": [],
+      "total_additions": 103,
+      "total_deletions": 5,
+      "accepted_lines": 100,
+      "overriden_lines": 1
+    }
+  }
+}
