@@ -21,8 +21,9 @@ void main() {
     });
 
     test('can run from a custom working directory', () async {
-      final tool = DevTool.fromProcess('pwd', [], workingDirectory: 'lib')
-          as ProcessTool;
+      final tool =
+          DevTool.fromProcess('pwd', [], workingDirectory: 'lib')
+              as ProcessTool;
       expect(await tool.run(), isZero);
       final stdout =
           (await tool.process!.stdout.transform(utf8.decoder).join('')).trim();
@@ -32,14 +33,18 @@ void main() {
     test('throws UsageException when args are present', () {
       final tool = DevTool.fromProcess('true', []);
       expect(
-          () => tool.run(
-              DevToolExecutionContext(argResults: ArgParser().parse(['foo']))),
-          throwsA(isA<UsageException>()));
+        () => tool.run(
+          DevToolExecutionContext(argResults: ArgParser().parse(['foo'])),
+        ),
+        throwsA(isA<UsageException>()),
+      );
     });
 
     test('logs the subprocess', () {
-      expect(Logger.root.onRecord,
-          emitsThrough(infoLogOf(contains('true foo bar'))));
+      expect(
+        Logger.root.onRecord,
+        emitsThrough(infoLogOf(contains('true foo bar'))),
+      );
       DevTool.fromProcess('true', ['foo', 'bar']).run();
     });
   });
@@ -48,16 +53,18 @@ void main() {
     sharedDevToolTests(() => BackgroundProcessTool('true', []).starter);
     sharedDevToolTests(() => BackgroundProcessTool('true', []).stopper);
 
-    test('starter runs the process without waiting for it to complete',
-        () async {
-      var processHasExited = false;
-      final tool = BackgroundProcessTool('sleep', ['5']);
-      expect(await tool.starter.run(), isZero);
-      unawaited(tool.process!.exitCode.then((_) => processHasExited = true));
-      await Future<void>.delayed(Duration.zero);
-      expect(processHasExited, isFalse);
-      await tool.stopper.run();
-    });
+    test(
+      'starter runs the process without waiting for it to complete',
+      () async {
+        var processHasExited = false;
+        final tool = BackgroundProcessTool('sleep', ['5']);
+        expect(await tool.starter.run(), isZero);
+        unawaited(tool.process!.exitCode.then((_) => processHasExited = true));
+        await Future<void>.delayed(Duration.zero);
+        expect(processHasExited, isFalse);
+        await tool.stopper.run();
+      },
+    );
 
     test('stopper stops the process immediately', () async {
       var processHasExited = false;
@@ -73,8 +80,11 @@ void main() {
     });
 
     test('starter forwards the returned exit code', () async {
-      final tool = BackgroundProcessTool('false', [],
-          delayAfterStart: Duration(milliseconds: 500));
+      final tool = BackgroundProcessTool(
+        'false',
+        [],
+        delayAfterStart: Duration(milliseconds: 500),
+      );
       expect(await tool.starter.run(), isNonZero);
     });
 
@@ -86,8 +96,12 @@ void main() {
     });
 
     test('can run from a custom working directory', () async {
-      final tool = BackgroundProcessTool('pwd', [],
-          workingDirectory: 'lib', delayAfterStart: Duration(seconds: 1));
+      final tool = BackgroundProcessTool(
+        'pwd',
+        [],
+        workingDirectory: 'lib',
+        delayAfterStart: Duration(seconds: 1),
+      );
       expect(await tool.starter.run(), isZero);
       final stdout =
           (await tool.process!.stdout.transform(utf8.decoder).join('')).trim();
@@ -97,14 +111,18 @@ void main() {
     test('throws UsageException when args are present', () {
       final tool = BackgroundProcessTool('true', []);
       expect(
-          () => tool.starter.run(
-              DevToolExecutionContext(argResults: ArgParser().parse(['foo']))),
-          throwsA(isA<UsageException>()));
+        () => tool.starter.run(
+          DevToolExecutionContext(argResults: ArgParser().parse(['foo'])),
+        ),
+        throwsA(isA<UsageException>()),
+      );
     });
 
     test('logs the subprocess', () {
-      expect(Logger.root.onRecord,
-          emitsThrough(infoLogOf(contains('true foo bar'))));
+      expect(
+        Logger.root.onRecord,
+        emitsThrough(infoLogOf(contains('true foo bar'))),
+      );
       BackgroundProcessTool('true', ['foo', 'bar']).starter.run();
     });
   });

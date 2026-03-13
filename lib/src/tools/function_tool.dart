@@ -13,10 +13,10 @@ import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
 /// Use [DevTool.fromFunction] to create [FunctionTool] instances.
 class FunctionTool extends DevTool {
   FunctionTool(
-      FutureOr<int?> Function(DevToolExecutionContext context) function,
-      {ArgParser? argParser})
-      : _argParser = argParser,
-        _function = function;
+    FutureOr<int?> Function(DevToolExecutionContext context) function, {
+    ArgParser? argParser,
+  }) : _argParser = argParser,
+       _function = function;
 
   final FutureOr<int?> Function(DevToolExecutionContext context) _function;
 
@@ -35,8 +35,10 @@ class FunctionTool extends DevTool {
     if (argResults != null) {
       if (argParser == null) {
         assertNoPositionalArgsNorArgsAfterSeparator(
-            argResults, context.usageException,
-            commandName: context.commandName);
+          argResults,
+          context.usageException,
+          commandName: context.commandName,
+        );
       }
     }
     final exitCode = await _function(context);
@@ -44,8 +46,9 @@ class FunctionTool extends DevTool {
       return exitCode;
     }
     Logger('DartFunctionTool').warning(
-        '${context.commandName != null ? 'The ${context.commandName}' : 'This'}'
-        ' command did not return an exit code.');
+      '${context.commandName != null ? 'The ${context.commandName}' : 'This'}'
+      ' command did not return an exit code.',
+    );
     return ExitCode.software.code;
   }
 }

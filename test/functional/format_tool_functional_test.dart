@@ -25,10 +25,7 @@ void main() {
       const projectPath =
           'test/functional/fixtures/format/unsorted_imports/organize_directives_off/';
       final sourceFile = await format(projectPath);
-      expect(
-        sourceFile.contentsBefore,
-        equals(sourceFile.contentsAfter),
-      );
+      expect(sourceFile.contentsBefore, equals(sourceFile.contentsAfter));
     });
 
     test('organize directives on', () async {
@@ -41,25 +38,27 @@ void main() {
       );
     });
 
-    test('passes configured languageVersion to dart format when supported',
-        () async {
-      const projectPath =
-          'test/functional/fixtures/format/language_version/dart_format_configured/';
+    test(
+      'passes configured languageVersion to dart format when supported',
+      () async {
+        const projectPath =
+            'test/functional/fixtures/format/language_version/dart_format_configured/';
 
-      final process = await runDevToolFunctionalTest('format', projectPath);
-      final stdoutFuture = process.stdoutStream().toList();
+        final process = await runDevToolFunctionalTest('format', projectPath);
+        final stdoutFuture = process.stdoutStream().toList();
 
-      await process.shouldExit(0);
+        await process.shouldExit(0);
 
-      final stdout = (await stdoutFuture).join('\n');
-      final expectedCommand = [
-        'dart format',
-        if (dartSemverVersion.major >= 3) '--language-version=3.0',
-        'lib/main.dart',
-      ].join(' ');
+        final stdout = (await stdoutFuture).join('\n');
+        final expectedCommand = [
+          'dart format',
+          if (dartSemverVersion.major >= 3) '--language-version=3.0',
+          'lib/main.dart',
+        ].join(' ');
 
-      expect(stdout, contains(expectedCommand));
-    });
+        expect(stdout, contains(expectedCommand));
+      },
+    );
   });
 }
 

@@ -12,14 +12,21 @@ abstract class DevTool {
   DevTool();
 
   factory DevTool.fromFunction(
-          FutureOr<int?> Function(DevToolExecutionContext context) function,
-          {ArgParser? argParser}) =>
-      FunctionTool(function, argParser: argParser);
+    FutureOr<int?> Function(DevToolExecutionContext context) function, {
+    ArgParser? argParser,
+  }) => FunctionTool(function, argParser: argParser);
 
-  factory DevTool.fromProcess(String executable, List<String> args,
-          {ProcessStartMode? mode, String? workingDirectory}) =>
-      ProcessTool(executable, args,
-          mode: mode, workingDirectory: workingDirectory);
+  factory DevTool.fromProcess(
+    String executable,
+    List<String> args, {
+    ProcessStartMode? mode,
+    String? workingDirectory,
+  }) => ProcessTool(
+    executable,
+    args,
+    mode: mode,
+    workingDirectory: workingDirectory,
+  );
 
   /// The argument parser for this tool, if needed.
   ///
@@ -79,12 +86,12 @@ abstract class DevTool {
 /// or not global verbose mode is enabled, and the [usageException] utility
 /// function from [Command].
 class DevToolExecutionContext {
-  DevToolExecutionContext(
-      {this.argResults,
-      this.commandName,
-      void Function(String message)? usageException,
-      this.verbose = false})
-      : _usageException = usageException;
+  DevToolExecutionContext({
+    this.argResults,
+    this.commandName,
+    void Function(String message)? usageException,
+    this.verbose = false,
+  }) : _usageException = usageException;
 
   final void Function(String message)? _usageException;
 
@@ -113,13 +120,12 @@ class DevToolExecutionContext {
     String? commandName,
     void Function(String message)? usageException,
     bool? verbose,
-  }) =>
-      DevToolExecutionContext(
-        argResults: argResults ?? this.argResults,
-        commandName: commandName ?? this.commandName,
-        usageException: usageException ?? this.usageException,
-        verbose: verbose ?? this.verbose,
-      );
+  }) => DevToolExecutionContext(
+    argResults: argResults ?? this.argResults,
+    commandName: commandName ?? this.commandName,
+    usageException: usageException ?? this.usageException,
+    verbose: verbose ?? this.verbose,
+  );
 
   /// Calling this will throw a [UsageException] with [message] that should be
   /// caught by [CommandRunner] and used to set the exit code accordingly and

@@ -6,8 +6,10 @@ import 'package:collection/collection.dart';
 Iterable<String> parseImports(String fileContents) =>
     _importRegex.allMatches(fileContents).map((m) => m.group(1)).whereNotNull();
 
-final _importRegex =
-    RegExp(r'''^import ['"]([^'"]+)['"];?$''', multiLine: true);
+final _importRegex = RegExp(
+  r'''^import ['"]([^'"]+)['"];?$''',
+  multiLine: true,
+);
 
 /// Return a set of package names given a list of imports.
 Set<String> computePackageNamesFromImports(Iterable<String> imports) => imports

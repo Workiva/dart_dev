@@ -28,10 +28,11 @@ class OverReactFormatTool extends DevTool {
     Iterable<String> paths = context.argResults?.rest ?? [];
     if (paths.isEmpty) {
       context.usageException.call(
-          '"hackFastFormat" must specify targets to format.\n'
-          'hackFastFormat should only be used to format specific files. '
-          'Running the command over an entire project may format files that '
-          'would be excluded using the standard "format" command.');
+        '"hackFastFormat" must specify targets to format.\n'
+        'hackFastFormat should only be used to format specific files. '
+        'Running the command over an entire project may format files that '
+        'would be excluded using the standard "format" command.',
+      );
     }
     final args = [
       'run',
@@ -39,8 +40,10 @@ class OverReactFormatTool extends DevTool {
       if (lineLength != null) '--line-length=$lineLength',
       if (organizeDirectives == true) '--organize-directives',
     ];
-    final process = ProcessDeclaration(exe.dart, [...args, ...paths],
-        mode: ProcessStartMode.inheritStdio);
+    final process = ProcessDeclaration(exe.dart, [
+      ...args,
+      ...paths,
+    ], mode: ProcessStartMode.inheritStdio);
     logCommand('dart', paths, args, verbose: context.verbose);
     return runProcessAndEnsureExit(process);
   }

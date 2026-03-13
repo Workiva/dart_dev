@@ -24,8 +24,10 @@ void main() {
       });
 
       test('configFromRunScriptForDart', () {
-        expect(paths.configFromRunScriptForDart,
-            '../../tool/dart_dev/config.dart');
+        expect(
+          paths.configFromRunScriptForDart,
+          '../../tool/dart_dev/config.dart',
+        );
       });
 
       test('legacyConfig', () {
@@ -57,8 +59,10 @@ void main() {
       });
 
       test('configFromRunScriptForDart', () {
-        expect(paths.configFromRunScriptForDart,
-            r'../../tool/dart_dev/config.dart');
+        expect(
+          paths.configFromRunScriptForDart,
+          r'../../tool/dart_dev/config.dart',
+        );
       });
 
       test('legacyConfig', () {

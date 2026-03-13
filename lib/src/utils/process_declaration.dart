@@ -6,6 +6,10 @@ class ProcessDeclaration {
   final ProcessStartMode? mode;
   final String? workingDirectory;
 
-  ProcessDeclaration(this.executable, this.args,
-      {this.mode, this.workingDirectory});
+  ProcessDeclaration(
+    this.executable,
+    this.args, {
+    this.mode,
+    this.workingDirectory,
+  });
 }

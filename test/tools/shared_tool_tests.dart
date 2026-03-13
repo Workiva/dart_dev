@@ -8,8 +8,10 @@ void sharedDevToolTests(DevTool Function() factory) {
     });
 
     test('should return a command with a customizable description', () {
-      expect((factory()..description = 'desc').toCommand('test').description,
-          'desc');
+      expect(
+        (factory()..description = 'desc').toCommand('test').description,
+        'desc',
+      );
     });
 
     test('should return a command with a customizable hidden value', () {

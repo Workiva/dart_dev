@@ -7,13 +7,17 @@ import '../functional.dart';
 void main() {
   test('success', () async {
     final process = await runDevToolFunctionalTest(
-        'analyze', 'test/functional/fixtures/analyze/success');
+      'analyze',
+      'test/functional/fixtures/analyze/success',
+    );
     await process.shouldExit(0);
   });
 
   test('failure', () async {
     final process = await runDevToolFunctionalTest(
-        'analyze', 'test/functional/fixtures/analyze/failure');
+      'analyze',
+      'test/functional/fixtures/analyze/failure',
+    );
     await process.shouldExit(greaterThan(0));
   });
 }

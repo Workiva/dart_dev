@@ -48,9 +48,9 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         return formatterInvocation.cascadeSections
             .whereType<AssignmentExpression>()
             .firstWhereOrNull((assignment) {
-          final lhs = assignment.leftHandSide;
-          return lhs is PropertyAccess && lhs.propertyName.name == property;
-        });
+              final lhs = assignment.leftHandSide;
+              return lhs is PropertyAccess && lhs.propertyName.name == property;
+            });
       }
 
       final typedFormatDevTool = formatDevTool;
@@ -59,8 +59,9 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         if (formatter != null) {
           final formatterType = formatter.rightHandSide;
           if (formatterType is PrefixedIdentifier) {
-            final detectedFormatter =
-                detectFormatterForFormatTool(formatterType.identifier);
+            final detectedFormatter = detectFormatterForFormatTool(
+              formatterType.identifier,
+            );
             if (detectedFormatter != null) {
               typedFormatDevTool.formatter = detectedFormatter;
             }
@@ -82,7 +83,8 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
 
             if (stringArgs.length < argList.elements.length) {
               logWarningMessageFor(
-                  KnownErrorOutcome.failedToReconstructFormatterArgs);
+                KnownErrorOutcome.failedToReconstructFormatterArgs,
+              );
             }
           } else {
             logWarningMessageFor(KnownErrorOutcome.failedToParseFormatterArgs);
@@ -96,7 +98,8 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
             typedFormatDevTool.organizeDirectives = valueExpression.value;
           } else {
             logWarningMessageFor(
-                KnownErrorOutcome.failedToParseOrganizeDirective);
+              KnownErrorOutcome.failedToParseOrganizeDirective,
+            );
           }
         }
 
@@ -108,7 +111,8 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
             typedFormatDevTool.languageVersion = valueExpression.stringValue;
           } else {
             logWarningMessageFor(
-                KnownErrorOutcome.failedToParseLanguageVersion);
+              KnownErrorOutcome.failedToParseLanguageVersion,
+            );
           }
         }
       } else if (typedFormatDevTool is OverReactFormatTool) {
@@ -122,15 +126,17 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
           }
         }
 
-        final organizeDirectivesAssignment =
-            getCascadeByProperty('organizeDirectives');
+        final organizeDirectivesAssignment = getCascadeByProperty(
+          'organizeDirectives',
+        );
         if (organizeDirectivesAssignment != null) {
           final valueExpression = organizeDirectivesAssignment.rightHandSide;
           if (valueExpression is BooleanLiteral) {
             typedFormatDevTool.organizeDirectives = valueExpression.value;
           } else {
             logWarningMessageFor(
-                KnownErrorOutcome.failedToParseOrganizeDirective);
+              KnownErrorOutcome.failedToParseOrganizeDirective,
+            );
           }
         }
       }
@@ -220,8 +226,10 @@ DevTool? detectFormatter(AstNode formatterNode) {
   if (formatterNode is MethodInvocation) {
     detectedFormatterName = formatterNode.methodName.name;
   } else if (formatterNode is CascadeExpression) {
-    detectedFormatterName =
-        formatterNode.target.toSource().replaceAll(RegExp('[()]'), '');
+    detectedFormatterName = formatterNode.target.toSource().replaceAll(
+      RegExp('[()]'),
+      '',
+    );
   }
 
   if (detectedFormatterName == 'FormatTool') {

@@ -6,7 +6,7 @@ library dart_dev.src.core_config;
 import 'package:dart_dev/dart_dev.dart';
 
 Map<String, DevTool> get coreConfig => {
-      'analyze': AnalyzeTool(),
-      'format': FormatTool(),
-      'test': TestTool(),
-    };
+  'analyze': AnalyzeTool(),
+  'format': FormatTool(),
+  'test': TestTool(),
+};

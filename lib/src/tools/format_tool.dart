@@ -92,23 +92,33 @@ class FormatTool extends DevTool {
   @override
   final ArgParser argParser = ArgParser()
     ..addSeparator('======== Formatter Mode')
-    ..addFlag('overwrite',
-        abbr: 'w',
-        negatable: false,
-        help: 'Overwrite input files with formatted output.')
-    ..addFlag('dry-run',
-        abbr: 'n',
-        negatable: false,
-        help: 'Show which files would be modified but make no changes.')
-    ..addFlag('check',
-        abbr: 'c',
-        negatable: false,
-        help: 'Check if changes need to be made and set the exit code '
-            'accordingly.\nImplies "--dry-run" and "--set-exit-if-changed".')
+    ..addFlag(
+      'overwrite',
+      abbr: 'w',
+      negatable: false,
+      help: 'Overwrite input files with formatted output.',
+    )
+    ..addFlag(
+      'dry-run',
+      abbr: 'n',
+      negatable: false,
+      help: 'Show which files would be modified but make no changes.',
+    )
+    ..addFlag(
+      'check',
+      abbr: 'c',
+      negatable: false,
+      help:
+          'Check if changes need to be made and set the exit code '
+          'accordingly.\nImplies "--dry-run" and "--set-exit-if-changed".',
+    )
     ..addSeparator('======== Other Options')
-    ..addOption('formatter-args',
-        help: 'Args to pass to the "dartfmt" or "dart format" process.\n'
-            'Run "dartfmt -h -v" or "dart format -h -v" to see all available options.');
+    ..addOption(
+      'formatter-args',
+      help:
+          'Args to pass to the "dartfmt" or "dart format" process.\n'
+          'Run "dartfmt -h -v" or "dart format -h -v" to see all available options.',
+    );
 
   @override
   String? description = 'Format dart files in this package.';
@@ -150,8 +160,11 @@ class FormatTool extends DevTool {
   }
 
   // Similar to listSync() but does not recurse into hidden directories.
-  static List<FileSystemEntity> _listSyncWithoutHidden(Directory dir,
-      {required bool recursive, required bool followLinks}) {
+  static List<FileSystemEntity> _listSyncWithoutHidden(
+    Directory dir, {
+    required bool recursive,
+    required bool followLinks,
+  }) {
     var allEntries = <FileSystemEntity>[];
     dir.listSync(recursive: false, followLinks: followLinks).forEach((element) {
       final basename = p.basename(element.path);
@@ -159,8 +172,13 @@ class FormatTool extends DevTool {
 
       allEntries.add(element);
       if (element is Directory) {
-        allEntries.addAll(_listSyncWithoutHidden(element,
-            recursive: recursive, followLinks: followLinks));
+        allEntries.addAll(
+          _listSyncWithoutHidden(
+            element,
+            recursive: recursive,
+            followLinks: followLinks,
+          ),
+        );
       }
     });
     return allEntries;
@@ -186,7 +204,8 @@ class FormatTool extends DevTool {
   }) {
     if (collapseDirectories != null) {
       _log.warning(
-          'ignoring deprecated option "collapseDirectories": argv limitations are now solved by parallel invocations');
+        'ignoring deprecated option "collapseDirectories": argv limitations are now solved by parallel invocations',
+      );
     }
 
     expandCwd ??= false;
@@ -201,8 +220,11 @@ class FormatTool extends DevTool {
 
     final dir = Directory(root ?? '.');
 
-    for (final entry in _listSyncWithoutHidden(dir,
-        recursive: true, followLinks: followLinks)) {
+    for (final entry in _listSyncWithoutHidden(
+      dir,
+      recursive: true,
+      followLinks: followLinks,
+    )) {
       final filename = p.relative(entry.path, from: dir.path);
       _log.finest('== Processing relative $filename ==\n');
 
@@ -229,10 +251,12 @@ class FormatTool extends DevTool {
 }
 
 class FormatterInputs {
-  FormatterInputs(this.includedFiles,
-      {@deprecated this.excludedFiles,
-      @deprecated this.hiddenDirectories,
-      @deprecated this.skippedLinks});
+  FormatterInputs(
+    this.includedFiles, {
+    @deprecated this.excludedFiles,
+    @deprecated this.hiddenDirectories,
+    @deprecated this.skippedLinks,
+  });
 
   final Set<String> includedFiles;
 
@@ -259,11 +283,11 @@ class FormatterInputs {
 /// output of step 1 (an instance of this class) with very simple unit tests.
 class FormatExecution {
   FormatExecution.exitEarly(this.exitCode)
-      : formatProcess = null,
-        directiveOrganization = null;
+    : formatProcess = null,
+      directiveOrganization = null;
 
   FormatExecution.process(this.formatProcess, [this.directiveOrganization])
-      : exitCode = null;
+    : exitCode = null;
 
   /// If non-null, the execution is already complete and the [FormatTool] should
   /// exit with this code.
@@ -339,10 +363,7 @@ Iterable<String> buildArgs(
     // Combine all args that should be passed through to the dartfmt in this
     // order:
     // 1. Mode flag(s), if configured
-    if (mode == FormatMode.check) ...[
-      '-n',
-      '--set-exit-if-changed',
-    ],
+    if (mode == FormatMode.check) ...['-n', '--set-exit-if-changed'],
     if (mode == FormatMode.overwrite && passWriteArgForOverwrite) '-w',
     if (mode == FormatMode.dryRun) '-n',
     if (languageVersion != null) '--language-version=$languageVersion',
@@ -372,10 +393,12 @@ Iterable<String> buildArgs(
 /// Finally, if [verbose] is true and the verbose flag (`-v`) is not already
 /// included, it will be added.
 Iterable<String> buildArgsForDartFormat(
-    Iterable<String> executableArgs, FormatMode? mode,
-    {ArgResults? argResults,
-    List<String>? configuredFormatterArgs,
-  String? languageVersion}) {
+  Iterable<String> executableArgs,
+  FormatMode? mode, {
+  ArgResults? argResults,
+  List<String>? configuredFormatterArgs,
+  String? languageVersion,
+}) {
   final args = <String>[
     ...executableArgs,
 
@@ -434,81 +457,101 @@ FormatExecution buildExecution(
 }) {
   FormatMode? mode;
 
-  final useRestForInputs = (context.argResults?.rest.isNotEmpty ?? false) &&
+  final useRestForInputs =
+      (context.argResults?.rest.isNotEmpty ?? false) &&
       context.commandName == 'hackFastFormat';
 
   final argResults = context.argResults;
   if (argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        argResults, context.usageException,
-        allowRest: useRestForInputs,
-        commandName: context.commandName,
-        usageFooter:
-            'Arguments can be passed to the "dartfmt" or "dart format" process via the '
-            '--formatter-args option.');
+      argResults,
+      context.usageException,
+      allowRest: useRestForInputs,
+      commandName: context.commandName,
+      usageFooter:
+          'Arguments can be passed to the "dartfmt" or "dart format" process via the '
+          '--formatter-args option.',
+    );
     mode = validateAndParseMode(argResults, context.usageException);
   }
   mode ??= defaultMode;
 
   if (formatter == Formatter.dartStyle &&
       !packageIsImmediateDependency('dart_style', path: path)) {
-    _log.severe(red.wrap('Cannot run "dart_style:format".\n')! +
-        yellow.wrap('You must either have a dependency on "dart_style" in '
+    _log.severe(
+      red.wrap('Cannot run "dart_style:format".\n')! +
+          yellow.wrap(
+            'You must either have a dependency on "dart_style" in '
             'pubspec.yaml or configure the format tool to use "dartfmt" '
             'instead.\n'
             'Either add "dart_style" to your pubspec.yaml or configure the '
-            'format tool to use "dartfmt" instead.')!);
+            'format tool to use "dartfmt" instead.',
+          )!,
+    );
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
   if (context.commandName == 'hackFastFormat' && !useRestForInputs) {
-    context.usageException('"hackFastFormat" must specify targets to format.\n'
-        'hackFastFormat should only be used to format specific files. '
-        'Running the command over an entire project may format files that '
-        'would be excluded using the standard "format" command.');
+    context.usageException(
+      '"hackFastFormat" must specify targets to format.\n'
+      'hackFastFormat should only be used to format specific files. '
+      'Running the command over an entire project may format files that '
+      'would be excluded using the standard "format" command.',
+    );
   }
 
   final inputs = useRestForInputs
       ? FormatterInputs({...?context.argResults?.rest})
-      : FormatTool.getInputs(
-          exclude: exclude,
-          root: path,
-        );
+      : FormatTool.getInputs(exclude: exclude, root: path);
 
   if (inputs.includedFiles.isEmpty) {
-    _log.severe('The formatter cannot run because no inputs could be found '
-        'with the configured includes and excludes.\n'
-        'Please modify the excludes and/or includes in "tool/dart_dev/config.dart".');
+    _log.severe(
+      'The formatter cannot run because no inputs could be found '
+      'with the configured includes and excludes.\n'
+      'Please modify the excludes and/or includes in "tool/dart_dev/config.dart".',
+    );
     return FormatExecution.exitEarly(ExitCode.config.code);
   }
 
   final dartFormatter = buildFormatProcess(formatter);
   Iterable<String> args;
   final dartStyleSupportsWriteArg =
-      formatter != Formatter.dartStyle || _dartStyleVersionSupportsWriteArg(path: path);
-  final formatterLanguageVersion =
-      _formatterLanguageVersion(formatter, dartStyleSupportsWriteArg,
-          configuredLanguageVersion: languageVersion);
-  if (formatter == Formatter.dartFormat) {
-    args = buildArgsForDartFormat(dartFormatter.args, mode,
-        argResults: context.argResults,
-      configuredFormatterArgs: configuredFormatterArgs,
-        languageVersion: formatterLanguageVersion);
-  } else {
-    args = buildArgs(dartFormatter.args, mode,
-        argResults: context.argResults,
-        configuredFormatterArgs: configuredFormatterArgs,
-        passWriteArgForOverwrite: dartStyleSupportsWriteArg,
-        languageVersion: formatterLanguageVersion);
-  }
-  logCommand(dartFormatter.executable, inputs.includedFiles, args,
-      verbose: context.verbose);
-
-  final formatProcess = ProcessDeclaration(
-    dartFormatter.executable,
-    [...args, ...inputs.includedFiles],
-    mode: ProcessStartMode.inheritStdio,
+      formatter != Formatter.dartStyle ||
+      _dartStyleVersionSupportsWriteArg(path: path);
+  final formatterLanguageVersion = _formatterLanguageVersion(
+    formatter,
+    dartStyleSupportsWriteArg,
+    configuredLanguageVersion: languageVersion,
   );
+  if (formatter == Formatter.dartFormat) {
+    args = buildArgsForDartFormat(
+      dartFormatter.args,
+      mode,
+      argResults: context.argResults,
+      configuredFormatterArgs: configuredFormatterArgs,
+      languageVersion: formatterLanguageVersion,
+    );
+  } else {
+    args = buildArgs(
+      dartFormatter.args,
+      mode,
+      argResults: context.argResults,
+      configuredFormatterArgs: configuredFormatterArgs,
+      passWriteArgForOverwrite: dartStyleSupportsWriteArg,
+      languageVersion: formatterLanguageVersion,
+    );
+  }
+  logCommand(
+    dartFormatter.executable,
+    inputs.includedFiles,
+    args,
+    verbose: context.verbose,
+  );
+
+  final formatProcess = ProcessDeclaration(dartFormatter.executable, [
+    ...args,
+    ...inputs.includedFiles,
+  ], mode: ProcessStartMode.inheritStdio);
   DirectiveOrganization? directiveOrganization;
   if (organizeDirectives) {
     directiveOrganization = DirectiveOrganization(
@@ -516,10 +559,7 @@ FormatExecution buildExecution(
       check: mode == FormatMode.check,
     );
   }
-  return FormatExecution.process(
-    formatProcess,
-    directiveOrganization,
-  );
+  return FormatExecution.process(formatProcess, directiveOrganization);
 }
 
 /// Returns a representation of the process that will be run by [FormatTool]
@@ -546,13 +586,18 @@ ProcessDeclaration buildFormatProcess([Formatter? formatter]) {
 /// If we cannot determine a resolved version from `pubspec.lock`, we preserve
 /// legacy behavior and continue passing `-w`.
 bool _dartStyleVersionSupportsWriteArg({String? path}) {
-  final dartStyleVersion = _resolvedDependencyVersionFromPubspecLock('dart_style', path: path);
+  final dartStyleVersion = _resolvedDependencyVersionFromPubspecLock(
+    'dart_style',
+    path: path,
+  );
   if (dartStyleVersion != null) {
     return dartStyleVersion < Version.parse('3.0.0');
   }
 
-  final dartStyleConstraint =
-      _declaredDependencyConstraintFromPubspec('dart_style', path: path);
+  final dartStyleConstraint = _declaredDependencyConstraintFromPubspec(
+    'dart_style',
+    path: path,
+  );
   if (dartStyleConstraint != null) {
     return dartStyleConstraint.allows(Version.parse('2.99.99'));
   }
@@ -574,7 +619,10 @@ String? _formatterLanguageVersion(
   return null;
 }
 
-Version? _resolvedDependencyVersionFromPubspecLock(String dependency, {String? path}) {
+Version? _resolvedDependencyVersionFromPubspecLock(
+  String dependency, {
+  String? path,
+}) {
   final lockFilePath = p.join(path ?? p.current, 'pubspec.lock');
   final lockFile = File(lockFilePath);
   if (!lockFile.existsSync()) return null;
@@ -586,9 +634,9 @@ Version? _resolvedDependencyVersionFromPubspecLock(String dependency, {String? p
 }
 
 VersionConstraint? _declaredDependencyConstraintFromPubspec(
-    String dependency, {
-    String? path,
-  }) {
+  String dependency, {
+  String? path,
+}) {
   final pubspecPath = p.join(path ?? p.current, 'pubspec.yaml');
   final pubspecFile = File(pubspecPath);
   if (!pubspecFile.existsSync()) return null;
@@ -620,8 +668,11 @@ VersionConstraint? _declaredDependencyConstraintFromPubspec(
 /// Unless [verbose] is true, the list of inputs will be abbreviated to avoid an
 /// unnecessarily long log.
 void logCommand(
-    String executable, Iterable<String> inputs, Iterable<String?> args,
-    {bool verbose = false}) {
+  String executable,
+  Iterable<String> inputs,
+  Iterable<String?> args, {
+  bool verbose = false,
+}) {
   final exeAndArgs = '$executable ${args.join(' ')}'.trim();
   if (inputs.length <= 5 || verbose) {
     logSubprocessHeader(_log, '$exeAndArgs ${inputs.join(' ')}');
@@ -639,14 +690,17 @@ void logCommand(
 ///
 /// If none of the mode flags were enabled, this returns `null`.
 FormatMode? validateAndParseMode(
-    ArgResults argResults, void Function(String message) usageException) {
+  ArgResults argResults,
+  void Function(String message) usageException,
+) {
   final check = argResults['check'] ?? false;
   final dryRun = argResults['dry-run'] ?? false;
   final overwrite = argResults['overwrite'] ?? false;
 
   if (check && dryRun && overwrite) {
     usageException(
-        'Cannot use --check and --dry-run and --overwrite at the same time.');
+      'Cannot use --check and --dry-run and --overwrite at the same time.',
+    );
   }
   if (check && dryRun) {
     usageException('Cannot use --check and --dry-run at the same time.');

@@ -28,18 +28,22 @@ void main() {
         'c',
         '-d',
       ]);
-      expect(restArgsWithSeparator(results), [
+      expect(restArgsWithSeparator(results), ['a', 'b', '--', 'c', '-d']);
+    });
+
+    test('with multiple separators', () {
+      final results = parser.parse([
         'a',
+        '-o',
+        'out',
+        '-v',
         'b',
         '--',
         'c',
         '-d',
+        '--',
+        'e',
       ]);
-    });
-
-    test('with multiple separators', () {
-      final results = parser
-          .parse(['a', '-o', 'out', '-v', 'b', '--', 'c', '-d', '--', 'e']);
       expect(restArgsWithSeparator(results), [
         'a',
         'b',

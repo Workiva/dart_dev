@@ -9,7 +9,9 @@ void assertNoPositionalArgs(
   bool beforeSeparator = false,
 }) {
   if (hasAnyPositionalArgsBeforeSeparator(argResults)) {
-    usageException('The "$name" command does not support positional args'
-        '${beforeSeparator ? ' before the `--` separator' : ''}.\n');
+    usageException(
+      'The "$name" command does not support positional args'
+      '${beforeSeparator ? ' before the `--` separator' : ''}.\n',
+    );
   }
 }

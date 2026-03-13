@@ -11,7 +11,7 @@ import 'utils/version.dart';
 
 class DartDevRunner extends CommandRunner<int> {
   DartDevRunner(Map<String, DevTool> commands)
-      : super('dart_dev', 'Dart tool runner.') {
+    : super('dart_dev', 'Dart tool runner.') {
     // For backwards-compatibility, only add the `clean` command if it doesn't
     // conflict with any configured command.
     if (!commands.containsKey('clean')) {
@@ -32,10 +32,17 @@ class DartDevRunner extends CommandRunner<int> {
     });
 
     argParser
-      ..addFlag('verbose',
-          abbr: 'v', negatable: false, help: 'Enables verbose logging.')
-      ..addFlag('version',
-          negatable: false, help: 'Prints the dart_dev version.');
+      ..addFlag(
+        'verbose',
+        abbr: 'v',
+        negatable: false,
+        help: 'Enables verbose logging.',
+      )
+      ..addFlag(
+        'version',
+        negatable: false,
+        help: 'Prints the dart_dev version.',
+      );
   }
 
   @override
@@ -60,7 +67,8 @@ class DartDevRunner extends CommandRunner<int> {
     final exitCode = (await super.run(args)) ?? 0;
     stopwatch.stop();
     await events.commandComplete(
-        events.CommandResult(args.toList(), exitCode, stopwatch.elapsed));
+      events.CommandResult(args.toList(), exitCode, stopwatch.elapsed),
+    );
     return exitCode;
   }
 }
@@ -71,6 +79,7 @@ class CommandNameMismatch implements Exception {
   CommandNameMismatch(this.actual, this.expected);
 
   @override
-  String toString() => 'CommandNameMismatch: '
+  String toString() =>
+      'CommandNameMismatch: '
       'Expected a "$expected" command but got one named "$actual".';
 }

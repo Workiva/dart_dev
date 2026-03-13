@@ -30,19 +30,25 @@ void main() {
     });
 
     test('configured ignoreInfos', () {
-      expect(buildArgs(configuredIgnoreInfos: true),
-          orderedEquals(['run', 'tuneup', 'check', '--ignore-infos']));
+      expect(
+        buildArgs(configuredIgnoreInfos: true),
+        orderedEquals(['run', 'tuneup', 'check', '--ignore-infos']),
+      );
     });
 
     test('--ignore-infos', () {
       final argResults = TuneupCheckTool().argParser.parse(['--ignore-infos']);
-      expect(buildArgs(argResults: argResults),
-          orderedEquals(['run', 'tuneup', 'check', '--ignore-infos']));
+      expect(
+        buildArgs(argResults: argResults),
+        orderedEquals(['run', 'tuneup', 'check', '--ignore-infos']),
+      );
     });
 
     test('verbose', () {
-      expect(buildArgs(verbose: true),
-          orderedEquals(['run', 'tuneup', 'check', '--verbose']));
+      expect(
+        buildArgs(verbose: true),
+        orderedEquals(['run', 'tuneup', 'check', '--verbose']),
+      );
     });
   });
 
@@ -50,22 +56,39 @@ void main() {
     test('throws UsageException if positional args are given', () {
       final argResults = ArgParser().parse(['a']);
       final context = DevToolExecutionContext(
-          argResults: argResults, commandName: 'test_tuneup');
+        argResults: argResults,
+        commandName: 'test_tuneup',
+      );
       expect(
-          () => buildExecution(context),
-          throwsA(isA<UsageException>().having(
-              (e) => e.message, 'command name', contains('test_tuneup'))));
+        () => buildExecution(context),
+        throwsA(
+          isA<UsageException>().having(
+            (e) => e.message,
+            'command name',
+            contains('test_tuneup'),
+          ),
+        ),
+      );
     });
 
     test('exits early and logs if tuneup is not an immediate dependency', () {
       expect(
-          Logger.root.onRecord,
-          emitsThrough(severeLogOf(allOf(contains('Cannot run "tuneup check"'),
-              contains('"tuneup" in pubspec.yaml')))));
+        Logger.root.onRecord,
+        emitsThrough(
+          severeLogOf(
+            allOf(
+              contains('Cannot run "tuneup check"'),
+              contains('"tuneup" in pubspec.yaml'),
+            ),
+          ),
+        ),
+      );
 
       final context = DevToolExecutionContext();
-      final execution = buildExecution(context,
-          path: 'test/tools/fixtures/tuneup_check/missing_tuneup');
+      final execution = buildExecution(
+        context,
+        path: 'test/tools/fixtures/tuneup_check/missing_tuneup',
+      );
       expect(execution.exitCode, ExitCode.config.code);
     });
 
@@ -76,28 +99,41 @@ void main() {
         expect(execution.exitCode, isNull);
         expect(execution.process!.executable, exe.dart);
         expect(
-            execution.process!.args, orderedEquals(['run', 'tuneup', 'check']));
+          execution.process!.args,
+          orderedEquals(['run', 'tuneup', 'check']),
+        );
         expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('with args', () {
-        final argResults =
-            TuneupCheckTool().argParser.parse(['--ignore-infos']);
-        final context =
-            DevToolExecutionContext(argResults: argResults, verbose: true);
+        final argResults = TuneupCheckTool().argParser.parse([
+          '--ignore-infos',
+        ]);
+        final context = DevToolExecutionContext(
+          argResults: argResults,
+          verbose: true,
+        );
         final execution = buildExecution(context, path: path);
         expect(execution.exitCode, isNull);
         expect(execution.process!.executable, exe.dart);
         expect(
-            execution.process!.args,
-            orderedEquals(
-                ['run', 'tuneup', 'check', '--ignore-infos', '--verbose']));
+          execution.process!.args,
+          orderedEquals([
+            'run',
+            'tuneup',
+            'check',
+            '--ignore-infos',
+            '--verbose',
+          ]),
+        );
         expect(execution.process!.mode, ProcessStartMode.inheritStdio);
       });
 
       test('and logs the subprocess header', () {
-        expect(Logger.root.onRecord,
-            emitsThrough(infoLogOf(allOf(contains('dart run tuneup check')))));
+        expect(
+          Logger.root.onRecord,
+          emitsThrough(infoLogOf(allOf(contains('dart run tuneup check')))),
+        );
 
         buildExecution(DevToolExecutionContext(), path: path);
       });

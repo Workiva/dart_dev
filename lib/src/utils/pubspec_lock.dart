@@ -5,7 +5,9 @@ import 'package:yaml/yaml.dart';
 /// Index into the pubspecLock to locate the 'source' field for the given
 /// package.
 String? _getPubSpecLockPackageSource(
-    YamlDocument pubSpecLock, String packageName) {
+  YamlDocument pubSpecLock,
+  String packageName,
+) {
   final contents = pubSpecLock.contents;
   if (contents is YamlMap) {
     final packages = contents['packages'];
@@ -38,7 +40,9 @@ String? getDependencyVersion(YamlDocument pubSpecLock, String packageName) {
 /// lock document. If a package cannot be located in the pubspec lock document,
 /// it will map to null.
 HashMap<String, String?> getDependencySources(
-        YamlDocument pubspecLockDocument, Iterable<String> packageNames) =>
-    HashMap.fromIterable(packageNames,
-        value: (name) =>
-            _getPubSpecLockPackageSource(pubspecLockDocument, name));
+  YamlDocument pubspecLockDocument,
+  Iterable<String> packageNames,
+) => HashMap.fromIterable(
+  packageNames,
+  value: (name) => _getPubSpecLockPackageSource(pubspecLockDocument, name),
+);

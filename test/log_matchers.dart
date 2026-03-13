@@ -35,8 +35,10 @@ class _LogRecordMatcher extends Matcher {
   final Matcher _message;
 
   factory _LogRecordMatcher(dynamic levelOr, dynamic messageOr) =>
-      _LogRecordMatcher._(levelOr is Matcher ? levelOr : equals(levelOr),
-          messageOr is Matcher ? messageOr : equals(messageOr));
+      _LogRecordMatcher._(
+        levelOr is Matcher ? levelOr : equals(levelOr),
+        messageOr is Matcher ? messageOr : equals(messageOr),
+      );
 
   _LogRecordMatcher._(this._level, this._message);
 
@@ -50,8 +52,12 @@ class _LogRecordMatcher extends Matcher {
   }
 
   @override
-  Description describeMismatch(covariant LogRecord item,
-      Description description, Map<dynamic, dynamic> _, bool __) {
+  Description describeMismatch(
+    covariant LogRecord item,
+    Description description,
+    Map<dynamic, dynamic> _,
+    bool __,
+  ) {
     if (!_level.matches(item.level, {})) {
       _level.describeMismatch(item.level, description, {}, false);
     }

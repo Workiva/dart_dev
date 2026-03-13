@@ -27,12 +27,15 @@ final _log = Logger('Process');
 /// It is also possible to run this tool directly in a dart script:
 ///     ProcessTool(exe, args).run();
 class ProcessTool extends DevTool {
-  ProcessTool(String executable, List<String> args,
-      {ProcessStartMode? mode, String? workingDirectory})
-      : _args = args,
-        _executable = executable,
-        _mode = mode,
-        _workingDirectory = workingDirectory;
+  ProcessTool(
+    String executable,
+    List<String> args, {
+    ProcessStartMode? mode,
+    String? workingDirectory,
+  }) : _args = args,
+       _executable = executable,
+       _mode = mode,
+       _workingDirectory = workingDirectory;
 
   final List<String> _args;
   final String _executable;
@@ -48,14 +51,21 @@ class ProcessTool extends DevTool {
     final argResults = context.argResults;
     if (argResults != null) {
       assertNoPositionalArgsNorArgsAfterSeparator(
-          argResults, context.usageException,
-          commandName: context.commandName);
+        argResults,
+        context.usageException,
+        commandName: context.commandName,
+      );
     }
     logSubprocessHeader(_log, '$_executable ${_args.join(' ')}');
     _process = await startProcessAndEnsureExit(
-        ProcessDeclaration(_executable, _args,
-            mode: _mode, workingDirectory: _workingDirectory),
-        log: _log);
+      ProcessDeclaration(
+        _executable,
+        _args,
+        mode: _mode,
+        workingDirectory: _workingDirectory,
+      ),
+      log: _log,
+    );
     return _process!.exitCode;
   }
 }
@@ -67,15 +77,17 @@ class BackgroundProcessTool {
   final Duration? _delayAfterStart;
   final String? _workingDirectory;
 
-  BackgroundProcessTool(String executable, List<String> args,
-      {ProcessStartMode? mode,
-      Duration? delayAfterStart,
-      String? workingDirectory})
-      : _args = args,
-        _executable = executable,
-        _mode = mode,
-        _delayAfterStart = delayAfterStart,
-        _workingDirectory = workingDirectory;
+  BackgroundProcessTool(
+    String executable,
+    List<String> args, {
+    ProcessStartMode? mode,
+    Duration? delayAfterStart,
+    String? workingDirectory,
+  }) : _args = args,
+       _executable = executable,
+       _mode = mode,
+       _delayAfterStart = delayAfterStart,
+       _workingDirectory = workingDirectory;
 
   Process? get process => _process;
   Process? _process;
@@ -90,17 +102,24 @@ class BackgroundProcessTool {
     final argResults = context.argResults;
     if (argResults != null) {
       assertNoPositionalArgsNorArgsAfterSeparator(
-          argResults, context.usageException,
-          commandName: context.commandName);
+        argResults,
+        context.usageException,
+        commandName: context.commandName,
+      );
     }
     logSubprocessHeader(_log, '$_executable ${_args.join(' ')}');
 
-    final mode = _mode ??
+    final mode =
+        _mode ??
         (context.verbose
             ? ProcessStartMode.inheritStdio
             : ProcessStartMode.normal);
-    _process = await Process.start(_executable, _args,
-        mode: mode, workingDirectory: _workingDirectory);
+    _process = await Process.start(
+      _executable,
+      _args,
+      mode: mode,
+      workingDirectory: _workingDirectory,
+    );
     ensureProcessExit(_process!);
     unawaited(_process!.exitCode.then((_) => _processHasExited = true));
 
@@ -121,8 +140,10 @@ class BackgroundProcessTool {
     final argResults = context.argResults;
     if (argResults != null) {
       assertNoPositionalArgsNorArgsAfterSeparator(
-          argResults, context.usageException,
-          commandName: context.commandName);
+        argResults,
+        context.usageException,
+        commandName: context.commandName,
+      );
     }
     _log.info('Stopping: $_executable ${_args.join(' ')}');
     _process?.kill();
