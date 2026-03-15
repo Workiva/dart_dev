@@ -62,10 +62,13 @@ Future<void> run(List<String> args) async {
   }
 
   final processArgs = generateRunScript();
-  final process = await Process.start(processArgs.first, [
-    if (processArgs.length > 1) ...processArgs.sublist(1),
-    ...args,
-  ], mode: ProcessStartMode.inheritStdio);
+  final process = await Process.start(
+      processArgs.first,
+      [
+        if (processArgs.length > 1) ...processArgs.sublist(1),
+        ...args,
+      ],
+      mode: ProcessStartMode.inheritStdio);
   ensureProcessExit(process);
   exitCode = await process.exitCode;
 }
@@ -171,14 +174,13 @@ String? _computeRunScriptDigest() {
     if (packageConfig.existsSync()) ...packageConfig.readAsBytesSync(),
     if (configFile.existsSync()) ...configFile.readAsBytesSync(),
     if (configHasRelativeImports)
-      for (final file
-          in Glob('tool/**.dart', recursive: true)
-              .listSync()
-              .whereType<File>()
-              .where(
-                (f) => p.canonicalize(f.path) != p.canonicalize(_paths.config),
-              )
-              .sortedBy((f) => f.path))
+      for (final file in Glob('tool/**.dart', recursive: true)
+          .listSync()
+          .whereType<File>()
+          .where(
+            (f) => p.canonicalize(f.path) != p.canonicalize(_paths.config),
+          )
+          .sortedBy((f) => f.path))
         ...file.readAsBytesSync(),
   ]);
   return base64.encode(digest.bytes);
@@ -326,8 +328,7 @@ Future<void> runWithConfig(
 DevTool chooseDefaultFormatTool({String? path}) {
   final pubspec = cachedPubspec(path: path);
   const orf = 'over_react_format';
-  final hasOverReactFormat =
-      pubspec.dependencies.containsKey(orf) ||
+  final hasOverReactFormat = pubspec.dependencies.containsKey(orf) ||
       pubspec.devDependencies.containsKey(orf) ||
       pubspec.dependencyOverrides.containsKey(orf);
 

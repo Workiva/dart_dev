@@ -291,7 +291,8 @@ dev_dependencies:
       },
     );
 
-    test('throws UsageException if --build-args is used but build_test is not '
+    test(
+        'throws UsageException if --build-args is used but build_test is not '
         'a direct dependency', () async {
       await d.file('pubspec.yaml', '''
 name: _test
@@ -343,7 +344,8 @@ environment:
       },
     );
 
-    test('returns config exit code and logs if configured to run tests with '
+    test(
+        'returns config exit code and logs if configured to run tests with '
         'build args but build_runner is not a direct dependency', () async {
       expect(
         Logger.root.onRecord,
@@ -378,7 +380,8 @@ dev_dependencies:
       );
     });
 
-    test('returns config exit code and logs if configured to run tests with '
+    test(
+        'returns config exit code and logs if configured to run tests with '
         'build args but build_test is not a direct dependency', () async {
       expect(
         Logger.root.onRecord,

@@ -15,8 +15,8 @@ class FunctionTool extends DevTool {
   FunctionTool(
     FutureOr<int?> Function(DevToolExecutionContext context) function, {
     ArgParser? argParser,
-  }) : _argParser = argParser,
-       _function = function;
+  })  : _argParser = argParser,
+        _function = function;
 
   final FutureOr<int?> Function(DevToolExecutionContext context) _function;
 

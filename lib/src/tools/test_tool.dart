@@ -53,8 +53,7 @@ class TestTool extends DevTool {
     ..addMultiOption(
       'name',
       abbr: 'n',
-      help:
-          'A substring of the name of the test to run.\n'
+      help: 'A substring of the name of the test to run.\n'
           'Regular expression syntax is supported.\n'
           'If passed multiple times, tests must match all substrings.',
       splitCommas: false,
@@ -62,8 +61,7 @@ class TestTool extends DevTool {
     ..addMultiOption(
       'plain-name',
       abbr: 'N',
-      help:
-          'A plain-text substring of the name of the test to run.\n'
+      help: 'A plain-text substring of the name of the test to run.\n'
           'If passed multiple times, tests must match all substrings.',
       splitCommas: false,
     )
@@ -75,8 +73,7 @@ class TestTool extends DevTool {
     )
     ..addFlag(
       'release',
-      help:
-          'Build with release mode defaults for builders.\n'
+      help: 'Build with release mode defaults for builders.\n'
           'This only applies in projects that run tests with build_runner.',
     )
     ..addSeparator('======== Output')
@@ -97,14 +94,12 @@ class TestTool extends DevTool {
     )
     ..addOption(
       'test-args',
-      help:
-          'Args to pass to the test runner process.\n'
+      help: 'Args to pass to the test runner process.\n'
           'Run "dart test -h" to see all available options.',
     )
     ..addOption(
       'build-args',
-      help:
-          'Args to pass to the build runner process.\n'
+      help: 'Args to pass to the build runner process.\n'
           'Run "dart run build_runner test -h" to see all available '
           'options.\n'
           'Note: these args are only applicable if the current project '

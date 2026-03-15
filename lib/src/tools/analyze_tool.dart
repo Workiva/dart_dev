@@ -68,8 +68,7 @@ class AnalyzeTool extends DevTool {
   final ArgParser argParser = ArgParser()
     ..addOption(
       'analyzer-args',
-      help:
-          'Args to pass to the "dartanalyzer" or "dart analyze" process.\n'
+      help: 'Args to pass to the "dartanalyzer" or "dart analyze" process.\n'
           'Run "dartanalyzer -h -v" or `dart analyze -h -v" to see all available options.',
     );
 
@@ -83,9 +82,8 @@ class AnalyzeTool extends DevTool {
         context ?? DevToolExecutionContext(),
         configuredAnalyzerArgs: analyzerArgs,
         include: include,
-        useDartAnalyze: !dartVersionHasDartanalyzer
-            ? true
-            : useDartAnalyze ?? false,
+        useDartAnalyze:
+            !dartVersionHasDartanalyzer ? true : useDartAnalyze ?? false,
       ),
       log: _log,
     );
@@ -181,8 +179,7 @@ ProcessDeclaration buildProcess(
       argResults,
       context.usageException,
       commandName: context.commandName,
-      usageFooter:
-          'Arguments can be passed to the "$analyzerUsed" process via '
+      usageFooter: 'Arguments can be passed to the "$analyzerUsed" process via '
           'the --analyzer-args option.',
     );
   }
@@ -200,10 +197,13 @@ ProcessDeclaration buildProcess(
     verbose: context.verbose,
     useDartAnalyzer: useDartAnalyze,
   );
-  return ProcessDeclaration(executable, [
-    ...args,
-    ...entrypoints,
-  ], mode: ProcessStartMode.inheritStdio);
+  return ProcessDeclaration(
+      executable,
+      [
+        ...args,
+        ...entrypoints,
+      ],
+      mode: ProcessStartMode.inheritStdio);
 }
 
 /// Logs the `dartanalyzer` or `dart analyze` command that will be run by [AnalyzeTool] so that

@@ -5,6 +5,7 @@ final config = {
   ...coreConfig,
   'analyze': AnalyzeTool()..useDartAnalyze = true,
   'format': FormatTool()
+    ..languageVersion = '2.19'
     ..organizeDirectives = true
     ..exclude = [Glob('test/**/fixtures/**.dart')]
     ..formatter = Formatter.dartFormat,

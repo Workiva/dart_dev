@@ -14,19 +14,21 @@ abstract class DevTool {
   factory DevTool.fromFunction(
     FutureOr<int?> Function(DevToolExecutionContext context) function, {
     ArgParser? argParser,
-  }) => FunctionTool(function, argParser: argParser);
+  }) =>
+      FunctionTool(function, argParser: argParser);
 
   factory DevTool.fromProcess(
     String executable,
     List<String> args, {
     ProcessStartMode? mode,
     String? workingDirectory,
-  }) => ProcessTool(
-    executable,
-    args,
-    mode: mode,
-    workingDirectory: workingDirectory,
-  );
+  }) =>
+      ProcessTool(
+        executable,
+        args,
+        mode: mode,
+        workingDirectory: workingDirectory,
+      );
 
   /// The argument parser for this tool, if needed.
   ///
@@ -120,12 +122,13 @@ class DevToolExecutionContext {
     String? commandName,
     void Function(String message)? usageException,
     bool? verbose,
-  }) => DevToolExecutionContext(
-    argResults: argResults ?? this.argResults,
-    commandName: commandName ?? this.commandName,
-    usageException: usageException ?? this.usageException,
-    verbose: verbose ?? this.verbose,
-  );
+  }) =>
+      DevToolExecutionContext(
+        argResults: argResults ?? this.argResults,
+        commandName: commandName ?? this.commandName,
+        usageException: usageException ?? this.usageException,
+        verbose: verbose ?? this.verbose,
+      );
 
   /// Calling this will throw a [UsageException] with [message] that should be
   /// caught by [CommandRunner] and used to set the exit code accordingly and

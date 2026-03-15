@@ -29,17 +29,23 @@ void main() {
         d.file('pubspec.yaml', pubspecSource),
       ]).create();
 
-      final pubGet = await TestProcess.start(exe.dart, [
-        'pub',
-        'get',
-      ], workingDirectory: '${d.sandbox}/project');
+      final pubGet = await TestProcess.start(
+          exe.dart,
+          [
+            'pub',
+            'get',
+          ],
+          workingDirectory: '${d.sandbox}/project');
       printOnFailure('PUBSPEC:\n$pubspecSource\n');
       await pubGet.shouldExit(0);
 
-      final analysis = await TestProcess.start(exe.dart, [
-        'analyze',
-        '--fatal-infos',
-      ], workingDirectory: '${d.sandbox}/project');
+      final analysis = await TestProcess.start(
+          exe.dart,
+          [
+            'analyze',
+            '--fatal-infos',
+          ],
+          workingDirectory: '${d.sandbox}/project');
       printOnFailure('SOURCE:\n${dartBlock.source}\n');
       await analysis.shouldExit(0);
     });
@@ -69,9 +75,8 @@ String pubspecWithPackages(Set<String> packages) {
     ..writeln('  sdk: ">=2.12.0 <3.0.0"')
     ..writeln('dependencies:');
   for (final package in packages) {
-    var constraint = package == 'dart_dev'
-        ? '\n    path: ${p.current}'
-        : ' any';
+    var constraint =
+        package == 'dart_dev' ? '\n    path: ${p.current}' : ' any';
     buffer.writeln('  $package:$constraint');
   }
   return buffer.toString();
@@ -84,7 +89,7 @@ class DartBlock {
   final String sourceUrl;
 
   DartBlock.fromSource(this.source, this.sourceUrl, this.index)
-    : packages = parsePackagesFromSource(source);
+      : packages = parsePackagesFromSource(source);
 
   static Set<String> parsePackagesFromSource(String source) {
     final packagePattern = RegExp(r'''['"]package:(\w+)\/.*['"]''');

@@ -21,9 +21,8 @@ void main() {
     });
 
     test('can run from a custom working directory', () async {
-      final tool =
-          DevTool.fromProcess('pwd', [], workingDirectory: 'lib')
-              as ProcessTool;
+      final tool = DevTool.fromProcess('pwd', [], workingDirectory: 'lib')
+          as ProcessTool;
       expect(await tool.run(), isZero);
       final stdout =
           (await tool.process!.stdout.transform(utf8.decoder).join('')).trim();

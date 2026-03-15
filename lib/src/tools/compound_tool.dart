@@ -43,9 +43,9 @@ ArgResults takeOptionArgs(ArgParser parser, ArgResults results) =>
 ///         ..addTool(TestTool(), argMapper: takeAllArgs)
 ///     };
 ArgResults takeAllArgs(ArgParser parser, ArgResults results) => parser.parse([
-  ...optionArgsOnly(results, allowedOptions: parser.options.keys),
-  ...restArgsWithSeparator(results),
-]);
+      ...optionArgsOnly(results, allowedOptions: parser.options.keys),
+      ...restArgsWithSeparator(results),
+    ]);
 
 class CompoundTool extends DevTool with CompoundToolMixin {}
 
@@ -81,8 +81,8 @@ mixin CompoundToolMixin on DevTool {
     for (var i = 0; i < _specs.length; i++) {
       if (!shouldRunTool(_specs[i].when, code)) continue;
       final newCode = await _specs[i].tool.run(
-        contextForTool(context, _specs[i]),
-      );
+            contextForTool(context, _specs[i]),
+          );
       _log.fine('Step ${i + 1}/${_specs.length} done (code: $newCode)\n');
       if (code == 0) {
         code = newCode;
@@ -282,18 +282,19 @@ class CompoundArgParser implements ArgParser {
     bool hide = false,
     bool hideNegatedUsage = false,
     List<String> aliases = const [],
-  }) => _compoundParser.addFlag(
-    name,
-    abbr: abbr,
-    help: help,
-    defaultsTo: defaultsTo,
-    negatable: negatable,
-    // TODO once lower bound of args is 2.7.0 (requires Dart SDK 3.3.0), which adds hideNegatedUsage, forward this arg
-    // hideNegatedUsage: hideNegatedUsage,
-    callback: callback,
-    hide: hide,
-    aliases: aliases,
-  );
+  }) =>
+      _compoundParser.addFlag(
+        name,
+        abbr: abbr,
+        help: help,
+        defaultsTo: defaultsTo,
+        negatable: negatable,
+        // TODO once lower bound of args is 2.7.0 (requires Dart SDK 3.3.0), which adds hideNegatedUsage, forward this arg
+        // hideNegatedUsage: hideNegatedUsage,
+        callback: callback,
+        hide: hide,
+        aliases: aliases,
+      );
 
   @override
   void addMultiOption(
@@ -308,19 +309,20 @@ class CompoundArgParser implements ArgParser {
     bool splitCommas = true,
     bool hide = false,
     List<String> aliases = const [],
-  }) => _compoundParser.addMultiOption(
-    name,
-    abbr: abbr,
-    help: help,
-    valueHelp: valueHelp,
-    allowed: allowed,
-    allowedHelp: allowedHelp,
-    defaultsTo: defaultsTo,
-    callback: callback,
-    splitCommas: splitCommas,
-    hide: hide,
-    aliases: aliases,
-  );
+  }) =>
+      _compoundParser.addMultiOption(
+        name,
+        abbr: abbr,
+        help: help,
+        valueHelp: valueHelp,
+        allowed: allowed,
+        allowedHelp: allowedHelp,
+        defaultsTo: defaultsTo,
+        callback: callback,
+        splitCommas: splitCommas,
+        hide: hide,
+        aliases: aliases,
+      );
 
   @override
   void addOption(
@@ -335,17 +337,18 @@ class CompoundArgParser implements ArgParser {
     bool mandatory = false,
     bool hide = false,
     List<String> aliases = const [],
-  }) => _compoundParser.addOption(
-    name,
-    abbr: abbr,
-    help: help,
-    valueHelp: valueHelp,
-    allowed: allowed,
-    allowedHelp: allowedHelp,
-    defaultsTo: defaultsTo,
-    callback: callback,
-    mandatory: mandatory,
-    hide: hide,
-    aliases: aliases,
-  );
+  }) =>
+      _compoundParser.addOption(
+        name,
+        abbr: abbr,
+        help: help,
+        valueHelp: valueHelp,
+        allowed: allowed,
+        allowedHelp: allowedHelp,
+        defaultsTo: defaultsTo,
+        callback: callback,
+        mandatory: mandatory,
+        hide: hide,
+        aliases: aliases,
+      );
 }

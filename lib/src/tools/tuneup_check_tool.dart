@@ -54,8 +54,7 @@ class TuneupCheckTool extends DevTool {
     ..addFlag('ignore-infos', help: 'Ignore any info level issues.');
 
   @override
-  String? description =
-      'Run static analysis on dart files in this package '
+  String? description = 'Run static analysis on dart files in this package '
       'using the tuneup tool.';
 
   @override
@@ -104,8 +103,7 @@ Iterable<String> buildArgs({
   bool? configuredIgnoreInfos,
   bool verbose = false,
 }) {
-  var ignoreInfos =
-      (configuredIgnoreInfos ?? false) ||
+  var ignoreInfos = (configuredIgnoreInfos ?? false) ||
       (flagValue(argResults, 'ignore-infos') ?? false);
   return [
     'run',

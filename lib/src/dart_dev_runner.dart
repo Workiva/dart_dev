@@ -11,7 +11,7 @@ import 'utils/version.dart';
 
 class DartDevRunner extends CommandRunner<int> {
   DartDevRunner(Map<String, DevTool> commands)
-    : super('dart_dev', 'Dart tool runner.') {
+      : super('dart_dev', 'Dart tool runner.') {
     // For backwards-compatibility, only add the `clean` command if it doesn't
     // conflict with any configured command.
     if (!commands.containsKey('clean')) {
@@ -79,7 +79,6 @@ class CommandNameMismatch implements Exception {
   CommandNameMismatch(this.actual, this.expected);
 
   @override
-  String toString() =>
-      'CommandNameMismatch: '
+  String toString() => 'CommandNameMismatch: '
       'Expected a "$expected" command but got one named "$actual".';
 }

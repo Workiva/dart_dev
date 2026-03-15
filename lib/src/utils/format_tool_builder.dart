@@ -48,9 +48,9 @@ class FormatToolBuilder extends GeneralizingAstVisitor<void> {
         return formatterInvocation.cascadeSections
             .whereType<AssignmentExpression>()
             .firstWhereOrNull((assignment) {
-              final lhs = assignment.leftHandSide;
-              return lhs is PropertyAccess && lhs.propertyName.name == property;
-            });
+          final lhs = assignment.leftHandSide;
+          return lhs is PropertyAccess && lhs.propertyName.name == property;
+        });
       }
 
       final typedFormatDevTool = formatDevTool;
@@ -227,9 +227,9 @@ DevTool? detectFormatter(AstNode formatterNode) {
     detectedFormatterName = formatterNode.methodName.name;
   } else if (formatterNode is CascadeExpression) {
     detectedFormatterName = formatterNode.target.toSource().replaceAll(
-      RegExp('[()]'),
-      '',
-    );
+          RegExp('[()]'),
+          '',
+        );
   }
 
   if (detectedFormatterName == 'FormatTool') {

@@ -32,10 +32,10 @@ class ProcessTool extends DevTool {
     List<String> args, {
     ProcessStartMode? mode,
     String? workingDirectory,
-  }) : _args = args,
-       _executable = executable,
-       _mode = mode,
-       _workingDirectory = workingDirectory;
+  })  : _args = args,
+        _executable = executable,
+        _mode = mode,
+        _workingDirectory = workingDirectory;
 
   final List<String> _args;
   final String _executable;
@@ -83,11 +83,11 @@ class BackgroundProcessTool {
     ProcessStartMode? mode,
     Duration? delayAfterStart,
     String? workingDirectory,
-  }) : _args = args,
-       _executable = executable,
-       _mode = mode,
-       _delayAfterStart = delayAfterStart,
-       _workingDirectory = workingDirectory;
+  })  : _args = args,
+        _executable = executable,
+        _mode = mode,
+        _delayAfterStart = delayAfterStart,
+        _workingDirectory = workingDirectory;
 
   Process? get process => _process;
   Process? _process;
@@ -109,8 +109,7 @@ class BackgroundProcessTool {
     }
     logSubprocessHeader(_log, '$_executable ${_args.join(' ')}');
 
-    final mode =
-        _mode ??
+    final mode = _mode ??
         (context.verbose
             ? ProcessStartMode.inheritStdio
             : ProcessStartMode.normal);
