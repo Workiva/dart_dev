@@ -40,13 +40,10 @@ class OverReactFormatTool extends DevTool {
       if (lineLength != null) '--line-length=$lineLength',
       if (organizeDirectives == true) '--organize-directives',
     ];
-    final process = ProcessDeclaration(
-        exe.dart,
-        [
-          ...args,
-          ...paths,
-        ],
-        mode: ProcessStartMode.inheritStdio);
+    final process = ProcessDeclaration(exe.dart, [
+      ...args,
+      ...paths,
+    ], mode: ProcessStartMode.inheritStdio);
     logCommand('dart', paths, args, verbose: context.verbose);
     return runProcessAndEnsureExit(process);
   }

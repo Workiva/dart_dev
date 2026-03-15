@@ -62,13 +62,10 @@ Future<TestProcess> runDevToolFunctionalTest(
     );
     pubspec.writeAsStringSync(updated);
 
-    final result = Process.runSync(
-        exe.dart,
-        [
-          'pub',
-          'get',
-        ],
-        workingDirectory: pubspec.parent.path);
+    final result = Process.runSync(exe.dart, [
+      'pub',
+      'get',
+    ], workingDirectory: pubspec.parent.path);
     if (result.exitCode != 0) {
       final origPath = p.join(
         p.relative(templateDir.absolute.path),

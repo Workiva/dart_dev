@@ -72,19 +72,22 @@ class WebdevServeTool extends DevTool {
     ..addSeparator('======== Other Options')
     ..addOption(
       'webdev-args',
-      help: 'Args to pass to the webdev serve process.\n'
+      help:
+          'Args to pass to the webdev serve process.\n'
           'Run "dart pub global run webdev serve -h -v" to see all available '
           'options.',
     )
     ..addOption(
       'build-args',
-      help: 'Args to pass to the build runner process.\n'
+      help:
+          'Args to pass to the build runner process.\n'
           'Run "dart run build_runner build -h -v" to see all available '
           'options.',
     );
 
   @override
-  String? description = 'Run a local web development server and a file system '
+  String? description =
+      'Run a local web development server and a file system '
       'watcher that rebuilds on changes.';
 
   @override
@@ -221,7 +224,8 @@ WebdevServeExecution buildExecution(
       argResults,
       context.usageException,
       commandName: context.commandName,
-      usageFooter: 'Arguments can be passed to the webdev process via the '
+      usageFooter:
+          'Arguments can be passed to the webdev process via the '
           '--webdev-args option.\n'
           'Arguments can be passed to the build process via the --build-args '
           'option.',

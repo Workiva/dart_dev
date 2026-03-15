@@ -42,8 +42,7 @@ String? getDependencyVersion(YamlDocument pubSpecLock, String packageName) {
 HashMap<String, String?> getDependencySources(
   YamlDocument pubspecLockDocument,
   Iterable<String> packageNames,
-) =>
-    HashMap.fromIterable(
-      packageNames,
-      value: (name) => _getPubSpecLockPackageSource(pubspecLockDocument, name),
-    );
+) => HashMap.fromIterable(
+  packageNames,
+  value: (name) => _getPubSpecLockPackageSource(pubspecLockDocument, name),
+);

@@ -8,8 +8,8 @@ class DartDevPaths {
   DartDevPaths({p.Context? context}) : _context = context ?? p.context;
 
   String cache([String? subPath]) => _context.normalize(
-        _context.joinAll([..._cacheParts, if (subPath != null) subPath]),
-      );
+    _context.joinAll([..._cacheParts, if (subPath != null) subPath]),
+  );
 
   String get _cacheForDart => p.url.joinAll(_cacheParts);
 
@@ -22,9 +22,9 @@ class DartDevPaths {
   final List<String> _configParts = ['tool', 'dart_dev', 'config.dart'];
 
   String get configFromRunScriptForDart => p.url.relative(
-        p.url.absolute(configForDart),
-        from: p.url.absolute(_cacheForDart),
-      );
+    p.url.absolute(configForDart),
+    from: p.url.absolute(_cacheForDart),
+  );
 
   String get packageConfig =>
       _context.join('.dart_tool', 'package_config.json');

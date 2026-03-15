@@ -330,8 +330,7 @@ void main() {
       );
     });
 
-    test(
-        'returns config exit code and logs if configured formatter is '
+    test('returns config exit code and logs if configured formatter is '
         'dart_style but the package is not a direct dependency', () {
       expect(
         Logger.root.onRecord,

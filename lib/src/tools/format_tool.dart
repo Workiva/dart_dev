@@ -108,13 +108,15 @@ class FormatTool extends DevTool {
       'check',
       abbr: 'c',
       negatable: false,
-      help: 'Check if changes need to be made and set the exit code '
+      help:
+          'Check if changes need to be made and set the exit code '
           'accordingly.\nImplies "--dry-run" and "--set-exit-if-changed".',
     )
     ..addSeparator('======== Other Options')
     ..addOption(
       'formatter-args',
-      help: 'Args to pass to the "dartfmt" or "dart format" process.\n'
+      help:
+          'Args to pass to the "dartfmt" or "dart format" process.\n'
           'Run "dartfmt -h -v" or "dart format -h -v" to see all available options.',
     );
 
@@ -281,11 +283,11 @@ class FormatterInputs {
 /// output of step 1 (an instance of this class) with very simple unit tests.
 class FormatExecution {
   FormatExecution.exitEarly(this.exitCode)
-      : formatProcess = null,
-        directiveOrganization = null;
+    : formatProcess = null,
+      directiveOrganization = null;
 
   FormatExecution.process(this.formatProcess, [this.directiveOrganization])
-      : exitCode = null;
+    : exitCode = null;
 
   /// If non-null, the execution is already complete and the [FormatTool] should
   /// exit with this code.
@@ -455,7 +457,8 @@ FormatExecution buildExecution(
 }) {
   FormatMode? mode;
 
-  final useRestForInputs = (context.argResults?.rest.isNotEmpty ?? false) &&
+  final useRestForInputs =
+      (context.argResults?.rest.isNotEmpty ?? false) &&
       context.commandName == 'hackFastFormat';
 
   final argResults = context.argResults;
@@ -512,7 +515,8 @@ FormatExecution buildExecution(
 
   final dartFormatter = buildFormatProcess(formatter);
   Iterable<String> args;
-  final dartStyleSupportsWriteArg = formatter != Formatter.dartStyle ||
+  final dartStyleSupportsWriteArg =
+      formatter != Formatter.dartStyle ||
       _dartStyleVersionSupportsWriteArg(path: path);
   final formatterLanguageVersion = _formatterLanguageVersion(
     formatter,
@@ -544,13 +548,10 @@ FormatExecution buildExecution(
     verbose: context.verbose,
   );
 
-  final formatProcess = ProcessDeclaration(
-      dartFormatter.executable,
-      [
-        ...args,
-        ...inputs.includedFiles,
-      ],
-      mode: ProcessStartMode.inheritStdio);
+  final formatProcess = ProcessDeclaration(dartFormatter.executable, [
+    ...args,
+    ...inputs.includedFiles,
+  ], mode: ProcessStartMode.inheritStdio);
   DirectiveOrganization? directiveOrganization;
   if (organizeDirectives) {
     directiveOrganization = DirectiveOrganization(

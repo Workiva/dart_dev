@@ -68,8 +68,9 @@ String _organizeDirectivesOfType<T>(
   String sourceFileContents,
   List<Namespace> namespaces,
 ) {
-  final directives =
-      namespaces.where((element) => element.directive is T).toList();
+  final directives = namespaces
+      .where((element) => element.directive is T)
+      .toList();
 
   directives.sort(_namespaceComparator);
 
@@ -130,9 +131,11 @@ void _assignCommentsBeforeTokenToNamespace(
   // `precedingComments` returns the first comment before token.
   // Calling `comment.next` returns the next comment.
   // Returns null when there are no more comments left.
-  for (Token? comment = token.precedingComments;
-      comment != null;
-      comment = comment.next) {
+  for (
+    Token? comment = token.precedingComments;
+    comment != null;
+    comment = comment.next
+  ) {
     // the LanguageVersionToken (`// @dart=2.11`) must stay where it is at
     // the top of the file. Do not assign this to any namespace
     if (comment is LanguageVersionToken) continue;
