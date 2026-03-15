@@ -50,13 +50,16 @@ void main() {
         await process.shouldExit(0);
 
         final stdout = (await stdoutFuture).join('\n');
-        final expectedCommand = [
-          'dart format',
-          if (dartSemverVersion.major >= 3) '--language-version=3.0',
-          'lib/main.dart',
-        ].join(' ');
+        final expectedCommandPattern = RegExp(
+          [
+            RegExp.escape('dart format'),
+            if (dartSemverVersion.major >= 3)
+              RegExp.escape('--language-version=3.0'),
+            r'lib[\\/]main\.dart',
+          ].join(r'\s+'),
+        );
 
-        expect(stdout, contains(expectedCommand));
+        expect(stdout, contains(expectedCommandPattern));
       },
     );
   });
