@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-    uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.13
+    uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.14
 
   dart:
     strategy:
@@ -25,7 +25,7 @@ jobs:
     name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
