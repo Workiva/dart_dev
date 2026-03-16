@@ -29,14 +29,19 @@ void main() {
   });
 
   test(
-      'calls usageException callback if assertion fails (beforeSeparator=true)',
-      () {
-    final argResults = ArgParser().parse(['positional', 'args']);
-    beforeSeparator = true;
-    assertNoPositionalArgs(commandName, argResults, usageException,
-        beforeSeparator: true);
-    expect(usageExceptionCalled, isTrue);
-  });
+    'calls usageException callback if assertion fails (beforeSeparator=true)',
+    () {
+      final argResults = ArgParser().parse(['positional', 'args']);
+      beforeSeparator = true;
+      assertNoPositionalArgs(
+        commandName,
+        argResults,
+        usageException,
+        beforeSeparator: true,
+      );
+      expect(usageExceptionCalled, isTrue);
+    },
+  );
 
   test('does not call usageException callback if assertion passes', () {
     final argResults = ArgParser().parse([]);

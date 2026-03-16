@@ -10,9 +10,9 @@ import 'namespace_collector.dart';
 ///
 /// Throws an ArgumentError if [sourceFileContents] cannot be parsed.
 String organizeDirectives(String sourceFileContents) {
-  final directives = parseString(content: sourceFileContents)
-      .unit
-      .accept(NamespaceCollector())!;
+  final directives = parseString(
+    content: sourceFileContents,
+  ).unit.accept(NamespaceCollector())!;
 
   if (directives.isEmpty) {
     return sourceFileContents;
@@ -59,7 +59,7 @@ String _organizeDirectives(
 
   return [
     if (sortedImports.isNotEmpty) sortedImports,
-    if (sortedExports.isNotEmpty) sortedExports
+    if (sortedExports.isNotEmpty) sortedExports,
   ].join('\n');
 }
 
@@ -68,8 +68,9 @@ String _organizeDirectivesOfType<T>(
   String sourceFileContents,
   List<Namespace> namespaces,
 ) {
-  final directives =
-      namespaces.where((element) => element.directive is T).toList();
+  final directives = namespaces
+      .where((element) => element.directive is T)
+      .toList();
 
   directives.sort(_namespaceComparator);
 
@@ -130,9 +131,11 @@ void _assignCommentsBeforeTokenToNamespace(
   // `precedingComments` returns the first comment before token.
   // Calling `comment.next` returns the next comment.
   // Returns null when there are no more comments left.
-  for (Token? comment = token.precedingComments;
-      comment != null;
-      comment = comment.next) {
+  for (
+    Token? comment = token.precedingComments;
+    comment != null;
+    comment = comment.next
+  ) {
     // the LanguageVersionToken (`// @dart=2.11`) must stay where it is at
     // the top of the file. Do not assign this to any namespace
     if (comment is LanguageVersionToken) continue;
@@ -152,7 +155,10 @@ void _assignCommentsBeforeTokenToNamespace(
 /// Checks if a given comment is on the same line as a directive.
 /// It's expected that directive end is before comment start.
 bool _commentIsOnSameLineAsNamespace(
-    Token comment, Namespace? namespace, String sourceFileContents) {
+  Token comment,
+  Namespace? namespace,
+  String sourceFileContents,
+) {
   return namespace != null &&
       !sourceFileContents
           .substring(namespace.directive.endToken.end, comment.charOffset)
@@ -165,10 +171,12 @@ String _getSortedNamespaceString(
   List<Namespace> namespaces,
 ) {
   final sortedReplacement = StringBuffer();
-  final firstRelativeNamespaceIdx =
-      namespaces.indexWhere((namespace) => namespace.isRelative);
-  final firstPkgDirectiveIdx =
-      namespaces.indexWhere((namespace) => namespace.isExternalPkg);
+  final firstRelativeNamespaceIdx = namespaces.indexWhere(
+    (namespace) => namespace.isRelative,
+  );
+  final firstPkgDirectiveIdx = namespaces.indexWhere(
+    (namespace) => namespace.isExternalPkg,
+  );
   for (var nsIndex = 0; nsIndex < namespaces.length; nsIndex++) {
     final namespace = namespaces[nsIndex];
     if (nsIndex != 0 &&

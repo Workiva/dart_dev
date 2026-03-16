@@ -78,8 +78,11 @@ void main() {
       final ct = CompoundTool()
         ..addTool(tool1)
         ..addTool(tool2);
-      await ct.run(DevToolExecutionContext(
-          argResults: ct.argParser.parse(['--foo', '--bar', 'baz'])));
+      await ct.run(
+        DevToolExecutionContext(
+          argResults: ct.argParser.parse(['--foo', '--bar', 'baz']),
+        ),
+      );
     });
 
     test('runs tools with a custom ArgMapper, if provided', () async {
@@ -90,8 +93,11 @@ void main() {
       }, argParser: ArgParser()..addFlag('foo'));
 
       final ct = CompoundTool()..addTool(tool, argMapper: takeAllArgs);
-      await ct.run(DevToolExecutionContext(
-          argResults: ct.argParser.parse(['--foo', 'bar', 'baz'])));
+      await ct.run(
+        DevToolExecutionContext(
+          argResults: ct.argParser.parse(['--foo', 'bar', 'baz']),
+        ),
+      );
     });
   });
 
@@ -151,7 +157,9 @@ void main() {
         ..addParser(parser1)
         ..addParser(parser2);
       expect(
-          cap.usage, allOf(contains(parser1.usage), contains(parser2.usage)));
+        cap.usage,
+        allOf(contains(parser1.usage), contains(parser2.usage)),
+      );
     });
   });
 
@@ -191,7 +199,8 @@ void main() {
         ..addTool(fooTool)
         ..addTool(barTool);
       final baseContext = DevToolExecutionContext(
-          argResults: compoundTool.argParser.parse(['--foo', '--bar']));
+        argResults: compoundTool.argParser.parse(['--foo', '--bar']),
+      );
 
       final spec = DevToolSpec(RunWhen.passing, fooTool);
       final result = contextForTool(baseContext, spec);
@@ -219,13 +228,9 @@ void main() {
       ]);
       final args = optionArgsOnly(originalResults);
       expect(
-          args,
-          unorderedEquals([
-            '--flag',
-            '--opt=opt',
-            '--multi=one',
-            '--multi=two',
-          ]));
+        args,
+        unorderedEquals(['--flag', '--opt=opt', '--multi=one', '--multi=two']),
+      );
     });
 
     test('filters by allowedOptions if given', () {
@@ -252,16 +257,14 @@ void main() {
         'foo',
         'bar',
       ]);
-      final args = optionArgsOnly(originalResults,
-          allowedOptions: ['flag', 'opt', 'multi']);
+      final args = optionArgsOnly(
+        originalResults,
+        allowedOptions: ['flag', 'opt', 'multi'],
+      );
       expect(
-          args,
-          unorderedEquals([
-            '--flag',
-            '--opt=opt',
-            '--multi=one',
-            '--multi=two',
-          ]));
+        args,
+        unorderedEquals(['--flag', '--opt=opt', '--multi=one', '--multi=two']),
+      );
     });
   });
 

@@ -50,48 +50,66 @@ class TestTool extends DevTool {
   @override
   final ArgParser argParser = ArgParser()
     ..addSeparator('======== Selecting Tests')
-    ..addMultiOption('name',
-        abbr: 'n',
-        help: 'A substring of the name of the test to run.\n'
-            'Regular expression syntax is supported.\n'
-            'If passed multiple times, tests must match all substrings.',
-        splitCommas: false)
-    ..addMultiOption('plain-name',
-        abbr: 'N',
-        help: 'A plain-text substring of the name of the test to run.\n'
-            'If passed multiple times, tests must match all substrings.',
-        splitCommas: false)
+    ..addMultiOption(
+      'name',
+      abbr: 'n',
+      help:
+          'A substring of the name of the test to run.\n'
+          'Regular expression syntax is supported.\n'
+          'If passed multiple times, tests must match all substrings.',
+      splitCommas: false,
+    )
+    ..addMultiOption(
+      'plain-name',
+      abbr: 'N',
+      help:
+          'A plain-text substring of the name of the test to run.\n'
+          'If passed multiple times, tests must match all substrings.',
+      splitCommas: false,
+    )
     ..addSeparator('======== Running Tests')
-    ..addMultiOption('preset',
-        abbr: 'P', help: 'The configuration preset(s) to use.')
-    ..addFlag('release',
-        help: 'Build with release mode defaults for builders.\n'
-            'This only applies in projects that run tests with build_runner.')
+    ..addMultiOption(
+      'preset',
+      abbr: 'P',
+      help: 'The configuration preset(s) to use.',
+    )
+    ..addFlag(
+      'release',
+      help:
+          'Build with release mode defaults for builders.\n'
+          'This only applies in projects that run tests with build_runner.',
+    )
     ..addSeparator('======== Output')
-    ..addOption('reporter',
-        help: 'The runner used to print test results.',
-        allowed: [
-          'compact',
-          'expanded',
-          'json'
-        ],
-        allowedHelp: {
-          'compact': 'A single line, updated continuously.',
-          'expanded': 'A separate line for each update.',
-          'json': 'A machine-readable format (see https://goo.gl/gBsV1a).'
-        })
+    ..addOption(
+      'reporter',
+      help: 'The runner used to print test results.',
+      allowed: ['compact', 'expanded', 'json'],
+      allowedHelp: {
+        'compact': 'A single line, updated continuously.',
+        'expanded': 'A separate line for each update.',
+        'json': 'A machine-readable format (see https://goo.gl/gBsV1a).',
+      },
+    )
     ..addSeparator('======== Other Options')
-    ..addOption('test-stdout',
-        help: 'Write the test process stdout to this file path.')
-    ..addOption('test-args',
-        help: 'Args to pass to the test runner process.\n'
-            'Run "dart test -h" to see all available options.')
-    ..addOption('build-args',
-        help: 'Args to pass to the build runner process.\n'
-            'Run "dart run build_runner test -h" to see all available '
-            'options.\n'
-            'Note: these args are only applicable if the current project '
-            'depends on "build_test".');
+    ..addOption(
+      'test-stdout',
+      help: 'Write the test process stdout to this file path.',
+    )
+    ..addOption(
+      'test-args',
+      help:
+          'Args to pass to the test runner process.\n'
+          'Run "dart test -h" to see all available options.',
+    )
+    ..addOption(
+      'build-args',
+      help:
+          'Args to pass to the build runner process.\n'
+          'Run "dart run build_runner test -h" to see all available '
+          'options.\n'
+          'Note: these args are only applicable if the current project '
+          'depends on "build_test".',
+    );
 
   /// The args to pass to the `dart run build_runner test` process that will be
   /// run by this command when the current project depends on `build_test`.
@@ -117,8 +135,11 @@ class TestTool extends DevTool {
   @override
   FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
-    final execution = buildExecution(context,
-        configuredBuildArgs: buildArgs, configuredTestArgs: testArgs);
+    final execution = buildExecution(
+      context,
+      configuredBuildArgs: buildArgs,
+      configuredTestArgs: testArgs,
+    );
     return execution.exitCode ??
         await runProcessAndEnsureExit(execution.process!, log: _log);
   }
@@ -214,8 +235,10 @@ List<String> buildArgs({
       '--reporter=${singleOptionValue(argResults, 'reporter')!}',
     // 3. The -n|--name, -N|--plain-name, and -P|--preset options
     ...?multiOptionValue(argResults, 'name')?.map((v) => '--name=$v'),
-    ...?multiOptionValue(argResults, 'plain-name')
-        ?.map((v) => '--plain-name=$v'),
+    ...?multiOptionValue(
+      argResults,
+      'plain-name',
+    )?.map((v) => '--plain-name=$v'),
     ...?multiOptionValue(argResults, 'preset')?.map((v) => '--preset=$v'),
     // 4. Args passed to --test-args
     ...?splitSingleOptionValue(argResults, 'test-args'),
@@ -271,51 +294,66 @@ TestExecution buildExecution(
   String? path,
 }) {
   final argResults = context.argResults;
-  final hasBuildRunner =
-      packageIsImmediateDependency('build_runner', path: path);
+  final hasBuildRunner = packageIsImmediateDependency(
+    'build_runner',
+    path: path,
+  );
   final hasBuildTest = packageIsImmediateDependency('build_test', path: path);
   final useBuildRunner = hasBuildRunner && hasBuildTest;
   if (!useBuildRunner &&
       argResults != null &&
       argResults['build-args'] != null) {
-    context.usageException('Can only use --build-args in a project that has a '
-        'direct dependency on both "build_runner" and "build_test" in the '
-        'pubspec.yaml.');
+    context.usageException(
+      'Can only use --build-args in a project that has a '
+      'direct dependency on both "build_runner" and "build_test" in the '
+      'pubspec.yaml.',
+    );
   }
 
   if (!useBuildRunner && (flagValue(argResults, 'release') ?? false)) {
-    _log.warning(yellow.wrap('The --release flag is only applicable in '
+    _log.warning(
+      yellow.wrap(
+        'The --release flag is only applicable in '
         'projects that run tests with build_runner, and this project does not.\n'
-        'It will have no effect.'));
+        'It will have no effect.',
+      ),
+    );
   }
 
   if (!packageIsImmediateDependency('test', path: path)) {
-    _log.severe(red.wrap('Cannot run tests.\n')! +
-        yellow
-            .wrap('You must have a dependency on "test" in pubspec.yaml.\n')!);
+    _log.severe(
+      red.wrap('Cannot run tests.\n')! +
+          yellow.wrap(
+            'You must have a dependency on "test" in pubspec.yaml.\n',
+          )!,
+    );
     return TestExecution.exitEarly(ExitCode.config.code);
   }
 
   if (!useBuildRunner &&
       configuredBuildArgs != null &&
       configuredBuildArgs.isNotEmpty) {
-    _log.severe('This project is configured to run tests with buildArgs, but '
-        'is missing a direct dependency on "build_runner" or "build_test".\n'
-        'Either remove these buildArgs in tool/dart_dev/config.dart or ensure '
-        'both "build_runner" and "build_test" are dependencies in the '
-        'pubspec.yaml.');
+    _log.severe(
+      'This project is configured to run tests with buildArgs, but '
+      'is missing a direct dependency on "build_runner" or "build_test".\n'
+      'Either remove these buildArgs in tool/dart_dev/config.dart or ensure '
+      'both "build_runner" and "build_test" are dependencies in the '
+      'pubspec.yaml.',
+    );
     return TestExecution.exitEarly(ExitCode.config.code);
   }
 
   final args = buildArgs(
-      argResults: argResults,
-      configuredBuildArgs: configuredBuildArgs,
-      configuredTestArgs: configuredTestArgs,
-      useBuildRunner: useBuildRunner,
-      verbose: context.verbose);
+    argResults: argResults,
+    configuredBuildArgs: configuredBuildArgs,
+    configuredTestArgs: configuredTestArgs,
+    useBuildRunner: useBuildRunner,
+    verbose: context.verbose,
+  );
   logSubprocessHeader(_log, 'dart ${args.join(' ')}'.trim());
   return TestExecution.process(
-      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
+    ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio),
+  );
 }
 
 // NOTE: This currently depends on https://github.com/dart-lang/build/pull/2445

@@ -52,8 +52,11 @@ int _organizeDirectivesInFiles(
 }) {
   var exitCode = 0;
   for (final path in paths) {
-    final codeForFile =
-        _organizeDirectivesInFile(path, verbose: verbose, check: check);
+    final codeForFile = _organizeDirectivesInFile(
+      path,
+      verbose: verbose,
+      check: check,
+    );
     if (codeForFile != 0) {
       exitCode = codeForFile;
     }

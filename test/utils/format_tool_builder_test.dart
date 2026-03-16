@@ -1,5 +1,4 @@
 @TestOn('vm')
-
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/tools/over_react_format_tool.dart';
@@ -27,7 +26,9 @@ void main() {
           expect(visitor.formatDevTool, isNotNull);
           expect(visitor.formatDevTool, isA<OverReactFormatTool>());
           expect(
-              (visitor.formatDevTool as OverReactFormatTool).lineLength, 120);
+            (visitor.formatDevTool as OverReactFormatTool).lineLength,
+            120,
+          );
         });
       });
     });
@@ -51,34 +52,40 @@ void main() {
 
             expect(visitor.formatDevTool, isNotNull);
             expect(visitor.formatDevTool, isA<FormatTool>());
-            expect((visitor.formatDevTool as FormatTool).formatter,
-                Formatter.dartfmt);
+            expect(
+              (visitor.formatDevTool as FormatTool).formatter,
+              Formatter.dartfmt,
+            );
           });
 
           test('dartFormat', () {
             final visitor = FormatToolBuilder();
 
-            parseString(content: formatToolCascadeSrc(formatter: 'dartFormat'))
-                .unit
-                .accept(visitor);
+            parseString(
+              content: formatToolCascadeSrc(formatter: 'dartFormat'),
+            ).unit.accept(visitor);
 
             expect(visitor.formatDevTool, isNotNull);
             expect(visitor.formatDevTool, isA<FormatTool>());
-            expect((visitor.formatDevTool as FormatTool).formatter,
-                Formatter.dartFormat);
+            expect(
+              (visitor.formatDevTool as FormatTool).formatter,
+              Formatter.dartFormat,
+            );
           });
 
           test('dartStyle', () {
             final visitor = FormatToolBuilder();
 
-            parseString(content: formatToolCascadeSrc(formatter: 'dartStyle'))
-                .unit
-                .accept(visitor);
+            parseString(
+              content: formatToolCascadeSrc(formatter: 'dartStyle'),
+            ).unit.accept(visitor);
 
             expect(visitor.formatDevTool, isNotNull);
             expect(visitor.formatDevTool, isA<FormatTool>());
-            expect((visitor.formatDevTool as FormatTool).formatter,
-                Formatter.dartStyle);
+            expect(
+              (visitor.formatDevTool as FormatTool).formatter,
+              Formatter.dartStyle,
+            );
           });
         });
 
@@ -89,22 +96,37 @@ void main() {
 
           expect(visitor.formatDevTool, isNotNull);
           expect(visitor.formatDevTool, isA<FormatTool>());
-          expect((visitor.formatDevTool as FormatTool).formatterArgs,
-              orderedEquals(['-l', '120']));
+          expect(
+            (visitor.formatDevTool as FormatTool).formatterArgs,
+            orderedEquals(['-l', '120']),
+          );
+        });
+
+        test('detects languageVersion', () {
+          final visitor = FormatToolBuilder();
+
+          parseString(
+            content: formatToolCascadeSrc(languageVersion: '3.0'),
+          ).unit.accept(visitor);
+
+          expect(visitor.formatDevTool, isNotNull);
+          expect(visitor.formatDevTool, isA<FormatTool>());
+          expect((visitor.formatDevTool as FormatTool).languageVersion, '3.0');
         });
       });
     });
 
     test(
-        'sets the failedToDetectAKnownFormatter flag when an unknown FormatTool is being used',
-        () {
-      final visitor = FormatToolBuilder();
+      'sets the failedToDetectAKnownFormatter flag when an unknown FormatTool is being used',
+      () {
+        final visitor = FormatToolBuilder();
 
-      parseString(content: unknownFormatterTool).unit.accept(visitor);
+        parseString(content: unknownFormatterTool).unit.accept(visitor);
 
-      expect(visitor.formatDevTool, isNull);
-      expect(visitor.failedToDetectAKnownFormatter, isTrue);
-    });
+        expect(visitor.formatDevTool, isNull);
+        expect(visitor.failedToDetectAKnownFormatter, isTrue);
+      },
+    );
   });
 }
 
@@ -136,7 +158,10 @@ final config = {
 };
 ''';
 
-String formatToolCascadeSrc({String formatter = 'dartfmt'}) =>
+String formatToolCascadeSrc({
+  String formatter = 'dartfmt',
+  String? languageVersion,
+}) =>
     '''import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 
@@ -144,7 +169,8 @@ final config = {
   ...coreConfig,
   'format': FormatTool()
     ..formatter = Formatter.$formatter
-    ..formatterArgs = ['-l', '120'],
+    ..formatterArgs = ['-l', '120']
+${languageVersion != null ? "    ..languageVersion = '$languageVersion'" : ''},
 };
 ''';
 

@@ -64,27 +64,40 @@ class WebdevServeTool extends DevTool {
 
   @override
   final ArgParser argParser = ArgParser()
-    ..addFlag('release',
-        abbr: 'r', help: 'Build with release mode defaults for builders.')
+    ..addFlag(
+      'release',
+      abbr: 'r',
+      help: 'Build with release mode defaults for builders.',
+    )
     ..addSeparator('======== Other Options')
-    ..addOption('webdev-args',
-        help: 'Args to pass to the webdev serve process.\n'
-            'Run "dart pub global run webdev serve -h -v" to see all available '
-            'options.')
-    ..addOption('build-args',
-        help: 'Args to pass to the build runner process.\n'
-            'Run "dart run build_runner build -h -v" to see all available '
-            'options.');
+    ..addOption(
+      'webdev-args',
+      help:
+          'Args to pass to the webdev serve process.\n'
+          'Run "dart pub global run webdev serve -h -v" to see all available '
+          'options.',
+    )
+    ..addOption(
+      'build-args',
+      help:
+          'Args to pass to the build runner process.\n'
+          'Run "dart run build_runner build -h -v" to see all available '
+          'options.',
+    );
 
   @override
-  String? description = 'Run a local web development server and a file system '
+  String? description =
+      'Run a local web development server and a file system '
       'watcher that rebuilds on changes.';
 
   @override
   FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
-    final execution = buildExecution(context,
-        configuredBuildArgs: buildArgs, configuredWebdevArgs: webdevArgs);
+    final execution = buildExecution(
+      context,
+      configuredBuildArgs: buildArgs,
+      configuredWebdevArgs: webdevArgs,
+    );
     return execution.exitCode ??
         await runProcessAndEnsureExit(execution.process!, log: _log);
   }
@@ -133,11 +146,12 @@ class WebdevServeExecution {
 ///
 /// If [verbose] is true, both the webdev args and the build args portions of
 /// the returned list will include the `-v` verbose flag.
-List<String> buildArgs(
-    {ArgResults? argResults,
-    List<String>? configuredBuildArgs,
-    List<String>? configuredWebdevArgs,
-    bool verbose = false}) {
+List<String> buildArgs({
+  ArgResults? argResults,
+  List<String>? configuredBuildArgs,
+  List<String>? configuredWebdevArgs,
+  bool verbose = false,
+}) {
   final webdevArgs = <String>[
     // Combine all args that should be passed through to the webdev serve
     // process in this order:
@@ -207,32 +221,44 @@ WebdevServeExecution buildExecution(
   final argResults = context.argResults;
   if (argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        argResults, context.usageException,
-        commandName: context.commandName,
-        usageFooter: 'Arguments can be passed to the webdev process via the '
-            '--webdev-args option.\n'
-            'Arguments can be passed to the build process via the --build-args '
-            'option.');
+      argResults,
+      context.usageException,
+      commandName: context.commandName,
+      usageFooter:
+          'Arguments can be passed to the webdev process via the '
+          '--webdev-args option.\n'
+          'Arguments can be passed to the build process via the --build-args '
+          'option.',
+    );
   }
 
   final webdevVersion = dartSemverVersion.major == 2 ? '^2.0.0' : '^3.0.0';
 
   if (!globalPackageIsActiveAndCompatible(
-      'webdev', VersionConstraint.parse(webdevVersion),
-      environment: environment)) {
-    _log.severe(red.wrap(
-            '${styleBold.wrap('webdev serve')} could not run for this project.\n')! +
-        yellow.wrap('You must have `webdev` globally activated:\n'
-            '  dart pub global activate webdev ${webdevVersion}')!);
+    'webdev',
+    VersionConstraint.parse(webdevVersion),
+    environment: environment,
+  )) {
+    _log.severe(
+      red.wrap(
+            '${styleBold.wrap('webdev serve')} could not run for this project.\n',
+          )! +
+          yellow.wrap(
+            'You must have `webdev` globally activated:\n'
+            '  dart pub global activate webdev ${webdevVersion}',
+          )!,
+    );
     return WebdevServeExecution.exitEarly(ExitCode.config.code);
   }
 
   final args = buildArgs(
-      argResults: argResults,
-      configuredBuildArgs: configuredBuildArgs,
-      configuredWebdevArgs: configuredWebdevArgs,
-      verbose: context.verbose);
+    argResults: argResults,
+    configuredBuildArgs: configuredBuildArgs,
+    configuredWebdevArgs: configuredWebdevArgs,
+    verbose: context.verbose,
+  );
   logSubprocessHeader(_log, 'dart ${args.join(' ')}'.trim());
   return WebdevServeExecution.process(
-      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
+    ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio),
+  );
 }

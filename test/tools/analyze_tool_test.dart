@@ -33,42 +33,52 @@ void main() {
       final argParser = AnalyzeTool().toCommand('t').argParser;
       final argResults = argParser.parse(['--analyzer-args', 'c d']);
       expect(
-          buildArgs(argResults: argResults, configuredAnalyzerArgs: ['a', 'b']),
-          orderedEquals(['a', 'b', 'c', 'd']));
+        buildArgs(argResults: argResults, configuredAnalyzerArgs: ['a', 'b']),
+        orderedEquals(['a', 'b', 'c', 'd']),
+      );
     });
 
     test(
-        'combines configured args and cli args (in that order) with useDartAnalyze',
-        () {
-      final argParser = AnalyzeTool().toCommand('t').argParser;
-      final argResults = argParser.parse(['--analyzer-args', 'c d']);
-      expect(
+      'combines configured args and cli args (in that order) with useDartAnalyze',
+      () {
+        final argParser = AnalyzeTool().toCommand('t').argParser;
+        final argResults = argParser.parse(['--analyzer-args', 'c d']);
+        expect(
           buildArgs(
-              argResults: argResults,
-              configuredAnalyzerArgs: ['a', 'b'],
-              useDartAnalyze: true),
-          orderedEquals(['analyze', 'a', 'b', 'c', 'd']));
-    });
+            argResults: argResults,
+            configuredAnalyzerArgs: ['a', 'b'],
+            useDartAnalyze: true,
+          ),
+          orderedEquals(['analyze', 'a', 'b', 'c', 'd']),
+        );
+      },
+    );
 
     test('inserts a verbose flag if not already present', () {
       final argParser = AnalyzeTool().toCommand('t').argParser;
       final argResults = argParser.parse(['--analyzer-args', 'c d']);
       expect(
-          buildArgs(
-              argResults: argResults,
-              configuredAnalyzerArgs: ['a', 'b'],
-              verbose: true),
-          orderedEquals(['a', 'b', 'c', 'd', '-v']));
+        buildArgs(
+          argResults: argResults,
+          configuredAnalyzerArgs: ['a', 'b'],
+          verbose: true,
+        ),
+        orderedEquals(['a', 'b', 'c', 'd', '-v']),
+      );
     });
 
     test('does not insert a duplicate verbose flag (-v)', () {
-      expect(buildArgs(configuredAnalyzerArgs: ['-v'], verbose: true),
-          orderedEquals(['-v']));
+      expect(
+        buildArgs(configuredAnalyzerArgs: ['-v'], verbose: true),
+        orderedEquals(['-v']),
+      );
     });
 
     test('does not insert a duplicate verbose flag (--verbose)', () {
-      expect(buildArgs(configuredAnalyzerArgs: ['--verbose'], verbose: true),
-          orderedEquals(['--verbose']));
+      expect(
+        buildArgs(configuredAnalyzerArgs: ['--verbose'], verbose: true),
+        orderedEquals(['--verbose']),
+      );
     });
   });
 
@@ -79,15 +89,19 @@ void main() {
     });
 
     test('from one glob', () {
-      expect(buildEntrypoints(include: [Glob('*.dart')], root: globRoot),
-          ['${globRoot}file.dart']);
+      expect(buildEntrypoints(include: [Glob('*.dart')], root: globRoot), [
+        '${globRoot}file.dart',
+      ]);
     });
 
     test('from multiple globs', () {
       expect(
-          buildEntrypoints(
-              include: [Glob('*.dart'), Glob('*.txt')], root: globRoot),
-          unorderedEquals(['${globRoot}file.dart', '${globRoot}file.txt']));
+        buildEntrypoints(
+          include: [Glob('*.dart'), Glob('*.txt')],
+          root: globRoot,
+        ),
+        unorderedEquals(['${globRoot}file.dart', '${globRoot}file.txt']),
+      );
     });
   });
 
@@ -95,27 +109,49 @@ void main() {
     test('throws UsageException if positional args are given', () {
       final argResults = ArgParser().parse(['a']);
       final context = DevToolExecutionContext(
-          argResults: argResults, commandName: 'test_analyze');
+        argResults: argResults,
+        commandName: 'test_analyze',
+      );
       expect(
-          () => buildProcess(context),
-          throwsA(isA<UsageException>()
+        () => buildProcess(context),
+        throwsA(
+          isA<UsageException>()
               .having(
-                  (e) => e.message, 'command name', contains('test_analyze'))
-              .having((e) => e.message, 'usage footer',
-                  contains('--analyzer-args'))));
+                (e) => e.message,
+                'command name',
+                contains('test_analyze'),
+              )
+              .having(
+                (e) => e.message,
+                'usage footer',
+                contains('--analyzer-args'),
+              ),
+        ),
+      );
     });
 
     test('throws UsageException if args are given after a separator', () {
       final argResults = ArgParser().parse(['--', 'a']);
       final context = DevToolExecutionContext(
-          argResults: argResults, commandName: 'test_analyze');
+        argResults: argResults,
+        commandName: 'test_analyze',
+      );
       expect(
-          () => buildProcess(context),
-          throwsA(isA<UsageException>()
+        () => buildProcess(context),
+        throwsA(
+          isA<UsageException>()
               .having(
-                  (e) => e.message, 'command name', contains('test_analyze'))
-              .having((e) => e.message, 'usage footer',
-                  contains('--analyzer-args'))));
+                (e) => e.message,
+                'command name',
+                contains('test_analyze'),
+              )
+              .having(
+                (e) => e.message,
+                'usage footer',
+                contains('--analyzer-args'),
+              ),
+        ),
+      );
     });
 
     test('returns a ProcessDeclaration (default)', () {
@@ -134,96 +170,121 @@ void main() {
 
     test('returns a ProcessDeclaration (with args)', () {
       final argParser = AnalyzeTool().toCommand('t').argParser;
-      final argResults =
-          argParser.parse(['--analyzer-args', '--dart-sdk /sdk']);
+      final argResults = argParser.parse([
+        '--analyzer-args',
+        '--dart-sdk /sdk',
+      ]);
       final context = DevToolExecutionContext(argResults: argResults);
-      final process = buildProcess(context,
-          configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
-          include: [Glob('*.dart'), Glob('*.txt')],
-          path: globRoot);
+      final process = buildProcess(
+        context,
+        configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
+        include: [Glob('*.dart'), Glob('*.txt')],
+        path: globRoot,
+      );
       expect(process.executable, exe.dartanalyzer);
       expect(
-          process.args,
-          orderedEquals([
-            '--fatal-infos',
-            '--fatal-warnings',
-            '--dart-sdk',
-            '/sdk',
-            '${globRoot}file.dart',
-            '${globRoot}file.txt',
-          ]));
+        process.args,
+        orderedEquals([
+          '--fatal-infos',
+          '--fatal-warnings',
+          '--dart-sdk',
+          '/sdk',
+          '${globRoot}file.dart',
+          '${globRoot}file.txt',
+        ]),
+      );
     });
 
     test('returns a ProcessDeclaration with useDartAnalyzer (with args)', () {
       final argParser = AnalyzeTool().toCommand('t').argParser;
-      final argResults =
-          argParser.parse(['--analyzer-args', '--dart-sdk /sdk']);
+      final argResults = argParser.parse([
+        '--analyzer-args',
+        '--dart-sdk /sdk',
+      ]);
       final context = DevToolExecutionContext(argResults: argResults);
-      final process = buildProcess(context,
-          configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
-          include: [Glob('*.dart')],
-          path: globRoot,
-          useDartAnalyze: true);
+      final process = buildProcess(
+        context,
+        configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
+        include: [Glob('*.dart')],
+        path: globRoot,
+        useDartAnalyze: true,
+      );
       expect(process.executable, exe.dart);
       expect(
-          process.args,
-          orderedEquals([
-            'analyze',
-            '--fatal-infos',
-            '--fatal-warnings',
-            '--dart-sdk',
-            '/sdk',
-            '${globRoot}file.dart',
-          ]));
+        process.args,
+        orderedEquals([
+          'analyze',
+          '--fatal-infos',
+          '--fatal-warnings',
+          '--dart-sdk',
+          '/sdk',
+          '${globRoot}file.dart',
+        ]),
+      );
     });
 
     test('returns a ProcessDeclaration (verbose)', () {
       final argParser = AnalyzeTool().toCommand('t').argParser;
-      final argResults =
-          argParser.parse(['--analyzer-args', '--dart-sdk /sdk']);
-      final context =
-          DevToolExecutionContext(argResults: argResults, verbose: true);
-      final process = buildProcess(context,
-          configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
-          include: [Glob('*.dart'), Glob('*.txt')],
-          path: globRoot);
+      final argResults = argParser.parse([
+        '--analyzer-args',
+        '--dart-sdk /sdk',
+      ]);
+      final context = DevToolExecutionContext(
+        argResults: argResults,
+        verbose: true,
+      );
+      final process = buildProcess(
+        context,
+        configuredAnalyzerArgs: ['--fatal-infos', '--fatal-warnings'],
+        include: [Glob('*.dart'), Glob('*.txt')],
+        path: globRoot,
+      );
       expect(process.executable, exe.dartanalyzer);
       expect(
-          process.args,
-          orderedEquals([
-            '--fatal-infos',
-            '--fatal-warnings',
-            '--dart-sdk',
-            '/sdk',
-            '-v',
-            '${globRoot}file.dart',
-            '${globRoot}file.txt',
-          ]));
+        process.args,
+        orderedEquals([
+          '--fatal-infos',
+          '--fatal-warnings',
+          '--dart-sdk',
+          '/sdk',
+          '-v',
+          '${globRoot}file.dart',
+          '${globRoot}file.txt',
+        ]),
+      );
     });
   });
 
   group('logCommand', () {
     test('with <=5 entrypoints', () {
-      expect(Logger.root.onRecord,
-          emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e'))));
+      expect(
+        Logger.root.onRecord,
+        emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e'))),
+      );
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e'], useDartAnalyzer: false);
     });
 
     test('with >5 entrypoints', () {
-      expect(Logger.root.onRecord,
-          emitsThrough(infoLogOf(contains('dartanalyzer -t <6 paths>'))));
+      expect(
+        Logger.root.onRecord,
+        emitsThrough(infoLogOf(contains('dartanalyzer -t <6 paths>'))),
+      );
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f']);
     });
 
     test('with >5 entrypoints in verbose mode', () {
-      expect(Logger.root.onRecord,
-          emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e f'))));
+      expect(
+        Logger.root.onRecord,
+        emitsThrough(infoLogOf(contains('dartanalyzer -t a b c d e f'))),
+      );
       logCommand(['-t'], ['a', 'b', 'c', 'd', 'e', 'f'], verbose: true);
     });
 
     test('in useDartAnalyze mode', () {
-      expect(Logger.root.onRecord,
-          emitsThrough(infoLogOf(contains('dart analyze -t a'))));
+      expect(
+        Logger.root.onRecord,
+        emitsThrough(infoLogOf(contains('dart analyze -t a'))),
+      );
       logCommand(['analyze', '-t'], ['a'], useDartAnalyzer: true);
     });
   });

@@ -1,0 +1,10 @@
+name: dart_dev_test_functional_format_language_version_dart_format
+version: 0.0.0
+environment:
+ sdk: ">=2.19.0 <4.0.0"
+dev_dependencies:
+  dart_dev:
+    path: ../../../../../../
+
+workiva:
+  disable_core_checks: true

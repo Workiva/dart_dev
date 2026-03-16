@@ -48,7 +48,7 @@ StringBuffer colorLog(LogRecord record, {bool verbose = false}) {
   final level = color.wrap('[${record.level}]');
   final eraseLine = ansiOutputEnabled && !verbose ? '\x1b[2K\r' : '';
   final lines = <Object>[
-    '$eraseLine$level ${_loggerName(record, verbose)}${record.message}'
+    '$eraseLine$level ${_loggerName(record, verbose)}${record.message}',
   ];
 
   if (record.error != null) {
@@ -100,11 +100,16 @@ String humanReadable(Duration duration) {
   return '${hours}h ${remaining.inMinutes}m';
 }
 
-void logSubprocessHeader(Logger logger, String command,
-    {Level level = Level.INFO}) {
+void logSubprocessHeader(
+  Logger logger,
+  String command, {
+  Level level = Level.INFO,
+}) {
   final numColumns = io.stdout.hasTerminal ? io.stdout.terminalColumns : 79;
-  logger.log(level,
-      'Running subprocess:\n${magenta.wrap(command)}\n${'-' * numColumns}\n');
+  logger.log(
+    level,
+    'Running subprocess:\n${magenta.wrap(command)}\n${'-' * numColumns}\n',
+  );
 }
 
 /// Logs an asynchronous [action] with [description] before and after.
@@ -144,9 +149,11 @@ T logTimedSync<T>(
 }
 
 void Function(LogRecord) stdIOLogListener({bool verbose = false}) =>
-    (record) => io.stdout.write(record.message.trim().isEmpty
-        ? '\n' * (record.message.split('\n').length - 1)
-        : colorLog(record, verbose: verbose));
+    (record) => io.stdout.write(
+      record.message.trim().isEmpty
+          ? '\n' * (record.message.split('\n').length - 1)
+          : colorLog(record, verbose: verbose),
+    );
 
 String _loggerName(LogRecord record, bool verbose) {
   final maybeSplit = record.level >= Level.WARNING ? '\n' : ' ';

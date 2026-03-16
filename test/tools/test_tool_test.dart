@@ -20,15 +20,16 @@ void main() {
     test('toCommand overrides the argParser', () {
       final argParser = TestTool().toCommand('t').argParser;
       expect(
-          argParser.options.keys,
-          containsAll([
-            'name',
-            'plain-name',
-            'preset',
-            'release',
-            'test-args',
-            'build-args',
-          ]));
+        argParser.options.keys,
+        containsAll([
+          'name',
+          'plain-name',
+          'preset',
+          'release',
+          'test-args',
+          'build-args',
+        ]),
+      );
 
       expect(argParser.options['name']!.type, OptionType.multiple);
       expect(argParser.options['name']!.abbr, 'n');
@@ -58,29 +59,37 @@ void main() {
     test('forwards the -n|--name options', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-n', 'foo', '-n', 'bar']);
-      expect(buildArgs(argResults: argResults),
-          orderedEquals(['test', '--name=foo', '--name=bar']));
+      expect(
+        buildArgs(argResults: argResults),
+        orderedEquals(['test', '--name=foo', '--name=bar']),
+      );
     });
 
     test('forwards the -N|--plain-name options', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-N', 'foo', '-N', 'bar']);
-      expect(buildArgs(argResults: argResults),
-          orderedEquals(['test', '--plain-name=foo', '--plain-name=bar']));
+      expect(
+        buildArgs(argResults: argResults),
+        orderedEquals(['test', '--plain-name=foo', '--plain-name=bar']),
+      );
     });
 
     test('forwards the -P|--preset options', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['-P', 'foo', '-P', 'bar']);
-      expect(buildArgs(argResults: argResults),
-          orderedEquals(['test', '--preset=foo', '--preset=bar']));
+      expect(
+        buildArgs(argResults: argResults),
+        orderedEquals(['test', '--preset=foo', '--preset=bar']),
+      );
     });
 
     test('forwards the --reporter option', () {
       final argParser = TestTool().toCommand('t').argParser;
       final argResults = argParser.parse(['--reporter', 'expanded']);
-      expect(buildArgs(argResults: argResults),
-          orderedEquals(['test', '--reporter=expanded']));
+      expect(
+        buildArgs(argResults: argResults),
+        orderedEquals(['test', '--reporter=expanded']),
+      );
     });
 
     group('with useBuildTest=false', () {
@@ -88,20 +97,24 @@ void main() {
         final argParser = TestTool().toCommand('t').argParser;
         final argResults = argParser.parse(['--test-args', '-N foo']);
         expect(
-            buildArgs(
-                argResults: argResults, configuredTestArgs: ['-P', 'unit']),
-            orderedEquals(['test', '-P', 'unit', '-N', 'foo']));
+          buildArgs(argResults: argResults, configuredTestArgs: ['-P', 'unit']),
+          orderedEquals(['test', '-P', 'unit', '-N', 'foo']),
+        );
       });
 
       test('ignores build args if given', () {
         final argParser = TestTool().toCommand('t').argParser;
-        final argResults =
-            argParser.parse(['--build-args', '--delete-conflicting-outputs']);
+        final argResults = argParser.parse([
+          '--build-args',
+          '--delete-conflicting-outputs',
+        ]);
         expect(
-            buildArgs(
-                argResults: argResults,
-                configuredBuildArgs: ['-o', 'test:build']),
-            orderedEquals(['test']));
+          buildArgs(
+            argResults: argResults,
+            configuredBuildArgs: ['-o', 'test:build'],
+          ),
+          orderedEquals(['test']),
+        );
       });
     });
 
@@ -109,48 +122,27 @@ void main() {
       test('forwards the --release flag', () {
         final argParser = TestTool().toCommand('t').argParser;
         final argResults = argParser.parse(['--release']);
-        expect(buildArgs(argResults: argResults, useBuildRunner: true),
-            orderedEquals(['run', 'build_runner', 'test', '--release']));
+        expect(
+          buildArgs(argResults: argResults, useBuildRunner: true),
+          orderedEquals(['run', 'build_runner', 'test', '--release']),
+        );
       });
 
       test('combines configured args with cli args (in that order)', () {
         final argParser = TestTool().toCommand('t').argParser;
-        final argResults = argParser
-            .parse(['--build-args', '--config bar', '--test-args', '-N foo']);
+        final argResults = argParser.parse([
+          '--build-args',
+          '--config bar',
+          '--test-args',
+          '-N foo',
+        ]);
         expect(
-            buildArgs(
-                argResults: argResults,
-                configuredBuildArgs: ['-o', 'test:build'],
-                configuredTestArgs: ['-P', 'unit'],
-                useBuildRunner: true),
-            orderedEquals([
-              'run',
-              'build_runner',
-              'test',
-              '-o',
-              'test:build',
-              '--config',
-              'bar',
-              '--',
-              '-P',
-              'unit',
-              '-N',
-              'foo'
-            ]));
-      });
-    });
-
-    test('inserts a verbose flag if not already present', () {
-      final argParser = TestTool().toCommand('t').argParser;
-      final argResults = argParser
-          .parse(['--build-args', '--config bar', '--test-args', '-N foo']);
-      expect(
           buildArgs(
-              argResults: argResults,
-              configuredBuildArgs: ['-o', 'test:build'],
-              configuredTestArgs: ['-P', 'unit'],
-              useBuildRunner: true,
-              verbose: true),
+            argResults: argResults,
+            configuredBuildArgs: ['-o', 'test:build'],
+            configuredTestArgs: ['-P', 'unit'],
+            useBuildRunner: true,
+          ),
           orderedEquals([
             'run',
             'build_runner',
@@ -159,29 +151,70 @@ void main() {
             'test:build',
             '--config',
             'bar',
-            '-v',
             '--',
             '-P',
             'unit',
             '-N',
             'foo',
-          ]));
+          ]),
+        );
+      });
+    });
+
+    test('inserts a verbose flag if not already present', () {
+      final argParser = TestTool().toCommand('t').argParser;
+      final argResults = argParser.parse([
+        '--build-args',
+        '--config bar',
+        '--test-args',
+        '-N foo',
+      ]);
+      expect(
+        buildArgs(
+          argResults: argResults,
+          configuredBuildArgs: ['-o', 'test:build'],
+          configuredTestArgs: ['-P', 'unit'],
+          useBuildRunner: true,
+          verbose: true,
+        ),
+        orderedEquals([
+          'run',
+          'build_runner',
+          'test',
+          '-o',
+          'test:build',
+          '--config',
+          'bar',
+          '-v',
+          '--',
+          '-P',
+          'unit',
+          '-N',
+          'foo',
+        ]),
+      );
     });
 
     test('does not insert a duplicate verbose flag (-v)', () {
       expect(
-          buildArgs(
-              configuredBuildArgs: ['-v'], useBuildRunner: true, verbose: true),
-          orderedEquals(['run', 'build_runner', 'test', '-v']));
+        buildArgs(
+          configuredBuildArgs: ['-v'],
+          useBuildRunner: true,
+          verbose: true,
+        ),
+        orderedEquals(['run', 'build_runner', 'test', '-v']),
+      );
     });
 
     test('does not insert a duplicate verbose flag (--verbose)', () {
       expect(
-          buildArgs(
-              configuredBuildArgs: ['--verbose'],
-              useBuildRunner: true,
-              verbose: true),
-          orderedEquals(['run', 'build_runner', 'test', '--verbose']));
+        buildArgs(
+          configuredBuildArgs: ['--verbose'],
+          useBuildRunner: true,
+          verbose: true,
+        ),
+        orderedEquals(['run', 'build_runner', 'test', '--verbose']),
+      );
     });
 
     group('supports test args after a separator', () {
@@ -189,45 +222,53 @@ void main() {
         final argParser = TestTool().toCommand('t').argParser;
         final argResults = argParser.parse(['--', '-r', 'json', '-j1']);
         expect(
-            buildArgs(argResults: argResults, useBuildRunner: true),
-            orderedEquals([
-              'run',
-              'build_runner',
-              'test',
-              '--',
-              '-r',
-              'json',
-              '-j1',
-            ]));
+          buildArgs(argResults: argResults, useBuildRunner: true),
+          orderedEquals([
+            'run',
+            'build_runner',
+            'test',
+            '--',
+            '-r',
+            'json',
+            '-j1',
+          ]),
+        );
       });
 
       test('with a test file', () {
         final argParser = TestTool().toCommand('t').argParser;
-        final argResults =
-            argParser.parse(['--', '-r', 'json', '-j1', 'test/foo_test.dart']);
+        final argResults = argParser.parse([
+          '--',
+          '-r',
+          'json',
+          '-j1',
+          'test/foo_test.dart',
+        ]);
         expect(
-            buildArgs(argResults: argResults, useBuildRunner: true),
-            orderedEquals([
-              'run',
-              'build_runner',
-              'test',
-              '--build-filter=test/foo_test.dart.*_test.dart.js*',
-              '--build-filter=test/foo_test.html',
-              '--',
-              '-r',
-              'json',
-              '-j1',
-              'test/foo_test.dart',
-            ]));
+          buildArgs(argResults: argResults, useBuildRunner: true),
+          orderedEquals([
+            'run',
+            'build_runner',
+            'test',
+            '--build-filter=test/foo_test.dart.*_test.dart.js*',
+            '--build-filter=test/foo_test.html',
+            '--',
+            '-r',
+            'json',
+            '-j1',
+            'test/foo_test.dart',
+          ]),
+        );
       });
     });
   });
 
   group('buildExecution', () {
     test(
-        'throws UsageException if --build-args is used but build_runner is not '
-        'a direct dependency', () async {
-      await d.file('pubspec.yaml', '''
+      'throws UsageException if --build-args is used but build_runner is not '
+      'a direct dependency',
+      () async {
+        await d.file('pubspec.yaml', '''
 name: _test
 publish_to: none
 environment:
@@ -236,18 +277,21 @@ dev_dependencies:
   build_test: any
   test: any
 ''').create();
-      final argParser = TestTool().toCommand('t').argParser;
-      final argResults = argParser.parse(['--build-args', 'foo']);
-      final context = DevToolExecutionContext(argResults: argResults);
-      expect(
+        final argParser = TestTool().toCommand('t').argParser;
+        final argResults = argParser.parse(['--build-args', 'foo']);
+        final context = DevToolExecutionContext(argResults: argResults);
+        expect(
           () => buildExecution(context, path: d.sandbox),
-          throwsA(isA<UsageException>()
-              .having((e) => e.message, 'help', contains('--build-args'))
-              .having((e) => e.message, 'help', contains('build_runner'))));
-    });
+          throwsA(
+            isA<UsageException>()
+                .having((e) => e.message, 'help', contains('--build-args'))
+                .having((e) => e.message, 'help', contains('build_runner')),
+          ),
+        );
+      },
+    );
 
-    test(
-        'throws UsageException if --build-args is used but build_test is not '
+    test('throws UsageException if --build-args is used but build_test is not '
         'a direct dependency', () async {
       await d.file('pubspec.yaml', '''
 name: _test
@@ -262,39 +306,58 @@ dev_dependencies:
       final argResults = argParser.parse(['--build-args', 'foo']);
       final context = DevToolExecutionContext(argResults: argResults);
       expect(
-          () => buildExecution(context, path: d.sandbox),
-          throwsA(isA<UsageException>()
+        () => buildExecution(context, path: d.sandbox),
+        throwsA(
+          isA<UsageException>()
               .having((e) => e.message, 'help', contains('--build-args'))
-              .having((e) => e.message, 'help', contains('build_test'))));
+              .having((e) => e.message, 'help', contains('build_test')),
+        ),
+      );
     });
 
-    test('returns config exit code and logs if test is not a direct dependency',
-        () async {
-      expect(
+    test(
+      'returns config exit code and logs if test is not a direct dependency',
+      () async {
+        expect(
           Logger.root.onRecord,
-          emitsThrough(severeLogOf(allOf(contains('Cannot run tests'),
-              contains('"test" in pubspec.yaml')))));
-      await d.file('pubspec.yaml', '''
+          emitsThrough(
+            severeLogOf(
+              allOf(
+                contains('Cannot run tests'),
+                contains('"test" in pubspec.yaml'),
+              ),
+            ),
+          ),
+        );
+        await d.file('pubspec.yaml', '''
 name: _test
 publish_to: none
 environment:
   sdk: '>=2.12.0 <3.0.0'
 ''').create();
-      final context = DevToolExecutionContext();
-      expect(buildExecution(context, path: d.sandbox).exitCode,
-          ExitCode.config.code);
-    });
+        final context = DevToolExecutionContext();
+        expect(
+          buildExecution(context, path: d.sandbox).exitCode,
+          ExitCode.config.code,
+        );
+      },
+    );
 
-    test(
-        'returns config exit code and logs if configured to run tests with '
+    test('returns config exit code and logs if configured to run tests with '
         'build args but build_runner is not a direct dependency', () async {
       expect(
-          Logger.root.onRecord,
-          emitsThrough(severeLogOf(allOf(
+        Logger.root.onRecord,
+        emitsThrough(
+          severeLogOf(
+            allOf(
               contains('missing a direct dependency on'),
               contains('build_runner'),
               contains('tool/dart_dev/config.dart'),
-              contains('pubspec.yaml')))));
+              contains('pubspec.yaml'),
+            ),
+          ),
+        ),
+      );
       await d.file('pubspec.yaml', '''
 name: _test
 publish_to: none
@@ -306,22 +369,30 @@ dev_dependencies:
 ''').create();
       final context = DevToolExecutionContext();
       expect(
-          buildExecution(context,
-                  configuredBuildArgs: ['-o', 'test:build'], path: d.sandbox)
-              .exitCode,
-          ExitCode.config.code);
+        buildExecution(
+          context,
+          configuredBuildArgs: ['-o', 'test:build'],
+          path: d.sandbox,
+        ).exitCode,
+        ExitCode.config.code,
+      );
     });
 
-    test(
-        'returns config exit code and logs if configured to run tests with '
+    test('returns config exit code and logs if configured to run tests with '
         'build args but build_test is not a direct dependency', () async {
       expect(
-          Logger.root.onRecord,
-          emitsThrough(severeLogOf(allOf(
+        Logger.root.onRecord,
+        emitsThrough(
+          severeLogOf(
+            allOf(
               contains('missing a direct dependency on'),
               contains('build_test'),
               contains('tool/dart_dev/config.dart'),
-              contains('pubspec.yaml')))));
+              contains('pubspec.yaml'),
+            ),
+          ),
+        ),
+      );
       await d.file('pubspec.yaml', '''
 name: _test
 publish_to: none
@@ -333,10 +404,13 @@ dev_dependencies:
 ''').create();
       final context = DevToolExecutionContext();
       expect(
-          buildExecution(context,
-                  configuredBuildArgs: ['-o', 'test:build'], path: d.sandbox)
-              .exitCode,
-          ExitCode.config.code);
+        buildExecution(
+          context,
+          configuredBuildArgs: ['-o', 'test:build'],
+          path: d.sandbox,
+        ).exitCode,
+        ExitCode.config.code,
+      );
     });
 
     group('returns a TestExecution', () {
@@ -365,12 +439,17 @@ dev_dependencies:
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);
           final context = DevToolExecutionContext(argResults: argResults);
-          final execution = buildExecution(context,
-              configuredTestArgs: ['-P', 'unit'], path: d.sandbox);
+          final execution = buildExecution(
+            context,
+            configuredTestArgs: ['-P', 'unit'],
+            path: d.sandbox,
+          );
           expect(execution.exitCode, isNull);
           expect(execution.process!.executable, exe.dart);
-          expect(execution.process!.args,
-              orderedEquals(['test', '-P', 'unit', '-n', 'foo']));
+          expect(
+            execution.process!.args,
+            orderedEquals(['test', '-P', 'unit', '-n', 'foo']),
+          );
         });
 
         test('with args after a separator', () {
@@ -384,29 +463,36 @@ dev_dependencies:
         });
 
         test(
-            'and logs a warning if --release is used in a non-build project',
-            () => overrideAnsiOutput(false, () {
-                  expect(
-                      Logger.root.onRecord,
-                      emitsThrough(warningLogOf(
-                          contains('The --release flag is only applicable'))));
+          'and logs a warning if --release is used in a non-build project',
+          () => overrideAnsiOutput(false, () {
+            expect(
+              Logger.root.onRecord,
+              emitsThrough(
+                warningLogOf(contains('The --release flag is only applicable')),
+              ),
+            );
 
-                  final argParser = TestTool().toCommand('t').argParser;
-                  final argResults = argParser.parse(['--release']);
-                  final context =
-                      DevToolExecutionContext(argResults: argResults);
-                  buildExecution(context, path: d.sandbox);
-                }));
+            final argParser = TestTool().toCommand('t').argParser;
+            final argResults = argParser.parse(['--release']);
+            final context = DevToolExecutionContext(argResults: argResults);
+            buildExecution(context, path: d.sandbox);
+          }),
+        );
 
         test('and logs the test subprocess', () {
-          expect(Logger.root.onRecord,
-              emitsThrough(infoLogOf(contains('dart test -P unit -n foo'))));
+          expect(
+            Logger.root.onRecord,
+            emitsThrough(infoLogOf(contains('dart test -P unit -n foo'))),
+          );
 
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);
           final context = DevToolExecutionContext(argResults: argResults);
-          buildExecution(context,
-              configuredTestArgs: ['-P', 'unit'], path: d.sandbox);
+          buildExecution(
+            context,
+            configuredTestArgs: ['-P', 'unit'],
+            path: d.sandbox,
+          );
         });
       });
 
@@ -435,12 +521,17 @@ dev_dependencies:
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);
           final context = DevToolExecutionContext(argResults: argResults);
-          final execution = buildExecution(context,
-              configuredTestArgs: ['-P', 'unit'], path: d.sandbox);
+          final execution = buildExecution(
+            context,
+            configuredTestArgs: ['-P', 'unit'],
+            path: d.sandbox,
+          );
           expect(execution.exitCode, isNull);
           expect(execution.process!.executable, exe.dart);
-          expect(execution.process!.args,
-              orderedEquals(['test', '-P', 'unit', '-n', 'foo']));
+          expect(
+            execution.process!.args,
+            orderedEquals(['test', '-P', 'unit', '-n', 'foo']),
+          );
         });
 
         test('with args after a separator', () {
@@ -454,29 +545,36 @@ dev_dependencies:
         });
 
         test(
-            'and logs a warning if --release is used in a non-build project',
-            () => overrideAnsiOutput(false, () {
-                  expect(
-                      Logger.root.onRecord,
-                      emitsThrough(warningLogOf(
-                          contains('The --release flag is only applicable'))));
+          'and logs a warning if --release is used in a non-build project',
+          () => overrideAnsiOutput(false, () {
+            expect(
+              Logger.root.onRecord,
+              emitsThrough(
+                warningLogOf(contains('The --release flag is only applicable')),
+              ),
+            );
 
-                  final argParser = TestTool().toCommand('t').argParser;
-                  final argResults = argParser.parse(['--release']);
-                  final context =
-                      DevToolExecutionContext(argResults: argResults);
-                  buildExecution(context, path: d.sandbox);
-                }));
+            final argParser = TestTool().toCommand('t').argParser;
+            final argResults = argParser.parse(['--release']);
+            final context = DevToolExecutionContext(argResults: argResults);
+            buildExecution(context, path: d.sandbox);
+          }),
+        );
 
         test('and logs the test subprocess', () {
-          expect(Logger.root.onRecord,
-              emitsThrough(infoLogOf(contains('dart test -P unit -n foo'))));
+          expect(
+            Logger.root.onRecord,
+            emitsThrough(infoLogOf(contains('dart test -P unit -n foo'))),
+          );
 
           final argParser = TestTool().toCommand('t').argParser;
           final argResults = argParser.parse(['--test-args', '-n foo']);
           final context = DevToolExecutionContext(argResults: argResults);
-          buildExecution(context,
-              configuredTestArgs: ['-P', 'unit'], path: d.sandbox);
+          buildExecution(
+            context,
+            configuredTestArgs: ['-P', 'unit'],
+            path: d.sandbox,
+          );
         });
       });
 
@@ -499,36 +597,45 @@ dev_dependencies:
           final execution = buildExecution(context, path: d.sandbox);
           expect(execution.exitCode, isNull);
           expect(execution.process!.executable, exe.dart);
-          expect(execution.process!.args,
-              orderedEquals(['run', 'build_runner', 'test']));
+          expect(
+            execution.process!.args,
+            orderedEquals(['run', 'build_runner', 'test']),
+          );
         });
 
         test('with args', () {
           final argParser = TestTool().toCommand('t').argParser;
-          final argResults = argParser.parse(
-              ['--build-args', '-o test:build', '--test-args', '-n foo']);
+          final argResults = argParser.parse([
+            '--build-args',
+            '-o test:build',
+            '--test-args',
+            '-n foo',
+          ]);
           final context = DevToolExecutionContext(argResults: argResults);
-          final execution = buildExecution(context,
-              configuredBuildArgs: ['foo'],
-              configuredTestArgs: ['-P', 'unit'],
-              path: d.sandbox);
+          final execution = buildExecution(
+            context,
+            configuredBuildArgs: ['foo'],
+            configuredTestArgs: ['-P', 'unit'],
+            path: d.sandbox,
+          );
           expect(execution.exitCode, isNull);
           expect(execution.process!.executable, exe.dart);
           expect(
-              execution.process!.args,
-              orderedEquals([
-                'run',
-                'build_runner',
-                'test',
-                'foo',
-                '-o',
-                'test:build',
-                '--',
-                '-P',
-                'unit',
-                '-n',
-                'foo'
-              ]));
+            execution.process!.args,
+            orderedEquals([
+              'run',
+              'build_runner',
+              'test',
+              'foo',
+              '-o',
+              'test:build',
+              '--',
+              '-P',
+              'unit',
+              '-n',
+              'foo',
+            ]),
+          );
         });
 
         test('with args after a separator', () {
@@ -539,61 +646,77 @@ dev_dependencies:
           expect(execution.exitCode, isNull);
           expect(execution.process!.executable, exe.dart);
           expect(
-              execution.process!.args,
-              orderedEquals([
-                'run',
-                'build_runner',
-                'test',
-                '--',
-                '-j1',
-              ]));
+            execution.process!.args,
+            orderedEquals(['run', 'build_runner', 'test', '--', '-j1']),
+          );
         });
 
         test('with verbose=true', () {
           final argParser = TestTool().toCommand('t').argParser;
-          final argResults = argParser.parse(
-              ['--build-args', '-o test:build', '--test-args', '-n foo']);
-          final context =
-              DevToolExecutionContext(argResults: argResults, verbose: true);
-          final execution = buildExecution(context,
-              configuredBuildArgs: ['foo'],
-              configuredTestArgs: ['-P', 'unit'],
-              path: d.sandbox);
+          final argResults = argParser.parse([
+            '--build-args',
+            '-o test:build',
+            '--test-args',
+            '-n foo',
+          ]);
+          final context = DevToolExecutionContext(
+            argResults: argResults,
+            verbose: true,
+          );
+          final execution = buildExecution(
+            context,
+            configuredBuildArgs: ['foo'],
+            configuredTestArgs: ['-P', 'unit'],
+            path: d.sandbox,
+          );
           expect(execution.exitCode, isNull);
           expect(execution.process!.executable, exe.dart);
           expect(
-              execution.process!.args,
-              orderedEquals([
-                'run',
-                'build_runner',
-                'test',
-                'foo',
-                '-o',
-                'test:build',
-                '-v',
-                '--',
-                '-P',
-                'unit',
-                '-n',
-                'foo',
-              ]));
+            execution.process!.args,
+            orderedEquals([
+              'run',
+              'build_runner',
+              'test',
+              'foo',
+              '-o',
+              'test:build',
+              '-v',
+              '--',
+              '-P',
+              'unit',
+              '-n',
+              'foo',
+            ]),
+          );
         });
 
         test('and logs the test subprocess', () {
           expect(
-              Logger.root.onRecord,
-              emitsThrough(infoLogOf(contains(
+            Logger.root.onRecord,
+            emitsThrough(
+              infoLogOf(
+                contains(
                   'dart run build_runner test foo -o test:build -- -P unit '
-                  '-n foo'))));
+                  '-n foo',
+                ),
+              ),
+            ),
+          );
 
           final argParser = TestTool().toCommand('t').argParser;
-          final argResults = argParser.parse(
-              ['--build-args', '-o test:build', '--test-args', '-n foo']);
+          final argResults = argParser.parse([
+            '--build-args',
+            '-o test:build',
+            '--test-args',
+            '-n foo',
+          ]);
           final context = DevToolExecutionContext(argResults: argResults);
-          buildExecution(context,
-              configuredBuildArgs: ['foo'],
-              configuredTestArgs: ['-P', 'unit'],
-              path: d.sandbox);
+          buildExecution(
+            context,
+            configuredBuildArgs: ['foo'],
+            configuredTestArgs: ['-P', 'unit'],
+            path: d.sandbox,
+          );
         });
       });
     });

@@ -1,0 +1,4 @@
+name: has_dart_style_v3
+
+dependencies:
+  dart_style: ^3.0.0

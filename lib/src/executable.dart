@@ -41,14 +41,19 @@ Future<void> run(List<String> args) async {
   final oldDevDartExists = File(_paths.legacyConfig).existsSync();
 
   if (!configExists) {
-    log.fine('No custom `${_paths.config}` file found; '
-        'using default config.');
+    log.fine(
+      'No custom `${_paths.config}` file found; '
+      'using default config.',
+    );
   }
   if (oldDevDartExists) {
-    log.warning(yellow.wrap(
+    log.warning(
+      yellow.wrap(
         'dart_dev v3 now expects configuration to be at `${_paths.config}`,\n'
         'but `${_paths.legacyConfig}` still exists. View the guide to see how to upgrade:\n'
-        'https://github.com/Workiva/dart_dev/blob/master/doc/v3-upgrade-guide.md'));
+        'https://github.com/Workiva/dart_dev/blob/master/doc/v3-upgrade-guide.md',
+      ),
+    );
   }
 
   if (args.contains('hackFastFormat') && !oldDevDartExists) {
@@ -57,13 +62,10 @@ Future<void> run(List<String> args) async {
   }
 
   final processArgs = generateRunScript();
-  final process = await Process.start(
-      processArgs.first,
-      [
-        if (processArgs.length > 1) ...processArgs.sublist(1),
-        ...args,
-      ],
-      mode: ProcessStartMode.inheritStdio);
+  final process = await Process.start(processArgs.first, [
+    if (processArgs.length > 1) ...processArgs.sublist(1),
+    ...args,
+  ], mode: ProcessStartMode.inheritStdio);
   ensureProcessExit(process);
   exitCode = await process.exitCode;
 }
@@ -75,17 +77,19 @@ Future<void> handleFastFormat(List<String> args) async {
   final configFile = File(_paths.config);
   if (configFile.existsSync()) {
     final toolBuilder = FormatToolBuilder();
-    parseString(content: configFile.readAsStringSync())
-        .unit
-        .accept(toolBuilder);
+    parseString(
+      content: configFile.readAsStringSync(),
+    ).unit.accept(toolBuilder);
     formatTool = toolBuilder
         .formatDevTool; // could be null if no custom `format` entry found
 
     if (formatTool == null && toolBuilder.failedToDetectAKnownFormatter) {
       exitCode = ExitCode.config.code;
-      log.severe('Failed to reconstruct the format tool\'s configuration.\n\n'
-          'This is likely because dart_dev expects either the FormatTool class or the\n'
-          'OverReactFormatTool class.');
+      log.severe(
+        'Failed to reconstruct the format tool\'s configuration.\n\n'
+        'This is likely because dart_dev expects either the FormatTool class or the\n'
+        'OverReactFormatTool class.',
+      );
       return;
     }
   }
@@ -116,27 +120,31 @@ bool _allPackagesAreImportedImmutably(Iterable<String> packageNames) {
   File pubspecLockFile = File('pubspec.lock');
   if (!pubspecLockFile.existsSync()) return false;
   final pubSpecLock = loadYamlDocument(pubspecLockFile.readAsStringSync());
-  return getDependencySources(pubSpecLock, packageNames)
-      .values
-      .every((source) => source == 'hosted' || source == 'git');
+  return getDependencySources(
+    pubSpecLock,
+    packageNames,
+  ).values.every((source) => source == 'hosted' || source == 'git');
 }
 
 /// Return null iff it is not possible to account for all
 /// recompilation-necessitating factors in the digest.
 String? _computeRunScriptDigest() {
-  final currentPackageName =
-      Pubspec.parse(File('pubspec.yaml').readAsStringSync()).name;
+  final currentPackageName = Pubspec.parse(
+    File('pubspec.yaml').readAsStringSync(),
+  ).name;
   final configFile = File(_paths.config);
   var configHasRelativeImports = false;
   if (configFile.existsSync()) {
     final configImports = parseImports(configFile.readAsStringSync());
     configHasRelativeImports = configImports.any((i) => !i.contains(':'));
-    final configHasSamePackageImports =
-        configImports.any((i) => i.startsWith('package:$currentPackageName'));
+    final configHasSamePackageImports = configImports.any(
+      (i) => i.startsWith('package:$currentPackageName'),
+    );
 
     if (configHasSamePackageImports) {
       log.fine(
-          'Skipping compilation because ${_paths.config} imports from its own package.');
+        'Skipping compilation because ${_paths.config} imports from its own package.',
+      );
 
       // If the config imports from its own source files, we don't have a way of
       // efficiently tracking changes that would require recompilation of this
@@ -148,7 +156,8 @@ String? _computeRunScriptDigest() {
     final packageNames = computePackageNamesFromImports(configImports);
     if (!_allPackagesAreImportedImmutably(packageNames)) {
       log.fine(
-          'Skipping compilation because ${_paths.config} imports non-hosted packages.');
+        'Skipping compilation because ${_paths.config} imports non-hosted packages.',
+      );
       _deleteRunExecutableAndDigest();
       return null;
     }
@@ -162,11 +171,14 @@ String? _computeRunScriptDigest() {
     if (packageConfig.existsSync()) ...packageConfig.readAsBytesSync(),
     if (configFile.existsSync()) ...configFile.readAsBytesSync(),
     if (configHasRelativeImports)
-      for (final file in Glob('tool/**.dart', recursive: true)
-          .listSync()
-          .whereType<File>()
-          .where((f) => p.canonicalize(f.path) != p.canonicalize(_paths.config))
-          .sortedBy((f) => f.path))
+      for (final file
+          in Glob('tool/**.dart', recursive: true)
+              .listSync()
+              .whereType<File>()
+              .where(
+                (f) => p.canonicalize(f.path) != p.canonicalize(_paths.config),
+              )
+              .sortedBy((f) => f.path))
         ...file.readAsBytesSync(),
   ]);
   return base64.encode(digest.bytes);
@@ -190,9 +202,12 @@ List<String> generateRunScript() {
   // Generate a digest of inputs to the run script. We use this to determine
   // whether we need to recompile the executable.
   String? encodedDigest;
-  logTimedSync(log, 'Computing run script digest',
-      () => encodedDigest = _computeRunScriptDigest(),
-      level: Level.FINE);
+  logTimedSync(
+    log,
+    'Computing run script digest',
+    () => encodedDigest = _computeRunScriptDigest(),
+    level: Level.FINE,
+  );
 
   if (encodedDigest != null &&
       (!runExecutableDigest.existsSync() ||
@@ -210,7 +225,7 @@ List<String> generateRunScript() {
         'exe',
         _paths.runScript,
         '-o',
-        _paths.runExecutable
+        _paths.runExecutable,
       ];
       final result = Process.runSync(Platform.executable, args);
       if (result.exitCode == 0) {
@@ -220,7 +235,8 @@ List<String> generateRunScript() {
         // Compilation failed. Dump some logs for debugging, but note to the
         // user that dart_dev should still work.
         log.warning(
-            'Could not compile run script; dart_dev will continue without precompilation.');
+          'Could not compile run script; dart_dev will continue without precompilation.',
+        );
         log.fine('CMD: ${Platform.executable} ${args.join(" ")}');
         log.fine('STDOUT:\n${result.stdout}');
         log.fine('STDERR:\n${result.stderr}');
@@ -258,9 +274,10 @@ void main(List<String> args) async {
 }
 
 Future<void> runWithConfig(
-    // ignore: library_private_types_in_public_api
-    List<String> args,
-    _ConfigGetter configGetter) async {
+  // ignore: library_private_types_in_public_api
+  List<String> args,
+  _ConfigGetter configGetter,
+) async {
   attachLoggerToStdio(args);
 
   try {
@@ -278,8 +295,10 @@ Future<void> runWithConfig(
     stderr
       ..writeln('Invalid "${_paths.config}" in ${p.absolute(p.current)}')
       ..writeln()
-      ..writeln('It should provide a `Map<String, DevTool> config;` getter,'
-          ' but it either does not exist or threw unexpectedly:')
+      ..writeln(
+        'It should provide a `Map<String, DevTool> config;` getter,'
+        ' but it either does not exist or threw unexpectedly:',
+      )
       ..writeln('  $error')
       ..writeln()
       ..writeln('For more info: https://github.com/Workiva/dart_dev');
@@ -307,7 +326,8 @@ Future<void> runWithConfig(
 DevTool chooseDefaultFormatTool({String? path}) {
   final pubspec = cachedPubspec(path: path);
   const orf = 'over_react_format';
-  final hasOverReactFormat = pubspec.dependencies.containsKey(orf) ||
+  final hasOverReactFormat =
+      pubspec.dependencies.containsKey(orf) ||
       pubspec.devDependencies.containsKey(orf) ||
       pubspec.dependencyOverrides.containsKey(orf);
 

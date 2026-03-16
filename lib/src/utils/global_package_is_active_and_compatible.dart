@@ -16,17 +16,25 @@ import 'executables.dart' as exe;
 /// an [environment] map with a `'PUB_CACHE': '<path>'` entry, which will be
 /// passed to the [Process] that is run by this function.
 bool globalPackageIsActiveAndCompatible(
-    String packageName, VersionConstraint constraint,
-    {Map<String, String>? environment}) {
+  String packageName,
+  VersionConstraint constraint, {
+  Map<String, String>? environment,
+}) {
   final args = ['pub', 'global', 'list'];
-  final result = Process.runSync(exe.dart, args,
-      environment: environment, stderrEncoding: utf8, stdoutEncoding: utf8);
+  final result = Process.runSync(
+    exe.dart,
+    args,
+    environment: environment,
+    stderrEncoding: utf8,
+    stdoutEncoding: utf8,
+  );
   if (result.exitCode != 0) {
     throw ProcessException(
-        exe.dart,
-        args,
-        'Could not list global pub packages:\n${result.stderr}',
-        result.exitCode);
+      exe.dart,
+      args,
+      'Could not list global pub packages:\n${result.stderr}',
+      result.exitCode,
+    );
   }
 
   for (final line in result.stdout.split('\n')) {

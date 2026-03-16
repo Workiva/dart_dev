@@ -79,6 +79,24 @@ dartfmt -w --fix .
 ----------------------------
 ```
 
+### Configuring the formatter language version
+
+For formatters that support `--language-version`, you can configure the value
+used by `dart_dev`.
+
+```dart
+// tool/dart_dev/config.dart
+import 'package:dart_dev/dart_dev.dart';
+
+final config = {
+  'format': FormatTool()
+    ..languageVersion = '3.0'
+};
+```
+
+If `languageVersion` is not configured, `dart_dev` will use `latest` only in
+the cases where it decides the formatter needs an explicit language version.
+
 ### Excluding files from formatting
 
 ```dart

@@ -5,16 +5,8 @@ import '../../tools/fixtures/organize_directives/directives.dart';
 
 void main() {
   const testCases = [
-    _TestCase(
-      '1. sorts dart imports alphabetically',
-      unorganized1,
-      organized1,
-    ),
-    _TestCase(
-      '2. sorts pkg imports alphabetically',
-      unorganized2,
-      organized2,
-    ),
+    _TestCase('1. sorts dart imports alphabetically', unorganized1, organized1),
+    _TestCase('2. sorts pkg imports alphabetically', unorganized2, organized2),
     _TestCase(
       '3. sorts relative imports alphabetically',
       unorganized3,

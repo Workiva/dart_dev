@@ -43,9 +43,9 @@ ArgResults takeOptionArgs(ArgParser parser, ArgResults results) =>
 ///         ..addTool(TestTool(), argMapper: takeAllArgs)
 ///     };
 ArgResults takeAllArgs(ArgParser parser, ArgResults results) => parser.parse([
-      ...optionArgsOnly(results, allowedOptions: parser.options.keys),
-      ...restArgsWithSeparator(results),
-    ]);
+  ...optionArgsOnly(results, allowedOptions: parser.options.keys),
+  ...restArgsWithSeparator(results),
+]);
 
 class CompoundTool extends DevTool with CompoundToolMixin {}
 
@@ -80,8 +80,9 @@ mixin CompoundToolMixin on DevTool {
     int? code = 0;
     for (var i = 0; i < _specs.length; i++) {
       if (!shouldRunTool(_specs[i].when, code)) continue;
-      final newCode =
-          await _specs[i].tool.run(contextForTool(context, _specs[i]));
+      final newCode = await _specs[i].tool.run(
+        contextForTool(context, _specs[i]),
+      );
       _log.fine('Step ${i + 1}/${_specs.length} done (code: $newCode)\n');
       if (code == 0) {
         code = newCode;
@@ -92,8 +93,10 @@ mixin CompoundToolMixin on DevTool {
   }
 }
 
-List<String> optionArgsOnly(ArgResults results,
-    {Iterable<String>? allowedOptions}) {
+List<String> optionArgsOnly(
+  ArgResults results, {
+  Iterable<String>? allowedOptions,
+}) {
   final args = <String>[];
   for (final option in results.options) {
     if (!results.wasParsed(option)) continue;
@@ -111,7 +114,9 @@ List<String> optionArgsOnly(ArgResults results,
 }
 
 DevToolExecutionContext contextForTool(
-    DevToolExecutionContext baseContext, DevToolSpec spec) {
+  DevToolExecutionContext baseContext,
+  DevToolSpec spec,
+) {
   final argResults = baseContext.argResults;
   if (argResults == null) return baseContext;
 
@@ -152,34 +157,40 @@ class CompoundArgParser implements ArgParser {
 
     for (final option in argParser.options.values) {
       if (option.isFlag) {
-        _compoundParser.addFlag(option.name,
-            abbr: option.abbr,
-            help: option.help,
-            defaultsTo: option.defaultsTo,
-            negatable: option.negatable!,
-            callback: (bool value) => option.callback?.call(value),
-            hide: option.hide);
+        _compoundParser.addFlag(
+          option.name,
+          abbr: option.abbr,
+          help: option.help,
+          defaultsTo: option.defaultsTo,
+          negatable: option.negatable!,
+          callback: (bool value) => option.callback?.call(value),
+          hide: option.hide,
+        );
       } else if (option.isMultiple) {
-        _compoundParser.addMultiOption(option.name,
-            abbr: option.abbr,
-            help: option.help,
-            valueHelp: option.valueHelp,
-            allowed: option.allowed,
-            allowedHelp: option.allowedHelp,
-            defaultsTo: option.defaultsTo,
-            callback: (List<String> values) => option.callback?.call(values),
-            splitCommas: option.splitCommas,
-            hide: option.hide);
+        _compoundParser.addMultiOption(
+          option.name,
+          abbr: option.abbr,
+          help: option.help,
+          valueHelp: option.valueHelp,
+          allowed: option.allowed,
+          allowedHelp: option.allowedHelp,
+          defaultsTo: option.defaultsTo,
+          callback: (List<String> values) => option.callback?.call(values),
+          splitCommas: option.splitCommas,
+          hide: option.hide,
+        );
       } else if (option.isSingle) {
-        _compoundParser.addOption(option.name,
-            abbr: option.abbr,
-            help: option.help,
-            valueHelp: option.valueHelp,
-            allowed: option.allowed,
-            allowedHelp: option.allowedHelp,
-            defaultsTo: option.defaultsTo,
-            callback: (String? value) => option.callback?.call(value),
-            hide: option.hide);
+        _compoundParser.addOption(
+          option.name,
+          abbr: option.abbr,
+          help: option.help,
+          valueHelp: option.valueHelp,
+          allowed: option.allowed,
+          allowedHelp: option.allowedHelp,
+          defaultsTo: option.defaultsTo,
+          callback: (String? value) => option.callback?.call(value),
+          hide: option.hide,
+        );
       }
     }
   }
@@ -227,8 +238,10 @@ class CompoundArgParser implements ArgParser {
 
     final buffer = StringBuffer()
       ..writeln()
-      ..writeln('This command is composed of multiple parts, each of which has '
-          'its own options.');
+      ..writeln(
+        'This command is composed of multiple parts, each of which has '
+        'its own options.',
+      );
     for (final parser in _subParsers) {
       buffer
         ..writeln()
@@ -259,71 +272,80 @@ class CompoundArgParser implements ArgParser {
       _compoundParser.addCommand(name, parser);
 
   @override
-  void addFlag(String name,
-          {String? abbr,
-          String? help,
-          bool? defaultsTo = false,
-          bool negatable = true,
-          void Function(bool value)? callback,
-          bool hide = false,
-          bool hideNegatedUsage = false,
-          List<String> aliases = const []}) =>
-      _compoundParser.addFlag(name,
-          abbr: abbr,
-          help: help,
-          defaultsTo: defaultsTo,
-          negatable: negatable,
-          // TODO once lower bound of args is 2.7.0 (requires Dart SDK 3.3.0), which adds hideNegatedUsage, forward this arg
-          // hideNegatedUsage: hideNegatedUsage,
-          callback: callback,
-          hide: hide,
-          aliases: aliases);
+  void addFlag(
+    String name, {
+    String? abbr,
+    String? help,
+    bool? defaultsTo = false,
+    bool negatable = true,
+    void Function(bool value)? callback,
+    bool hide = false,
+    bool hideNegatedUsage = false,
+    List<String> aliases = const [],
+  }) => _compoundParser.addFlag(
+    name,
+    abbr: abbr,
+    help: help,
+    defaultsTo: defaultsTo,
+    negatable: negatable,
+    // TODO once lower bound of args is 2.7.0 (requires Dart SDK 3.3.0), which adds hideNegatedUsage, forward this arg
+    // hideNegatedUsage: hideNegatedUsage,
+    callback: callback,
+    hide: hide,
+    aliases: aliases,
+  );
 
   @override
-  void addMultiOption(String name,
-          {String? abbr,
-          String? help,
-          String? valueHelp,
-          Iterable<String>? allowed,
-          Map<String, String>? allowedHelp,
-          Iterable<String>? defaultsTo,
-          void Function(List<String> values)? callback,
-          bool splitCommas = true,
-          bool hide = false,
-          List<String> aliases = const []}) =>
-      _compoundParser.addMultiOption(name,
-          abbr: abbr,
-          help: help,
-          valueHelp: valueHelp,
-          allowed: allowed,
-          allowedHelp: allowedHelp,
-          defaultsTo: defaultsTo,
-          callback: callback,
-          splitCommas: splitCommas,
-          hide: hide,
-          aliases: aliases);
+  void addMultiOption(
+    String name, {
+    String? abbr,
+    String? help,
+    String? valueHelp,
+    Iterable<String>? allowed,
+    Map<String, String>? allowedHelp,
+    Iterable<String>? defaultsTo,
+    void Function(List<String> values)? callback,
+    bool splitCommas = true,
+    bool hide = false,
+    List<String> aliases = const [],
+  }) => _compoundParser.addMultiOption(
+    name,
+    abbr: abbr,
+    help: help,
+    valueHelp: valueHelp,
+    allowed: allowed,
+    allowedHelp: allowedHelp,
+    defaultsTo: defaultsTo,
+    callback: callback,
+    splitCommas: splitCommas,
+    hide: hide,
+    aliases: aliases,
+  );
 
   @override
-  void addOption(String name,
-          {String? abbr,
-          String? help,
-          String? valueHelp,
-          Iterable<String>? allowed,
-          Map<String, String>? allowedHelp,
-          String? defaultsTo,
-          void Function(String?)? callback,
-          bool mandatory = false,
-          bool hide = false,
-          List<String> aliases = const []}) =>
-      _compoundParser.addOption(name,
-          abbr: abbr,
-          help: help,
-          valueHelp: valueHelp,
-          allowed: allowed,
-          allowedHelp: allowedHelp,
-          defaultsTo: defaultsTo,
-          callback: callback,
-          mandatory: mandatory,
-          hide: hide,
-          aliases: aliases);
+  void addOption(
+    String name, {
+    String? abbr,
+    String? help,
+    String? valueHelp,
+    Iterable<String>? allowed,
+    Map<String, String>? allowedHelp,
+    String? defaultsTo,
+    void Function(String?)? callback,
+    bool mandatory = false,
+    bool hide = false,
+    List<String> aliases = const [],
+  }) => _compoundParser.addOption(
+    name,
+    abbr: abbr,
+    help: help,
+    valueHelp: valueHelp,
+    allowed: allowed,
+    allowedHelp: allowedHelp,
+    defaultsTo: defaultsTo,
+    callback: callback,
+    mandatory: mandatory,
+    hide: hide,
+    aliases: aliases,
+  );
 }

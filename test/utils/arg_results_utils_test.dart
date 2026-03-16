@@ -87,7 +87,9 @@ void main() {
     test('throws ArgumentError on non-single-option value', () {
       final argResults = (ArgParser()..addFlag(opt)).parse(['--$opt']);
       expect(
-          () => splitSingleOptionValue(argResults, opt), throwsArgumentError);
+        () => splitSingleOptionValue(argResults, opt),
+        throwsArgumentError,
+      );
     });
 
     test('returns value as Iterable<String>', () {

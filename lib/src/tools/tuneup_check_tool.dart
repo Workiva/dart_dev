@@ -54,13 +54,16 @@ class TuneupCheckTool extends DevTool {
     ..addFlag('ignore-infos', help: 'Ignore any info level issues.');
 
   @override
-  String? description = 'Run static analysis on dart files in this package '
+  String? description =
+      'Run static analysis on dart files in this package '
       'using the tuneup tool.';
 
   @override
   FutureOr<int?> run([DevToolExecutionContext? context]) async {
-    final execution = buildExecution(context ?? DevToolExecutionContext(),
-        configuredIgnoreInfos: ignoreInfos);
+    final execution = buildExecution(
+      context ?? DevToolExecutionContext(),
+      configuredIgnoreInfos: ignoreInfos,
+    );
     return execution.exitCode ??
         await runProcessAndEnsureExit(execution.process!, log: _log);
   }
@@ -101,7 +104,8 @@ Iterable<String> buildArgs({
   bool? configuredIgnoreInfos,
   bool verbose = false,
 }) {
-  var ignoreInfos = (configuredIgnoreInfos ?? false) ||
+  var ignoreInfos =
+      (configuredIgnoreInfos ?? false) ||
       (flagValue(argResults, 'ignore-infos') ?? false);
   return [
     'run',
@@ -136,14 +140,19 @@ TuneupExecution buildExecution(
   final argResults = context.argResults;
   if (argResults != null) {
     assertNoPositionalArgsNorArgsAfterSeparator(
-        argResults, context.usageException,
-        commandName: context.commandName);
+      argResults,
+      context.usageException,
+      commandName: context.commandName,
+    );
   }
 
   if (!packageIsImmediateDependency('tuneup', path: path)) {
-    _log.severe(red.wrap('Cannot run "tuneup check".\n')! +
-        yellow.wrap(
-            'You must have a dependency on "tuneup" in pubspec.yaml.\n')!);
+    _log.severe(
+      red.wrap('Cannot run "tuneup check".\n')! +
+          yellow.wrap(
+            'You must have a dependency on "tuneup" in pubspec.yaml.\n',
+          )!,
+    );
     return TuneupExecution.exitEarly(ExitCode.config.code);
   }
 
@@ -154,5 +163,6 @@ TuneupExecution buildExecution(
   ).toList();
   logSubprocessHeader(_log, 'dart ${args.join(' ')}');
   return TuneupExecution.process(
-      ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio));
+    ProcessDeclaration(exe.dart, args, mode: ProcessStartMode.inheritStdio),
+  );
 }

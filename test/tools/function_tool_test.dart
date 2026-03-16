@@ -17,14 +17,18 @@ void main() {
       expect(await tool.run(), 1);
     });
 
-    test('throws UsageException when no ArgParser given but args are present',
-        () {
-      final tool = DevTool.fromFunction((_) => 0);
-      expect(
+    test(
+      'throws UsageException when no ArgParser given but args are present',
+      () {
+        final tool = DevTool.fromFunction((_) => 0);
+        expect(
           () => tool.run(
-              DevToolExecutionContext(argResults: ArgParser().parse(['foo']))),
-          throwsA(isA<UsageException>()));
-    });
+            DevToolExecutionContext(argResults: ArgParser().parse(['foo'])),
+          ),
+          throwsA(isA<UsageException>()),
+        );
+      },
+    );
 
     test('accepts a custom ArgParser', () async {
       final parser = ArgParser()..addFlag('flag');
@@ -32,19 +36,23 @@ void main() {
         expect(context.argResults!['flag'], isTrue);
         return 0;
       }, argParser: parser);
-      await tool
-          .run(DevToolExecutionContext(argResults: parser.parse(['--flag'])));
+      await tool.run(
+        DevToolExecutionContext(argResults: parser.parse(['--flag'])),
+      );
     });
 
     test('allows a custom ArgParser and args after a separator', () async {
       final tool = DevTool.fromFunction((_) => 0, argParser: ArgParser());
-      await tool.run(DevToolExecutionContext(
-          argResults: ArgParser().parse(['--', 'foo'])));
+      await tool.run(
+        DevToolExecutionContext(argResults: ArgParser().parse(['--', 'foo'])),
+      );
     });
 
     test('logs a warning if no exit code is returned', () {
-      expect(Logger.root.onRecord,
-          emitsThrough(warningLogOf(contains('did not return an exit code'))));
+      expect(
+        Logger.root.onRecord,
+        emitsThrough(warningLogOf(contains('did not return an exit code'))),
+      );
       DevTool.fromFunction((_) => null).run();
     });
   });

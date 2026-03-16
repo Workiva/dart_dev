@@ -16,16 +16,23 @@ void main() {
     'utils/dart_dev_paths.dart',
   ];
   group(
-      'parseImports',
-      () => test('correctly returns all imports',
-          () => expect(parseImports(sampleFile), equals(expectedImportList))));
+    'parseImports',
+    () => test(
+      'correctly returns all imports',
+      () => expect(parseImports(sampleFile), equals(expectedImportList)),
+    ),
+  );
 
   group(
-      'computePackageNamesFromImports',
-      () => test(
-          'correctly computes package names from imports',
-          () => expect(computePackageNamesFromImports(expectedImportList),
-              equals(['analyzer', 'dart_dev', 'test']))));
+    'computePackageNamesFromImports',
+    () => test(
+      'correctly computes package names from imports',
+      () => expect(
+        computePackageNamesFromImports(expectedImportList),
+        equals(['analyzer', 'dart_dev', 'test']),
+      ),
+    ),
+  );
 }
 
 const sampleFile = '''
