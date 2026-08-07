@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu, windows ]
-        sdk: [ 2.19.6, stable ]
+        sdk: [ stable ]
     name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     steps:
@@ -36,7 +36,7 @@ jobs:
       - name: Analysis
         run: dart run dart_dev analyze
       - name: Formatting
-        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+        if: ${{ matrix.os == 'ubuntu' }}
         run: dart run dart_dev format --check
       - name: Tests
-        run: dart run dart_dev test ${{ matrix.sdk != '2.19.6' && '--test-args="--exclude-tags dart2"' || '' }}
+        run: dart run dart_dev test

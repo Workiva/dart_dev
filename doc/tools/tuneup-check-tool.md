@@ -6,7 +6,7 @@ Statically analyzes the current project via the `tuneup` package.
 
 This is intended to be used as a drop-in replacement to the
 [`AnalyzeTool`][analyze-tool] to workaround an
-[open issue with `dartanalyzer` and excluding files][analyzer-exclude-issue] via
+[open issue with `dart analyze` and excluding files][analyzer-exclude-issue] via
 `analysis_options.yaml`.
 
 Add `tuneup` as a dev dependency to your project:

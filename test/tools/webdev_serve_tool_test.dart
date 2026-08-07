@@ -3,7 +3,6 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/tools/webdev_serve_tool.dart';
-import 'package:dart_dev/src/utils/dart_semver_version.dart';
 import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:io/ansi.dart';
 import 'package:io/io.dart';
@@ -169,7 +168,7 @@ void main() {
       pubCacheWithWebdev = TempPubCache();
       globalActivate(
         'webdev',
-        '^${dartSemverVersion.major}.0.0',
+        '^3.0.0',
         environment: pubCacheWithWebdev.envOverride,
       );
 
@@ -226,7 +225,7 @@ void main() {
                 allOf(
                   contains('webdev serve could not run'),
                   contains(
-                    'dart pub global activate webdev ^${dartSemverVersion.major}.0.0',
+                    'dart pub global activate webdev ^3.0.0',
                   ),
                 ),
               ),

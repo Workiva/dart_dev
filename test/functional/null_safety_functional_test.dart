@@ -21,13 +21,5 @@ void main() {
       );
       await process.shouldExit(0);
     });
-
-    test('with a custom config that has a language version comment', () async {
-      final process = await runDevToolFunctionalTest(
-        'analyze',
-        'test/functional/fixtures/null_safety/opted_in_custom_config_version_comment',
-      );
-      await process.shouldExit(0);
-    }, tags: 'dart2');
   });
 }
