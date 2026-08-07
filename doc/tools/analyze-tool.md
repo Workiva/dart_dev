@@ -1,6 +1,6 @@
 # `AnalyzeTool`
 
-Statically analyzes the current project by running the `dartanalyzer`.
+Statically analyzes the current project by running `dart analyze`.
 
 ## Usage
 
@@ -18,13 +18,13 @@ final config = {
 
 ## Default behavior
 
-By default this tool will run `dartanalyzer .` which will analyze all dart files
+By default this tool will run `dart analyze .` which will analyze all dart files
 in the current project.
 
 ## Configuration
 
 `AnalyzeTool` supports one configuration option which is the list of args to
-pass to the `dartanalyzer` process:
+pass to `dart analyze`:
 
 ```dart
 // tool/dart_dev/config.dart
@@ -44,13 +44,12 @@ final config = {
 
 The `analysis_options.yaml` configuration file
 [supports excluding files][analysis-exclude]. However, there is an
-[open issue with the `dartanalyzer` CLI][analyzer-exclude-issue] because it does
+[open issue with the `dart analyze` CLI][analyzer-exclude-issue] because it does
 not respect this list.
 
 If your project has files that need to be excluded from analysis (e.g. generated
-files), use the [`TuneupCheckTool`][tuneup-check-tool]. It uses the
-`tuneup` package to run analysis instead of `dartanalyzer` and it properly
-respects the exclude rules defined in `analysis_options.yaml`.
+files), use the [`TuneupCheckTool`][tuneup-check-tool] which properly respects
+the exclude rules defined in `analysis_options.yaml`.
 
 ## Command-line options
 

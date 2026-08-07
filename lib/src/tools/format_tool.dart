@@ -13,7 +13,6 @@ import 'package:yaml/yaml.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
-import '../utils/dart_semver_version.dart';
 import '../utils/executables.dart' as exe;
 import '../utils/logging.dart';
 import '../utils/organize_directives/organize_directives_in_paths.dart';
@@ -64,14 +63,13 @@ class FormatTool extends DevTool {
   List<Glob>? exclude;
 
   /// The formatter to run, one of:
-  /// - `dartfmt` (provided by the SDK)
+  /// - `dart format` (provided by the SDK)
   /// - `dart run dart_style:format` (provided by the `dart_style` package)
-  /// - `dart format` (added in Dart SDK 2.10.0)
-  Formatter formatter = Formatter.dartfmt;
+  Formatter formatter = Formatter.dartFormat;
 
   /// The args to pass to the formatter process run by this command.
   ///
-  /// Run `dartfmt -h -v` or `dart format -h -v` to see all available args.
+  /// Run `dart format -h -v` to see all available args.
   List<String>? formatterArgs;
 
   /// The language version to pass to formatters that support
@@ -116,8 +114,8 @@ class FormatTool extends DevTool {
     ..addOption(
       'formatter-args',
       help:
-          'Args to pass to the "dartfmt" or "dart format" process.\n'
-          'Run "dartfmt -h -v" or "dart format -h -v" to see all available options.',
+          'Args to pass to the "dart format" process.\n'
+          'Run "dart format -h -v" to see all available options.',
     );
 
   @override
@@ -126,7 +124,8 @@ class FormatTool extends DevTool {
   @override
   FutureOr<int?> run([DevToolExecutionContext? context]) async {
     context ??= DevToolExecutionContext();
-    if (formatter == Formatter.dartfmt && !dartVersionHasDartfmt) {
+    // ignore: deprecated_member_use_from_same_package
+    if (formatter == Formatter.dartfmt) {
       formatter = Formatter.dartFormat;
     }
     final formatExecution = buildExecution(
@@ -325,11 +324,13 @@ enum FormatMode {
 
 /// Available dart formatters.
 enum Formatter {
-  // The formatter provided via the Dart SDK.
+  @Deprecated(
+    'Use Formatter.dartFormat instead. dartfmt was removed in Dart 2.15.',
+  )
   dartfmt,
   // The formatter provided via the `dart_style` package.
   dartStyle,
-  // The formatter provided via the Dart 2.10 SDK
+  // The formatter provided via `dart format`.
   dartFormat,
 }
 
@@ -455,6 +456,7 @@ FormatExecution buildExecution(
   bool organizeDirectives = false,
   String? path,
 }) {
+  formatter ??= Formatter.dartFormat;
   FormatMode? mode;
 
   final useRestForInputs =
@@ -469,7 +471,7 @@ FormatExecution buildExecution(
       allowRest: useRestForInputs,
       commandName: context.commandName,
       usageFooter:
-          'Arguments can be passed to the "dartfmt" or "dart format" process via the '
+          'Arguments can be passed to the "dart format" process via the '
           '--formatter-args option.',
     );
     mode = validateAndParseMode(argResults, context.usageException);
@@ -482,10 +484,10 @@ FormatExecution buildExecution(
       red.wrap('Cannot run "dart_style:format".\n')! +
           yellow.wrap(
             'You must either have a dependency on "dart_style" in '
-            'pubspec.yaml or configure the format tool to use "dartfmt" '
+            'pubspec.yaml or configure the format tool to use "dartFormat" '
             'instead.\n'
             'Either add "dart_style" to your pubspec.yaml or configure the '
-            'format tool to use "dartfmt" instead.',
+            'format tool to use "dartFormat" instead.',
           )!,
     );
     return FormatExecution.exitEarly(ExitCode.config.code);
@@ -523,7 +525,8 @@ FormatExecution buildExecution(
     dartStyleSupportsWriteArg,
     configuredLanguageVersion: languageVersion,
   );
-  if (formatter == Formatter.dartFormat) {
+  // ignore: deprecated_member_use_from_same_package
+  if (formatter == Formatter.dartFormat || formatter == Formatter.dartfmt) {
     args = buildArgsForDartFormat(
       dartFormatter.args,
       mode,
@@ -565,7 +568,6 @@ FormatExecution buildExecution(
 /// Returns a representation of the process that will be run by [FormatTool]
 /// based on the given [formatter].
 ///
-/// - [Formatter.dartfmt] -> `dartfmt`
 /// - [Formatter.dartFormat] -> `dart format`
 /// - [Formatter.dartStyle] -> `dart run dart_style:format`
 ProcessDeclaration buildFormatProcess([Formatter? formatter]) {
@@ -573,10 +575,10 @@ ProcessDeclaration buildFormatProcess([Formatter? formatter]) {
     case Formatter.dartStyle:
       return ProcessDeclaration(exe.dart, ['run', 'dart_style:format']);
     case Formatter.dartFormat:
-      return ProcessDeclaration(exe.dart, ['format']);
+    // ignore: deprecated_member_use_from_same_package
     case Formatter.dartfmt:
     default:
-      return ProcessDeclaration(exe.dartfmt, []);
+      return ProcessDeclaration(exe.dart, ['format']);
   }
 }
 
@@ -613,7 +615,8 @@ String? _formatterLanguageVersion(
   if (formatter == Formatter.dartStyle && !dartStyleSupportsWriteArg) {
     return configuredLanguageVersion ?? 'latest';
   }
-  if (formatter == Formatter.dartFormat && dartSemverVersion.major >= 3) {
+  // ignore: deprecated_member_use_from_same_package
+  if (formatter == Formatter.dartFormat || formatter == Formatter.dartfmt) {
     return configuredLanguageVersion ?? 'latest';
   }
   return null;

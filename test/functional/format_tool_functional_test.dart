@@ -2,7 +2,6 @@
 @Timeout(Duration(seconds: 20))
 import 'dart:io';
 
-import 'package:dart_dev/src/utils/dart_semver_version.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
@@ -53,8 +52,7 @@ void main() {
         final expectedCommandPattern = RegExp(
           [
             RegExp.escape('dart format'),
-            if (dartSemverVersion.major >= 3)
-              RegExp.escape('--language-version=3.0'),
+            RegExp.escape('--language-version=3.0'),
             r'lib[\\/]main\.dart',
           ].join(r'\s+'),
         );

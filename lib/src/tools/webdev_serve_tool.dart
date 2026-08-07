@@ -10,7 +10,6 @@ import 'package:pub_semver/pub_semver.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
-import '../utils/dart_semver_version.dart';
 import '../utils/executables.dart' as exe;
 import '../utils/global_package_is_active_and_compatible.dart';
 import '../utils/logging.dart';
@@ -232,7 +231,7 @@ WebdevServeExecution buildExecution(
     );
   }
 
-  final webdevVersion = dartSemverVersion.major == 2 ? '^2.0.0' : '^3.0.0';
+  const webdevVersion = '^3.0.0';
 
   if (!globalPackageIsActiveAndCompatible(
     'webdev',

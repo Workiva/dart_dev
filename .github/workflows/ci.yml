@@ -15,28 +15,32 @@ permissions:
 jobs:
   build:
     uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.14
+    with:
+      sdk: 3.12.2
 
   dart:
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu, windows ]
-        sdk: [ 2.19.6, stable ]
+        sdk: [ stable ]
     name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
         run: dart pub get
       - name: Validate dependencies
-        run: dart run dependency_validator
+        run: |
+          dart pub global activate dependency_validator
+          dart pub global run dependency_validator
       - name: Analysis
         run: dart run dart_dev analyze
       - name: Formatting
-        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+        if: ${{ matrix.os == 'ubuntu' }}
         run: dart run dart_dev format --check
       - name: Tests
-        run: dart run dart_dev test ${{ matrix.sdk != '2.19.6' && '--test-args="--exclude-tags dart2"' || '' }}
+        run: dart run dart_dev test
