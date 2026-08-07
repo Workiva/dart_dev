@@ -224,9 +224,7 @@ void main() {
               severeLogOf(
                 allOf(
                   contains('webdev serve could not run'),
-                  contains(
-                    'dart pub global activate webdev ^3.0.0',
-                  ),
+                  contains('dart pub global activate webdev ^3.0.0'),
                 ),
               ),
             ),

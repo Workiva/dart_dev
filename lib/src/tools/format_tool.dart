@@ -324,7 +324,9 @@ enum FormatMode {
 
 /// Available dart formatters.
 enum Formatter {
-  @Deprecated('Use Formatter.dartFormat instead. dartfmt was removed in Dart 2.15.')
+  @Deprecated(
+    'Use Formatter.dartFormat instead. dartfmt was removed in Dart 2.15.',
+  )
   dartfmt,
   // The formatter provided via the `dart_style` package.
   dartStyle,

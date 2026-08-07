@@ -479,9 +479,7 @@ void main() {
         expect(
           Logger.root.onRecord,
           emitsThrough(
-            infoLogOf(
-              contains('dart format --language-version=latest .'),
-            ),
+            infoLogOf(contains('dart format --language-version=latest .')),
           ),
         );
 
