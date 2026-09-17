@@ -77,9 +77,8 @@ Future<void> handleFastFormat(List<String> args) async {
   final configFile = File(_paths.config);
   if (configFile.existsSync()) {
     final toolBuilder = FormatToolBuilder();
-    parseString(
-      content: configFile.readAsStringSync(),
-    ).unit.accept(toolBuilder);
+    parseString(content: configFile.readAsStringSync()).unit
+        .accept(toolBuilder);
     formatTool = toolBuilder
         .formatDevTool; // could be null if no custom `format` entry found
 
@@ -274,10 +273,7 @@ void main(List<String> args) async {
 ''';
 }
 
-Future<void> runWithConfig(
-  List<String> args,
-  ConfigGetter configGetter,
-) async {
+Future<void> runWithConfig(List<String> args, ConfigGetter configGetter) async {
   attachLoggerToStdio(args);
 
   try {

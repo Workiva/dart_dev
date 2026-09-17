@@ -1,5 +1,6 @@
 @TestOn('vm')
 library;
+
 import 'package:args/args.dart';
 import 'package:dart_dev/src/utils/arg_results_utils.dart';
 import 'package:test/test.dart';

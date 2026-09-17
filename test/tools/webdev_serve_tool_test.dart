@@ -1,5 +1,6 @@
 @TestOn('vm')
 library;
+
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
@@ -215,34 +216,31 @@ void main() {
       );
     });
 
-    test(
-      'returns config exit code and logs if webdev is not globally activate',
-      () {
-        overrideAnsiOutput(false, () {
-          expect(
-            Logger.root.onRecord,
-            emitsThrough(
-              severeLogOf(
-                allOf(
-                  contains('webdev serve could not run'),
-                  contains(
-                    "dart pub global activate webdev '$webdevVersionConstraint'",
-                  ),
+    test('returns config exit code and logs if webdev is not globally activate', () {
+      overrideAnsiOutput(false, () {
+        expect(
+          Logger.root.onRecord,
+          emitsThrough(
+            severeLogOf(
+              allOf(
+                contains('webdev serve could not run'),
+                contains(
+                  "dart pub global activate webdev '$webdevVersionConstraint'",
                 ),
               ),
             ),
-          );
+          ),
+        );
 
-          expect(
-            buildExecution(
-              DevToolExecutionContext(),
-              environment: pubCacheWithoutWebdev.envOverride,
-            ).exitCode,
-            ExitCode.config.code,
-          );
-        });
-      },
-    );
+        expect(
+          buildExecution(
+            DevToolExecutionContext(),
+            environment: pubCacheWithoutWebdev.envOverride,
+          ).exitCode,
+          ExitCode.config.code,
+        );
+      });
+    });
 
     group('returns a WebdevServeExecution', () {
       test('(default)', () {
