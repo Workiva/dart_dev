@@ -1,5 +1,6 @@
 @TestOn('vm')
 @Timeout(Duration(seconds: 20))
+library;
 import 'package:test/test.dart';
 
 import '../functional.dart';

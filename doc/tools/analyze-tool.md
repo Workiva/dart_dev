@@ -1,6 +1,6 @@
 # `AnalyzeTool`
 
-Statically analyzes the current project by running the `dartanalyzer`.
+Statically analyzes the current project by running `dart analyze`.
 
 ## Usage
 
@@ -18,13 +18,13 @@ final config = {
 
 ## Default behavior
 
-By default this tool will run `dartanalyzer .` which will analyze all dart files
+By default this tool will run `dart analyze .` which will analyze all dart files
 in the current project.
 
 ## Configuration
 
 `AnalyzeTool` supports one configuration option which is the list of args to
-pass to the `dartanalyzer` process:
+pass to the `dart analyze` process:
 
 ```dart
 // tool/dart_dev/config.dart
@@ -43,14 +43,7 @@ final config = {
 ## Excluding files from analysis
 
 The `analysis_options.yaml` configuration file
-[supports excluding files][analysis-exclude]. However, there is an
-[open issue with the `dartanalyzer` CLI][analyzer-exclude-issue] because it does
-not respect this list.
-
-If your project has files that need to be excluded from analysis (e.g. generated
-files), use the [`TuneupCheckTool`][tuneup-check-tool]. It uses the
-`tuneup` package to run analysis instead of `dartanalyzer` and it properly
-respects the exclude rules defined in `analysis_options.yaml`.
+[supports excluding files][analysis-exclude]. `dart analyze` respects this list.
 
 ## Command-line options
 
@@ -58,7 +51,6 @@ respects the exclude rules defined in `analysis_options.yaml`.
 $ ddev help analyze
 ```
 
-[analyzer-exclude-issue]: https://github.com/dart-lang/sdk/issues/25551
 [analysis-exclude]: https://dart.dev/guides/language/analysis-options#excluding-code-from-analysis
 [core-config]: /lib/src/core_config.dart
 
@@ -71,14 +63,12 @@ $ ddev help analyze
   - [`AnalyzeTool`][analyze-tool]
   - [`FormatTool`][format-tool]
   - [`TestTool`][test-tool]
-  - [`TuneupCheckTool`][tuneup-check-tool]
   - [`WebdevServeTool`][webdev-serve-tool]
 - [Creating, Extending, and Composing Tools][tool-composition]
 - [v3 upgrade guide][v3-upgrade-guide]
 
 <!-- Table of Contents Links -->
 [analyze-tool]: /doc/tools/analyze-tool.md
-[tuneup-check-tool]: /doc/tools/tuneup-check-tool.md
 [dart-function-tool]: /doc/tools/dart-function-tool.md
 [format-tool]: /doc/tools/format-tool.md
 [process-tool]: /doc/tools/process-tool.md

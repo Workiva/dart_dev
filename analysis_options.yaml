@@ -6,13 +6,9 @@ analyzer:
   language:
     strict-inference: true
     strict-raw-types: true
-  strong-mode:
-    implicit-casts: true
-    implicit-dynamic: true
 
 linter:
   rules:
-    - avoid_types_on_closure_parameters
-    - prefer_void_to_null
-    - void_checks
-    - overridden_fields: false
+    avoid_types_on_closure_parameters: true
+    prefer_void_to_null: true
+    void_checks: true

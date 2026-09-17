@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/tools/over_react_format_tool.dart';
@@ -45,7 +46,7 @@ void main() {
 
       group('when the tool is a CascadeExpression', () {
         group('detects formatter correctly for:', () {
-          test('darfmt', () {
+          test('dartfmt maps to dartFormat', () {
             final visitor = FormatToolBuilder();
 
             parseString(content: formatToolCascadeSrc()).unit.accept(visitor);
@@ -54,7 +55,7 @@ void main() {
             expect(visitor.formatDevTool, isA<FormatTool>());
             expect(
               (visitor.formatDevTool as FormatTool).formatter,
-              Formatter.dartfmt,
+              Formatter.dartFormat,
             );
           });
 
@@ -180,7 +181,7 @@ import 'package:glob/glob.dart';
 final config = {
   ...coreConfig,
   'format': UnknownTool()
-    ..formatter = Formatter.dartfmt
+    ..formatter = Formatter.dartFormat
     ..formatterArgs = ['-l', '120'],
 };
 ''';

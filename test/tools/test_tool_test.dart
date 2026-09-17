@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
@@ -272,7 +273,7 @@ void main() {
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 dev_dependencies:
   build_test: any
   test: any
@@ -297,7 +298,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 dev_dependencies:
   build_runner: any
   test: any
@@ -333,7 +334,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 ''').create();
         final context = DevToolExecutionContext();
         expect(
@@ -362,7 +363,7 @@ environment:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 dev_dependencies:
   build_test: any
   test: any
@@ -397,7 +398,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 dev_dependencies:
   build_runner: any
   test: any
@@ -420,7 +421,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 dev_dependencies:
   build_test: any
   test: any
@@ -502,7 +503,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 dev_dependencies:
   build_runner: any
   test: any
@@ -584,7 +585,7 @@ dev_dependencies:
 name: _test
 publish_to: none
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 dev_dependencies:
   build_runner: any
   build_test: any

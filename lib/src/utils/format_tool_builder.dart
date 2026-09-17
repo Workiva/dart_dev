@@ -204,8 +204,6 @@ Formatter? detectFormatterForFormatTool(SimpleIdentifier formatterIdentifier) {
 
   switch (formatterIdentifier.name) {
     case 'dartfmt':
-      formatter = Formatter.dartfmt;
-      break;
     case 'dartFormat':
       formatter = Formatter.dartFormat;
       break;

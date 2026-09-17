@@ -9,7 +9,8 @@ import '../utils/dart_dev_paths.dart' show DartDevPaths;
 
 class CleanTool extends DevTool {
   @override
-  final String? description = 'Cleans up temporary files used by dart_dev.';
+  String? get description =>
+      super.description ?? 'Cleans up temporary files used by dart_dev.';
 
   @override
   FutureOr<int?> run([DevToolExecutionContext? context]) {
