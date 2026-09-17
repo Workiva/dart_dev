@@ -15,28 +15,56 @@ permissions:
 jobs:
   build:
     uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.14
+    with:
+      sdk: 3.13.4
 
   dart:
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu, windows ]
-        sdk: [ 2.19.6, stable ]
+        # 3.7.0 is the oldest Dart 3 that supports `dart format --language-version`,
+        # which dart_dev already passes on Dart 3.
+        sdk: [ 3.7.0, stable ]
     name: Dart ${{ matrix.sdk }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
         run: dart pub get
+      # Dart stable is currently 3.13.4, which resolves analyzer 14.x.
+      # analyzer 11+ requires Dart 3.9+, so this check is stable-only.
+      - name: Verify analyzer 14.x on Dart stable
+        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+        run: |
+          version=$(awk '
+            $0 == "  analyzer:" { found=1 }
+            found && $1 == "version:" {
+              gsub(/"/, "", $2)
+              print $2
+              exit
+            }
+          ' pubspec.lock)
+          echo "Dart SDK: $(dart --version 2>&1)"
+          echo "Resolved analyzer $version"
+          case "$version" in
+            14.*) ;;
+            *)
+              echo "Expected analyzer 14.x on Dart stable, got: ${version:-<none>}"
+              exit 1
+              ;;
+          esac
       - name: Validate dependencies
         run: dart run dependency_validator
       - name: Analysis
         run: dart run dart_dev analyze
-      - name: Formatting
-        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
-        run: dart run dart_dev format --check
+      # Format check disabled for the Dart 3 upgrade. Dart 3.7+ uses a new
+      # formatter style; uncomment after a dedicated format PR.
+      # - name: Formatting
+      #   if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+      #   run: dart run dart_dev format --check
       - name: Tests
-        run: dart run dart_dev test ${{ matrix.sdk != '2.19.6' && '--test-args="--exclude-tags dart2"' || '' }}
+        run: dart run dart_dev test

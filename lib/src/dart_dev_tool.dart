@@ -66,7 +66,7 @@ abstract class DevTool {
   /// implementation/extension of [DevToolCommand].
   ///     class CustomTool extends DevTool {
   ///       @override
-  ///       Command<int> toCommand(String name) => CustomCommand(name, this);
+  ///       `Command<int>` toCommand(String name) => CustomCommand(name, this);
   ///     }
   ///
   ///     class CustomCommand extends DevToolCommand {
@@ -132,7 +132,7 @@ class DevToolExecutionContext {
   /// print out usage information.
   void usageException(String message) {
     if (_usageException != null) {
-      _usageException!(message);
+      _usageException(message);
     }
     throw UsageException(message, '');
   }

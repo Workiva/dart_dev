@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Require Dart SDK `>=3.7.0 <4.0.0`. Always use `dart analyze` and `dart format` (the `dartanalyzer`
+  and `dartfmt` SDK commands no longer exist). `Formatter.dartfmt` now maps to
+  `dart format`. `AnalyzeTool.useDartAnalyze` is ignored.
+- Allow analyzer 14 (`>=5.0.0 <15.0.0`).
+- Serve accepts globally activated `webdev` `>=3.0.0 <5.0.0` (3.x and 4.x).
+- Remove `TuneupCheckTool`.
+
 ## 4.2.4
 
 - Update dependencies to allow analyzer 7

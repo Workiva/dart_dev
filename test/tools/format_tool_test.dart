@@ -1,11 +1,11 @@
 @TestOn('vm')
+library;
 import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';
 import 'package:dart_dev/src/tools/format_tool.dart';
-import 'package:dart_dev/src/utils/dart_semver_version.dart';
 import 'package:dart_dev/src/utils/executables.dart' as exe;
 import 'package:glob/glob.dart';
 import 'package:io/io.dart';
@@ -280,8 +280,11 @@ void main() {
       );
       final execution = buildExecution(context);
       expect(execution.exitCode, isNull);
-      expect(execution.formatProcess!.executable, exe.dartfmt);
-      expect(execution.formatProcess!.args, orderedEquals(['a/random/path']));
+      expect(execution.formatProcess!.executable, exe.dart);
+      expect(
+        execution.formatProcess!.args,
+        orderedEquals(['format', '--language-version=latest', 'a/random/path']),
+      );
       expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
       expect(execution.directiveOrganization, isNull);
     });
@@ -339,7 +342,7 @@ void main() {
             allOf(
               contains('Cannot run "dart_style:format"'),
               contains('add "dart_style" to your pubspec.yaml'),
-              contains('use "dartfmt" instead'),
+              contains('use "dart format" instead'),
             ),
           ),
         ),
@@ -381,8 +384,11 @@ void main() {
         final context = DevToolExecutionContext();
         final execution = buildExecution(context);
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess!.executable, exe.dartfmt);
-        expect(execution.formatProcess!.args, orderedEquals(['.']));
+        expect(execution.formatProcess!.executable, exe.dart);
+        expect(
+          execution.formatProcess!.args,
+          orderedEquals(['format', '--language-version=latest', '.']),
+        );
         expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
         expect(execution.directiveOrganization, isNull);
       });
@@ -394,18 +400,34 @@ void main() {
           defaultMode: FormatMode.dryRun,
         );
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess!.executable, exe.dartfmt);
-        expect(execution.formatProcess!.args, orderedEquals(['-n', '.']));
+        expect(execution.formatProcess!.executable, exe.dart);
+        expect(
+          execution.formatProcess!.args,
+          orderedEquals([
+            'format',
+            '-o',
+            'none',
+            '--language-version=latest',
+            '.',
+          ]),
+        );
         expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
         expect(execution.directiveOrganization, isNull);
       });
 
-      test('with dartfmt', () {
+      test('with dartfmt (maps to dart format)', () {
         final context = DevToolExecutionContext();
-        final execution = buildExecution(context, formatter: Formatter.dartfmt);
+        final execution = buildExecution(
+          context,
+          // ignore: deprecated_member_use
+          formatter: Formatter.dartfmt,
+        );
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess!.executable, exe.dartfmt);
-        expect(execution.formatProcess!.args, orderedEquals(['.']));
+        expect(execution.formatProcess!.executable, exe.dart);
+        expect(
+          execution.formatProcess!.args,
+          orderedEquals(['format', '--language-version=latest', '.']),
+        );
         expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
         expect(execution.directiveOrganization, isNull);
       });
@@ -422,7 +444,7 @@ void main() {
           execution.formatProcess!.args,
           orderedEquals([
             'format',
-            if (dartSemverVersion.major >= 3) '--language-version=latest',
+            '--language-version=latest',
             '.',
           ]),
         );
@@ -446,7 +468,7 @@ void main() {
         expect(execution.directiveOrganization, isNull);
       });
 
-      test('dartfmt with args', () {
+      test('dartfmt with args (maps to dart format)', () {
         final argParser = FormatTool().toCommand('t').argParser;
         final argResults = argParser.parse([
           '-w',
@@ -457,14 +479,16 @@ void main() {
         final execution = buildExecution(
           context,
           configuredFormatterArgs: ['--fix', '--follow-links'],
+          // ignore: deprecated_member_use
           formatter: Formatter.dartfmt,
         );
         expect(execution.exitCode, isNull);
-        expect(execution.formatProcess!.executable, exe.dartfmt);
+        expect(execution.formatProcess!.executable, exe.dart);
         expect(
           execution.formatProcess!.args,
           orderedEquals([
-            '-w',
+            'format',
+            '--language-version=latest',
             '--fix',
             '--follow-links',
             '--indent',
@@ -562,7 +586,7 @@ void main() {
           execution.formatProcess!.args,
           orderedEquals([
             'format',
-            if (dartSemverVersion.major >= 3) '--language-version=latest',
+            '--language-version=latest',
             '--fix',
             '--follow-links',
             '--indent',
@@ -586,7 +610,7 @@ void main() {
           execution.formatProcess!.args,
           orderedEquals([
             'format',
-            if (dartSemverVersion.major >= 3) '--language-version=3.0',
+            '--language-version=3.0',
             '.',
           ]),
         );
@@ -596,7 +620,9 @@ void main() {
       test('and logs the test subprocess by default', () {
         expect(
           Logger.root.onRecord,
-          emitsThrough(infoLogOf(contains('${exe.dartfmt} .'))),
+          emitsThrough(
+            infoLogOf(contains('dart format --language-version=latest .')),
+          ),
         );
 
         buildExecution(DevToolExecutionContext());
@@ -611,7 +637,7 @@ void main() {
                 [
                   exe.dart,
                   'format',
-                  if (dartSemverVersion.major >= 3) '--language-version=latest',
+                  '--language-version=latest',
                   '.',
                 ].join(' '),
               ),
@@ -652,10 +678,11 @@ void main() {
   });
 
   group('buildFormatProcess', () {
-    test('dartfmt', () {
+    test('dartfmt maps to dart format', () {
+      // ignore: deprecated_member_use
       final process = buildFormatProcess(Formatter.dartfmt);
-      expect(process.executable, exe.dartfmt);
-      expect(process.args, isEmpty);
+      expect(process.executable, exe.dart);
+      expect(process.args, orderedEquals(['format']));
     });
 
     test('dart format', () {
@@ -671,9 +698,9 @@ void main() {
     });
 
     test('default', () {
-      final process = buildFormatProcess(Formatter.dartfmt);
-      expect(process.executable, exe.dartfmt);
-      expect(process.args, isEmpty);
+      final process = buildFormatProcess();
+      expect(process.executable, exe.dart);
+      expect(process.args, orderedEquals(['format']));
     });
   });
 
@@ -681,26 +708,26 @@ void main() {
     test('<=5 inputs and verbose=false', () async {
       expect(
         Logger.root.onRecord,
-        emitsThrough(infoLogOf(contains('dartfmt -x -y a b'))),
+        emitsThrough(infoLogOf(contains('dart -x -y a b'))),
       );
-      logCommand('dartfmt', ['a', 'b'], ['-x', '-y']);
+      logCommand('dart', ['a', 'b'], ['-x', '-y']);
     });
 
     test('>5 inputs and verbose=true', () async {
       expect(
         Logger.root.onRecord,
-        emitsThrough(infoLogOf(contains('dartfmt -x -y <6 paths>'))),
+        emitsThrough(infoLogOf(contains('dart -x -y <6 paths>'))),
       );
-      logCommand('dartfmt', ['a', 'b', 'c', 'd', 'e', 'f'], ['-x', '-y']);
+      logCommand('dart', ['a', 'b', 'c', 'd', 'e', 'f'], ['-x', '-y']);
     });
 
     test('>5 inputs and verbose=false', () async {
       expect(
         Logger.root.onRecord,
-        emitsThrough(infoLogOf(contains('dartfmt -x -y a b c d e f'))),
+        emitsThrough(infoLogOf(contains('dart -x -y a b c d e f'))),
       );
       logCommand(
-        'dartfmt',
+        'dart',
         ['a', 'b', 'c', 'd', 'e', 'f'],
         ['-x', '-y'],
         verbose: true,

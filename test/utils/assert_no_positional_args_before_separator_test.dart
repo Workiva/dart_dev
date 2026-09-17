@@ -1,4 +1,5 @@
 @TestOn('vm')
+library;
 import 'package:args/args.dart';
 import 'package:dart_dev/src/utils/assert_no_positional_args_before_separator.dart';
 import 'package:test/test.dart';

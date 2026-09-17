@@ -106,9 +106,9 @@ variance across projects becomes a configuration detail that need not be
 memorized or referenced in order to run said task.
 
 Consider formatting as an example. The default approach to formatting files is
-to run `dartfmt -w .`. But, some projects may want to exclude certain files that
+to run `dart format .`. But, some projects may want to exclude certain files that
 would otherwise be formatted by this command. Or, some projects may want to use
-`pub run dart_style:format` instead of `dart format`. Currently, there is no
+`dart run dart_style:format` instead of `dart format`. Currently, there is no
 project-level configuration supported by the formatter, so these sorts of things
 just have to be documented in a `README.md` or `CONTRIBUTING.md`.
 
@@ -234,7 +234,7 @@ final config = {
 dart_dev can be used to facilitate formatting on save inside of JetBrains IDEs. For setup instructions, see below.
 
 ### A Note on VS Code
-A VS code extension exists to run either `dartfmt` or `over_react_format` on save. For information on it, see [its project](vs-code-formatter). However, that VS Code extension does not run `dart_dev`, but rather has its own logic to run a formatting command.
+A VS code extension exists to run either `dart format` or `over_react_format` on save. For information on it, see [its project](vs-code-formatter). However, that VS Code extension does not run `dart_dev`, but rather has its own logic to run a formatting command.
 
 ### JetBrains IDEs (WebStorm, IntelliJ, etc.)
 Webstorm exposes a File Watcher utility that can be used to run commands when a file saves. For this approach, all you need to do is set up the file watcher. Shoutout to @patkujawa-wf for creating the original inspiration of this solution!

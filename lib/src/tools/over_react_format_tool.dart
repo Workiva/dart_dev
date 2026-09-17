@@ -19,7 +19,8 @@ class OverReactFormatTool extends DevTool {
   bool? organizeDirectives;
 
   @override
-  String? description =
+  String? get description =>
+      super.description ??
       'Format dart files in this package with over_react_format.';
 
   @override

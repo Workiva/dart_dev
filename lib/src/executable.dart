@@ -30,7 +30,7 @@ import 'utils/get_dart_version_comment.dart';
 import 'utils/logging.dart';
 import 'utils/parse_flag_from_args.dart';
 
-typedef _ConfigGetter = Map<String, DevTool> Function();
+typedef ConfigGetter = Map<String, DevTool> Function();
 
 final _paths = DartDevPaths();
 
@@ -108,11 +108,12 @@ Future<void> handleFastFormat(List<String> args) async {
   }
 }
 
-void _deleteRunExecutableAndDigest() =>
-    [_paths.runExecutable, _paths.runExecutableDigest].forEach((p) {
-      final f = File(p);
-      if (f.existsSync()) f.deleteSync();
-    });
+void _deleteRunExecutableAndDigest() {
+  for (final p in [_paths.runExecutable, _paths.runExecutableDigest]) {
+    final f = File(p);
+    if (f.existsSync()) f.deleteSync();
+  }
+}
 
 /// Return true iff all the provided package names can be traced to 'hosted'
 /// entries in pubspec.lock.
@@ -274,9 +275,8 @@ void main(List<String> args) async {
 }
 
 Future<void> runWithConfig(
-  // ignore: library_private_types_in_public_api
   List<String> args,
-  _ConfigGetter configGetter,
+  ConfigGetter configGetter,
 ) async {
   attachLoggerToStdio(args);
 

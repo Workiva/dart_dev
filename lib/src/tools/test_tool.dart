@@ -118,7 +118,8 @@ class TestTool extends DevTool {
   List<String>? buildArgs;
 
   @override
-  String? description = 'Run dart tests in this package.';
+  String? get description =>
+      super.description ?? 'Run dart tests in this package.';
 
   /// The args to pass to the `dart test` process (either directly or
   /// through the `dart run build_runner test` process if applicable).
@@ -149,7 +150,7 @@ class TestTool extends DevTool {
 }
 
 class TestToolCommand extends DevToolCommand {
-  TestToolCommand(String name, DevTool devTool) : super(name, devTool);
+  TestToolCommand(super.name, super.devTool);
 
   @override
   String get usage =>

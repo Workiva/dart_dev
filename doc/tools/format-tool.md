@@ -1,6 +1,6 @@
 # `FormatTool`
 
-Formats dart files in the current project by running `dartfmt`.
+Formats dart files in the current project by running `dart format`.
 
 ## Usage
 
@@ -18,7 +18,7 @@ final config = {
 
 ## Default behavior
 
-By default this tool will run `dartfmt -w .` which will format all dart files in
+By default this tool will run `dart format .` which will format all dart files in
 the current project.
 
 ## Configuration
@@ -44,11 +44,11 @@ final config = {
 };
 ```
 
-### Using the `dart_style` package instead of `dartfmt`
+### Using the `dart_style` package instead of `dart format`
 
 Some projects like to depend on a specific version of the `dart_style` package
-and use its `format` executable rather than the `dartfmt` provided by the Dart
-SDK.
+and use its `format` executable rather than the `dart format` command provided
+by the Dart SDK.
 
 ```dart
 // tool/dart_dev/config.dart
@@ -75,7 +75,7 @@ final config = {
 ```bash
 $ ddev format
 [INFO] Running subprocess...
-dartfmt -w --fix .
+dart format --fix .
 ----------------------------
 ```
 
@@ -142,14 +142,12 @@ $ ddev help format
   - [`AnalyzeTool`][analyze-tool]
   - [`FormatTool`][format-tool]
   - [`TestTool`][test-tool]
-  - [`TuneupCheckTool`][tuneup-check-tool]
   - [`WebdevServeTool`][webdev-serve-tool]
 - [Creating, Extending, and Composing Tools][tool-composition]
 - [v3 upgrade guide][v3-upgrade-guide]
 
 <!-- Table of Contents Links -->
 [analyze-tool]: /doc/tools/analyze-tool.md
-[tuneup-check-tool]: /doc/tools/tuneup-check-tool.md
 [dart-function-tool]: /doc/tools/dart-function-tool.md
 [format-tool]: /doc/tools/format-tool.md
 [process-tool]: /doc/tools/process-tool.md

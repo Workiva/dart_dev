@@ -10,7 +10,6 @@ import 'package:pub_semver/pub_semver.dart';
 import '../dart_dev_tool.dart';
 import '../utils/arg_results_utils.dart';
 import '../utils/assert_no_positional_args_nor_args_after_separator.dart';
-import '../utils/dart_semver_version.dart';
 import '../utils/executables.dart' as exe;
 import '../utils/global_package_is_active_and_compatible.dart';
 import '../utils/logging.dart';
@@ -18,6 +17,11 @@ import '../utils/process_declaration.dart';
 import '../utils/run_process_and_ensure_exit.dart';
 
 final _log = Logger('WebdevServe');
+
+/// Globally activated `webdev` versions compatible with Dart 3.
+///
+/// webdev 3.x requires Dart 3.0+; webdev 4.x requires Dart 3.10+.
+const webdevVersionConstraint = '>=3.0.0 <5.0.0';
 
 /// A dart_dev tool that runs a local web development server for the current
 /// project using the `webdev` package.
@@ -86,9 +90,10 @@ class WebdevServeTool extends DevTool {
     );
 
   @override
-  String? description =
+  String? get description =>
+      super.description ??
       'Run a local web development server and a file system '
-      'watcher that rebuilds on changes.';
+          'watcher that rebuilds on changes.';
 
   @override
   FutureOr<int?> run([DevToolExecutionContext? context]) async {
@@ -134,7 +139,7 @@ class WebdevServeExecution {
 ///
 /// Since the `webdev` tool wraps a `build_runner` process, the returned list of
 /// args will be two portions with an arg separator between them, e.g.:
-///     dart pub global run webdev serve <webdev args> -- <build args>
+///     dart pub global run webdev serve `<webdev args>` -- `<build args>`
 ///
 /// When building the webdev args portion of the list, the
 /// [configuredWebdevArgs] will be included first (if non-null) followed by the
@@ -232,11 +237,9 @@ WebdevServeExecution buildExecution(
     );
   }
 
-  final webdevVersion = dartSemverVersion.major == 2 ? '^2.0.0' : '^3.0.0';
-
   if (!globalPackageIsActiveAndCompatible(
     'webdev',
-    VersionConstraint.parse(webdevVersion),
+    VersionConstraint.parse(webdevVersionConstraint),
     environment: environment,
   )) {
     _log.severe(
@@ -245,7 +248,7 @@ WebdevServeExecution buildExecution(
           )! +
           yellow.wrap(
             'You must have `webdev` globally activated:\n'
-            '  dart pub global activate webdev ${webdevVersion}',
+            "  dart pub global activate webdev '$webdevVersionConstraint'",
           )!,
     );
     return WebdevServeExecution.exitEarly(ExitCode.config.code);

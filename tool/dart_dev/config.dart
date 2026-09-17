@@ -3,7 +3,7 @@ import 'package:glob/glob.dart';
 
 final config = {
   ...coreConfig,
-  'analyze': AnalyzeTool()..useDartAnalyze = true,
+  'analyze': AnalyzeTool(),
   'format': FormatTool()
     ..languageVersion = 'latest'
     ..organizeDirectives = true

@@ -1,6 +1,6 @@
 // These matchers are borrowed from the build package:
 // https://github.com/dart-lang/build/blob/a337a908a25e4d1bd06e898f40c3c013a7ec04e3/build_test/lib/src/record_logs.dart
-library dart_dev.test.log_matchers;
+library;
 
 import 'package:logging/logging.dart';
 import 'package:matcher/matcher.dart';
@@ -56,7 +56,7 @@ class _LogRecordMatcher extends Matcher {
     covariant LogRecord item,
     Description description,
     Map<dynamic, dynamic> _,
-    bool __,
+    bool _,
   ) {
     if (!_level.matches(item.level, {})) {
       _level.describeMismatch(item.level, description, {}, false);

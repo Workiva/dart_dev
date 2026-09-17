@@ -163,7 +163,7 @@ class CompoundArgParser implements ArgParser {
           help: option.help,
           defaultsTo: option.defaultsTo,
           negatable: option.negatable!,
-          callback: (bool value) => option.callback?.call(value),
+          callback: (value) => option.callback?.call(value),
           hide: option.hide,
         );
       } else if (option.isMultiple) {
@@ -175,7 +175,7 @@ class CompoundArgParser implements ArgParser {
           allowed: option.allowed,
           allowedHelp: option.allowedHelp,
           defaultsTo: option.defaultsTo,
-          callback: (List<String> values) => option.callback?.call(values),
+          callback: (values) => option.callback?.call(values),
           splitCommas: option.splitCommas,
           hide: option.hide,
         );
@@ -188,7 +188,7 @@ class CompoundArgParser implements ArgParser {
           allowed: option.allowed,
           allowedHelp: option.allowedHelp,
           defaultsTo: option.defaultsTo,
-          callback: (String? value) => option.callback?.call(value),
+          callback: (value) => option.callback?.call(value),
           hide: option.hide,
         );
       }

@@ -161,14 +161,12 @@ $ ddev help test
   - [`AnalyzeTool`][analyze-tool]
   - [`FormatTool`][format-tool]
   - [`TestTool`][test-tool]
-  - [`TuneupCheckTool`][tuneup-check-tool]
   - [`WebdevServeTool`][webdev-serve-tool]
 - [Creating, Extending, and Composing Tools][tool-composition]
 - [v3 upgrade guide][v3-upgrade-guide]
 
 <!-- Table of Contents Links -->
 [analyze-tool]: /doc/tools/analyze-tool.md
-[tuneup-check-tool]: /doc/tools/tuneup-check-tool.md
 [dart-function-tool]: /doc/tools/dart-function-tool.md
 [format-tool]: /doc/tools/format-tool.md
 [process-tool]: /doc/tools/process-tool.md

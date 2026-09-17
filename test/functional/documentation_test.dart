@@ -8,7 +8,7 @@
 ///     ```
 @TestOn('vm')
 @Timeout(Duration(seconds: 10))
-library test.functional.documentation_test;
+library;
 
 import 'dart:io';
 
@@ -66,7 +66,7 @@ String pubspecWithPackages(Set<String> packages) {
   final buffer = StringBuffer()
     ..writeln('name: doc_test')
     ..writeln('environment:')
-    ..writeln('  sdk: ">=2.12.0 <3.0.0"')
+    ..writeln('  sdk: ">=3.7.0 <4.0.0"')
     ..writeln('dependencies:');
   for (final package in packages) {
     var constraint = package == 'dart_dev'
