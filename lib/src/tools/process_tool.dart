@@ -124,7 +124,7 @@ class BackgroundProcessTool {
     unawaited(_process!.exitCode.then((_) => _processHasExited = true));
 
     if (_delayAfterStart != null) {
-      await Future<void>.delayed(_delayAfterStart!);
+      await Future<void>.delayed(_delayAfterStart);
     }
 
     if (_processHasExited) {

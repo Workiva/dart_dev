@@ -132,7 +132,7 @@ class DevToolExecutionContext {
   /// print out usage information.
   void usageException(String message) {
     if (_usageException != null) {
-      _usageException!(message);
+      _usageException(message);
     }
     throw UsageException(message, '');
   }

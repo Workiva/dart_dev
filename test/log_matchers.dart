@@ -56,7 +56,7 @@ class _LogRecordMatcher extends Matcher {
     covariant LogRecord item,
     Description description,
     Map<dynamic, dynamic> _,
-    bool __,
+    bool _,
   ) {
     if (!_level.matches(item.level, {})) {
       _level.describeMismatch(item.level, description, {}, false);

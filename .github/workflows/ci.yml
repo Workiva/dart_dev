@@ -33,6 +33,28 @@ jobs:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
         run: dart pub get
+      # Dart stable is currently 3.13.4, which resolves analyzer 14.x.
+      # analyzer 11+ requires Dart 3.9+, so this check is stable-only.
+      - name: Verify analyzer 14.x on Dart stable
+        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+        run: |
+          version=$(awk '
+            $0 == "  analyzer:" { found=1 }
+            found && $1 == "version:" {
+              gsub(/"/, "", $2)
+              print $2
+              exit
+            }
+          ' pubspec.lock)
+          echo "Dart SDK: $(dart --version 2>&1)"
+          echo "Resolved analyzer $version"
+          case "$version" in
+            14.*) ;;
+            *)
+              echo "Expected analyzer 14.x on Dart stable, got: ${version:-<none>}"
+              exit 1
+              ;;
+          esac
       - name: Validate dependencies
         run: dart run dependency_validator
       - name: Analysis
