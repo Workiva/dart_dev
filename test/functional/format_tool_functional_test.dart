@@ -1,6 +1,7 @@
 @TestOn('vm')
 @Timeout(Duration(seconds: 20))
 library;
+
 import 'dart:io';
 
 import 'package:test/test.dart';
@@ -38,29 +39,26 @@ void main() {
       );
     });
 
-    test(
-      'passes configured languageVersion to dart format when supported',
-      () async {
-        const projectPath =
-            'test/functional/fixtures/format/language_version/dart_format_configured/';
+    test('passes configured languageVersion to dart format when supported', () async {
+      const projectPath =
+          'test/functional/fixtures/format/language_version/dart_format_configured/';
 
-        final process = await runDevToolFunctionalTest('format', projectPath);
-        final stdoutFuture = process.stdoutStream().toList();
+      final process = await runDevToolFunctionalTest('format', projectPath);
+      final stdoutFuture = process.stdoutStream().toList();
 
-        await process.shouldExit(0);
+      await process.shouldExit(0);
 
-        final stdout = (await stdoutFuture).join('\n');
-        final expectedCommandPattern = RegExp(
-          [
-            RegExp.escape('dart format'),
-            RegExp.escape('--language-version=3.0'),
-            r'lib[\\/]main\.dart',
-          ].join(r'\s+'),
-        );
+      final stdout = (await stdoutFuture).join('\n');
+      final expectedCommandPattern = RegExp(
+        [
+          RegExp.escape('dart format'),
+          RegExp.escape('--language-version=3.0'),
+          r'lib[\\/]main\.dart',
+        ].join(r'\s+'),
+      );
 
-        expect(stdout, contains(expectedCommandPattern));
-      },
-    );
+      expect(stdout, contains(expectedCommandPattern));
+    });
   });
 }
 

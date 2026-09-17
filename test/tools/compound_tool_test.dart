@@ -1,5 +1,6 @@
 @TestOn('vm')
 library;
+
 import 'package:args/args.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/tools/compound_tool.dart';

@@ -1,5 +1,6 @@
 @TestOn('vm')
 library;
+
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_dev/src/dart_dev_tool.dart';

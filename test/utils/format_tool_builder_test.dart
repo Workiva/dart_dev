@@ -1,5 +1,6 @@
 @TestOn('vm')
 library;
+
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:dart_dev/dart_dev.dart';
 import 'package:dart_dev/src/tools/over_react_format_tool.dart';
@@ -62,9 +63,9 @@ void main() {
           test('dartFormat', () {
             final visitor = FormatToolBuilder();
 
-            parseString(
-              content: formatToolCascadeSrc(formatter: 'dartFormat'),
-            ).unit.accept(visitor);
+            parseString(content: formatToolCascadeSrc(formatter: 'dartFormat'))
+                .unit
+                .accept(visitor);
 
             expect(visitor.formatDevTool, isNotNull);
             expect(visitor.formatDevTool, isA<FormatTool>());
@@ -77,9 +78,9 @@ void main() {
           test('dartStyle', () {
             final visitor = FormatToolBuilder();
 
-            parseString(
-              content: formatToolCascadeSrc(formatter: 'dartStyle'),
-            ).unit.accept(visitor);
+            parseString(content: formatToolCascadeSrc(formatter: 'dartStyle'))
+                .unit
+                .accept(visitor);
 
             expect(visitor.formatDevTool, isNotNull);
             expect(visitor.formatDevTool, isA<FormatTool>());
@@ -106,9 +107,9 @@ void main() {
         test('detects languageVersion', () {
           final visitor = FormatToolBuilder();
 
-          parseString(
-            content: formatToolCascadeSrc(languageVersion: '3.0'),
-          ).unit.accept(visitor);
+          parseString(content: formatToolCascadeSrc(languageVersion: '3.0'))
+              .unit
+              .accept(visitor);
 
           expect(visitor.formatDevTool, isNotNull);
           expect(visitor.formatDevTool, isA<FormatTool>());
@@ -117,17 +118,14 @@ void main() {
       });
     });
 
-    test(
-      'sets the failedToDetectAKnownFormatter flag when an unknown FormatTool is being used',
-      () {
-        final visitor = FormatToolBuilder();
+    test('sets the failedToDetectAKnownFormatter flag when an unknown FormatTool is being used', () {
+      final visitor = FormatToolBuilder();
 
-        parseString(content: unknownFormatterTool).unit.accept(visitor);
+      parseString(content: unknownFormatterTool).unit.accept(visitor);
 
-        expect(visitor.formatDevTool, isNull);
-        expect(visitor.failedToDetectAKnownFormatter, isTrue);
-      },
-    );
+      expect(visitor.formatDevTool, isNull);
+      expect(visitor.failedToDetectAKnownFormatter, isTrue);
+    });
   });
 }
 

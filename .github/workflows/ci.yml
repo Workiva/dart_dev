@@ -61,10 +61,8 @@ jobs:
         run: dart run dependency_validator
       - name: Analysis
         run: dart run dart_dev analyze
-      # Format check disabled for the Dart 3 upgrade. Dart 3.7+ uses a new
-      # formatter style; uncomment after a dedicated format PR.
-      # - name: Formatting
-      #   if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
-      #   run: dart run dart_dev format --check
+      - name: Formatting
+        if: ${{ matrix.sdk == 'stable' && matrix.os == 'ubuntu' }}
+        run: dart run dart_dev format --check
       - name: Tests
         run: dart run dart_dev test

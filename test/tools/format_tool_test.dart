@@ -1,5 +1,6 @@
 @TestOn('vm')
 library;
+
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -442,11 +443,7 @@ void main() {
         expect(execution.formatProcess!.executable, exe.dart);
         expect(
           execution.formatProcess!.args,
-          orderedEquals([
-            'format',
-            '--language-version=latest',
-            '.',
-          ]),
+          orderedEquals(['format', '--language-version=latest', '.']),
         );
         expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
       });
@@ -545,31 +542,28 @@ void main() {
         },
       );
 
-      test(
-        'dart_style:format uses configured language version for dart_style >=3.0.0',
-        () {
-          final context = DevToolExecutionContext();
-          final execution = buildExecution(
-            context,
-            formatter: Formatter.dartStyle,
-            languageVersion: '3.0',
-            defaultMode: FormatMode.overwrite,
-            path: 'test/tools/fixtures/format/has_dart_style_v3',
-          );
-          expect(execution.exitCode, isNull);
-          expect(execution.formatProcess!.executable, exe.dart);
-          expect(
-            execution.formatProcess!.args,
-            orderedEquals([
-              'run',
-              'dart_style:format',
-              '--language-version=3.0',
-              '.',
-            ]),
-          );
-          expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
-        },
-      );
+      test('dart_style:format uses configured language version for dart_style >=3.0.0', () {
+        final context = DevToolExecutionContext();
+        final execution = buildExecution(
+          context,
+          formatter: Formatter.dartStyle,
+          languageVersion: '3.0',
+          defaultMode: FormatMode.overwrite,
+          path: 'test/tools/fixtures/format/has_dart_style_v3',
+        );
+        expect(execution.exitCode, isNull);
+        expect(execution.formatProcess!.executable, exe.dart);
+        expect(
+          execution.formatProcess!.args,
+          orderedEquals([
+            'run',
+            'dart_style:format',
+            '--language-version=3.0',
+            '.',
+          ]),
+        );
+        expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
+      });
 
       test('dartFormat with args', () {
         final argParser = FormatTool().toCommand('t').argParser;
@@ -608,11 +602,7 @@ void main() {
         expect(execution.formatProcess!.executable, exe.dart);
         expect(
           execution.formatProcess!.args,
-          orderedEquals([
-            'format',
-            '--language-version=3.0',
-            '.',
-          ]),
+          orderedEquals(['format', '--language-version=3.0', '.']),
         );
         expect(execution.formatProcess!.mode, ProcessStartMode.inheritStdio);
       });
@@ -741,9 +731,8 @@ void main() {
 
     setUp(() {
       argParser = FormatTool().toCommand('test_format').argParser;
-      usageException = DevToolExecutionContext(
-        commandName: 'test_format',
-      ).usageException;
+      usageException = DevToolExecutionContext(commandName: 'test_format')
+          .usageException;
     });
 
     test('--check and --dry-run and --overwrite throws UsageException', () {

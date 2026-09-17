@@ -10,9 +10,8 @@ import 'namespace_collector.dart';
 ///
 /// Throws an ArgumentError if [sourceFileContents] cannot be parsed.
 String organizeDirectives(String sourceFileContents) {
-  final directives = parseString(
-    content: sourceFileContents,
-  ).unit.accept(NamespaceCollector())!;
+  final directives = parseString(content: sourceFileContents).unit
+      .accept(NamespaceCollector())!;
 
   if (directives.isEmpty) {
     return sourceFileContents;
